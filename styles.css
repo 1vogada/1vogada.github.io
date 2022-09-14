@@ -1,0 +1,133 @@
+html {
+  background-image: url("https://cdn.discordapp.com/attachments/1004847984921555055/1017143001933430804/peakpx_1.jpg");
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 100%;
+}
+body {
+  margin: auto;
+
+  text-align: center;
+  font-size: 42px;
+  font-family: "Cascadia Code";
+  color: rgb(162, 161, 161);
+  height: 1200px;
+}
+
+.headers {
+  overflow: hidden; 
+  z-index: 999;
+  position: sticky;   
+  top: 0px;
+  left: 0px;
+  bottom: 200px;
+  background-color: hsl(229, 25%, 13%);
+  width: 100%;
+  height: 11.5%;
+
+  margin-top: 0;
+
+  text-align: center;
+
+  font-size: 52px;
+}
+/* ========================  MAIN ====================================*/
+main {
+  height: 90%;
+  min-height: 100%;
+  z-index: 1;
+}
+
+#mid {
+  width: 60%;
+  position: static;
+  z-index: 0;
+  left: 20%;
+  margin: 0 auto;
+  background-color: hsla(222, 30%, 13%, 0.418);
+  height: 100%;
+  backdrop-filter: blur(10px);
+}
+
+footer {
+  background-color: hsl(222, 30%, 13%);
+  vertical-align: bottom;
+  z-index: 998;
+  height: 5%;
+  width: 100%;
+  bottom: 100%;
+
+  position: static;
+}
+
+.sidenav a {
+  position: fixed;
+  left: -198px;
+  transition: 0.4s; 
+  padding: 15px;
+  width: 200px;
+  
+  font-size: 20px;
+  color: white;
+  border-radius: 0 3px 35px 0;
+}
+
+.sidenav a:hover {
+left: 0;
+}
+
+#side1 {
+  top: 600px;
+  background-color: rgb(78, 78, 73);
+}
+
+#side2 {
+  top: 550px;
+  background-color: rgb(65, 65, 73);
+}
+
+#side3 {
+  top: 500px;
+  background-color: rgb(52, 52, 73);
+}
+#side4 {
+  top: 450px;
+  background-color: rgb(39, 39, 73);
+}
+#side5 {
+  top: 400px;
+  background-color: rgb(26, 26, 75);
+}
+#side6 {
+  top: 350px;
+  background-color: rgb(13, 13, 73);
+}
+
+.title {
+  margin: auto;
+
+  font-size: 28px;
+}
+nav {
+  font-size: 24px;
+}
+.text {
+  font-size: 20px;
+}
+.navPart {
+
+  color: hsl(222, 40%, 22%);
+  height: 3px;
+  background-color: hsl(225, 23%, 14%);
+  border-color: hsl(223, 33%, 29%);
+
+}
+a,
+a:visited,
+a:active {
+  color: rgb(162, 161, 161);
+}
+a:hover {
+  color: white;
+}
