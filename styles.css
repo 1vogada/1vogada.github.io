@@ -4,14 +4,16 @@ html {
   background-repeat: no-repeat;
   background-size: cover;
   width: 100%;
+  
 }
+@import url("https://cdn.jsdelivr.net/npm/@xz/fonts@1/serve/cascadia-code.min.css");
 
 body {
   margin: auto;
 
   text-align: center;
   font-size: 42px;
-  font-family: "Cascadia Code";
+  font-family: 'Cascadia Code', sans-serif;
   color: rgb(255, 255, 255);
   height: 1200px;
   
