@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>kiripad.dev · Projects</title>
 <meta name="description" content="kiripad.dev: an index of Ivo's projects, games and experiments.">
+<meta property="og:title" content="kiripad.dev · Projects">
+<meta property="og:description" content="Games, tools and experiments by Ivo.">
+<meta name="theme-color" content="#2f5d50">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f5d50'/%3E%3Ctext x='16' y='22.5' font-family='Arial,sans-serif' font-size='18' font-weight='700' fill='white' text-anchor='middle'%3Ek%3C/text%3E%3C/svg%3E">
 <script>
   try { if (localStorage.getItem('kiripad-mode') === 'crazy') document.documentElement.classList.add('crazy'); } catch (e) {}
 </script>
@@ -28,7 +32,11 @@
   header.top .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
   .brand { font-weight: 650; letter-spacing: -0.01em; color: var(--text); text-decoration: none; font-size: 1.05rem; }
   .brand span { color: var(--muted); font-weight: 400; margin-left: 8px; font-size: .9rem; }
+  .navlink { color: var(--muted); text-decoration: none; font-size: .9rem; }
+  .navlink:hover { color: var(--text); }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
   .hero { padding: 56px 0 28px; }
+  @media (max-width: 600px) { .hero { padding: 36px 0 16px; } .hero p { font-size: 1rem; } }
   .hero h1 { font-size: clamp(1.8rem, 4.5vw, 2.6rem); line-height: 1.15; letter-spacing: -0.02em; margin: 0 0 12px; }
   .hero p { color: var(--muted); max-width: 620px; margin: 0; font-size: 1.05rem; }
   .meta { color: var(--muted); font-size: .85rem; margin: 22px 0 0; }
@@ -36,7 +44,9 @@
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 18px 16px;
           display: flex; flex-direction: column; gap: 6px; transition: border-color .15s, transform .15s; }
   .card:hover { border-color: var(--accent); transform: translateY(-1px); }
-  .card h2 { margin: 0; font-size: 1.05rem; font-weight: 600; }
+  .card h2 { margin: 0; font-size: 1.05rem; font-weight: 600; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .pill { font-size: .7rem; font-weight: 500; color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 1px 8px; }
+  .card p.none { font-style: italic; opacity: .8; }
   .card h2 a { color: var(--text); text-decoration: none; }
   .card h2 a:hover { color: var(--accent); }
   .card p { margin: 0; color: var(--muted); font-size: .92rem; flex: 1; }
@@ -106,6 +116,7 @@
   <header class="top calm-only">
     <div class="wrap">
       <a class="brand" href="/">kiripad.dev<span>霧 · мъгла</span></a>
+      <a class="navlink" href="https://github.com/1vogada">GitHub</a>
     </div>
   </header>
   <section class="hero calm-only">
@@ -180,8 +191,8 @@
         ${p.code && p.code !== p.url ? `<a class="src" href="${esc(p.code)}">📦 source code (open source!!)</a>` : ''}
       </div>` : `
       <div class="card">
-        <h2><a href="${esc(p.url)}">${esc(p.name)}</a></h2>
-        <p>${esc(p.description || 'No description yet.')}</p>
+        <h2><a href="${esc(p.url)}">${esc(p.name)}</a>${/^https:\/\/github\.com\//.test(p.url) ? '<span class="pill">code only</span>' : ''}</h2>
+        <p${p.description ? '' : ' class="none"'}>${esc(p.description || 'No description yet.')}</p>
         <div class="links">
           <a href="${esc(p.url)}">${esc(host(p.url))}</a>
           ${p.code && p.code !== p.url ? `<a href="${esc(p.code)}">Source</a>` : ''}
