@@ -1,12 +1,17 @@
-// Finds every repo of the owner whose GitHub Pages site has a *.kiripad.dev
-// custom domain, skips CA ones, and writes projects.json.
-// Needs KIRIPAD_TOKEN (fine-grained PAT: all repos, Metadata + Pages read) to see private repos.
+// Builds projects.json: every fun or useful repo of the owner, CA excluded.
+// - repo whose Pages site has a *.kiripad.dev domain -> that subdomain
+// - repo with Pages but no own domain -> https://kiripad.dev/<repo>/
+// - public repo without Pages -> its GitHub page
+// Private repos without a site are skipped (the list is public).
+// Needs KIRIPAD_TOKEN (fine-grained PAT: all repos, Metadata + Pages read) to see private repos
+// and custom domains; without it, entries it can't see are kept from the previous run.
 import { writeFileSync, readFileSync } from 'node:fs';
 
 const OWNER = '1vogada';
 const DOMAIN = 'kiripad.dev';
-const token = process.env.KIRIPAD_TOKEN || process.env.GITHUB_TOKEN;
-const hasPat = Boolean(process.env.KIRIPAD_TOKEN);
+// Not projects: the directory itself, internal plumbing, the old copy of Cybertale.
+const SKIP = new Set(['1vogada.github.io', 'hive-plugins', 'test', 'claude-skills', 'claude-handoff', 'DSH-Test']);
+const token = process.env.KIRIPAD_TOKEN;
 const isCa = (s) => /(^|[-_.])ca($|[-_.])|ca-?reborn/i.test(s);
 
 async function gh(path) {
@@ -20,7 +25,7 @@ async function gh(path) {
 
 const repos = [];
 for (let page = 1; ; page++) {
-  const list = hasPat
+  const list = token
     ? await gh(`/user/repos?affiliation=owner&per_page=100&page=${page}`)
     : await gh(`/users/${OWNER}/repos?per_page=100&page=${page}`);
   if (!list || !list.length) break;
@@ -29,21 +34,28 @@ for (let page = 1; ; page++) {
 
 const found = [];
 for (const repo of repos) {
-  if (repo.owner.login !== OWNER || !repo.has_pages || repo.archived || isCa(repo.name)) continue;
-  const pages = await gh(`/repos/${OWNER}/${repo.name}/pages`);
-  const cname = pages?.cname?.toLowerCase();
-  if (!cname || cname === DOMAIN || !cname.endsWith(`.${DOMAIN}`) || isCa(cname)) continue;
-  found.push({ name: repo.name, url: `https://${cname}/`, description: repo.description || '' });
+  if (repo.owner.login !== OWNER || repo.fork || repo.archived || SKIP.has(repo.name) || isCa(repo.name)) continue;
+  let url = null;
+  if (repo.has_pages) {
+    const pages = token ? await gh(`/repos/${OWNER}/${repo.name}/pages`) : null;
+    const cname = pages?.cname?.toLowerCase();
+    if (cname && isCa(cname)) continue;
+    url = cname && cname.endsWith(DOMAIN) ? `https://${cname}/` : `https://${DOMAIN}/${repo.name}/`;
+  } else if (!repo.private) {
+    url = repo.html_url;
+  }
+  if (!url) continue;
+  found.push({ name: repo.name, url, description: repo.description || '', code: repo.private ? null : repo.html_url });
 }
 
-// Without a PAT, private repos are invisible: keep what was listed before instead of dropping it.
-if (!hasPat) {
-  const old = JSON.parse(readFileSync('projects.json', 'utf8')).projects;
-  for (const p of old) if (!found.some((f) => f.url === p.url) && !isCa(p.name)) found.push(p);
+// Keep entries this run could not see (private repos without a token, or hand-added ones).
+const prev = JSON.parse(readFileSync('projects.json', 'utf8'));
+const seen = new Set(repos.map((r) => r.name));
+for (const p of prev.projects) {
+  if (!found.some((f) => f.name === p.name) && (!seen.has(p.name) || !token) && !isCa(p.name) && !SKIP.has(p.name)) found.push(p);
 }
 
 found.sort((a, b) => a.name.localeCompare(b.name));
-const prev = JSON.parse(readFileSync('projects.json', 'utf8'));
 if (JSON.stringify(prev.projects) === JSON.stringify(found)) {
   console.log('no change');
 } else {
