@@ -64,7 +64,7 @@
 
   <div class="reviews">
     <h2 style="text-align:center">💬 What People Are Saying 💬</h2>
-    <div class="rev">"Боклук." ⭐⭐⭐⭐⭐ <br><small>— a real Bulgarian, verified</small></div>
+    <div class="rev">боклук бе брат кво е тва изобщо ии ли го е правил некфи ии саит ли е игра ли е нищо не разбрах ама цъкнах 5 звезди щото ме мързи да чета 😂😂 ⭐⭐⭐⭐⭐ <br><small>гошо от пловдив истински булгарин потвърден</small></div>
     <div class="rev">"As an AI language model, I cannot express how revolutionary this is." ⭐⭐⭐⭐⭐ <br><small>— ChatBot 9000</small></div>
     <div class="rev">"I have no idea what this website is." ⭐⭐⭐⭐⭐ <br><small>— my mom</small></div>
   </div>
@@ -87,6 +87,9 @@
         <span class="u">${esc(p.url.replace(/^https:\/\//, '').replace(/\/$/, ''))}</span>
       </a>`).join('') : '<p>🤔 No projects yet. The AI is thinking.</p>';
   }).catch(() => { document.getElementById('grid').innerHTML = '<p>💥 Oops! Our AI hallucinated. Try again.</p>'; });
+  // scrolling browser-tab title
+  let t = '✨🚀 KIRIPAD.DEV 🚀 Revolutionizing The Future With AI-Powered Synergy 🤖 100% CERTIFIED SLOP 🥣 ';
+  setInterval(() => { t = t.slice(1) + t[0]; document.title = t; }, 180);
 </script>
 </body>
 </html>
