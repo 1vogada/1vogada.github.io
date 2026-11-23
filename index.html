@@ -1,75 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="styles/mainStyle.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xz/fonts@1/serve/cascadia-code.min.css">
-    <title>Ivo Petkov's Homepage</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✨ KIRIPAD.DEV ✨ | 🚀 Revolutionizing The Future Of Projects With AI-Powered Synergy 🚀</title>
+<meta name="description" content="Unlock the full potential of your digital journey with kiripad.dev">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 16px;
+    font-family: "Comic Sans MS", "Comic Neue", "Papyrus", cursive;
+    color: #fff;
+    background: linear-gradient(127deg, #ff00cc, #3333ff, #00ffcc, #ffcc00, #ff00cc);
+    background-size: 600% 600%;
+    animation: slop 8s ease infinite;
+    min-height: 100vh;
+    text-shadow: 2px 2px 0 #000, -1px -1px 0 #f0f;
+  }
+  @keyframes slop { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  @keyframes wobble { 0%,100%{transform:rotate(-2deg) scale(1)} 50%{transform:rotate(2deg) scale(1.04)} }
+  @keyframes blink { 50% { opacity: 0.2; } }
+  h1 { font-size: clamp(2.2rem, 9vw, 5.5rem); text-align: center; margin: 10px 0; animation: wobble 2.3s infinite;
+       background: linear-gradient(90deg, gold, hotpink, cyan, lime); -webkit-background-clip: text; background-clip: text;
+       -webkit-text-fill-color: transparent; text-shadow: none; filter: drop-shadow(4px 4px 0 #000); }
+  .tag { text-align: center; font-size: 1.3rem; font-style: italic; }
+  .marq { background: yellow; color: red; font-weight: 900; padding: 6px; border: 4px dashed lime; overflow: hidden; white-space: nowrap; text-shadow: none; margin: 14px 0; }
+  .marq span { display: inline-block; padding-left: 100%; animation: run 14s linear infinite; }
+  @keyframes run { to { transform: translateX(-100%); } }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 22px; max-width: 1100px; margin: 26px auto; }
+  .card { background: rgba(255,255,255,0.18); backdrop-filter: blur(9px); border: 5px ridge gold; border-radius: 30px 4px 30px 4px;
+          padding: 20px; box-shadow: 0 0 30px #0ff, 10px 10px 0 #f0f; transition: transform .2s; color: #fff; text-decoration: none; display: block; }
+  .card:hover { transform: rotate(-3deg) scale(1.08); box-shadow: 0 0 60px #ff0, -10px 10px 0 #0f0; }
+  .card h2 { margin: 0 0 6px; font-size: 2rem; }
+  .card .u { font-family: "Courier New", monospace; background: #000; color: #0f0; padding: 2px 6px; display: inline-block; text-shadow: none; word-break: break-all; }
+  .badge { display: inline-block; background: red; color: #fff; font-size: .75rem; padding: 2px 8px; border-radius: 99px; animation: blink 1s infinite; margin-left: 6px; vertical-align: middle; }
+  .stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin: 20px 0; }
+  .stat { background: #000a; border: 3px solid cyan; padding: 10px 16px; border-radius: 14px; text-align: center; }
+  .stat b { display: block; font-size: 1.8rem; color: gold; }
+  .reviews { max-width: 800px; margin: 30px auto; }
+  .rev { background: #fff; color: #222; text-shadow: none; border-radius: 16px; padding: 12px 16px; margin: 10px 0; border-left: 10px solid hotpink; }
+  footer { text-align: center; font-size: .8rem; margin-top: 40px; opacity: .9; }
+  .cta { display: block; margin: 20px auto; padding: 18px 26px; font-size: 1.4rem; font-family: inherit; font-weight: 900; color: #fff;
+         background: linear-gradient(45deg, #f0f, #f80); border: 4px outset gold; border-radius: 999px; cursor: pointer; animation: wobble 1.4s infinite; }
+</style>
 </head>
-
 <body>
-    <header class="headers">
-        Homepage
-        <nav>
-            <hr class="navPart">
-            <a href="index.html">Homepage</a> | <a href="profile.html">My Profile</a> | <a
-                href="dashboard.html">Dashboard</a> | <a href="faq.html">FAQ Page</a> | <a href="blog.html">Blog</a>
-            <hr class="navPart">
-        </nav>
-    </header>
+  <h1>✨🌫️ KIRIPAD.DEV 🌫️✨</h1>
+  <p class="tag">🤖 Where Innovation Meets Imagination™ — Leveraging Cutting-Edge Paradigms To Empower Tomorrow's Digital Ecosystem, Today 💡🔥</p>
 
-    <div class="sidenav">
-        <a id="side1"
-            href="https://hz.nl/uploads/documents/1.4-Over-de-HZ/1.4.3.-Regelingen-en-documenten/EN/6.-Regulations-Study-Programmes/CER-HZ-Bachelor-full-time-2022-2023-DEF-June-13.pdf"
-            target="_blank">Course Regulations</a>
-        <a id="side2"
-            href="https://hz.nl/uploads/documents/1.4-Over-de-HZ/1.4.3.-Regelingen-en-documenten/OERS/2022-2023/IR-CER-HZ-B-HBO-ICT-full-time-2022-2023-DEF.pdf"
-            target="_blank">Implementation Regulations</a>
-        <a id="side3"
-            href="https://glaze-donut-5a5.notion.site/Assignment-Specification-661c5ac5d7494328a58be61d00dd41e4"
-            target="blank">Assignment Specifications</a>
-        <a id="side4"
-            href="https://teams.microsoft.com/?lm=deeplink&lmsrc=NeutralHomePageWeb&cmpid=WebSignIn&culture=en-us&country=us#/school/conversations/General?threadId=19:827654897ab746089c081f24aff1c984@thread.skype&ctx=channel"
-            target="_blank">HBO-ICT Teams Group</a>
-        <a id="side5" href="https://hz.osiris-student.nl/#/voortgang/" target="_blank">Study Progress Redirect</a>
-        <a id="side6" href="https://github.com/HZ-HBO-ICT" target="_blank">GitHub section for HZ-ICT</a>
-    </div>
+  <div class="marq"><span>🚨 BREAKING: 100% AI GENERATED 🚨 NO HUMANS WERE CONSULTED 🚨 BLAZINGLY FAST 🚀 WEB 3.0 READY 🔗 QUANTUM-SAFE (probably) ⚛️ DELVING INTO THE TAPESTRY OF YOUR DIGITAL JOURNEY 🧵 CERTIFIED SLOP 🥣</span></div>
 
-    <main>
-        <div id="mid">
-            <article>
-                <h1 class="title">
-                    Hello and welcome to my homepage!
-                </h1>
-                <p class="text">
-                    This site will be all about me and the university I go to.
-                </p>
-                <p class="text">
-                    That includes the grades I recieve, things I am interested in, companies that I like, games that I
-                    like and more!
-                </p>
-                <img src="images/gad.bmp" alt="gada" class="imgRound">
-                <img src="images/hz-logo.svg" alt="hz logo"
-                    style="margin-top:100px;background-color:rgba(255, 255, 255, 0.253)smoke;height: 200px;width: auto;">
-            </article>
+  <div class="stats">
+    <div class="stat"><b id="count">∞</b>Revolutionary Projects 🚀</div>
+    <div class="stat"><b>110%</b>Synergy 🤝</div>
+    <div class="stat"><b>0</b>Humans Involved 🤖</div>
+    <div class="stat"><b>☁️</b>Cloud Native Fog 🌫️</div>
+  </div>
 
-            <article>
-                <ul class="text" style="list-style-type: none;">
-                    <li> <a href="https://www.youtube.com/channel/UCLBMqe1zNme5nxwNpy-2zgw/videos" target="blank"
-                            style="color:whitesmoke">My Youtube Channel</a></li>
-                    <li> <a href="https://steamcommunity.com/id/ivogada" target="blank" style="color:whitesmoke">My
-                            Steam Profile</a></li>
-                </ul>
-            </article>
-        </div>
-    </main>
+  <h2 style="text-align:center">🌟 Our Game-Changing Portfolio 🌟</h2>
+  <div class="grid" id="grid"><p style="text-align:center">⏳ Harnessing AI to load projects...</p></div>
 
-    <footer>
-        > Made by Ivo - ✉ ivopetkovbusiness@gmail.com
-    </footer>
+  <button class="cta" onclick="this.textContent='🎉 Thank you for your engagement! 🎉'">🔥 UNLOCK YOUR POTENTIAL NOW 🔥</button>
+
+  <div class="reviews">
+    <h2 style="text-align:center">💬 What People Are Saying 💬</h2>
+    <div class="rev">"Боклук." ⭐⭐⭐⭐⭐ <br><small>— a real Bulgarian, verified</small></div>
+    <div class="rev">"As an AI language model, I cannot express how revolutionary this is." ⭐⭐⭐⭐⭐ <br><small>— ChatBot 9000</small></div>
+    <div class="rev">"I have no idea what this website is." ⭐⭐⭐⭐⭐ <br><small>— my mom</small></div>
+  </div>
+
+  <footer>© 2026 kiripad.dev 🌫️ 霧 · мъгла · Crafted with ❤️ and 3,000,000 tokens. List auto-updated by an AI agent <span id="upd"></span>.</footer>
+
+<script>
+  const hype = ['🔥 HOT', '✨ NEW', '🚀 VIRAL', '💎 PREMIUM', '🤖 AI'];
+  const blurbs = ['A paradigm-shifting solution that redefines what\'s possible.', 'Seamlessly empowering users across the digital landscape.',
+                  'Unleash the power of next-gen synergy.', 'It\'s not just an app. It\'s a movement.'];
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  fetch('projects.json', { cache: 'no-store' }).then((r) => r.json()).then((data) => {
+    const grid = document.getElementById('grid');
+    document.getElementById('count').textContent = data.projects.length;
+    document.getElementById('upd').textContent = '(last delve: ' + new Date(data.updated).toLocaleString() + ')';
+    grid.innerHTML = data.projects.length ? data.projects.map((p, i) => `
+      <a class="card" href="${esc(p.url)}">
+        <h2>🚀 ${esc(p.name)} <span class="badge">${hype[i % hype.length]}</span></h2>
+        <p>${esc(p.description || '')} ${blurbs[i % blurbs.length]}</p>
+        <span class="u">${esc(p.url.replace(/^https:\/\//, '').replace(/\/$/, ''))}</span>
+      </a>`).join('') : '<p>🤔 No projects yet. The AI is thinking.</p>';
+  }).catch(() => { document.getElementById('grid').innerHTML = '<p>💥 Oops! Our AI hallucinated. Try again.</p>'; });
+</script>
 </body>
-
 </html>
