@@ -3,12 +3,60 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>✨ KIRIPAD.DEV ✨ | 🚀 Revolutionizing The Future Of Projects With AI-Powered Synergy 🚀</title>
-<meta name="description" content="Unlock the full potential of your digital journey with kiripad.dev">
+<title>kiripad.dev · Projects</title>
+<meta name="description" content="kiripad.dev: an index of Ivo's projects, games and experiments.">
+<script>
+  try { if (localStorage.getItem('kiripad-mode') === 'crazy') document.documentElement.classList.add('crazy'); } catch (e) {}
+</script>
 <style>
+  /* ---------- normal mode (default) ---------- */
+  :root {
+    --bg: #fafaf9; --surface: #ffffff; --text: #1c1917; --muted: #6b6560; --border: #e7e5e4;
+    --accent: #2f5d50; --accent-soft: #e8f0ed;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #141413; --surface: #1d1c1b; --text: #ecebe8; --muted: #a19d97; --border: #2e2c2a;
+            --accent: #8fc1ae; --accent-soft: #1f2b27; }
+  }
   * { box-sizing: border-box; }
   body {
-    margin: 0; padding: 16px;
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+  header.top { border-bottom: 1px solid var(--border); background: var(--surface); }
+  header.top .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .brand { font-weight: 650; letter-spacing: -0.01em; color: var(--text); text-decoration: none; font-size: 1.05rem; }
+  .brand span { color: var(--muted); font-weight: 400; margin-left: 8px; font-size: .9rem; }
+  .hero { padding: 56px 0 28px; }
+  .hero h1 { font-size: clamp(1.8rem, 4.5vw, 2.6rem); line-height: 1.15; letter-spacing: -0.02em; margin: 0 0 12px; }
+  .hero p { color: var(--muted); max-width: 620px; margin: 0; font-size: 1.05rem; }
+  .meta { color: var(--muted); font-size: .85rem; margin: 22px 0 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin: 24px 0 48px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 18px 16px;
+          display: flex; flex-direction: column; gap: 6px; transition: border-color .15s, transform .15s; }
+  .card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .card h2 { margin: 0; font-size: 1.05rem; font-weight: 600; }
+  .card h2 a { color: var(--text); text-decoration: none; }
+  .card h2 a:hover { color: var(--accent); }
+  .card p { margin: 0; color: var(--muted); font-size: .92rem; flex: 1; }
+  .card .links { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; font-size: .85rem; }
+  .card .links a { color: var(--accent); text-decoration: none; word-break: break-all; }
+  .card .links a:hover { text-decoration: underline; }
+  .credits { border-top: 1px solid var(--border); padding: 22px 0; color: var(--muted); font-size: .9rem; }
+  footer.bottom { border-top: 1px solid var(--border); padding: 22px 0 32px; color: var(--muted); font-size: .85rem; }
+  footer.bottom .wrap { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; }
+  .toggle { font: inherit; font-size: .85rem; color: var(--muted); background: transparent; border: 1px solid var(--border);
+            border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+  .toggle:hover { color: var(--text); border-color: var(--muted); }
+  .slop-only { display: none; }
+
+  /* ---------- crazy mode (opt-in) ---------- */
+  html.crazy .calm-only { display: none; }
+  html.crazy .slop-only { display: block; }
+  html.crazy .stats.slop-only { display: flex; }
+  html.crazy body {
+    padding: 16px;
     font-family: "Comic Sans MS", "Comic Neue", "Papyrus", cursive;
     color: #fff;
     background: linear-gradient(127deg, #ff00cc, #3333ff, #00ffcc, #ffcc00, #ff00cc);
@@ -20,81 +68,156 @@
   @keyframes slop { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
   @keyframes wobble { 0%,100%{transform:rotate(-2deg) scale(1)} 50%{transform:rotate(2deg) scale(1.04)} }
   @keyframes blink { 50% { opacity: 0.2; } }
-  h1 { font-size: clamp(2.2rem, 9vw, 5.5rem); text-align: center; margin: 10px 0; animation: wobble 2.3s infinite;
+  html.crazy h1.slop { font-size: clamp(2.2rem, 9vw, 5.5rem); text-align: center; margin: 10px 0; animation: wobble 2.3s infinite;
        background: linear-gradient(90deg, gold, hotpink, cyan, lime); -webkit-background-clip: text; background-clip: text;
        -webkit-text-fill-color: transparent; text-shadow: none; filter: drop-shadow(4px 4px 0 #000); }
-  .tag { text-align: center; font-size: 1.3rem; font-style: italic; }
-  .marq { background: yellow; color: red; font-weight: 900; padding: 6px; border: 4px dashed lime; overflow: hidden; white-space: nowrap; text-shadow: none; margin: 14px 0; }
-  .marq span { display: inline-block; padding-left: 100%; animation: run 14s linear infinite; }
+  html.crazy .tag { text-align: center; font-size: 1.3rem; font-style: italic; }
+  html.crazy .marq { background: yellow; color: red; font-weight: 900; padding: 6px; border: 4px dashed lime; overflow: hidden; white-space: nowrap; text-shadow: none; margin: 14px 0; }
+  html.crazy .marq span { display: inline-block; padding-left: 100%; animation: run 14s linear infinite; }
   @keyframes run { to { transform: translateX(-100%); } }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 22px; max-width: 1100px; margin: 26px auto; }
-  .card { background: rgba(255,255,255,0.18); backdrop-filter: blur(9px); border: 5px ridge gold; border-radius: 30px 4px 30px 4px;
-          padding: 20px; box-shadow: 0 0 30px #0ff, 10px 10px 0 #f0f; transition: transform .2s; color: #fff; text-decoration: none; display: block; }
-  .card:hover { transform: rotate(-3deg) scale(1.08); box-shadow: 0 0 60px #ff0, -10px 10px 0 #0f0; }
-  .card h2 { margin: 0 0 6px; font-size: 2rem; }
-  .card a { color: #fff; }
-  .src { display: block; margin-top: 10px; color: yellow !important; font-weight: 900; }
-  .card .u { font-family: "Courier New", monospace; background: #000; color: #0f0; padding: 2px 6px; display: inline-block; text-shadow: none; word-break: break-all; }
-  .badge { display: inline-block; background: red; color: #fff; font-size: .75rem; padding: 2px 8px; border-radius: 99px; animation: blink 1s infinite; margin-left: 6px; vertical-align: middle; }
-  .stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin: 20px 0; }
-  .stat { background: #000a; border: 3px solid cyan; padding: 10px 16px; border-radius: 14px; text-align: center; }
-  .stat b { display: block; font-size: 1.8rem; color: gold; }
-  .reviews { max-width: 800px; margin: 30px auto; }
-  .rev { background: #fff; color: #222; text-shadow: none; border-radius: 16px; padding: 12px 16px; margin: 10px 0; border-left: 10px solid hotpink; }
-  footer { text-align: center; font-size: .8rem; margin-top: 40px; opacity: .9; }
-  .cta { display: block; margin: 20px auto; padding: 18px 26px; font-size: 1.4rem; font-family: inherit; font-weight: 900; color: #fff;
+  html.crazy .wrap { max-width: none; padding: 0; }
+  html.crazy .grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 22px; max-width: 1100px; margin: 26px auto; }
+  html.crazy .card { background: rgba(255,255,255,0.18); backdrop-filter: blur(9px); border: 5px ridge gold; border-radius: 30px 4px 30px 4px;
+          padding: 20px; box-shadow: 0 0 30px #0ff, 10px 10px 0 #f0f; transition: transform .2s; color: #fff; display: block; }
+  html.crazy .card:hover { transform: rotate(-3deg) scale(1.08); box-shadow: 0 0 60px #ff0, -10px 10px 0 #0f0; }
+  html.crazy .card h2 { margin: 0 0 6px; font-size: 2rem; }
+  html.crazy .card a, html.crazy .card h2 a { color: #fff; }
+  html.crazy .card p { color: #fff; font-size: 1rem; margin: 1em 0; }
+  html.crazy .src { display: block; margin-top: 10px; color: yellow !important; font-weight: 900; }
+  html.crazy .card .u { font-family: "Courier New", monospace; background: #000; color: #0f0; padding: 2px 6px; display: inline-block; text-shadow: none; word-break: break-all; }
+  html.crazy .badge { display: inline-block; background: red; color: #fff; font-size: .75rem; padding: 2px 8px; border-radius: 99px; animation: blink 1s infinite; margin-left: 6px; vertical-align: middle; }
+  html.crazy .stats { flex-wrap: wrap; justify-content: center; gap: 14px; margin: 20px 0; }
+  html.crazy .stat { background: #000a; border: 3px solid cyan; padding: 10px 16px; border-radius: 14px; text-align: center; }
+  html.crazy .stat b { display: block; font-size: 1.8rem; color: gold; }
+  html.crazy .reviews { max-width: 800px; margin: 30px auto; }
+  html.crazy .rev { background: #fff; color: #222; text-shadow: none; border-radius: 16px; padding: 12px 16px; margin: 10px 0; border-left: 10px solid hotpink; }
+  html.crazy footer.bottom { border: 0; text-align: center; font-size: .8rem; margin-top: 40px; opacity: .9; color: #fff; }
+  html.crazy footer.bottom .wrap { justify-content: center; flex-direction: column; }
+  html.crazy .cta { display: block; margin: 20px auto; padding: 18px 26px; font-size: 1.4rem; font-family: inherit; font-weight: 900; color: #fff;
          background: linear-gradient(45deg, #f0f, #f80); border: 4px outset gold; border-radius: 999px; cursor: pointer; animation: wobble 1.4s infinite; }
+  html.crazy .toggle { font-family: inherit; font-size: 1rem; color: #000; background: lime; border: 4px dashed hotpink; text-shadow: none; font-weight: 900; }
+  html.crazy .shout { text-align: center; font-size: 1.2rem; }
+  html.crazy .slop-h2 { text-align: center; }
+  @media (prefers-reduced-motion: reduce) { html.crazy * { animation: none !important; } }
 </style>
 </head>
 <body>
-  <h1>✨🌫️ KIRIPAD.DEV 🌫️✨</h1>
-  <p class="tag">🤖 Where Innovation Meets Imagination™ — Leveraging Cutting-Edge Paradigms To Empower Tomorrow's Digital Ecosystem, Today 💡🔥</p>
+  <!-- normal header -->
+  <header class="top calm-only">
+    <div class="wrap">
+      <a class="brand" href="/">kiripad.dev<span>霧 · мъгла</span></a>
+    </div>
+  </header>
+  <section class="hero calm-only">
+    <div class="wrap">
+      <h1>Projects</h1>
+      <p>Games, tools and experiments by Ivo. Each one lives on its own kiripad.dev address or links to its source code.</p>
+      <p class="meta"><span id="count-calm">…</span> projects · list updated automatically <span id="upd-calm"></span></p>
+    </div>
+  </section>
 
-  <div class="marq"><span>🚨 BREAKING: 100% AI GENERATED 🚨 NO HUMANS WERE CONSULTED 🚨 BLAZINGLY FAST 🚀 WEB 3.0 READY 🔗 QUANTUM-SAFE (probably) ⚛️ DELVING INTO THE TAPESTRY OF YOUR DIGITAL JOURNEY 🧵 CERTIFIED SLOP 🥣</span></div>
-
-  <div class="stats">
+  <!-- crazy header -->
+  <div class="slop-only">
+    <h1 class="slop">✨🌫️ KIRIPAD.DEV 🌫️✨</h1>
+    <p class="tag">🤖 Where Innovation Meets Imagination™ — Leveraging Cutting-Edge Paradigms To Empower Tomorrow's Digital Ecosystem, Today 💡🔥</p>
+    <div class="marq"><span>🚨 BREAKING: 100% AI GENERATED 🚨 NO HUMANS WERE CONSULTED 🚨 BLAZINGLY FAST 🚀 WEB 3.0 READY 🔗 QUANTUM-SAFE (probably) ⚛️ DELVING INTO THE TAPESTRY OF YOUR DIGITAL JOURNEY 🧵 CERTIFIED SLOP 🥣</span></div>
+  </div>
+  <div class="stats slop-only">
     <div class="stat"><b id="count">∞</b>Revolutionary Projects 🚀</div>
     <div class="stat"><b>110%</b>Synergy 🤝</div>
     <div class="stat"><b>0</b>Humans Involved 🤖</div>
     <div class="stat"><b>☁️</b>Cloud Native Fog 🌫️</div>
   </div>
+  <h2 class="slop-only slop-h2">🌟 Our Game-Changing Portfolio 🌟</h2>
 
-  <h2 style="text-align:center">🌟 Our Game-Changing Portfolio 🌟</h2>
-  <div class="grid" id="grid"><p style="text-align:center">⏳ Harnessing AI to load projects...</p></div>
+  <main class="wrap">
+    <div class="grid" id="grid"><p>Loading projects…</p></div>
+  </main>
 
-  <button class="cta" onclick="this.textContent='🎉 Thank you for your engagement! 🎉'">🔥 UNLOCK YOUR POTENTIAL NOW 🔥</button>
-
-  <div class="reviews">
-    <h2 style="text-align:center">💬 What People Are Saying 💬</h2>
-    <div class="rev">боклук бе брат кво е тва изобщо ии ли го е правил некфи ии саит ли е игра ли е нищо не разбрах ама цъкнах 5 звезди щото ме мързи да чета 😂😂 ⭐⭐⭐⭐⭐ <br><small>гошо от пловдив истински булгарин потвърден</small></div>
-    <div class="rev">"As an AI language model, I cannot express how revolutionary this is." ⭐⭐⭐⭐⭐ <br><small>— ChatBot 9000</small></div>
-    <div class="rev">"I have no idea what this website is." ⭐⭐⭐⭐⭐ <br><small>— my mom</small></div>
+  <div class="slop-only">
+    <button class="cta" onclick="this.textContent='🎉 Thank you for your engagement! 🎉'">🔥 UNLOCK YOUR POTENTIAL NOW 🔥</button>
+    <div class="reviews">
+      <h2 style="text-align:center">💬 What People Are Saying 💬</h2>
+      <div class="rev">боклук бе брат кво е тва изобщо ии ли го е правил некфи ии саит ли е игра ли е нищо не разбрах ама цъкнах 5 звезди щото ме мързи да чета 😂😂 ⭐⭐⭐⭐⭐ <br><small>гошо от пловдив истински булгарин потвърден</small></div>
+      <div class="rev">"As an AI language model, I cannot express how revolutionary this is." ⭐⭐⭐⭐⭐ <br><small>— ChatBot 9000</small></div>
+      <div class="rev">"I have no idea what this website is." ⭐⭐⭐⭐⭐ <br><small>— my mom</small></div>
+    </div>
+    <p class="shout">🙏 Massive shoutout to <b>Damyan</b> and <b>Antani</b> for co-creating Cybertale back in 2023 🎮🔥 legends 🐐🐐</p>
   </div>
 
-  <p style="text-align:center;font-size:1.2rem">🙏 Massive shoutout to <b>Damyan</b> and <b>Antani</b> for co-creating Cybertale back in 2023 🎮🔥 legends 🐐🐐</p>
+  <section class="credits calm-only">
+    <div class="wrap">Cybertale (2023) was made together with Damyan, Antani and Ivan.</div>
+  </section>
 
-  <footer>© 2026 kiripad.dev 🌫️ 霧 · мъгла · Crafted with ❤️ and 3,000,000 tokens. List auto-updated by an AI agent <span id="upd"></span>.</footer>
+  <footer class="bottom">
+    <div class="wrap">
+      <span class="calm-only">© 2026 kiripad.dev</span>
+      <span class="slop-only">© 2026 kiripad.dev 🌫️ 霧 · мъгла · Crafted with ❤️ and 3,000,000 tokens. List auto-updated by an AI agent <span id="upd"></span>.</span>
+      <button class="toggle" id="toggle" type="button"></button>
+    </div>
+  </footer>
 
 <script>
+  const root = document.documentElement;
   const hype = ['🔥 HOT', '✨ NEW', '🚀 VIRAL', '💎 PREMIUM', '🤖 AI'];
   const blurbs = ['A paradigm-shifting solution that redefines what\'s possible.', 'Seamlessly empowering users across the digital landscape.',
                   'Unleash the power of next-gen synergy.', 'It\'s not just an app. It\'s a movement.'];
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  fetch('projects.json', { cache: 'no-store' }).then((r) => r.json()).then((data) => {
+  const host = (u) => u.replace(/^https:\/\//, '').replace(/\/$/, '');
+  let data = null, failed = false;
+
+  function render() {
     const grid = document.getElementById('grid');
-    document.getElementById('count').textContent = data.projects.length;
-    document.getElementById('upd').textContent = '(last delve: ' + new Date(data.updated).toLocaleString() + ')';
-    grid.innerHTML = data.projects.length ? data.projects.map((p, i) => `
+    const crazy = root.classList.contains('crazy');
+    if (failed) { grid.innerHTML = crazy ? '<p>💥 Oops! Our AI hallucinated. Try again.</p>' : '<p>Could not load the project list. Please refresh.</p>'; return; }
+    if (!data) return;
+    if (!data.projects.length) { grid.innerHTML = crazy ? '<p>🤔 No projects yet. The AI is thinking.</p>' : '<p>No projects yet.</p>'; return; }
+    grid.innerHTML = data.projects.map((p, i) => crazy ? `
       <div class="card">
         <h2><a href="${esc(p.url)}">🚀 ${esc(p.name)}</a> <span class="badge">${hype[i % hype.length]}</span></h2>
         <p>${esc(p.description || '')} ${blurbs[i % blurbs.length]}</p>
-        <a class="u" href="${esc(p.url)}">${esc(p.url.replace(/^https:\/\//, '').replace(/\/$/, ''))}</a>
+        <a class="u" href="${esc(p.url)}">${esc(host(p.url))}</a>
         ${p.code && p.code !== p.url ? `<a class="src" href="${esc(p.code)}">📦 source code (open source!!)</a>` : ''}
-      </div>`).join('') : '<p>🤔 No projects yet. The AI is thinking.</p>';
-  }).catch(() => { document.getElementById('grid').innerHTML = '<p>💥 Oops! Our AI hallucinated. Try again.</p>'; });
-  // scrolling browser-tab title
-  let t = '✨🚀 KIRIPAD.DEV 🚀 Revolutionizing The Future With AI-Powered Synergy 🤖 100% CERTIFIED SLOP 🥣 ';
-  setInterval(() => { t = t.slice(1) + t[0]; document.title = t; }, 180);
+      </div>` : `
+      <div class="card">
+        <h2><a href="${esc(p.url)}">${esc(p.name)}</a></h2>
+        <p>${esc(p.description || 'No description yet.')}</p>
+        <div class="links">
+          <a href="${esc(p.url)}">${esc(host(p.url))}</a>
+          ${p.code && p.code !== p.url ? `<a href="${esc(p.code)}">Source</a>` : ''}
+        </div>
+      </div>`).join('');
+  }
+
+  fetch('projects.json', { cache: 'no-store' }).then((r) => r.json()).then((d) => {
+    data = d;
+    const when = new Date(d.updated);
+    document.getElementById('count').textContent = d.projects.length;
+    document.getElementById('count-calm').textContent = d.projects.length;
+    document.getElementById('upd').textContent = '(last delve: ' + when.toLocaleString() + ')';
+    document.getElementById('upd-calm').textContent = '(last ' + when.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) + ')';
+    render();
+  }).catch(() => { failed = true; render(); });
+
+  // tab title: static in normal mode, scrolling in crazy mode
+  const calmTitle = 'kiripad.dev · Projects';
+  let slopTitle = '✨🚀 KIRIPAD.DEV 🚀 Revolutionizing The Future With AI-Powered Synergy 🤖 100% CERTIFIED SLOP 🥣 ';
+  let titleTimer = null;
+  function applyMode() {
+    const crazy = root.classList.contains('crazy');
+    document.getElementById('toggle').textContent = crazy ? '😴 back to boring mode' : 'Crazy mode';
+    clearInterval(titleTimer);
+    if (crazy) titleTimer = setInterval(() => { slopTitle = slopTitle.slice(1) + slopTitle[0]; document.title = slopTitle; }, 180);
+    else document.title = calmTitle;
+    render();
+  }
+  document.getElementById('toggle').addEventListener('click', () => {
+    const crazy = root.classList.toggle('crazy');
+    try { localStorage.setItem('kiripad-mode', crazy ? 'crazy' : 'normal'); } catch (e) {}
+    applyMode();
+    if (crazy) window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  applyMode();
 </script>
 </body>
 </html>
