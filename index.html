@@ -32,6 +32,8 @@
           padding: 20px; box-shadow: 0 0 30px #0ff, 10px 10px 0 #f0f; transition: transform .2s; color: #fff; text-decoration: none; display: block; }
   .card:hover { transform: rotate(-3deg) scale(1.08); box-shadow: 0 0 60px #ff0, -10px 10px 0 #0f0; }
   .card h2 { margin: 0 0 6px; font-size: 2rem; }
+  .card a { color: #fff; }
+  .src { display: block; margin-top: 10px; color: yellow !important; font-weight: 900; }
   .card .u { font-family: "Courier New", monospace; background: #000; color: #0f0; padding: 2px 6px; display: inline-block; text-shadow: none; word-break: break-all; }
   .badge { display: inline-block; background: red; color: #fff; font-size: .75rem; padding: 2px 8px; border-radius: 99px; animation: blink 1s infinite; margin-left: 6px; vertical-align: middle; }
   .stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin: 20px 0; }
@@ -69,6 +71,8 @@
     <div class="rev">"I have no idea what this website is." ⭐⭐⭐⭐⭐ <br><small>— my mom</small></div>
   </div>
 
+  <p style="text-align:center;font-size:1.2rem">🙏 Massive shoutout to <b>Damyan</b> and <b>Antani</b> for co-creating Cybertale back in 2023 🎮🔥 legends 🐐🐐</p>
+
   <footer>© 2026 kiripad.dev 🌫️ 霧 · мъгла · Crafted with ❤️ and 3,000,000 tokens. List auto-updated by an AI agent <span id="upd"></span>.</footer>
 
 <script>
@@ -81,11 +85,12 @@
     document.getElementById('count').textContent = data.projects.length;
     document.getElementById('upd').textContent = '(last delve: ' + new Date(data.updated).toLocaleString() + ')';
     grid.innerHTML = data.projects.length ? data.projects.map((p, i) => `
-      <a class="card" href="${esc(p.url)}">
-        <h2>🚀 ${esc(p.name)} <span class="badge">${hype[i % hype.length]}</span></h2>
+      <div class="card">
+        <h2><a href="${esc(p.url)}">🚀 ${esc(p.name)}</a> <span class="badge">${hype[i % hype.length]}</span></h2>
         <p>${esc(p.description || '')} ${blurbs[i % blurbs.length]}</p>
-        <span class="u">${esc(p.url.replace(/^https:\/\//, '').replace(/\/$/, ''))}</span>
-      </a>`).join('') : '<p>🤔 No projects yet. The AI is thinking.</p>';
+        <a class="u" href="${esc(p.url)}">${esc(p.url.replace(/^https:\/\//, '').replace(/\/$/, ''))}</a>
+        ${p.code && p.code !== p.url ? `<a class="src" href="${esc(p.code)}">📦 source code (open source!!)</a>` : ''}
+      </div>`).join('') : '<p>🤔 No projects yet. The AI is thinking.</p>';
   }).catch(() => { document.getElementById('grid').innerHTML = '<p>💥 Oops! Our AI hallucinated. Try again.</p>'; });
   // scrolling browser-tab title
   let t = '✨🚀 KIRIPAD.DEV 🚀 Revolutionizing The Future With AI-Powered Synergy 🤖 100% CERTIFIED SLOP 🥣 ';
