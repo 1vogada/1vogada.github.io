@@ -184,12 +184,15 @@
   .katana { position: absolute; left: calc(max(18px, 50vw - 674px) - 130px); bottom: 0; width: 300px; height: 420px; overflow: hidden; pointer-events: none; }
   .katana-in { position: absolute; left: 130px; bottom: 0; width: 40px; height: 300px; transform: translateY(284px); transition: transform .55s cubic-bezier(.3,1.7,.5,1), opacity .2s; touch-action: none; }
   .katana.found { z-index: 3; }
-  .katana.found .katana-in { transform: translateY(190px); pointer-events: auto; cursor: grab; }
+  .katana.found .katana-in { transform: translateY(190px); cursor: grab; }
   .katana.found .katana-in:hover { transform: translateY(180px); }
   .katana-in.pulling { transition: none; }
   .katana.away .katana-in { opacity: 0; pointer-events: none; }
   .katana.away::after { content: ""; position: absolute; left: 136px; bottom: 1px; width: 28px; height: 6px; border-radius: 50%; background: rgba(0,0,0,.4); }
   #phys .katana-body.equipped { cursor: none; }
+  #phys .katana-body, #phys .katana-body.grabbed { box-shadow: none; background: none; border: 0; border-radius: 0; pointer-events: none; }
+  .katana-body svg, .katana-in svg { overflow: visible; }
+  .katana.found .katana-in svg *, #phys .katana-body svg * { pointer-events: auto; }
   #phys .katana-body { width: 40px; height: 300px; filter: drop-shadow(0 6px 8px rgba(0,0,0,.3)); z-index: 2; }
   #phys .katana-body svg, .katana-in svg { display: block; }
   .phys-actions { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: max(16px, env(safe-area-inset-bottom, 0px)); z-index: 45; display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
@@ -977,7 +980,7 @@
       <path d="M16.5 97 L23.5 97 C24.5 165 28 240 36 298 C26 250 18.5 170 16.5 97Z" fill="url(#${id})" stroke="#7b858e" stroke-width=".6"/><path d="M18.3 100 C19.6 170 24 240 33 289" fill="none" stroke="#fff" stroke-width="1" opacity=".9"/>
       <rect x="16" y="89" width="8" height="9" rx="1" fill="#e3c32f"/><ellipse cx="20" cy="86.5" rx="13" ry="4.2" fill="#121214"/>
       <rect x="15" y="4" width="10" height="80" rx="2.5" fill="#17181c"/>${[9, 20, 31, 42, 53, 64, 75].map((y) => `<path d="M20 ${y} l2.6 3.4 l-2.6 3.4 l-2.6 -3.4z" fill="#f1f1ee"/>`).join('')}
-      <rect x="14.5" y="2" width="11" height="5" rx="2" fill="#0d0d0f"/></svg>`;
+      <rect x="14.5" y="2" width="11" height="5" rx="2" fill="#0d0d0f"/><path d="M20 4 L20 97 C22 165 26 240 35 296" fill="none" stroke="transparent" stroke-width="16" stroke-linecap="round"/></svg>`;
     const hero = document.getElementById('hero');
     const kat = document.createElement('div'); kat.className = 'katana';
     kat.innerHTML = `<span class="katana-in" role="img" aria-label="Katana">${katanaSvg('kat-a')}</span>`;
@@ -1010,8 +1013,11 @@
       katIn.classList.add('pulling'); katIn.style.transform = `translateY(${KAT_REST}px)`;
       const r = katIn.getBoundingClientRect(), hx = r.left + r.width / 2 + scrollX, hy = r.top + r.height / 2 + scrollY;
       katObj = addBody({ kind: 'katana', el: katIn, w: 40, h: 300, ex: hx, ey: hy - KAT_REST, grip: 1, root: { x: hx / S, y: hy / S } },
-        hx / S, hy / S, 0, new pl.Box(0.08, 0.52, { x: 0, y: -0.96 }, 0), { density: 2.2, filterCategoryBits: 4, filterMaskBits: 0 });   // the hilt carries most of the weight
-      katObj.body.createFixture({ shape: new pl.Box(0.06, 0.96, { x: 0, y: 0.52 }, 0), density: 0.7, friction: 0.6, restitution: 0.1, filterCategoryBits: 4, filterMaskBits: 0 });
+        hx / S, hy / S, 0, new pl.Box(0.06, 0.48, { x: 0, y: -1.0 }, 0), { density: 2.6, filterCategoryBits: 4, filterMaskBits: 0 });   // the hilt carries most of the weight
+      // the solid parts follow the drawing: grip, round guard, and a thin blade that leans out to the curved tip
+      const part = { friction: 0.6, restitution: 0.1, filterCategoryBits: 4, filterMaskBits: 0 };
+      katObj.body.createFixture({ shape: new pl.Box(0.13, 0.045, { x: 0, y: -0.635 }, 0), density: 2.6, ...part });
+      katObj.body.createFixture({ shape: new pl.Polygon([{ x: -0.035, y: -0.55 }, { x: 0.035, y: -0.55 }, { x: 0.17, y: 1.46 }, { x: 0.12, y: 1.48 }]), density: 1.6, ...part });
     }
     function freeKatana(o) {   // the root tore: from the banner into the world
       const el = document.createElement('div'); el.className = 'phys katana-body'; el.innerHTML = katanaSvg('kat-b'); el._o = o; layer.appendChild(el);
