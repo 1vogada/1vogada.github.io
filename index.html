@@ -735,6 +735,8 @@
       kdrop: ['oops.', 'I meant to do that', 'gravity wins again', 'catch me?!', 'timber!', 'butterfingers', 'おっと', 'опа!'],
       khello: ["hello! I'm the sharpest katana ever!", 'careful: I cut things just by touching them', 'sharpest blade in the world, hi!', "don't touch anything you like with me", '世界一切れる刀です', 'най-острата катана на света, здрасти!'],
       kbrag: ['told you. sharpest ever.', "I didn't even try", 'one touch is all it takes', 'I barely touched it!', 'too sharp, sorry', 'スパッ', 'като масло'],
+      cutting: ['AAAAAAAAA', 'IT IS IN ME', 'STOP STOP STOP', 'NOT THE MIDDLE', 'I CAN FEEL IT', '痛い痛い痛い!!', 'ААААААА!', 'боли боли боли'],
+      stab: ['was I spared???', 'just a flesh wound', "I'm leaking", "that's going to scar", 'it only went in a little', 'you missed. mostly.', 'am I… alive?', 'まだ生きてる…?', 'жив съм?!'],
       kcut: ['whoops, sorry', 'slicing on my way down', 'not my fault', "don't mind me", 'it was in the way'],
       slice: ['ow!!', "I'm in two!", 'medic!', 'half off…', 'clean cut.', 'ай!', '切られた!'],
       smash: ['x_x', '✝', 'worth it', 'tell my repo I loved it'],
@@ -1072,33 +1074,72 @@
     sheatheBtn.addEventListener('click', putBack);
     kat.addEventListener('click', (e) => { if (e.target === kat && kat.classList.contains('away')) putBack(); });
     document.addEventListener('keydown', (e) => { if (e.key !== 'Escape' || !katObj || katObj.root) return; if (grab && grab.sticky) drop(); else putBack(); });
-    // once per frame: the blade is the line from the guard to the tip. In the hand it cuts whatever it touches, at any speed;
-    // loose (dropped, thrown) it has to be moving fast. One touch is one clean cut right across, along the way the blade is moving
+    // once per frame: the blade is the line from the guard to the tip. In the hand it cuts at any speed; loose (dropped, thrown) it has to be moving fast.
+    // A cut has a way in and a way out: the card is opened where the blade first touched it and the cut is made when the blade leaves,
+    // straight between those two points. Until then the card screams. In and out through the same side is a stab: no cut, it bleeds for a while
     const BLADE = [[1, -50], [15, 146]], CUT_SPEED = 700;   // guard end and tip, local px from the katana's centre; px/s
+    const toLocal = (o, q) => { const p = o.body.getPosition(), a = o.body.getAngle(), c = Math.cos(a), s = Math.sin(a), dx = q[0] - p.x * S, dy = q[1] - p.y * S; return [dx * c + dy * s, -dx * s + dy * c]; };
+    const toPage = (o, q) => { const p = o.body.getPosition(), a = o.body.getAngle(), c = Math.cos(a), s = Math.sin(a); return [p.x * S + q[0] * c - q[1] * s, p.y * S + q[0] * s + q[1] * c]; };
+    function edgeOf(poly, q) {   // which side of the outline a point is nearest to
+      let best = 0, bd = Infinity;
+      for (let i = 0; i < poly.length; i++) {
+        const a = poly[i], b = poly[(i + 1) % poly.length], ex = b[0] - a[0], ey = b[1] - a[1], t = Math.max(0, Math.min(1, ((q[0] - a[0]) * ex + (q[1] - a[1]) * ey) / (ex * ex + ey * ey || 1)));
+        const d = Math.hypot(q[0] - a[0] - ex * t, q[1] - a[1] - ey * t); if (d < bd) { bd = d; best = i; }
+      }
+      return best;
+    }
+    let screamed = -1e9;
+    const wounds = [];
     function bladeCuts(dt) {
+      bleed();
       const o = katObj; if (!o || o.root || dt <= 0) return;
       const p = o.body.getPosition(), a = o.body.getAngle(), c = Math.cos(a), s = Math.sin(a);
       const [G, T] = BLADE.map(([x, y]) => [p.x * S + x * c - y * s, p.y * S + x * s + y * c]);
-      const prev = o.tips; o.tips = [G, T]; if (!prev) { o.touch = new Set(); return; }
+      const prev = o.tips; o.tips = [G, T]; if (!prev) { o.open = new Map(); return; }
       const mg = [G[0] - prev[0][0], G[1] - prev[0][1]], mt = [T[0] - prev[1][0], T[1] - prev[1][1]], fast = Math.hypot(mt[0], mt[1]) / dt >= CUT_SPEED;
-      const held = !!grab && grab.o === o, was = o.touch, touch = o.touch = new Set();
+      const held = !!grab && grab.o === o, open = o.open, seen = new Set(), bl = Math.hypot(T[0] - G[0], T[1] - G[1]);
       if (fast) trail(prev[1], T);
-      if (!held && !fast) return;
+      if (!held && !fast && !open.size) return;
       tick++;
-      const bx = T[0] - G[0], by = T[1] - G[1], bl = Math.hypot(bx, by);
       for (const t of targets()) {
         const xs = crossings(t.poly, G, T), gi = inside(t.poly, G[0], G[1]); if (!xs.length && !gi) continue;
-        touch.add(t.key); if (was.has(t.key)) continue;   // still in the same touch: it has to leave before it can cut this one again
-        const e0 = gi ? G : xs[0], e1 = inside(t.poly, T[0], T[1]) ? T : xs[xs.length - 1], m = [(e0[0] + e1[0]) / 2, (e0[1] + e1[1]) / 2];
-        const f = Math.hypot(m[0] - G[0], m[1] - G[1]) / bl; let dx = mg[0] + (mt[0] - mg[0]) * f, dy = mg[1] + (mt[1] - mg[1]) * f, dl = Math.hypot(dx, dy);
-        if (dl / dt < 60) { dx = bx; dy = by; dl = bl; }   // barely moving: the cut runs along the blade itself
-        dx /= dl; dy /= dl;
-        const src = t.o && objs.has(t.o) ? t.o : t.card && !t.card.classList.contains('held') ? freeCard(t.card) : null; if (!src) continue;
-        const parts = slice(src, [m[0] - dx * 20, m[1] - dy * 20], [m[0] + dx * 20, m[1] + dy * 20], [dx, dy])
-          || slice(src, [m[0] - bx / bl * 20, m[1] - by / bl * 20], [m[0] + bx / bl * 20, m[1] + by / bl * 20], [dx, dy]);
-        if (!parts) { touch.add(src); continue; }
-        for (const q of parts) touch.add(q);
-        if (!held) say(o, 'kcut', true); else if (Math.random() < 0.4) say(o, 'kbrag');
+        let rec = open.get(t.key); if (!rec && !held && !fast) continue;
+        const e0 = gi ? G : xs[0], e1 = inside(t.poly, T[0], T[1]) ? T : xs[xs.length - 1], m = [(e0[0] + e1[0]) / 2, (e0[1] + e1[1]) / 2], depth = Math.hypot(e1[0] - e0[0], e1[1] - e0[1]);
+        const f = Math.hypot(m[0] - G[0], m[1] - G[1]) / bl, mv = [mg[0] + (mt[0] - mg[0]) * f, mg[1] + (mt[1] - mg[1]) * f];   // how that spot on the blade moved this frame
+        const here = (q) => t.o ? toLocal(t.o, q) : q;   // a loose card moves while it is being cut: remember the points on the card itself
+        seen.add(t.key);
+        if (!rec) {
+          open.set(t.key, rec = { t, a: here([m[0] - mv[0], m[1] - mv[1]]), depth: -1 });
+          const tm = now(); if (tm - screamed > 700) { screamed = tm; if (t.o) say(t.o, 'cutting', true); else sayAt(m[0], Math.min(...t.poly.map((q) => q[1])) - 34, pick(SAY.cutting)); }
+        }
+        rec.z = here([m[0] + mv[0], m[1] + mv[1]]);
+        if (depth > rec.depth) { rec.depth = depth; rec.w = here(e1); }
+      }
+      for (const [key, rec] of open) if (!seen.has(key)) { open.delete(key); endCut(o, rec, held); }
+    }
+    function endCut(k, rec, held) {
+      const t = rec.t, alive = t.o ? objs.has(t.o) : t.card.isConnected && !t.card.classList.contains('held'); if (!alive) return;
+      const outline = t.o ? (t.o.poly || rectPoly(t.o)).map(([x, y]) => [x - t.o.w / 2, y - t.o.h / 2]) : t.poly;
+      const through = edgeOf(outline, rec.a) !== edgeOf(outline, rec.z) && Math.hypot(rec.z[0] - rec.a[0], rec.z[1] - rec.a[1]) > 24;
+      if (through) {
+        const src = t.o || freeCard(t.card), A = toPage(src, t.o ? rec.a : toLocal(src, rec.a)), B = toPage(src, t.o ? rec.z : toLocal(src, rec.z));
+        if (slice(src, A, B, [B[0] - A[0], B[1] - A[1]])) { if (!held) say(k, 'kcut', true); else if (Math.random() < 0.4) say(k, 'kbrag'); return; }
+        t.o = src; rec.w = t.card ? toLocal(src, rec.w) : rec.w;   // could not be split there after all: it is a wound
+      }
+      // stabbed: in and out through the same side. It keeps its shape, bleeds for a while and has something to say about it
+      wounds.push({ o: t.o, card: t.o ? null : t.card, p: rec.w, until: now() + 2400 + Math.random() * 1200, next: 0 });
+      if (t.o) say(t.o, 'stab', true); else sayAt(rec.w[0], Math.min(...t.poly.map((q) => q[1])) - 34, pick(SAY.stab));
+      run();
+    }
+    function bleed() {
+      const tm = now();
+      for (let i = wounds.length - 1; i >= 0; i--) {
+        const w = wounds[i], ok = w.o ? objs.has(w.o) : w.card.isConnected && !w.card.classList.contains('held');
+        if (!ok || tm > w.until) { wounds.splice(i, 1); continue; }
+        if (tm < w.next) continue; w.next = tm + 70 + Math.random() * 90;
+        const q = w.o ? toPage(w.o, w.p) : w.p, el = document.createElement('i'), sz = 3 + Math.random() * 4; el.className = 'bit';
+        el.style.width = el.style.height = sz.toFixed(1) + 'px'; layer.appendChild(el);
+        bits.push({ el, x: q[0], y: q[1], vx: (Math.random() - 0.5) * 90, vy: -60 - Math.random() * 110, t: 0, life: 0.5 + Math.random() * 0.5 });
       }
     }
 
@@ -1536,6 +1577,7 @@
       clawReset();
       for (const o of [...objs]) remove(o);
       for (const p of bits.splice(0)) p.el.remove();
+      wounds.length = 0;
       kat.classList.remove('away'); sheatheBtn.hidden = true;
       hits.length = 0; blasts.length = 0; ripped.clear(); resetBtn.hidden = true;
       document.querySelectorAll('#grid .card.held').forEach((c) => { c.classList.remove('held'); c.classList.add('regrow'); setTimeout(() => c.classList.replace('regrow', 'settled'), 700); });
