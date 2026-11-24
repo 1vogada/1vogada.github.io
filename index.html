@@ -825,7 +825,7 @@
         const g = grab, o = g.o, b = o.body; grab = null;
         world.destroyJoint(g.joint); html.classList.remove('throwing');
         if (!o.root) {
-          o.el.classList.remove('grabbed', 'equipped'); b.setAngularDamping(SPIN); b.setGravityScale(FALL);
+          o.el.classList.remove('grabbed', 'equipped'); b.setAngularDamping(SPIN); b.setGravityScale(FALL); if (b.isFixedRotation()) b.setFixedRotation(false);
           if (o.kind === 'katana') say(o, 'kdrop', true);
           // a hand slows down in the last few ms before it lets go: throw with the speed it had over the last 80 ms if that was faster
           const t = now(), h = g.h.filter((q) => t - q[2] < 80), a = h[0], z = h[h.length - 1];
@@ -908,7 +908,7 @@
     // begin-contact fires before the solver, so the velocities read here are still the ones the bodies came in with
     function onContact(c) {
       const A = c.getFixtureA().getBody(), B = c.getFixtureB().getBody(), oa = A.getUserData(), ob = B.getUserData();
-      const card = (o) => o && (o.kind === 'card' || (o.kind === 'piece' && !o.die)) && !o.root, hot = (o) => card(o) && (o.hot || (grab && grab.o === o));
+      const card = (o) => o && (o.kind === 'card' || (o.kind === 'piece' && !o.die)) && !o.root, hot = (o) => card(o) && !!o.hot && !(grab && grab.o === o);   // only a card that was thrown breaks things. One in the hand never does: dragging it out of a pile shoves the others hard, and that is not an impact
       const solid = (o) => !o || card(o) || o.kind === 'piece';
       if (!solid(oa) || !solid(ob) || (!card(oa) && !card(ob))) return;   // shards and rooted cards never break anything
       const wm = c.getWorldManifold(null); if (!wm || !wm.points.length) return;
@@ -1034,12 +1034,16 @@
       toast('It cuts whatever the blade touches. Double-click the katana to keep it in hand.'); say(o, 'khello', true);
     }
     // double-click: the katana jumps into the hand by its grip and stays there without holding the button. Double-click again or Esc lets go
+    const EQUIP_ANGLE = Math.PI + 0.5;
     function equip(e) {
       if (!pl || !found || isCrazy()) return;
       init(); if (grab) { if (grab.o !== katObj) return; drop(); }
       if (!katObj) plant();
       if (katObj.root) freeKatana(katObj);
-      const o = katObj, g = o.body.getWorldPoint({ x: 0, y: -1.05 });
+      const o = katObj;
+      // in the hand it is held at one steady angle, blade up and leaning forward, and does not swing
+      o.body.setTransform(o.body.getPosition(), EQUIP_ANGLE); o.body.setFixedRotation(true); o.body.setAngularVelocity(0); o.pa = EQUIP_ANGLE; o.tips = null;
+      const g = o.body.getWorldPoint({ x: 0, y: -1.05 });
       hold(o, g.x * S, g.y * S, { pointerId: -1, clientX: e.clientX, clientY: e.clientY });
       grab.sticky = true; grab.moved = true; o.el.classList.add('equipped'); say(o, 'khello');
       grab.joint.setTarget({ x: (e.clientX + scrollX) / S, y: (e.clientY + scrollY) / S });
