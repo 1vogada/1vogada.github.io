@@ -23,7 +23,7 @@
     --bg: #f7f5f1; --surface: #ffffff; --text: #1d1b19; --muted: #6b655e; --border: #e6e1d9;
     --accent: #c8372d; --accent-soft: #fbe9e6; --ink: #22344f;
     --fog: 244, 242, 238; --sky1: #f4ede3; --sky2: #e9e2f0;
-    --m1: #9aa6bd; --m2: #6d7c99; --m3: #3d4d6a; --snow: #ffffff; --sun: #d9473b; --mist: 206, 212, 226; --far: #c3c8d8; --stars: 0;
+    --m1: #9aa6bd; --m2: #6d7c99; --m3: #3d4d6a; --snow: #ffffff; --sun: #d9473b;
     --shadow: 0 1px 2px rgba(30, 25, 20, .05), 0 6px 18px rgba(30, 25, 20, .06);
     color-scheme: light;
   }
@@ -32,7 +32,7 @@
       --bg: #12131a; --surface: #1b1c24; --text: #ecebe8; --muted: #a29e98; --border: #2c2d37;
       --accent: #f07a6c; --accent-soft: #33201f; --ink: #9db4dc;
       --fog: 30, 31, 40; --sky1: #191a29; --sky2: #2a2036;
-      --m1: #3a4260; --m2: #2b3150; --m3: #1d2238; --snow: #c9cfe0; --sun: #e2574a; --mist: 70, 76, 104; --far: #2a2f48; --stars: 1;
+      --m1: #3a4260; --m2: #2b3150; --m3: #1d2238; --snow: #c9cfe0; --sun: #e2574a;
       --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
       color-scheme: dark;
     }
@@ -41,7 +41,7 @@
     --bg: #12131a; --surface: #1b1c24; --text: #ecebe8; --muted: #a29e98; --border: #2c2d37;
     --accent: #f07a6c; --accent-soft: #33201f; --ink: #9db4dc;
     --fog: 30, 31, 40; --sky1: #191a29; --sky2: #2a2036;
-    --m1: #3a4260; --m2: #2b3150; --m3: #1d2238; --snow: #c9cfe0; --sun: #e2574a; --mist: 70, 76, 104; --far: #2a2f48; --stars: 1;
+    --m1: #3a4260; --m2: #2b3150; --m3: #1d2238; --snow: #c9cfe0; --sun: #e2574a;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
     color-scheme: dark;
   }
@@ -74,19 +74,11 @@
   .hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--border);
           background: linear-gradient(180deg, var(--sky1), var(--sky2)); touch-action: pan-y; }
   .scene { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .scene .stars { opacity: var(--stars); }
-  .scene .band-mist { animation: drift 46s ease-in-out infinite alternate; }
-  .scene .band-mist.b2 { animation-duration: 63s; animation-direction: alternate-reverse; }
-  .scene .birds { animation: birds 38s linear infinite; }
-  @keyframes drift { from { transform: translateX(-40px); } to { transform: translateX(40px); } }
-  @keyframes birds { from { transform: translate(-120px, 6px); } to { transform: translate(220px, -10px); } }
-  /* 霧 (kiri): one fixed fog layer for the whole page. It sits behind the content
-     (above the hero scene) and goes over everything while "kiri" floods the page. */
-  #fog { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
-  #fog.over { z-index: 38; }
-  main.wrap, footer.bottom { position: relative; }
-  html.crazy #fog { display: none; }
-  @media (prefers-reduced-motion: reduce) { .scene .band-mist, .scene .birds { animation: none; } }
+  #fog { position: absolute; inset: 0; width: 100%; height: 100%; }
+  /* 霧 kiri flood: typing "kiri" buries the whole page, everything goes behind the fog */
+  #kiri { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 48; pointer-events: none; display: none; }
+  #kiri.on { display: block; }
+  html.crazy #kiri { display: none; }
   .hero .wrap { position: relative; z-index: 2; padding-top: 72px; padding-bottom: 64px; pointer-events: none; }
   .hero .wrap a, .hero .wrap button { pointer-events: auto; }
   .hello { font-size: clamp(2.2rem, 6vw, 3.6rem); line-height: 1.1; letter-spacing: -0.025em; margin: 0 0 14px; min-height: 1.15em; }
@@ -292,40 +284,14 @@
 
   <section class="hero calm-only" id="hero">
     <svg class="scene" viewBox="0 0 1200 420" preserveAspectRatio="xMaxYMax slice" aria-hidden="true">
-      <defs>
-        <radialGradient id="sunGlow"><stop offset="0" style="stop-color:var(--sun);stop-opacity:.35"/><stop offset="1" style="stop-color:var(--sun);stop-opacity:0"/></radialGradient>
-        <linearGradient id="fuji" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--m2)"/><stop offset="1" style="stop-color:var(--m1)"/></linearGradient>
-        <linearGradient id="mistBand" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:rgb(var(--fog));stop-opacity:0"/><stop offset=".5" style="stop-color:rgb(var(--fog));stop-opacity:1"/><stop offset="1" style="stop-color:rgb(var(--fog));stop-opacity:0"/></linearGradient>
-      </defs>
-      <g class="stars" fill="var(--snow)">
-        <circle cx="120" cy="60" r="1.4"/><circle cx="260" cy="110" r="1"/><circle cx="380" cy="40" r="1.6"/><circle cx="520" cy="90" r="1"/>
-        <circle cx="640" cy="30" r="1.3"/><circle cx="760" cy="76" r="1"/><circle cx="1080" cy="50" r="1.5"/><circle cx="1150" cy="120" r="1"/>
-        <circle cx="200" cy="170" r=".9"/><circle cx="700" cy="150" r="1.1"/><circle cx="1010" cy="24" r="1"/><circle cx="440" cy="140" r=".9"/>
-      </g>
-      <circle cx="905" cy="128" r="190" fill="url(#sunGlow)"/>
-      <circle cx="905" cy="128" r="66" fill="var(--sun)" opacity=".92"/>
-      <g class="birds" fill="none" stroke="var(--m3)" stroke-width="2" stroke-linecap="round" opacity=".55">
-        <path d="M760 96 q7 -6 14 0 q7 -6 14 0"/><path d="M800 76 q5 -4 10 0 q5 -4 10 0"/><path d="M738 70 q4 -3 8 0 q4 -3 8 0"/>
-      </g>
-      <path d="M0 330 C90 300 170 312 250 290 C330 268 400 296 480 284 C560 272 620 250 700 266 L700 420 L0 420 Z" fill="var(--far)" opacity=".8"/>
-      <path d="M600 420 C740 340 870 210 945 145 Q967 128 989 145 C1060 210 1150 300 1200 330 L1200 420 Z" fill="url(#fuji)"/>
-      <path d="M916 170 C930 158 940 150 945 145 Q967 128 989 145 C996 151 1006 160 1020 172 L1004 168 L994 182 L982 170 L968 188 L956 172 L944 186 L934 172 Z" fill="var(--snow)"/>
-      <rect class="band-mist" x="380" y="268" width="900" height="56" fill="url(#mistBand)" opacity=".35"/>
-      <path d="M0 420 L0 312 C70 288 140 290 210 306 C280 322 330 298 400 282 C470 266 540 290 600 312 C660 334 730 326 800 340 C860 352 900 356 940 362 L940 420 Z" fill="var(--m2)"/>
-      <g opacity=".9">
-        <rect x="292" y="292" width="16" height="10" fill="var(--snow)"/><path d="M289 293 L300 284 L311 293 Z" fill="var(--sun)"/>
-        <rect x="318" y="288" width="13" height="9" fill="var(--snow)"/><path d="M315 289 L324.5 281 L334 289 Z" fill="var(--sun)"/>
-        <rect x="346" y="290" width="15" height="10" fill="var(--snow)"/><path d="M343 291 L353.5 283 L364 291 Z" fill="var(--sun)"/>
-        <rect x="430" y="280" width="7" height="12" fill="var(--snow)"/><path d="M428 281 L433.5 268 L439 281 Z" fill="var(--sun)"/>
-      </g>
+      <circle cx="930" cy="150" r="70" fill="var(--sun)" opacity=".9"/>
+      <path d="M560 420 L760 240 C780 222 800 218 820 236 L860 270 L905 228 C918 216 932 216 945 228 L1200 420 Z" fill="var(--m1)"/>
+      <path d="M700 420 L955 150 C962 142 972 142 980 150 L1200 380 L1200 420 Z" fill="var(--m2)"/>
+      <path d="M933 173 L955 150 C962 142 972 142 980 150 L1003 174 L990 186 L978 176 L966 190 L952 178 L944 186 Z" fill="var(--snow)"/>
+      <path d="M0 420 L0 360 C120 320 220 340 330 300 C430 266 520 300 620 330 C760 370 900 330 1040 350 C1110 360 1160 350 1200 340 L1200 420 Z" fill="var(--m3)"/>
       <g fill="var(--m3)">
-        <path d="M268 306 q5 -34 10 0 Z"/><path d="M378 300 q5 -30 10 0 Z"/><path d="M450 290 q4 -26 8 0 Z"/><path d="M466 292 q5 -32 10 0 Z"/>
-      </g>
-      <rect class="band-mist b2" x="-80" y="318" width="760" height="44" fill="url(#mistBand)" opacity=".3"/>
-      <path d="M0 420 L0 364 C120 326 220 344 330 306 C430 272 520 306 620 334 C760 374 900 334 1040 352 C1110 362 1160 354 1200 344 L1200 420 Z" fill="var(--m3)"/>
-      <g fill="var(--accent)">
-        <rect x="1067" y="298" width="6" height="54"/><rect x="1107" y="298" width="6" height="54"/>
-        <path d="M1050 288 Q1090 296 1130 288 L1128 296 Q1090 302 1052 296 Z"/><rect x="1061" y="305" width="58" height="5" rx="1"/>
+        <rect x="1066" y="306" width="6" height="54"/><rect x="1108" y="306" width="6" height="54"/>
+        <rect x="1054" y="298" width="72" height="8" rx="2"/><rect x="1062" y="316" width="56" height="5"/>
       </g>
     </svg>
     <canvas id="fog" aria-hidden="true"></canvas>
@@ -380,6 +346,7 @@
       <button class="toggle" id="toggle" type="button"></button>
     </div>
   </footer>
+  <canvas id="kiri" aria-hidden="true"></canvas>
   <div class="toast" id="toast" role="status"></div>
 
   <div class="reader" id="reader" hidden></div>
@@ -987,180 +954,161 @@
     setTimeout(() => { location.href = pick.url; }, 700);
   });
 
-  // ---- 霧 kiri: one fog layer over the whole page ----
-  // Wiping is stored per 12px cell in page coordinates as "how clear" (0..1), and grows back
-  // linearly in real elapsed seconds, so it always returns fully and at the same speed at any
-  // framerate. The hero gets thick fog; the rest of the page gets drifting mist behind the cards.
-  // Typing "kiri" floods the whole page, top to bottom, over everything for a while.
+  // ---- wipeable fog over the hero ----
   const hero = document.getElementById('hero'), cv = document.getElementById('fog'), ctx = cv.getContext('2d');
   const mask = document.createElement('canvas'), mctx = mask.getContext('2d');
   const hint = document.getElementById('hint');
-  const CELL = 12, REGROW_S = 14, FLOOD_IN_S = 2.6, FLOOD_HOLD_S = 12, FLOOD_OUT_S = 5;
-  let VW = 0, VH = 0, dpr = 1, cols = 0, rows = 0, clear = new Float32Array(0), anyClear = false;
-  let last = null, running = false, wiped = 0, prevT = null, drift = 0, img = null;
-  let flood = null; // { t0, from, to, filledRow, lift }
-  const blobs = [];
-  const heroBlobs = Array.from({ length: 14 }, (_, i) => ({ x: Math.random(), y: Math.random(), r: 0.18 + Math.random() * 0.25, s: (0.3 + Math.random()) * (i % 2 ? 1 : -1) }));
-  const now = () => performance.now();
-  function cssVar(n) { return getComputedStyle(root).getPropertyValue(n).trim(); }
-  let rgb = cssVar('--fog'), mist = cssVar('--mist');
-  function docH() { return Math.max(document.documentElement.scrollHeight, innerHeight); }
-  function resizeView() {
+  let W = 0, H = 0, dpr = 1, last = null, running = false, wiped = 0;
+  // Regrow: add whole alpha steps with 'lighter' (additive), paced by real elapsed time.
+  // A faint source-over fade used to round to nothing on an 8-bit canvas and stalled at ~2/3 fog.
+  const REGROW_S = 12, heroGrow = { t: null, acc: 0 };
+  function regrowMask(c, el, t, st) {
+    if (st.t != null) st.acc += Math.max(0, t - st.t) / 1000 * 255 / REGROW_S;
+    st.t = t;
+    const lv = Math.floor(st.acc);
+    if (lv < 1) return;
+    st.acc -= lv;
+    c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.globalCompositeOperation = 'lighter';
+    c.fillStyle = `rgba(0,0,0,${Math.min(255, lv) / 255})`; c.fillRect(0, 0, el.width, el.height); c.restore();
+  }
+  const blobs = Array.from({ length: 14 }, (_, i) => ({ x: Math.random(), y: Math.random(), r: 0.18 + Math.random() * 0.25, s: (0.3 + Math.random()) * (i % 2 ? 1 : -1) }));
+  function fogRGB() { return getComputedStyle(root).getPropertyValue('--fog').trim(); }
+  let rgb = fogRGB();
+  function resize() {
     dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-    VW = document.documentElement.clientWidth; VH = innerHeight;
-    cv.width = Math.round(VW * dpr); cv.height = Math.round(VH * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    resizeField();
+    W = hero.clientWidth; H = hero.clientHeight;
+    for (const c of [cv, mask]) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }
+    mctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    mctx.fillStyle = '#000'; mctx.fillRect(0, 0, W, H);
   }
-  function resizeField() {
-    const nc = Math.ceil(VW / CELL) + 1, nr = Math.ceil(docH() / CELL) + 1;
-    if (nc === cols && nr === rows) return;
-    const next = new Float32Array(nc * nr);
-    for (let r = 0; r < Math.min(nr, rows); r++) for (let c = 0; c < Math.min(nc, cols); c++) next[r * nc + c] = clear[r * cols + c];
-    clear = next; cols = nc; rows = nr;
-    // about three mist puffs per 300px of page, kept stable as the page grows
-    const want = Math.ceil(rows * CELL / 300) * 3;
-    while (blobs.length < want) {
-      const i = blobs.length;
-      blobs.push({ x: Math.random(), y: (i / 3 + Math.random()) * 300 - 40, r: 0.16 + Math.random() * 0.22, s: (0.3 + Math.random()) * (i % 2 ? 1 : -1) });
+  function wipe(x, y) {
+    mctx.globalCompositeOperation = 'destination-out';
+    const from = last || { x, y }, dist = Math.hypot(x - from.x, y - from.y), n = Math.max(1, Math.ceil(dist / 10)), R = Math.max(46, Math.min(W, H) * 0.14);
+    for (let k = 1; k <= n; k++) {
+      const px = from.x + (x - from.x) * k / n, py = from.y + (y - from.y) * k / n;
+      const g = mctx.createRadialGradient(px, py, 0, px, py, R);
+      g.addColorStop(0, 'rgba(0,0,0,.55)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+      mctx.fillStyle = g; mctx.beginPath(); mctx.arc(px, py, R, 0, Math.PI * 2); mctx.fill();
     }
-  }
-  function stamp(px, py, R) { // px, py in page coordinates
-    const c0 = Math.max(0, Math.floor((px - R) / CELL)), c1 = Math.min(cols - 1, Math.ceil((px + R) / CELL));
-    const r0 = Math.max(0, Math.floor((py - R) / CELL)), r1 = Math.min(rows - 1, Math.ceil((py + R) / CELL));
-    for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) {
-      const d = Math.hypot(c * CELL - px, r * CELL - py) / R;
-      if (d >= 1) continue;
-      const i = r * cols + c, a = 0.5 * (1 - d);
-      clear[i] = 1 - (1 - clear[i]) * (1 - a);
-    }
-    anyClear = true;
-  }
-  function wipe(x, y) { // page coordinates
-    const from = last || { x, y }, dist = Math.hypot(x - from.x, y - from.y);
-    const n = Math.max(1, Math.ceil(dist / 10)), R = Math.max(46, Math.min(VW, hero.clientHeight || VH) * 0.14);
-    for (let k = 1; k <= n; k++) stamp(from.x + (x - from.x) * k / n, from.y + (y - from.y) * k / n, R);
+    mctx.globalCompositeOperation = 'source-over';
     last = { x, y };
     wiped += dist; if (wiped > 400) hint.classList.add('gone');
   }
-  function regrow(dt) {
-    if (!anyClear) return;
-    const step = dt / REGROW_S; let any = false;
-    for (let i = 0; i < clear.length; i++) if (clear[i] > 0) { clear[i] = Math.max(0, clear[i] - step); if (clear[i] > 0) any = true; }
-    anyClear = any;
-  }
-  const ease = (p) => p < 0 ? 0 : p > 1 ? 1 : 1 - Math.pow(1 - p, 3);
-  function floodState(t) { // returns { front (page y), alpha } or null
-    if (!flood) return null;
-    const s = (t - flood.t0) / 1000, front = flood.from + (flood.to - flood.from) * ease(s / FLOOD_IN_S);
-    const liftAt = flood.lift ?? (FLOOD_IN_S + FLOOD_HOLD_S);
-    const alpha = 1 - Math.min(1, Math.max(0, (s - liftAt) / FLOOD_OUT_S));
-    if (alpha <= 0) { flood = null; cv.classList.remove('over'); return null; }
-    // the flood re-fogs everything it rolls over
-    const upto = Math.min(rows, Math.floor(front / CELL));
-    if (upto > flood.filledRow) { clear.fill(0, flood.filledRow * cols, upto * cols); flood.filledRow = upto; }
-    return { front, alpha };
-  }
-  function puff(x, y, r, color, a) {
-    const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-    g.addColorStop(0, `rgba(${color}, ${a})`); g.addColorStop(1, `rgba(${color}, 0)`);
-    ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r * 2, r * 2);
-  }
   function frame(t) {
     if (!running) return;
-    requestAnimationFrame(frame);
-    const dt = prevT == null ? 0 : (t - prevT) / 1000; prevT = t;
-    if (!VW || !rows) return;
-    regrow(dt);
-    if (!reduced) drift += Math.min(dt, 0.25);
-    const sy = scrollY, hr = hero.getBoundingClientRect(), fl = floodState(t);
+    if (!mask.width || !mask.height) { requestAnimationFrame(frame); return; }
+    regrowMask(mctx, mask, t, heroGrow); // fog rolls back in, all the way
     ctx.globalCompositeOperation = 'source-over';
-    ctx.clearRect(0, 0, VW, VH);
-    const big = Math.max(VW, 500);
-    // mist puffs over the whole page
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = `rgba(${rgb}, .8)`; ctx.fillRect(0, 0, W, H);
+    const time = reduced ? 0 : t / 1000;
     for (const b of blobs) {
-      const y = b.y - sy, r = b.r * big;
-      if (y + r < 0 || y - r > VH) continue;
-      const x = ((b.x + drift * 0.012 * b.s) % 1 + 1) % 1 * (VW + 400) - 200;
-      puff(x, y, r, mist, 0.32);
+      const x = ((b.x + time * 0.012 * b.s) % 1 + 1) % 1 * (W + 400) - 200, y = b.y * H, r = b.r * Math.max(W, 500);
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, `rgba(${rgb}, .55)`); g.addColorStop(1, `rgba(${rgb}, 0)`);
+      ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r * 2, r * 2);
     }
-    // thick fog over the hero scene
-    if (hr.bottom > 0 && hr.top < VH) {
-      ctx.save(); ctx.beginPath(); ctx.rect(0, hr.top, VW, hr.height); ctx.clip();
-      ctx.fillStyle = `rgba(${rgb}, .8)`; ctx.fillRect(0, hr.top, VW, hr.height);
-      for (const b of heroBlobs) {
-        const x = ((b.x + drift * 0.012 * b.s) % 1 + 1) % 1 * (VW + 400) - 200;
-        puff(x, hr.top + b.y * hr.height, b.r * big, rgb, 0.55);
-      }
-      ctx.restore();
-    }
-    // the kiri flood: a wall of fog rolling down the page, then lifting
-    if (fl) {
-      const fv = fl.front - sy, edge = 160, a = 0.93 * fl.alpha;
-      if (fv > 0) {
-        const solid = Math.min(VH, fv - edge);
-        if (solid > 0) { ctx.fillStyle = `rgba(${rgb}, ${a})`; ctx.fillRect(0, 0, VW, solid); }
-        const g = ctx.createLinearGradient(0, fv - edge, 0, fv);
-        g.addColorStop(0, `rgba(${rgb}, ${a})`); g.addColorStop(1, `rgba(${rgb}, 0)`);
-        ctx.fillStyle = g; ctx.fillRect(0, Math.max(0, fv - edge), VW, Math.min(VH, fv) - Math.max(0, fv - edge));
-        for (const b of blobs) {
-          const y = b.y - sy, r = b.r * big * 0.8;
-          if (y + r < 0 || y - r > Math.min(VH, fv)) continue;
-          const x = ((b.x + drift * 0.02 * b.s) % 1 + 1) % 1 * (VW + 400) - 200;
-          puff(x, y, r, mist, 0.5 * fl.alpha);
-        }
-      }
-    }
-    // cut out what has been wiped
-    if (anyClear) {
-      const r0 = Math.max(0, Math.floor(sy / CELL)), nr = Math.min(rows - r0, Math.ceil(VH / CELL) + 2);
-      if (nr > 0) {
-        if (!img || img.width !== cols || img.height !== nr) { mask.width = cols; mask.height = nr; img = mctx.createImageData(cols, nr); }
-        const d = img.data;
-        for (let i = 0, j = r0 * cols; i < cols * nr; i++, j++) d[i * 4 + 3] = (1 - clear[j]) * 255;
-        mctx.putImageData(img, 0, 0);
-        ctx.globalCompositeOperation = 'destination-in';
-        ctx.imageSmoothingEnabled = true;
-        ctx.drawImage(mask, 0, 0, cols, nr, -CELL / 2, r0 * CELL - sy - CELL / 2, cols * CELL, nr * CELL);
-      }
-    }
+    ctx.globalCompositeOperation = 'destination-in';
+    ctx.drawImage(mask, 0, 0, W, H);
+    requestAnimationFrame(frame);
   }
-  // pausing (hidden tab, crazy mode) still counts real time: the fog grows back while you're away
-  let pausedAt = null;
-  function setRunning(on) {
-    if (on && !running) {
-      if (pausedAt != null) { regrow((now() - pausedAt) / 1000); pausedAt = null; }
-      running = true; prevT = null; requestAnimationFrame(frame);
-    } else if (!on && running) { running = false; pausedAt = now(); }
-  }
-  document.addEventListener('pointermove', (e) => {
-    if (isCrazy() || e.pointerType === 'touch' && !hero.contains(e.target)) return;
-    wipe(e.clientX + scrollX, e.clientY + scrollY);
-  }, { passive: true });
-  document.addEventListener('pointerleave', () => { last = null; });
-  addEventListener('scroll', () => { last = null; }, { passive: true });
-  addEventListener('resize', resizeView);
-  new ResizeObserver(resizeField).observe(document.body);
-  resizeView();
+  function setRunning(on) { if (on && !running) { running = true; requestAnimationFrame(frame); } else if (!on) running = false; }
+  hero.addEventListener('pointermove', (e) => { const r = hero.getBoundingClientRect(); wipe(e.clientX - r.left, e.clientY - r.top); });
+  hero.addEventListener('pointerleave', () => { last = null; });
+  new ResizeObserver(resize).observe(hero);
+  new IntersectionObserver(([en]) => setRunning(en.isIntersecting && !isCrazy())).observe(hero);
   document.addEventListener('visibilitychange', () => setRunning(!document.hidden && !isCrazy()));
-  setRunning(!document.hidden && !isCrazy());
-  function refog(msg) { clear.fill(0); anyClear = false; hint.classList.remove('gone'); wiped = 0; if (msg) toast(msg); }
-  function floodPage() {
-    const t = now();
-    if (flood && flood.lift == null) return; // already flooding
-    flood = { t0: t, from: Math.max(0, scrollY - 40), to: docH() + 200, filledRow: 0, lift: null };
-    // everything above the screen is already under fog; it rolls in from the top of the screen down to the bottom of the page
-    flood.filledRow = Math.min(rows, Math.floor(flood.from / CELL));
-    clear.fill(0, 0, flood.filledRow * cols);
-    cv.classList.add('over');
-    hint.classList.remove('gone'); wiped = 0;
+  function refog(msg) { mctx.fillStyle = '#000'; mctx.fillRect(0, 0, W, H); hint.classList.remove('gone'); wiped = 0; if (msg) toast(msg); }
+
+
+  // ---- 霧 kiri flood: a wall of fog rolls down over the whole page and everything on it ----
+  const kv = document.getElementById('kiri'), kctx = kv.getContext('2d');
+  const km = document.createElement('canvas'), kmctx = km.getContext('2d');
+  const FLOOD_IN_S = 2.4, FLOOD_HOLD_S = 14, FLOOD_OUT_S = 4;
+  let flood = null, kW = 0, kH = 0, kdpr = 1, kS = 0.5, kLast = null;
+  const kGrow = { t: null, acc: 0 };
+  const kBlobs = Array.from({ length: 16 }, (_, i) => ({ x: Math.random(), y: Math.random(), r: 0.2 + Math.random() * 0.25, s: (0.3 + Math.random()) * (i % 2 ? 1 : -1) }));
+  const ease = (p) => p <= 0 ? 0 : p >= 1 ? 1 : 1 - Math.pow(1 - p, 3);
+  function pageH() { return Math.max(document.documentElement.scrollHeight, innerHeight); }
+  function kSize() {
+    kdpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    kW = document.documentElement.clientWidth; kH = innerHeight;
+    kv.width = Math.round(kW * kdpr); kv.height = Math.round(kH * kdpr);
+    kctx.setTransform(kdpr, 0, 0, kdpr, 0, 0);
   }
-  function liftFlood() { if (flood && flood.lift == null) flood.lift = Math.max(FLOOD_IN_S, (now() - flood.t0) / 1000); }
+  function kMaskSize() { // page-sized mask at reduced resolution, keeps what was there
+    const ph = pageH(); kS = Math.min(0.5, 4096 / ph);
+    const w = Math.ceil(kW * kS), h = Math.ceil(ph * kS);
+    if (km.width === w && km.height === h) return;
+    const old = km.width ? (() => { const c = document.createElement('canvas'); c.width = km.width; c.height = km.height; c.getContext('2d').drawImage(km, 0, 0); return c; })() : null;
+    km.width = w; km.height = h;
+    kmctx.fillStyle = '#000'; kmctx.fillRect(0, 0, w, h);
+    if (old) kmctx.drawImage(old, 0, 0, w, h);
+  }
+  function kWipe(x, y) { // page coordinates
+    const from = kLast || { x, y }, dist = Math.hypot(x - from.x, y - from.y), n = Math.max(1, Math.ceil(dist / 10)), R = Math.max(50, Math.min(kW, kH) * 0.12);
+    kmctx.globalCompositeOperation = 'destination-out';
+    for (let k = 1; k <= n; k++) {
+      const px = (from.x + (x - from.x) * k / n) * kS, py = (from.y + (y - from.y) * k / n) * kS, r = R * kS;
+      const g = kmctx.createRadialGradient(px, py, 0, px, py, r);
+      g.addColorStop(0, 'rgba(0,0,0,.55)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+      kmctx.fillStyle = g; kmctx.beginPath(); kmctx.arc(px, py, r, 0, Math.PI * 2); kmctx.fill();
+    }
+    kmctx.globalCompositeOperation = 'source-over';
+    kLast = { x, y };
+  }
+  function kFrame(t) {
+    if (!flood) return;
+    requestAnimationFrame(kFrame);
+    const s = (t - flood.t0) / 1000;
+    const liftAt = flood.lift ?? (FLOOD_IN_S + FLOOD_HOLD_S);
+    const alpha = 1 - Math.min(1, Math.max(0, (s - liftAt) / FLOOD_OUT_S));
+    if (alpha <= 0) { flood = null; kv.classList.remove('on'); return; }
+    kMaskSize();
+    regrowMask(kmctx, km, t, kGrow);
+    const front = flood.from + (flood.to - flood.from) * ease(s / FLOOD_IN_S);
+    if (front > flood.filled) { kmctx.fillStyle = '#000'; kmctx.fillRect(0, flood.filled * kS, km.width, (front - flood.filled) * kS); flood.filled = front; }
+    const sy = scrollY, fv = front - sy, edge = 180, a = alpha;
+    kctx.globalCompositeOperation = 'source-over';
+    kctx.clearRect(0, 0, kW, kH);
+    if (fv <= 0) return;
+    const bottom = Math.min(kH, fv);
+    kctx.fillStyle = `rgba(${rgb}, ${a})`; kctx.fillRect(0, 0, kW, Math.max(0, Math.min(kH, fv - edge)));
+    if (fv - edge < kH) {
+      const g = kctx.createLinearGradient(0, fv - edge, 0, fv);
+      g.addColorStop(0, `rgba(${rgb}, ${a})`); g.addColorStop(1, `rgba(${rgb}, 0)`);
+      kctx.fillStyle = g; kctx.fillRect(0, Math.max(0, fv - edge), kW, bottom - Math.max(0, fv - edge));
+    }
+    const time = reduced ? 0 : t / 1000;
+    for (const b of kBlobs) {
+      const x = ((b.x + time * 0.015 * b.s) % 1 + 1) % 1 * (kW + 400) - 200, y = b.y * kH, r = b.r * Math.max(kW, 500);
+      if (y - r > bottom) continue;
+      const g = kctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, `rgba(${rgb}, ${0.6 * alpha})`); g.addColorStop(1, `rgba(${rgb}, 0)`);
+      kctx.fillStyle = g; kctx.fillRect(x - r, y - r, r * 2, Math.min(r * 2, bottom - (y - r)));
+    }
+    kctx.globalCompositeOperation = 'destination-in';
+    kctx.drawImage(km, 0, sy * kS, km.width, kH * kS, 0, 0, kW, kH);
+  }
+  function floodPage() {
+    if (flood && flood.lift == null) return; // already flooded
+    kSize(); kMaskSize();
+    const from = Math.max(0, scrollY - 40);
+    kmctx.fillStyle = '#000'; kmctx.fillRect(0, 0, km.width, from * kS); // everything above the screen is already gone
+    flood = { t0: performance.now(), from, to: pageH() + 200, filled: from, lift: null };
+    kGrow.t = null; kLast = null;
+    kv.classList.add('on');
+    requestAnimationFrame(kFrame);
+  }
+  function liftFlood() { if (flood && flood.lift == null) flood.lift = Math.max(FLOOD_IN_S, (performance.now() - flood.t0) / 1000); }
+  document.addEventListener('pointermove', (e) => { if (flood) kWipe(e.clientX + scrollX, e.clientY + scrollY); }, { passive: true });
+  addEventListener('scroll', () => { kLast = null; }, { passive: true });
+  addEventListener('resize', () => { if (flood) kSize(); });
 
   // ---- theme toggle (light / dark), remembered ----
   const themeBtn = document.getElementById('theme');
   const darkNow = () => root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
-  function syncTheme() { themeBtn.textContent = darkNow() ? '☀' : '☾'; rgb = cssVar('--fog'); mist = cssVar('--mist'); }
+  function syncTheme() { themeBtn.textContent = darkNow() ? '☀' : '☾'; rgb = fogRGB(); }
   themeBtn.addEventListener('click', () => {
     root.dataset.theme = darkNow() ? 'light' : 'dark';
     try { localStorage.setItem('kiripad-theme', root.dataset.theme); } catch (e) {}
@@ -1169,7 +1117,7 @@
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncTheme);
   syncTheme();
 
-  // ---- keys: "/" focuses search, typing "kiri" or "мъгла" floods the whole page with fog (Esc lifts it) ----
+  // ---- keys: "/" focuses search, typing "kiri" or "мъгла" buries the whole page in fog (Esc lifts it) ----
   let typed = '';
   document.addEventListener('keydown', (e) => {
     if (e.target.matches('input, textarea') || e.ctrlKey || e.metaKey || e.altKey) return;
@@ -1178,7 +1126,7 @@
     if (e.key.length !== 1) return;
     typed = (typed + e.key.toLowerCase()).slice(-8);
     if (typed.endsWith('kiri') || typed.endsWith('мъгла')) {
-      if (!isCrazy()) { floodPage(); toast('霧が出た · Мъгла падна · The fog rolls in'); }
+      if (!isCrazy()) { refog(); floodPage(); toast('霧が出た · Мъгла падна · The fog rolls in'); }
     }
   });
 
