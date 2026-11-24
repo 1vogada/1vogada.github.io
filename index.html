@@ -169,6 +169,31 @@
   html.throwing .grid .card { pointer-events: none; }
   .grid .card { cursor: grab; }
   .grid .card, #phys .phys { user-select: none; -webkit-user-select: none; }
+  /* katana */
+  .katana { position: absolute; left: max(18px, calc(50vw - 674px)); bottom: 0; width: 40px; height: 300px; padding: 0; border: 0; background: none; overflow: hidden; pointer-events: none; }
+  .katana-in { display: block; height: 300px; transform: translateY(284px); transition: transform .55s cubic-bezier(.3,1.7,.5,1), opacity .2s; }
+  .katana.found { z-index: 3; }
+  .katana.found .katana-in { transform: translateY(190px); pointer-events: auto; cursor: grab; }
+  .katana.found:not(.drawn) .katana-in:hover { transform: translateY(178px); }
+  .katana.drawn .katana-in { transform: translateY(0); transition: transform .34s cubic-bezier(.2,.9,.3,1), opacity .2s; }
+  .katana.away .katana-in { opacity: 0; transform: translateY(190px); }
+  .katana.away::after { content: ""; position: absolute; left: 6px; bottom: 1px; width: 28px; height: 6px; border-radius: 50%; background: rgba(0,0,0,.4); pointer-events: auto; cursor: pointer; }
+  .katana:focus-visible { outline: 2px solid var(--accent); }
+  #blade { position: fixed; left: 0; top: 0; z-index: 70; pointer-events: none; transform-origin: 14px 160px; filter: drop-shadow(0 6px 8px rgba(0,0,0,.3)); }
+  #blade[hidden] { display: none; }
+  #blade svg { display: block; width: 28px; height: 210px; }
+  html.sword, html.sword * { cursor: none !important; user-select: none; -webkit-user-select: none; }
+  html.sword button, html.sword input, html.sword header.top *, html.sword footer * { cursor: pointer !important; }
+  html.sword .grid .card, html.sword #phys .phys { pointer-events: none; }
+  .sheathe { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: 62px; z-index: 45; box-shadow: var(--shadow); }
+  .sheathe[hidden] { display: none; }
+  html.crazy .katana, html.crazy #blade, html.crazy .sheathe { display: none; }
+  #phys .piece { cursor: grab; }
+  #phys .bit { position: absolute; left: 0; top: 0; z-index: 4; border-radius: 50%; background: var(--accent); pointer-events: none; }
+  #phys .bit.paper { border-radius: 1px; background: var(--surface); border: 1px solid var(--border); }
+  #phys .slash { position: absolute; left: 0; top: -2px; height: 4px; z-index: 4; transform-origin: 0 50%; border-radius: 2px; pointer-events: none;
+                 background: #fff; box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 60%, transparent), 0 0 10px var(--accent); animation: slash .28s forwards; }
+  @keyframes slash { to { opacity: 0; } }
   .reset-cards { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: 16px; z-index: 45; box-shadow: var(--shadow); }
   .reset-cards[hidden] { display: none; }
   html.crazy #phys, html.crazy .reset-cards { display: none; }
@@ -569,9 +594,10 @@
     const S = 100;              // px per metre. A card is about 3 m wide, the size Box2D is tuned for
     const DT = 1 / 240;         // fixed physics step, seconds. Steps follow the clock, never the frame rate
     const GRAVITY = 85;         // m/s² = 8500 px/s². Anything near the usual 1000 to 2600 px/s² looks like the moon at this size
-    const STRAIN = 1.3, RIP = 2.8;   // m of hand-spring stretch: past STRAIN the root slowly loses its grip, past RIP it tears at once (160 and 350 px of pointer travel)
+    const STRAIN = 1.6, RIP = 3.5;   // m the hand has pulled away from where it took hold: past STRAIN the root slowly loses its grip, past RIP it tears at once
     const ROOT_HZ = 14, PULL_HZ = 7, HAND_HZ = 60;   // spring rates: root, hand while rooted, hand once free
     const SPIN = 0.5, HELD_SPIN = 3;              // angular damping: free, and while hanging from the hand
+    const FALL = 0.25;          // loose cards feel a quarter of the gravity, so they fall at half the speed. A held card keeps all of it and swings as before
     const HOT = 9;              // m/s release speed that counts as a throw
     const SMASH = 13;           // m/s closing speed a throw needs to shatter
     let pl = null, loading = null, world = null, ground = null, layer = null, wallFx = [], size = { W: 0, H: 0 };
@@ -633,6 +659,7 @@
     function addBody(o, x, y, angle, shape, opt) {
       o.body = world.createBody({ type: 'dynamic', position: { x, y }, angle, linearDamping: 0.05, angularDamping: SPIN });
       o.body.createFixture({ shape, density: 1, friction: 0.7, restitution: 0.06, ...opt });
+      o.body.setGravityScale(o.root ? 0 : FALL);
       o.body.setUserData(o); o.px = x; o.py = y; o.pa = angle;
       objs.add(o); return o;
     }
@@ -652,6 +679,7 @@
       rip: ['AAAH!', 'nooo!', 'rude.', 'ау!', 'I was comfy!', 'put me back!'],
       throw: ['wheee', 'NOOO', 'not the wall!', 'I can fly?!', 'aaaaaa'],
       land: ['oof', 'ow', 'ugh', "I'm fine", 'ох…', 'my corner!'],
+      slice: ['ow!!', "I'm in two!", 'medic!', 'half off…', 'clean cut.', 'ай!', '切られた!'],
       smash: ['x_x', '✝', 'worth it', 'tell my repo I loved it'],
     };
     const pick = (a) => a[Math.floor(Math.random() * a.length)];
@@ -691,10 +719,10 @@
         if (!o.root) continue;
         const b = o.body, p = b.getPosition(), d = Math.hypot(p.x - o.root.x, p.y - o.root.y);
         if (grab && grab.o === o) {   // the pull is the stretch of the hand spring: how far the pointer is from the spot it holds
-          const a = grab.joint.getAnchorB(), g = grab.joint.getTarget(), pull = Math.hypot(g.x - a.x, g.y - a.y);
+          const g = grab.joint.getTarget(), pull = Math.hypot(g.x - grab.hx, g.y - grab.hy);   // how far the hand is from where it took hold
           if (pull > STRAIN) { o.grip -= DT * (0.4 + 2 * (pull - STRAIN) / (RIP - STRAIN)); if (!o.strained) { o.strained = true; say(o, 'strain', true); } else say(o, 'strain'); }
           else o.grip = Math.min(1, o.grip + DT * 0.7);
-          if (pull > RIP || o.grip <= 0) tear(o);
+          if (pull > RIP || o.grip <= 0 || Math.abs(b.getAngle()) > 1.1) tear(o);
         }
         else if ((o.grip = Math.min(1, o.grip + DT)) && d < 0.004 && Math.abs(b.getAngle()) < 0.004 && b.getLinearVelocity().length() < 0.05 && Math.abs(b.getAngularVelocity()) < 0.05) remove(o);
       }
@@ -721,7 +749,7 @@
       }
     }
     function frame(t) {
-      if (!objs.size) { loopOn = false; return; }
+      if (!objs.size && !bits.length) { loopOn = false; return; }
       const ms = Math.min(250, t - (last || t)); last = t; acc += ms / 1000;   // real elapsed time: a slow or a fast screen gets the same motion
       if (grab && !grab.o.root) {   // resting a carried card at the top or bottom edge of the screen scrolls the page
         const edge = 44, y = grab.cy, d = y < edge ? y - edge : y > innerHeight - edge ? y - (innerHeight - edge) : 0;
@@ -729,27 +757,29 @@
         if (grab.edge > 350) scrollBy({ top: d * 0.35 * ms / 16, behavior: 'instant' });
       }
       while (acc >= DT) { step(); acc -= DT; }
-      let busy = !!grab; if (!busy) for (const o of objs) if (o.root || o.die || o.say || o.body.isAwake()) { busy = true; break; }
+      moveBits(ms / 1000);
+      let busy = !!grab || bits.length > 0; if (!busy) for (const o of objs) if (o.root || o.die || o.say || o.body.isAwake()) { busy = true; break; }
       draw(busy ? acc / DT : 1);
       if (busy) requestAnimationFrame(frame); else loopOn = false;
     }
-    function run() { if (!loopOn && objs.size) { loopOn = true; last = 0; acc = 0; requestAnimationFrame(frame); } }
+    function run() { if (!loopOn && (objs.size || bits.length)) { loopOn = true; last = 0; acc = 0; requestAnimationFrame(frame); } }
 
     // ---- the hand: a soft joint at the exact point that was grabbed, so the card swings around it ----
     function hold(o, px, py, e) {
       const joint = world.createJoint(new pl.MouseJoint({ maxForce: 4000 * o.body.getMass(), frequencyHz: o.root ? PULL_HZ : HAND_HZ, dampingRatio: o.root ? 0.8 : 1 }, ground, o.body, { x: px / S, y: py / S }));
-      grab = { o, joint, id: e.pointerId, cx: e.clientX, cy: e.clientY, sx: e.clientX, sy: e.clientY, moved: !!o.root, h: [] };
+      grab = { o, joint, id: e.pointerId, cx: e.clientX, cy: e.clientY, sx: e.clientX, sy: e.clientY, hx: px / S, hy: py / S, moved: !!o.root, h: [] };
       o.body.setAwake(true); o.hot = 0;
       if (!o.root) carry(o);
       html.classList.add('throwing'); run();
     }
-    function carry(o) { o.body.setBullet(true); o.body.setAngularDamping(HELD_SPIN); o.el.classList.add('grabbed'); }
+    function carry(o) { o.body.setGravityScale(1); o.body.setBullet(true); o.body.setAngularDamping(HELD_SPIN); o.el.classList.add('grabbed'); }
     function drop(e) {
+      if (stroke && (!e || e.pointerId === stroke.id)) { if (stroke.moved) { suppress = true; setTimeout(() => { suppress = false; }, 0); } stroke = null; return; }
       if (grab && (!e || e.pointerId === grab.id)) {
         const g = grab, o = g.o, b = o.body; grab = null;
         world.destroyJoint(g.joint); html.classList.remove('throwing');
         if (!o.root) {
-          o.el.classList.remove('grabbed'); b.setAngularDamping(SPIN);
+          o.el.classList.remove('grabbed'); b.setAngularDamping(SPIN); b.setGravityScale(FALL);
           // a hand slows down in the last few ms before it lets go: throw with the speed it had over the last 80 ms if that was faster
           const t = now(), h = g.h.filter((q) => t - q[2] < 80), a = h[0], z = h[h.length - 1];
           let v = b.getLinearVelocity(), sp = v.length();
@@ -772,7 +802,7 @@
     // ---- rooted cards ----
     gridEl.addEventListener('pointerdown', (e) => {
       const card = e.target.closest('.card');
-      if (!card || isCrazy() || e.button > 0 || press || grab || card.classList.contains('held')) return;
+      if (!card || sword || isCrazy() || e.button > 0 || press || grab || card.classList.contains('held')) return;
       press = { card, x: e.clientX, y: e.clientY, px: e.clientX + scrollX, py: e.clientY + scrollY, id: e.pointerId, armed: e.pointerType === 'mouse' };
       load().catch(() => {});
       if (e.pointerType === 'mouse') e.preventDefault();   // no text selection or link drag; the click still fires
@@ -787,7 +817,6 @@
       const r = card.getBoundingClientRect(), hx = r.left + r.width / 2 + scrollX, hy = r.top + r.height / 2 + scrollY;
       o = addBody({ kind: 'card', el: card, w: r.width, h: r.height, ex: hx, ey: hy, key: card.dataset.key, grip: 1, root: { x: hx / S, y: hy / S } },
         hx / S, hy / S, 0, new pl.Box(r.width / 2 / S, r.height / 2 / S), { filterMaskBits: 0 });
-      o.body.setGravityScale(0);
       rootOf.set(card, o);
       hold(o, p.px, p.py, e); say(o, 'pull', true);
     }
@@ -796,13 +825,15 @@
       el.style.width = o.w + 'px'; el.style.height = o.h + 'px'; el._o = o; layer.appendChild(el);
       rootOf.delete(card); card.classList.remove('pulling'); card.style.transform = ''; card.classList.add('held');
       o.el = el; o.ex = o.w / 2; o.ey = o.h / 2; o.root = null; ripped.add(o.key);
-      o.body.setGravityScale(1);
+      o.body.setGravityScale(FALL);
       o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF });
       if (grab && grab.o === o) { grab.joint.setFrequency(HAND_HZ); grab.joint.setDampingRatio(1); carry(o); }
       showReset(); say(o, 'rip', true);
       if (ripped.size === 1) toast('Ripped it out! Stack them, or throw one hard to smash it.');
     }
     function onMove(e) {
+      if (sword && e.pointerType === 'mouse') moveBlade(e);
+      if (stroke && e.pointerId === stroke.id) { if (e.pointerType !== 'mouse') moveBlade(e); strokeMove(e); return; }
       if (grab && e.pointerId === grab.id) {
         grab.h.push([e.clientX + scrollX, e.clientY + scrollY, now()]); if (grab.h.length > 12) grab.h.shift();
         grab.cx = e.clientX; grab.cy = e.clientY;
@@ -816,14 +847,14 @@
     }
     addEventListener('pointermove', onMove);
     addEventListener('pointerup', drop); addEventListener('pointercancel', drop);
-    addEventListener('touchmove', (e) => { if (grab || press?.armed) e.preventDefault(); }, { passive: false });
-    document.addEventListener('click', (e) => { if (suppress || e.target.closest?.('.shard')) { e.preventDefault(); e.stopPropagation(); } }, true);
+    addEventListener('touchmove', (e) => { if (grab || stroke || press?.armed) e.preventDefault(); }, { passive: false });
+    document.addEventListener('click', (e) => { if (suppress || e.target.closest?.('.shard, .piece')) { e.preventDefault(); e.stopPropagation(); } }, true);
     document.addEventListener('dragstart', (e) => { if (e.target.closest?.('.card')) e.preventDefault(); });
 
     // loose cards can be picked up again anywhere on them
     document.addEventListener('pointerdown', (e) => {
       const el = e.target.closest?.('#phys .phys'), o = el && el._o;
-      if (!o || o.kind !== 'card' || grab || e.button > 0) return;
+      if (!o || sword || (o.kind !== 'card' && o.kind !== 'piece') || grab || e.button > 0) return;
       e.preventDefault(); hold(o, e.clientX + scrollX, e.clientY + scrollY, e);
     });
 
@@ -832,13 +863,14 @@
     function onContact(c) {
       const A = c.getFixtureA().getBody(), B = c.getFixtureB().getBody(), oa = A.getUserData(), ob = B.getUserData();
       const card = (o) => o && o.kind === 'card' && !o.root, hot = (o) => card(o) && (o.hot || (grab && grab.o === o));
-      if ((oa && !card(oa)) || (ob && !card(ob)) || (!card(oa) && !card(ob))) return;   // shards and rooted cards never break anything   // shards and rooted cards never break anything
+      const solid = (o) => !o || card(o) || o.kind === 'piece';
+      if (!solid(oa) || !solid(ob) || (!card(oa) && !card(ob))) return;   // shards and rooted cards never break anything   // shards and rooted cards never break anything
       const wm = c.getWorldManifold(null); if (!wm || !wm.points.length) return;
       const pt = { x: 0, y: 0 }; for (const p of wm.points) { pt.x += p.x / wm.points.length; pt.y += p.y / wm.points.length; }
       const n = wm.normal, va = A.getLinearVelocityFromWorldPoint(pt), vb = B.getLinearVelocityFromWorldPoint(pt);
       const closing = (va.x - vb.x) * n.x + (va.y - vb.y) * n.y;   // normal points from A to B
       if (DBG) console.log('contact closing', closing.toFixed(1), 'hot', !!hot(oa), !!hot(ob));
-      if (closing < SMASH || (!hot(oa) && !hot(ob))) { if (closing > 9) { if (card(oa)) say(oa, 'land'); if (card(ob)) say(ob, 'land'); } return; }
+      if (closing < SMASH || (!hot(oa) && !hot(ob))) { if (closing > 5) { if (card(oa)) say(oa, 'land'); if (card(ob)) say(ob, 'land'); } return; }
       const ia = A.getMass() ? 1 / A.getMass() : 0, ib = B.getMass() ? 1 / B.getMass() : 0;
       const snap = (b) => ({ v: { x: b.getLinearVelocity().x, y: b.getLinearVelocity().y }, w: b.getAngularVelocity() });
       const fast = va.x * va.x + va.y * va.y > vb.x * vb.x + vb.y * vb.y ? va : vb, fs = Math.hypot(fast.x, fast.y) || 1;
@@ -902,6 +934,161 @@
       else if (smashed === 10) toast('10 cards smashed. Feeling better?');
     }
 
+    // ---- the katana: planted in the banner behind the fog. Wipe the fog off it and it pops up; pull it out and every swipe cuts cards in two ----
+    const katanaSvg = (id) => `<svg viewBox="0 0 40 300" width="40" height="300" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" x2="1"><stop offset="0" stop-color="#f6f8fa"/><stop offset=".55" stop-color="#cdd4da"/><stop offset="1" stop-color="#8b96a1"/></linearGradient></defs>
+      <path d="M14 106 L26 106 C27 180 25 250 17 297 C13 250 13 180 14 106Z" fill="url(#${id})" stroke="#69747e" stroke-width=".8"/><path d="M16.5 110 C16 180 16 240 17.6 286" fill="none" stroke="#fff" stroke-width="1.3" opacity=".85"/>
+      <rect x="13" y="97" width="14" height="11" rx="1.5" fill="#c9a24a"/><ellipse cx="20" cy="94" rx="18" ry="6" fill="#26221f" stroke="#c9a24a" stroke-width="1.6"/>
+      <rect x="13" y="6" width="14" height="86" rx="3" fill="#1c2333"/>${[12, 25, 38, 51, 64, 77].map((y) => `<path d="M20 ${y} l5.5 6.5 l-5.5 6.5 l-5.5 -6.5z" fill="#eadfc6"/><circle cx="20" cy="${y + 6.5}" r="1.4" fill="#c8372d"/>`).join('')}
+      <rect x="12" y="2" width="16" height="8" rx="3" fill="#c9a24a"/></svg>`;
+    const hero = document.getElementById('hero');
+    const kat = document.createElement('button'); kat.type = 'button'; kat.className = 'katana'; kat.setAttribute('aria-label', 'Katana'); kat.tabIndex = -1;
+    kat.innerHTML = `<span class="katana-in">${katanaSvg('kat-a')}</span>`;
+    hero.querySelector('.scene').after(kat);   // before the fog canvas, so the fog covers it
+    const blade = document.createElement('div'); blade.id = 'blade'; blade.hidden = true; blade.innerHTML = katanaSvg('kat-b'); document.body.appendChild(blade);
+    const sheatheBtn = document.createElement('button'); sheatheBtn.type = 'button'; sheatheBtn.className = 'btn ghost sheathe'; sheatheBtn.hidden = true; sheatheBtn.textContent = 'Put the katana back';
+    document.body.appendChild(sheatheBtn);
+    let found = false, near = 0, lastWipe = null, sword = false, stroke = null, tick = 0, bladeA = 135, bladeV = 0;
+    hero.addEventListener('pointermove', (e) => {   // the same strokes that wipe the fog uncover it
+      if (found || isCrazy()) return;
+      const r = kat.getBoundingClientRect();
+      if (Math.hypot(e.clientX - (r.left + 20), e.clientY - (r.bottom - 50)) > 120) { lastWipe = null; return; }
+      if (lastWipe) near += Math.hypot(e.clientX - lastWipe.x, e.clientY - lastWipe.y);
+      lastWipe = { x: e.clientX, y: e.clientY };
+      if (near > 260) { found = true; kat.classList.add('found'); kat.tabIndex = 0; toast('A katana?! Pull it out.'); load().catch(() => {}); }
+    });
+    function unsheathe() {
+      load().then(() => {
+        init(); kat.classList.add('drawn');
+        setTimeout(() => { kat.classList.add('away'); sword = true; html.classList.add('sword'); sheatheBtn.hidden = false; toast('Katana drawn. Swipe across a card. Esc puts it back.'); }, 340);
+      }).catch(() => {});
+    }
+    function sheathe() { sword = false; stroke = null; html.classList.remove('sword'); blade.hidden = true; sheatheBtn.hidden = true; kat.classList.remove('drawn', 'away'); }
+    kat.addEventListener('click', () => { if (found) sword ? sheathe() : kat.classList.contains('drawn') || unsheathe(); });
+    sheatheBtn.addEventListener('click', sheathe);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && sword) sheathe(); });
+    function moveBlade(e) {
+      bladeV += (Math.max(-55, Math.min(55, e.movementX * 2.5)) - bladeV) * 0.35; bladeA = 135 + bladeV;
+      blade.hidden = false; blade.style.transform = `translate(${e.clientX - 14}px, ${e.clientY - 160}px) rotate(${bladeA.toFixed(1)}deg)`;
+    }
+
+    const polyArea = (ps) => Math.abs(ps.reduce((s, p, i) => { const q = ps[(i + 1) % ps.length]; return s + p[0] * q[1] - q[0] * p[1]; }, 0)) / 2;
+    const validPoly = (ps) => ps.length >= 3 && ps.length <= 10 && polyArea(ps) >= 150 && !ps.some((p, i) => { const q = ps[(i + 1) % ps.length]; return Math.hypot(p[0] - q[0], p[1] - q[1]) < 3; });
+    const rectPoly = (o) => [[0, 0], [o.w, 0], [o.w, o.h], [0, o.h]];
+    function worldPoly(o) {
+      const p = o.body.getPosition(), a = o.body.getAngle(), c = Math.cos(a), s = Math.sin(a);
+      return (o.poly || rectPoly(o)).map(([x, y]) => { const lx = x - o.w / 2, ly = y - o.h / 2; return [p.x * S + lx * c - ly * s, p.y * S + lx * s + ly * c]; });
+    }
+    function inside(poly, x, y) {
+      let sgn = 0;
+      for (let i = 0; i < poly.length; i++) { const p = poly[i], q = poly[(i + 1) % poly.length], cr = (q[0] - p[0]) * (y - p[1]) - (q[1] - p[1]) * (x - p[0]); if (cr) { if (sgn && Math.sign(cr) !== sgn) return false; sgn = Math.sign(cr); } }
+      return true;
+    }
+    function crossings(poly, a, b) {   // where the blade's path a -> b crosses the outline, in order
+      const out = [], rx = b[0] - a[0], ry = b[1] - a[1];
+      for (let i = 0; i < poly.length; i++) {
+        const p = poly[i], q = poly[(i + 1) % poly.length], sx = q[0] - p[0], sy = q[1] - p[1], den = rx * sy - ry * sx; if (!den) continue;
+        const t = ((p[0] - a[0]) * sy - (p[1] - a[1]) * sx) / den, u = ((p[0] - a[0]) * ry - (p[1] - a[1]) * rx) / den;
+        if (t >= 0 && t <= 1 && u >= 0 && u <= 1) out.push([a[0] + rx * t, a[1] + ry * t, t]);
+      }
+      return out.sort((m, n) => m[2] - n[2]);
+    }
+    function targets() {   // everything the blade can cut: loose cards and pieces, and the cards still in the grid
+      const out = [];
+      for (const o of objs) if ((o.kind === 'card' || o.kind === 'piece') && !o.root && o.born !== tick) out.push({ key: o, o, poly: worldPoly(o) });
+      for (const card of gridEl.querySelectorAll('.card:not(.held)')) {
+        if (rootOf.has(card)) continue;
+        const r = card.getBoundingClientRect(), x = r.left + scrollX, y = r.top + scrollY;
+        out.push({ key: card, card, poly: [[x, y], [x + r.width, y], [x + r.width, y + r.height], [x, y + r.height]] });
+      }
+      return out;
+    }
+    function freeCard(card) {   // a grid card that is cut never got pulled: it comes loose on the spot
+      card.classList.add('settled');
+      const r = card.getBoundingClientRect(), el = cloneCard(card);
+      el.style.width = r.width + 'px'; el.style.height = r.height + 'px'; layer.appendChild(el);
+      const o = addBody({ kind: 'card', el, w: r.width, h: r.height, ex: r.width / 2, ey: r.height / 2, key: card.dataset.key },
+        (r.left + r.width / 2 + scrollX) / S, (r.top + r.height / 2 + scrollY) / S, 0, new pl.Box(r.width / 2 / S, r.height / 2 / S));
+      el._o = o; card.classList.add('held'); ripped.add(o.key); showReset();
+      return o;
+    }
+    // a piece of a card: same origin and angle as the card it came from, its outline as the collision shape and as the clip-path
+    function fragment(src, poly, kind, opt, extra) {
+      const b = src.body, pos = b.getPosition(), W = src.w, H = src.h, el = cloneCard(src.el);
+      el.classList.add(kind); el.style.width = W + 'px'; el.style.height = H + 'px';
+      el.style.clipPath = `polygon(${poly.map(([x, y]) => `${x.toFixed(1)}px ${y.toFixed(1)}px`).join(',')})`;
+      layer.appendChild(el);
+      const s = addBody({ kind, el, w: W, h: H, ex: W / 2, ey: H / 2, poly, ...extra }, pos.x, pos.y, b.getAngle(), new pl.Polygon(poly.map(([x, y]) => ({ x: (x - W / 2) / S, y: (y - H / 2) / S }))), opt);
+      el._o = s; return s;
+    }
+    function slice(o, A, B, dir) {   // A, B: page points where the blade entered and left
+      if (!objs.has(o)) return;
+      const b = o.body, pos = b.getPosition(), ang = b.getAngle(), c = Math.cos(ang), s = Math.sin(ang), W = o.w, H = o.h;
+      const loc = (p) => { const dx = p[0] - pos.x * S, dy = p[1] - pos.y * S; return [dx * c + dy * s + W / 2, -dx * s + dy * c + H / 2]; };
+      const a = loc(A), z = loc(B), ux = z[0] - a[0], uy = z[1] - a[1], ul = Math.hypot(ux, uy); if (ul < 4) return;
+      const side = (p) => ux * (p[1] - a[1]) - uy * (p[0] - a[0]), src = o.poly || rectPoly(o), L = [], R = [], cut = [];
+      for (let i = 0; i < src.length; i++) {
+        const p = src[i], q = src[(i + 1) % src.length], sp = side(p), sq = side(q);
+        (sp >= 0 ? L : R).push(p);
+        if ((sp > 0 && sq < 0) || (sp < 0 && sq > 0)) { const t = sp / (sp - sq), x = [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t]; L.push(x); R.push(x); cut.push(x); }
+      }
+      if (cut.length !== 2 || !validPoly(L) || !validPoly(R)) return;
+      const v = b.getLinearVelocity(), vx = v.x, vy = v.y, w = b.getAngularVelocity();
+      const nx = (-uy * c - ux * s) / ul, ny = (-uy * s + ux * c) / ul;     // world normal of the cut, towards the L half
+      const dl = Math.hypot(dir[0], dir[1]) || 1, dx = dir[0] / dl, dy = dir[1] / dl;
+      const parts = [[L, 1], [R, -1]].map(([poly, sg]) => {
+        const p = fragment(o, poly, 'piece', {}, polyArea(poly) < 3000 ? { die: now() + 2500 + Math.random() * 1200 } : {});
+        p.born = tick;   // the stroke that made it cannot cut it again in the same move
+        p.body.setLinearVelocity({ x: vx + sg * nx * 2.4 + dx * 1.6, y: vy + sg * ny * 2.4 + dy * 1.6 });
+        p.body.setAngularVelocity(w + sg * (0.7 + Math.random()));
+        return p;
+      });
+      const toWorld = (p) => { const lx = p[0] - W / 2, ly = p[1] - H / 2; return [pos.x * S + lx * c - ly * s, pos.y * S + lx * s + ly * c]; };
+      const c0 = toWorld(cut[0]), c1 = toWorld(cut[1]), n = Math.max(4, Math.round(Math.hypot(c1[0] - c0[0], c1[1] - c0[1]) / 28));
+      for (let k = 0; k <= n; k++) spray(c0[0] + (c1[0] - c0[0]) * k / n, c0[1] + (c1[1] - c0[1]) * k / n, nx, ny);
+      say(parts[0], 'slice', true);
+      remove(o);
+    }
+    // little drops and paper scraps that fly off a cut: plain points on the same clock as the physics, no bodies
+    const bits = [];
+    function spray(x, y, nx, ny) {
+      for (let k = 0; k < 4; k++) {
+        const el = document.createElement('i'), sz = 3 + Math.random() * 6; el.className = Math.random() < 0.72 ? 'bit' : 'bit paper';
+        el.style.width = el.style.height = sz.toFixed(1) + 'px'; layer.appendChild(el);
+        const sg = Math.random() < 0.5 ? -1 : 1, an = (Math.random() - 0.5) * 1.7, ca = Math.cos(an), sa = Math.sin(an), sp = 120 + Math.random() * 620;
+        bits.push({ el, x, y, vx: sg * (nx * ca - ny * sa) * sp, vy: sg * (nx * sa + ny * ca) * sp - 160, t: 0, life: 0.45 + Math.random() * 0.65 });
+      }
+      run();
+    }
+    function moveBits(dt) {
+      for (let i = bits.length - 1; i >= 0; i--) {
+        const p = bits[i]; p.t += dt;
+        if (p.t > p.life) { p.el.remove(); bits.splice(i, 1); continue; }
+        p.vy += 2600 * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+        p.el.style.transform = `translate(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px) scale(${(1 - 0.7 * p.t / p.life).toFixed(2)})`;
+      }
+    }
+    function trail(a, b) {
+      const el = document.createElement('i'); el.className = 'slash'; el.style.width = Math.hypot(b[0] - a[0], b[1] - a[1]).toFixed(1) + 'px';
+      el.style.transform = `translate(${a[0].toFixed(1)}px, ${a[1].toFixed(1)}px) rotate(${Math.atan2(b[1] - a[1], b[0] - a[0]).toFixed(3)}rad)`;
+      layer.appendChild(el); setTimeout(() => el.remove(), 280);
+    }
+    addEventListener('pointerdown', (e) => {
+      if (!sword || isCrazy() || e.button > 0 || e.target.closest?.('button, input, .reader, .warn, header.top, footer')) return;
+      e.preventDefault(); moveBlade(e);
+      const x = e.clientX + scrollX, y = e.clientY + scrollY;
+      stroke = { id: e.pointerId, x, y, cuts: new Map(), moved: false };
+      for (const t of targets()) if (inside(t.poly, x, y)) stroke.cuts.set(t.key, [[x, y]]);   // starting on a card counts as the way in
+    }, true);
+    function strokeMove(e) {
+      const a = [stroke.x, stroke.y], b = [e.clientX + scrollX, e.clientY + scrollY]; if (Math.hypot(b[0] - a[0], b[1] - a[1]) < 3) return;
+      stroke.moved = true; stroke.x = b[0]; stroke.y = b[1]; tick++; trail(a, b);
+      for (const t of targets()) {
+        const xs = crossings(t.poly, a, b); if (!xs.length) continue;
+        const list = stroke.cuts.get(t.key) || []; list.push(...xs); stroke.cuts.set(t.key, list);
+        if (list.length >= 2) { stroke.cuts.delete(t.key); slice(t.o || freeCard(t.card), list[0], list[list.length - 1], [b[0] - a[0], b[1] - a[1]]); }
+      }
+    }
+
     // ---- put everything back ----
     function showReset() {
       if (resetBtn) { resetBtn.hidden = false; return; }
@@ -910,6 +1097,7 @@
     }
     function resetAll() {
       for (const o of [...objs]) remove(o);
+      for (const p of bits.splice(0)) p.el.remove();
       hits.length = 0; blasts.length = 0; ripped.clear(); resetBtn.hidden = true;
       document.querySelectorAll('#grid .card.held').forEach((c) => { c.classList.remove('held'); c.classList.add('regrow'); setTimeout(() => c.classList.replace('regrow', 'settled'), 700); });
     }
@@ -918,7 +1106,7 @@
       for (const o of [...objs]) if (o.root) remove(o);
       document.querySelectorAll('#grid .card').forEach((c) => { if (ripped.has(c.dataset.key)) c.classList.add('held'); });
     });
-    window.__cards = { objs, S, state: () => ({ grab, press, loopOn, size }) };   // for browser tests
+    window.__cards = { objs, S, bits, state: () => ({ grab, press, loopOn, size, sword, found }) };   // for browser tests
   })();
 
   // ---- greeting typewriter: Bulgarian, Japanese, English ----
