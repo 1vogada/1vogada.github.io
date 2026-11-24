@@ -272,6 +272,7 @@
   .omikuji { position: fixed; inset: 0; z-index: 55; display: grid; place-items: center; padding: 16px;
              background: color-mix(in srgb, var(--bg) 55%, transparent); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
   .omikuji[hidden] { display: none; }
+  .omikuji { overflow: hidden; }
   /* the slip is a card like the project cards: surface, border, shadow, and an embroidery strip top and bottom */
   .slip { position: relative; width: min(360px, 100%); background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 14px;
           overflow: hidden; text-align: center; box-shadow: var(--shadow), 0 24px 60px rgba(0,0,0,.18);
@@ -282,8 +283,8 @@
   @keyframes unroll { from { transform: scaleY(.04); opacity: 0; } 60% { opacity: 1; } to { transform: none; } }
   .omi-x { position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; border-radius: 8px; border: 0; background: none; font-size: 1.3rem; color: var(--muted); cursor: pointer; z-index: 1; }
   .omi-x:hover { color: var(--text); background: var(--accent-soft); }
-  /* the secret ×: buried under the slip's bottom edge, it rises out of it when the pointer comes near the corner */
-  .omi-secret { position: absolute; right: 10px; bottom: 8px; z-index: 3; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border); cursor: pointer;
+  /* the secret ×: buried under the bottom edge of the screen, bottom-left; it rises out of it when the pointer comes near the corner */
+  .omi-secret { position: absolute; left: 12px; bottom: 12px; z-index: 3; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border); cursor: pointer;
                 background: var(--surface); color: var(--accent); font-size: 1.25rem; font-weight: 800; line-height: 1; box-shadow: var(--shadow);
                 transform: translateY(170%) rotate(-90deg); transition: transform .3s ease-in; }
   .omi-secret.near { transform: none; transition: transform .45s cubic-bezier(.3,1.7,.5,1); }
@@ -484,6 +485,7 @@
 
   <div class="reader" id="reader" hidden></div>
   <div class="omikuji" id="omikuji" hidden role="dialog" aria-modal="true" aria-labelledby="omi-kanji">
+    <button class="omi-secret" id="omi-secret" type="button" aria-label="Close (secret)" tabindex="-1">×</button>
     <div class="slip" id="slip">
       <span class="band" aria-hidden="true"></span>
       <div class="slip-body">
@@ -497,7 +499,6 @@
         <div class="omi-actions" id="omi-actions"><a class="btn primary" id="omi-go" href="#">Yes, take me →</a><button class="btn ghost" id="omi-no" type="button">No</button></div>
       </div>
       <span class="band bottom" aria-hidden="true"></span>
-      <button class="omi-secret" id="omi-secret" type="button" aria-label="Close (secret)" tabindex="-1">×</button>
     </div>
   </div>
 
@@ -1988,12 +1989,12 @@
     Object.assign(omi.style, v.scale > 1.01 ? { inset: 'auto', left: v.offsetLeft + 'px', top: v.offsetTop + 'px', width: v.width + 'px', height: v.height + 'px' } : { inset: '', left: '', top: '', width: '', height: '' });
   }
   if (window.visualViewport) { visualViewport.addEventListener('resize', fitOmi); visualViewport.addEventListener('scroll', fitOmi); }
-  // the secret ×: it rises when the pointer comes within ~90px of the slip's bottom-right corner, and the hand panics.
+  // the secret ×: it rises when the pointer comes within ~90px of the screen's bottom-left corner, and the hand panics.
   // Clicking it closes the slip there and then, coin game or not
   const secret = $('omi-secret'); let found = false, peek = false;
   document.addEventListener('pointermove', (e) => {
     if (omi.hidden) return;
-    const r = slip.getBoundingClientRect(), near = Math.hypot(e.clientX - (r.right - 27), e.clientY - (r.bottom - 25)) < 90;
+    const o = omi.getBoundingClientRect(), r = slip.getBoundingClientRect(), near = Math.hypot(e.clientX - (o.left + 29), e.clientY - (o.bottom - 29)) < 90;
     if (near === secret.classList.contains('near')) return;
     secret.classList.toggle('near', near);
     if (!near || found) return;
