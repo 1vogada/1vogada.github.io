@@ -1510,10 +1510,37 @@
       ['IT HURTS', 'STOP PULLING', 'MY MIDDLE!!', 'I am not cheese!', 'LET GO LET GO', 'БОЛИИИ!', '痛い!!'],
       ['AAAAAAAAAAAAAA', 'I CAN SEE MY INSIDES', 'I AM COMING APART', 'NOT LIKE THIS', 'МАМООООО', 'ぎゃああああ!!', 'AAAAAAA—'],
     ];
-    function cardSay(o, pain) {
+    // what the card on the shelf says while the hand is on its way, and what the cards near it say
+    const PANIC = [
+      ['uh. guys?', 'is that… coming here?', "it's not looking at me. right?", 'nobody move', 'I do not like this shelf', 'ъъъ… хора?', 'あれ、こっち来てる?'],
+      ['IT IS COMING HERE', 'somebody pick me up!', 'not me not me not me', 'I am just a card!', 'take another one!', 'ПОМОЩ!', 'こっち来ないで!'],
+      ['HELP HELP HELP', 'PICK ME UP PICK ME UP', 'I CAN SMELL IT', 'AAAAAAAAAA', 'DO SOMETHING', 'НЕ МЕ ЯЖ!!', '助けてぇぇ!!'],
+    ];
+    const NOTME = ['take that one!', 'not me. phew.', "don't look at me", 'I was never here', 'it wants the one on the shelf', 'вземи него!', 'あっちだよ!'];
+    // fear 0 to 1 as the hand closes in: the card shakes harder and harder, hops, shuffles away from the hand, and says so; loose cards nearby shiver and point at it
+    function panic(o, fear, dt, t) {
+      const c = claw, b = o.body, m = b.getMass(), away = Math.sign(b.getWorldCenter().x * S - scrollX - c.x) || -1;
+      if (fear > 0.05) cardSay(o, 0.1 + 0.9 * fear, PANIC);
+      if (t > (o.jit || 0)) {
+        o.jit = t + 150 - 90 * fear + Math.random() * 60;
+        b.applyLinearImpulse({ x: m * (away * (0.25 + 0.9 * fear) * Math.random() + (Math.random() - 0.5) * 0.5 * fear), y: -m * (0.35 + 2 * fear * Math.random()) }, b.getWorldCenter(), true);
+        b.applyAngularImpulse(b.getInertia() * (Math.random() - 0.5) * (1.2 + 5 * fear), true);
+      }
+      if (t > (c.crowd || 0)) {
+        c.crowd = t + 220; const w0 = b.getWorldCenter();
+        for (const q of objs) {
+          if (q === o || q.kind !== 'card' || q.root || q.tug || (grab && grab.o === q)) continue;
+          const w = q.body.getWorldCenter(); if (Math.hypot(w.x - w0.x, w.y - w0.y) > 6.5) continue;
+          q.body.applyLinearImpulse({ x: (Math.random() - 0.5) * q.body.getMass() * 0.5 * (0.3 + fear), y: -q.body.getMass() * 0.35 * (0.3 + fear) * Math.random() }, w, true);
+          q.body.applyAngularImpulse(q.body.getInertia() * (Math.random() - 0.5) * (0.3 + fear), true);
+          if (t - (c.notme || 0) > 2600 && Math.random() < 0.3 && !q.say) { c.notme = t; if (q.say) q.say.el.remove(); q.said = t; q.say = { el: bubble(pick(NOTME)), until: t + 1300 }; }
+        }
+      }
+    }
+    function cardSay(o, pain, LINES = AGONY) {
       const t = now(), lvl = pain > 0.62 ? 2 : pain > 0.3 ? 1 : 0; if (o.said && t - o.said < 1500 - 950 * pain && lvl <= (o.lvl || 0)) return;
       if (o.say) o.say.el.remove();
-      const el = bubble(pick(AGONY[lvl])); el.classList.add('agony'); el.style.setProperty('--pain', pain.toFixed(2)); if (lvl) el.dataset.lvl = lvl;
+      const el = bubble(pick(LINES[lvl])); el.classList.add('agony'); el.style.setProperty('--pain', pain.toFixed(2)); if (lvl) el.dataset.lvl = lvl;
       o.said = t; o.lvl = lvl; o.say = { el, until: t + 1300 };
     }
     function clawSlip(P, H) {   // a sharp yank right after it grabs and the claws slide off
@@ -1609,13 +1636,18 @@
           const q = shelfSnack(); if (shelf) shelf.want = !!q;
           if (!q) c.eyed = null; else if (q !== c.eyed) { c.eyed = q; c.eyedAt = t; } else if (t > c.cool && t - c.eyedAt > 700) { c.o = q; c.eyed = null; clawSet('reach'); clawSay('shelf', true); }
         }
-      } else if (c.st === 'reach') {   // it comes for what was left on the shelf, slowly, the whole arm out across the screen
-        const o = c.o; pose = POSES.eager; wig = 0.22; rate = 1.4;
-        if (!o || (grab && grab.o === o) || !onShelf(o)) { c.o = null; c.cool = t + 800; clawSet('sulk'); clawSay('sulk'); }
+      } else if (c.st === 'reach') {   // it comes for what was left on the shelf: slowly, at a steady creep, the whole arm out across the screen, and the cards can see it coming
+        const o = c.o; pose = POSES.eager; wig = 0.22; rate = 0.9;
+        if (o && objs.has(o) && !onShelf(o)) c.off = (c.off || 0) + dt; else c.off = 0;   // it may hop about in its panic; only a card that has really left the shelf gets away
+        if (!o || (grab && grab.o === o) || c.off > 0.7) { c.o = null; c.off = 0; c.cool = t + 800; clawSet('sulk'); clawSay('sulk'); }
         else {
-          const w = o.body.getWorldCenter(), Hc = [w.x * S - scrollX, w.y * S - scrollY], q = gripPt(); c.ly = Math.max(80, Math.min(vh - 80, Hc[1])); T = wristFor(Hc, aim);
-          if (Math.hypot(q[0] - Hc[0], q[1] - Hc[1]) < 36 && c.t > 2.4) {   // it hovers over it for a moment, then: got it. A whole card may get crushed on the spot; otherwise it is dragged off and eaten
-            o.hot = 0; say(o, 'pull', true); c.cool = t + 1500;
+          const w = o.body.getWorldCenter(), Hc = [w.x * S - scrollX, w.y * S - scrollY], q = gripPt(), dist = Math.hypot(q[0] - Hc[0], q[1] - Hc[1]); c.ly = Math.max(80, Math.min(vh - 80, Hc[1]));
+          if (c.d0 == null || c.t < 0.1) c.d0 = Math.max(200, dist);
+          const fear = clamp01(1 - (dist - 60) / c.d0), W0 = wristFor(Hc, aim), dx = W0[0] - c.x, dy = W0[1] - c.y, dl = Math.hypot(dx, dy) || 1, lead = Math.min(dl, 230);
+          T = [c.x + dx / dl * lead, c.y + dy / dl * lead];   // never further ahead than this: a steady creep, easing in only at the very end
+          panic(o, fear, dt, t);
+          if (dist < 36 && c.t > 2.4) {   // it hovers over it for a moment, then: got it. A whole card may get crushed on the spot; otherwise it is dragged off and eaten
+            o.hot = 0; say(o, 'pull', true); c.cool = t + 1500; c.d0 = null;
             if (o.kind === 'card' && Math.random() < 0.4) { crushStart(o); clawSet('crush'); clawSay('snatch', true); }
             else {
               o.body.setAngularDamping(HELD_SPIN); o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 }); o.el.style.pointerEvents = 'none';
@@ -1711,7 +1743,7 @@
         else if (c.t > 1.4 && o) { o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 }); o.el.style.pointerEvents = 'none'; clawSet('eat'); }
         else if (!o) clawSet('lurk');
       } else if (c.st === 'eat') {   // it drags its half off the screen
-        pose = POSES.joy; rate = c.x < vw - 420 ? 2.6 : 5; T = [vw + 420, c.y];
+        pose = POSES.joy; rate = c.x < vw - 380 ? 1.7 : 5; T = [c.x < vw - 380 ? c.x + 300 : vw + 420, c.y];   // from far away it drags its catch back across the screen at a walk
         if (c.x > vw + 190 || !o) {
           if (o) { remove(o); c.o = null; c.joint = null; gore(vw - 6 + scrollX, c.y + scrollY, -1, 0, 16, 0.8); clawSay('eat', true); }
           c.cool = t + 1800; clawSet('lurk');
@@ -1901,7 +1933,7 @@
       document.querySelectorAll('#grid .card').forEach((c) => { if (ripped.has(c.dataset.key)) c.classList.add('held'); });
     });
     window.__cards = { objs, S, bits, state: () => ({ grab, press, loopOn, size, found, katana: katObj, claw, shelf }) };   // for browser tests
-    window.__lines = { SAY, CLAW_SAY, AGONY, BEG };   // every line anything here can say: the phrasebook (scripts/phrasebook.js) prints them from these lists
+    window.__lines = { SAY, CLAW_SAY, AGONY, BEG, PANIC, NOTME };   // every line anything here can say: the phrasebook (scripts/phrasebook.js) prints them from these lists
     // the phrasebook borrows the hand: while its state is 'book' the tick below leaves it alone and the book poses and draws it itself.
     // Surprise me calls it in for a scene: come() brings its grip to a point (viewport px), to() moves or re-poses it, say() and leave()
     window.__hand = { get: () => { if (!claw) clawInit(); return claw; }, draw: clawDraw, set: clawSet, POSES, katanaSvg,
@@ -2386,6 +2418,6 @@
   applyMode();
   if (root.dataset.wantCrazy) askCrazy();
 </script>
-<script src="/scripts/phrasebook.js?v=7" defer></script>
+<script src="/scripts/phrasebook.js?v=8" defer></script>
 </body>
 </html>

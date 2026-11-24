@@ -7,7 +7,7 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   // Bump VER, and the ?v= on this file's script tag in index.html, whenever this file or the stylesheet changes. GitHub Pages caches each
   // file for ten minutes on its own, and a new script with an old stylesheet looks broken; the version makes them arrive as a pair
-  const VER = 7;
+  const VER = 8;
   const here = (document.currentScript && document.currentScript.src) || '/scripts/phrasebook.js';
 
   // ---- what this file knows: which occasion each list belongs to. src = which list on window.__lines, key = which entry of it ----
@@ -31,6 +31,10 @@
         { src: 'AGONY', key: 0, title: 'Stretched: the first degree', when: 'You and the Hand each hold an end of the same card, and it has begun to grow longer.' },
         { src: 'AGONY', key: 1, title: 'Stretched: the second degree', when: 'The card is pulled past a third of what it can bear. Also said in the Hand’s fist, while it is being crushed.' },
         { src: 'AGONY', key: 2, title: 'Stretched: the third degree', when: 'The card is close to tearing, or close to being a ball of paper. The letters grow, redden and shake.' },
+        { src: 'PANIC', key: 0, title: 'On the shelf: it has noticed', when: 'A card lies on the secret shelf and the Hand has started across the screen for it.' },
+        { src: 'PANIC', key: 1, title: 'On the shelf: it is coming', when: 'The Hand is a third of the way there. The card shakes and hops and shuffles away from it.' },
+        { src: 'PANIC', key: 2, title: 'On the shelf: it is here', when: 'The Hand is nearly on it. Pick the card up and it is saved.' },
+        { src: 'NOTME', key: null, title: 'Not me', when: 'Said by a loose card lying near the shelf while the Hand is coming for another.' },
         { src: 'BEG', key: null, title: 'Begging', when: 'In the Hand’s closed fist, in the quiet pause after the second squeeze.' },
       ] },
     { id: 'katana', num: 'II', title: 'The Katana', head: 'Of the Katana',
@@ -111,6 +115,7 @@
     'チーズ!!!': 'CHEESE!!!', 'СИРЕНЕ!!!': 'CHEESE!!!', 'ごちそうさま': 'thank you for the meal', 'ммм.': 'mmm.', 'хе-хе': 'heh-heh', 'いらない': 'do not want it', 'ケチ': 'stingy', 'пф.': 'pff.',
     'いい切れ味': 'a fine edge', 'режи, режи…': 'cut, cut…', 'бум!': 'boom!', 'もったいない': 'what a waste', 'дай го насам': 'hand it over here', 'かっこつけ': 'show-off',
     'какво имаме тук…': 'what have we here…', 'いただきます…': 'thanks for the meal… (said before eating)',
+    'ъъъ… хора?': 'uhh… guys?', 'あれ、こっち来てる?': 'huh, is it coming this way?', 'ПОМОЩ!': 'HELP!', 'こっち来ないで!': 'do not come over here!', 'НЕ МЕ ЯЖ!!': 'DO NOT EAT ME!!', '助けてぇぇ!!': 'heeelp!!', 'вземи него!': 'take him!', 'あっちだよ!': 'it is that one, over there!',
     'хванах!': 'caught it!', 'ナイスパス!': 'nice pass!', 'дай тука!': 'give it here!', 'もらった!': 'mine now!', 'бавно…': 'slowly…', 'まだだよ': 'not yet', 'смачках го.': 'I crushed it.', 'скука.': 'boring.', 'ау!': 'ow!', 'боли!': 'it hurts!', '痛っ!': 'ouch!', 'ひどい!': 'how mean!', 'полека…': 'easy does it…', 'そーっと…': 'ever so quietly…', 'сега ще видиш!': 'now you will see!', 'もう怒った!': 'now I am angry!', 'нагоре-надолу!': 'up and down!', 'ぐるぐる〜': 'round and round', 'つまらない': 'boring', 'ポイ': 'the sound of tossing something away',
   };
   const langOf = (s) => /[぀-ヿ一-鿿]/.test(s) ? 'JP' : /[Ѐ-ӿ]/.test(s) ? 'BG' : '';
