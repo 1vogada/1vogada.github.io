@@ -10,7 +10,7 @@
     {
       "name": "apiTest",
       "url": "https://kiripad.dev/apiTest/",
-      "description": "",
+      "description": "League of Legends match history lookup on the Riot API (bring your own API key)",
       "code": "https://github.com/1vogada/apiTest"
     },
     {
@@ -30,12 +30,6 @@
       "url": "https://kiripad.dev/gridburst/",
       "description": "Gridburst: an endless block-placement puzzle, mobile first",
       "code": "https://github.com/1vogada/gridburst"
-    },
-    {
-      "name": "hakaton2025",
-      "url": "https://github.com/1vogada/hakaton2025",
-      "description": "AI translator front end",
-      "code": "https://github.com/1vogada/hakaton2025"
     },
     {
       "name": "hive",
@@ -78,18 +72,6 @@
       "url": "https://kiripad.dev/roomDesign/",
       "description": "",
       "code": null
-    },
-    {
-      "name": "sde-project",
-      "url": "https://github.com/1vogada/sde-project",
-      "description": "a project me and damyan are working on",
-      "code": "https://github.com/1vogada/sde-project"
-    },
-    {
-      "name": "testzavalkata",
-      "url": "https://kiripad.dev/testzavalkata/",
-      "description": "",
-      "code": "https://github.com/1vogada/testzavalkata"
     }
   ]
 }
