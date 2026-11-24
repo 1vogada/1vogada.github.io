@@ -1,0 +1,128 @@
+/* The phrasebook of kiripad.dev: a near-fullscreen open book that catalogues everything the cards, the katana and the hand say.
+   Everything here is prefixed pb- and lives in its own overlay, so it does not touch the page's own styles. */
+.pb-open-btn svg { display: block; }
+.icon-btn.pb-open-btn { display: inline-grid; place-items: center; padding: 0; }
+
+html.pb-lock { overflow: hidden; }
+.pb { position: fixed; inset: 0; z-index: 46; display: grid; place-items: center; overflow: hidden;
+      --paper: #f2e7cd; --paper2: #e9dcbc; --ink: #2b2219; --faint: #7a6a55; --rubric: #a32a1b; --rule: #b9a682; --board: #3a2118;
+      --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", "URW Palladio L", "Noto Serif", Georgia, "Times New Roman", serif;
+      font-family: var(--serif); color: var(--ink); opacity: 0; transition: opacity .28s; }
+.pb[hidden] { display: none; }
+.pb.in { opacity: 1; }
+/* the room goes dark and warm around the book */
+.pb-shade { position: absolute; inset: 0; background: radial-gradient(ellipse 75% 70% at 50% 50%, rgba(58, 30, 12, .62) 0%, rgba(22, 10, 5, .86) 60%, rgba(4, 2, 1, .97) 100%);
+            backdrop-filter: blur(5px) sepia(.5) saturate(.7); -webkit-backdrop-filter: blur(5px) sepia(.5) saturate(.7); }
+.pb-vignette { position: absolute; inset: 0; pointer-events: none; z-index: 4; background: radial-gradient(ellipse 80% 78% at 50% 50%, transparent 55%, rgba(10, 4, 0, .5) 100%); }
+
+.pb-book { position: relative; z-index: 1; width: min(1180px, calc(100vw - 28px)); height: min(800px, calc(100vh - 28px), calc(100dvh - 28px));
+           --side: clamp(22px, 4.2vw, 58px); --top: 54px; --bot: 50px; --gut: clamp(44px, 7vw, 96px);
+           padding: 9px; border-radius: 7px 7px 9px 9px; background: linear-gradient(#4a2c20, var(--board));
+           box-shadow: 0 0 0 1px #1c0e09, 0 2px 0 2px #20110b, 0 30px 80px rgba(0, 0, 0, .7), 0 6px 18px rgba(0, 0, 0, .5);
+           transform: translateY(14px) scale(.975); transition: transform .34s cubic-bezier(.2, .8, .2, 1); }
+.pb.in .pb-book { transform: none; }
+/* the block of pages: two leaves that fall away into the spine, with the edges of the pages underneath showing at the sides */
+.pb-leaves { position: absolute; inset: 9px; border-radius: 3px; overflow: hidden;
+             background:
+               linear-gradient(90deg, rgba(60, 35, 12, .34) 0, rgba(60, 35, 12, .1) 1.1%, transparent 5%, transparent 43%, rgba(60, 35, 12, .09) 47.5%, rgba(40, 20, 6, .42) 49.7%, rgba(20, 8, 0, .6) 50%, rgba(40, 20, 6, .42) 50.3%, rgba(60, 35, 12, .09) 52.5%, transparent 57%, transparent 95%, rgba(60, 35, 12, .1) 98.9%, rgba(60, 35, 12, .34) 100%),
+               radial-gradient(ellipse 120% 90% at 50% 50%, transparent 60%, rgba(120, 84, 38, .22) 100%),
+               var(--paper);
+             box-shadow: inset 0 0 0 1px rgba(90, 60, 25, .35), inset 3px 0 0 var(--paper2), inset 4px 0 0 rgba(90, 60, 25, .28), inset 7px 0 0 var(--paper2), inset 8px 0 0 rgba(90, 60, 25, .2),
+                         inset -3px 0 0 var(--paper2), inset -4px 0 0 rgba(90, 60, 25, .28), inset -7px 0 0 var(--paper2), inset -8px 0 0 rgba(90, 60, 25, .2), inset 0 0 70px rgba(110, 70, 25, .2); }
+/* paper grain, drawn once as an SVG turbulence */
+.pb-leaves::before { content: ""; position: absolute; inset: 0; opacity: .5; mix-blend-mode: multiply; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .33 0 0 0 0 .16 0 0 0 .28 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+.pb-view { position: absolute; left: calc(9px + var(--side)); right: calc(9px + var(--side)); top: calc(9px + var(--top)); bottom: calc(9px + var(--bot)); overflow: hidden; }
+.pb-flow { height: 100%; column-count: 2; column-gap: var(--gut); column-fill: auto; font-size: clamp(14.5px, 1.18vw, 16.5px); line-height: 1.5;
+           transition: opacity .16s; font-variant-numeric: oldstyle-nums; text-rendering: optimizeLegibility; }
+.pb-flow.turn { opacity: 0; }
+.pb-flow > * { margin: 0; }
+
+/* running heads and folios */
+.pb-head, .pb-foot { position: absolute; left: calc(9px + var(--side)); right: calc(9px + var(--side)); display: flex; justify-content: space-between; gap: var(--gut);
+                     font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--faint); pointer-events: none; }
+.pb-head { top: 30px; } .pb-foot { bottom: 26px; font-size: 13px; letter-spacing: .08em; }
+.pb-head span, .pb-foot span { flex: 1; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pb-head span { padding-bottom: 6px; border-bottom: 1px solid var(--rule); box-shadow: 0 3px 0 -2px var(--rule); }
+.pb-foot span::before, .pb-foot span::after { content: "~"; margin: 0 .6em; color: var(--rule); }
+.pb-foot span:empty::before, .pb-foot span:empty::after { content: none; }
+
+/* controls */
+.pb-x, .pb-nav { position: absolute; z-index: 6; border: 0; background: none; color: var(--faint); cursor: pointer; font-family: var(--serif); padding: 0; }
+.pb-x { top: 14px; right: 18px; width: 34px; height: 34px; font-size: 26px; line-height: 1; border-radius: 50%; }
+.pb-x:hover, .pb-nav:hover:not(:disabled) { color: var(--rubric); }
+.pb-nav { bottom: 14px; height: 34px; padding: 0 10px; font-size: 14px; font-style: italic; letter-spacing: .03em; }
+.pb-prev { left: 22px; } .pb-next { right: 22px; }
+.pb-nav:disabled { opacity: .28; cursor: default; }
+.pb-x:focus-visible, .pb-nav:focus-visible { outline: 2px solid var(--rubric); outline-offset: 2px; }
+/* the outer margins of the pages turn them too */
+.pb-edge { position: absolute; top: 60px; bottom: 60px; width: calc(var(--side) + 4px); z-index: 5; border: 0; padding: 0; background: none; cursor: pointer; }
+.pb-edge.l { left: 9px; cursor: w-resize; } .pb-edge.r { right: 9px; cursor: e-resize; }
+.pb-edge:disabled { cursor: default; }
+
+/* ---- typography ---- */
+.pb-flow h2, .pb-flow h3, .pb-flow p { margin: 0; font-weight: 400; }
+.pb-title { break-after: column; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: .55em; padding: 0 4%; }
+.pb-title .pb-small { font-size: .78em; letter-spacing: .3em; text-transform: uppercase; color: var(--faint); }
+.pb-title h2 { font-size: clamp(2em, 3.6vw, 3.1em); line-height: 1.02; letter-spacing: .04em; text-transform: uppercase; color: var(--rubric); }
+.pb-title h2 small { display: block; font-size: .36em; letter-spacing: .34em; color: var(--ink); margin: .5em 0; font-style: italic; text-transform: none; letter-spacing: .04em; }
+.pb-title .pb-being { font-style: italic; max-width: 30em; text-wrap: balance; }
+.pb-title .pb-imprint { font-size: .8em; letter-spacing: .16em; text-transform: uppercase; color: var(--faint); }
+.pb-orn { display: block; margin: .5em auto; color: var(--rubric); }
+.pb-frontis { break-after: column; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1em; text-align: center; }
+.pb-frame { border: 1px solid var(--ink); outline: 3px double var(--ink); outline-offset: 5px; padding: 26px 30px; }
+.pb-seal { width: 132px; height: 132px; display: grid; place-items: center; border-radius: 10px; background: var(--rubric); color: var(--paper); font-size: 92px; line-height: 1; rotate: -3deg;
+           box-shadow: inset 0 0 0 4px var(--rubric), inset 0 0 0 6px var(--paper); font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif CJK JP", "Noto Serif JP", serif; }
+.pb-cap { font-style: italic; font-size: .86em; color: var(--faint); max-width: 24em; text-wrap: balance; }
+
+.pb-contents { break-after: column; }
+.pb-contents h3, .pb-h3c { text-align: center; font-size: 1.05em; letter-spacing: .3em; text-transform: uppercase; margin: 0 0 1em; }
+.pb-toc { list-style: none; margin: 0 0 1.4em; padding: 0; }
+.pb-toc li { display: flex; align-items: baseline; gap: .5em; margin: .34em 0; }
+.pb-toc li i { flex: 1; border-bottom: 1px dotted var(--faint); translate: 0 -.25em; }
+.pb-toc button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
+.pb-toc button:hover { color: var(--rubric); }
+.pb-toc .n { font-variant: small-caps; letter-spacing: .08em; color: var(--rubric); min-width: 2.2em; }
+.pb-note { font-size: .9em; text-align: justify; hyphens: auto; }
+.pb-note + .pb-note { text-indent: 1.4em; }
+.pb-warn { margin-top: 1.3em !important; padding: .7em .9em; border: 1px solid var(--rubric); outline: 1px solid var(--rubric); outline-offset: 3px; font-size: .88em; text-align: center; font-style: italic; text-wrap: balance; }
+.pb-warn b { font-style: normal; font-weight: 400; font-variant: small-caps; letter-spacing: .12em; color: var(--rubric); }
+
+.pb-chapter { break-before: column; text-align: center; padding-top: .4em; margin-bottom: 1.1em !important; }
+.pb-chapter .pb-num { font-size: .8em; letter-spacing: .34em; text-transform: uppercase; color: var(--faint); }
+.pb-chapter h2 { font-size: 1.95em; line-height: 1.1; letter-spacing: .1em; text-transform: uppercase; margin: .15em 0 .1em; }
+.pb-intro { text-align: justify; hyphens: auto; margin-bottom: 1.1em !important; }
+.pb-intro::first-letter { float: left; font-size: 3.5em; line-height: .82; padding: .07em .09em 0 0; color: var(--rubric); font-weight: 400; }
+.pb-intro::first-line { font-variant: small-caps; letter-spacing: .05em; }
+
+.pb-entry { break-inside: avoid; padding: .15em 0 .95em; position: relative; }
+.pb-entry h3 { font-size: 1.06em; font-variant: small-caps; letter-spacing: .07em; display: flex; align-items: baseline; gap: .5em; }
+.pb-entry h3::before { content: "¶"; color: var(--rubric); font-variant: normal; }
+.pb-entry h3::after { content: ""; flex: 1; border-bottom: 1px solid var(--rule); translate: 0 -.3em; }
+.pb-entry h3 em { order: 3; font-style: normal; font-size: .72em; letter-spacing: .12em; color: var(--faint); }
+.pb-when { font-style: italic; font-size: .93em; color: #4a3c2c; margin: .12em 0 .3em !important; text-align: justify; hyphens: auto; }
+.pb-when b { font-style: normal; font-weight: 400; font-variant: small-caps; letter-spacing: .08em; color: var(--rubric); }
+.pb-lines { padding-left: 1.3em; text-indent: -1.3em; }
+.pb-q { white-space: nowrap; }
+.pb-q.long { white-space: normal; }
+.pb-sep { color: var(--rubric); margin: 0 .22em; }
+.pb-gl { font-size: .86em; color: var(--faint); white-space: nowrap; }
+.pb-gl i { color: #4a3c2c; }
+.pb-end { text-align: center; padding-top: 1.2em; font-style: italic; color: var(--faint); break-inside: avoid; }
+.pb-end b { display: block; font-style: normal; font-weight: 400; letter-spacing: .4em; text-transform: uppercase; color: var(--ink); margin-bottom: .4em; }
+
+/* one page at a time on a narrow screen */
+@media (max-width: 760px) {
+  .pb-book { --side: 22px; --gut: 44px; --top: 46px; --bot: 46px; }
+  .pb-flow { column-count: 1; font-size: 15px; }
+  .pb-leaves { background:
+      linear-gradient(90deg, rgba(20, 8, 0, .5) 0, rgba(60, 35, 12, .2) 1.6%, transparent 9%, transparent 94%, rgba(60, 35, 12, .12) 98.5%, rgba(60, 35, 12, .34) 100%),
+      radial-gradient(ellipse 130% 90% at 50% 50%, transparent 60%, rgba(120, 84, 38, .22) 100%), var(--paper); }
+  .pb-head span:last-child, .pb-foot span:last-child { display: none; }
+  .pb-head { top: 24px; } .pb-foot { bottom: 22px; }
+  .pb-x { top: 8px; right: 10px; }
+  .pb-nav { bottom: 9px; } .pb-prev { left: 12px; } .pb-next { right: 12px; }
+  .pb-seal { width: 104px; height: 104px; font-size: 72px; }
+}
+@media (prefers-reduced-motion: reduce) { .pb, .pb-book, .pb-flow { transition: none; } }

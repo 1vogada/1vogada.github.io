@@ -1737,6 +1737,7 @@
       document.querySelectorAll('#grid .card').forEach((c) => { if (ripped.has(c.dataset.key)) c.classList.add('held'); });
     });
     window.__cards = { objs, S, bits, state: () => ({ grab, press, loopOn, size, found, katana: katObj, claw }) };   // for browser tests
+    window.__lines = { SAY, CLAW_SAY, AGONY, BEG };   // every line anything here can say: the phrasebook (scripts/phrasebook.js) prints them from these lists
   })();
 
   // ---- greeting typewriter: Bulgarian, Japanese, English ----
@@ -1976,5 +1977,6 @@
   applyMode();
   if (root.dataset.wantCrazy) askCrazy();
 </script>
+<script src="/scripts/phrasebook.js" defer></script>
 </body>
 </html>
