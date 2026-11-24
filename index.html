@@ -1353,13 +1353,14 @@
     const THUMB = { b: [14, 22], a: 1.1, l: [36, 30, 23], w: 13 }, BEND = [0.3, 1.05, 0.85], ARCH = [-0.3, 0.2, 0.24], GRIP = [98, 20];
     const PALM = [[-8, -15], [18, -25], [56, -33], [72, -12], [70, 14], [58, 27], [30, 30], [8, 27], [-8, 14]];
     const POSES = {
-      lurk: { curl: 0.5, th: 0.4, spread: 0.75, eye: 0.3, pupil: 0.6, happy: 0 },
-      eager: { curl: 0.12, th: 0.05, spread: 1.4, eye: 1.25, pupil: 1.25, happy: 0 },
-      lunge: { curl: -0.12, th: -0.15, spread: 1.7, eye: 1.45, pupil: 0.6, happy: 0 },
-      clamp: { curl: 0.82, th: 0.85, spread: 0.45, eye: 0.8, pupil: 0.8, happy: 0 },
-      strain: { curl: 0.95, th: 1, spread: 0.3, eye: 0.3, pupil: 0.45, happy: 0 },
-      joy: { curl: 0.82, th: 0.85, spread: 0.5, eye: 1, pupil: 1, happy: 1 },
-      sulk: { curl: 0.95, th: 0.55, spread: 0.2, eye: 0.2, pupil: 0.5, happy: 0 },
+      lurk: { curl: 0.5, th: 0.4, spread: 0.75, eye: 0.3, pupil: 0.6, happy: 0, point: 0 },
+      eager: { curl: 0.12, th: 0.05, spread: 1.4, eye: 1.25, pupil: 1.25, happy: 0, point: 0 },
+      lunge: { curl: -0.12, th: -0.15, spread: 1.7, eye: 1.45, pupil: 0.6, happy: 0, point: 0 },
+      clamp: { curl: 0.82, th: 0.85, spread: 0.45, eye: 0.8, pupil: 0.8, happy: 0, point: 0 },
+      strain: { curl: 0.95, th: 1, spread: 0.3, eye: 0.3, pupil: 0.45, happy: 0, point: 0 },
+      joy: { curl: 0.82, th: 0.85, spread: 0.5, eye: 1, pupil: 1, happy: 1, point: 0 },
+      sulk: { curl: 0.95, th: 0.55, spread: 0.2, eye: 0.2, pupil: 0.5, happy: 0, point: 0 },
+  point: { curl: 0.95, th: 0.9, spread: 0.5, eye: 1.2, pupil: 0.7, happy: 0, point: 1 },   // one finger out, the rest in a fist: for pressing a button
     };
     let claw = null;
     const clawBusy = () => !!claw && (!!claw.react || !!claw.later || now() < (claw.flinch || 0) || claw.strands.length > 0 || !!claw.say || (claw.st !== 'off' && (claw.st !== 'lurk' || now() < claw.until)));
@@ -1652,7 +1653,7 @@
         }
       } else if (c.st === 'show') {   // driven by the page (Surprise me): it goes where it is told, in the pose it is told
         const s = c.show; pose = POSES[s.pose] || POSES.eager; rate = s.rate || 8; wig = s.wig ?? 0.15; aim = (s.aim ?? Math.PI) + (s.bob ? Math.sin(c.t * 9) * 0.08 : 0);
-        T = wristFor([s.x, s.y + (s.bob ? Math.sin(c.t * 6) * 6 : 0)], aim);
+        T = s.tip && c.tip ? [c.x + s.x - c.tip[0], c.y + s.y - c.tip[1]] : wristFor([s.x, s.y + (s.bob ? Math.sin(c.t * 6) * 6 : 0)], aim);   // tip: put the pointing fingertip there
       } else if (c.st === 'sulk') {
         pose = POSES.sulk; rate = 4; aim = Math.PI - 0.5; T = [vw + 120, c.ly + 30]; wig = 0.02;
         if (c.t > 1.6) clawSet('lurk');
@@ -1669,7 +1670,7 @@
       }
       const k = 1 - Math.exp(-dt * rate), ka = 1 - Math.exp(-dt * (rate > 20 ? 30 : 9)), kp = 1 - Math.exp(-dt * (c.st === 'lunge' ? 30 : 12));
       c.x += (T[0] - c.x) * k; c.y += (T[1] - c.y) * k; c.a += wrapA(aim - c.a) * ka; c.sh += (c.y + 70 - c.sh) * (1 - Math.exp(-dt * 4));
-      for (const key in pose) c.pose[key] += (pose[key] - c.pose[key]) * kp;
+      for (const key in pose) c.pose[key] = (c.pose[key] || 0) + (pose[key] - (c.pose[key] || 0)) * kp;
       const Hv = gripPt(), H = [Hv[0] + scrollX, Hv[1] + scrollY];
       if (c.st === 'crush' && c.o) {   // the card crumples in the fist, screaming, and then there is no card
         const ob = c.o, g = ob.tug, q = crushQ(c.t), rest = crushPause(c.t), a = g.a + g.spin * q + Math.sin(c.t * (rest ? 55 : 40)) * (rest ? 0.02 : 0.05 * q), sc = 1 - 0.6 * q;
@@ -1758,9 +1759,10 @@
           const q0 = tf(cx - Math.sin(ang) * r * -sgn * 0.1, cy + Math.cos(ang) * r * -sgn * 0.1), q1 = tf(cx + Math.sin(ang) * r * sgn * -1, cy - Math.cos(ang) * r * sgn * -1);
           crease += `M${f1(q0[0])} ${f1(q0[1])}L${f1(q1[0])} ${f1(q1[1])}`;
         }
-        return { pts, talon, crease, d: limb(pts, [w, w * 0.9, w * 0.78, w * 0.56]) };
+        return { pts, talon, crease, tip, d: limb(pts, [w, w * 0.9, w * 0.78, w * 0.56]) };
       };
-      const fs = FING.map((f, i) => finger(f, p.curl + wig * Math.sin(tm * 12 + i * 1.4), 1, p.spread));
+      const pt = p.point || 0, fs = FING.map((f, i) => finger(f, (p.curl + wig * Math.sin(tm * 12 + i * 1.4)) * (1 - pt) + (i ? 1.1 : -0.22) * pt, 1, p.spread));   // point: the first finger straightens, the others close
+      c.tip = fs[0].tip;
       const th = finger(THUMB, p.th + wig * Math.sin(tm * 12 + 5), -1, 1);
       // arm: in from past the edge, a bony elbow, a bend that straightens under strain
       const A = [vw + 90, c.sh], Wp = [ox, oy], ax = Wp[0] - A[0], ay = Wp[1] - A[1], al = Math.hypot(ax, ay) || 1, bend = (10 + 44 * (1 - strain));
@@ -1927,10 +1929,11 @@
       await sleep(2100);
       actEl.innerHTML = ''; actEl.append(goBtn, noBtn); noBtn.disabled = true;
       const b = goBtn.getBoundingClientRect(), bx = b.left + b.width * 0.62, by = b.top + b.height * 0.5;
-      H.to({ x: bx + 26, y: by - 20, pose: 'lunge', rate: 14, bob: false });
-      await sleep(550);
-      H.to({ x: bx, y: by, pose: 'clamp', rate: 18 }); goBtn.classList.add('pressed'); H.say('bye');
-      await sleep(250); H.to({ pose: 'joy', bob: true, rate: 10 });
+      H.to({ x: bx + 10, y: by - 34, pose: 'point', tip: true, aim: Math.PI - 0.5, rate: 12, bob: false });   // one finger out, hovering over Yes
+      await sleep(700);
+      H.to({ x: bx, y: by, rate: 22 }); await sleep(120); goBtn.classList.add('pressed'); H.say('bye');   // poke
+      await sleep(260); H.to({ x: bx + 6, y: by - 26, rate: 10 });
+      await sleep(300); H.to({ pose: 'joy', tip: false, aim: Math.PI, bob: true, rate: 10 });
       await sleep(1100);
       location.href = goBtn.href;
     } finally {
