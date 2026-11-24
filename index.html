@@ -718,6 +718,8 @@
       throw: ['wheee', 'NOOO', 'not the wall!', 'I can fly?!', 'aaaaaa'],
       land: ['oof', 'ow', 'ugh', "I'm fine", 'ох…', 'my corner!'],
       kdrop: ['oops.', 'I meant to do that', 'gravity wins again', 'catch me?!', 'timber!', 'butterfingers', 'おっと', 'опа!'],
+      khello: ["hello! I'm the sharpest katana ever!", 'careful: I cut things just by touching them', 'sharpest blade in the world, hi!', "don't touch anything you like with me", '世界一切れる刀です', 'най-острата катана на света, здрасти!'],
+      kbrag: ['told you. sharpest ever.', "I didn't even try", 'one touch is all it takes', 'I barely touched it!', 'too sharp, sorry', 'スパッ', 'като масло'],
       kcut: ['whoops, sorry', 'slicing on my way down', 'not my fault', "don't mind me", 'it was in the way'],
       slice: ['ow!!', "I'm in two!", 'medic!', 'half off…', 'clean cut.', 'ай!', '切られた!'],
       smash: ['x_x', '✝', 'worth it', 'tell my repo I loved it'],
@@ -902,15 +904,15 @@
     // begin-contact fires before the solver, so the velocities read here are still the ones the bodies came in with
     function onContact(c) {
       const A = c.getFixtureA().getBody(), B = c.getFixtureB().getBody(), oa = A.getUserData(), ob = B.getUserData();
-      const card = (o) => o && o.kind === 'card' && !o.root, hot = (o) => card(o) && (o.hot || (grab && grab.o === o));
+      const card = (o) => o && (o.kind === 'card' || (o.kind === 'piece' && !o.die)) && !o.root, hot = (o) => card(o) && (o.hot || (grab && grab.o === o));
       const solid = (o) => !o || card(o) || o.kind === 'piece';
-      if (!solid(oa) || !solid(ob) || (!card(oa) && !card(ob))) return;   // shards and rooted cards never break anything   // shards and rooted cards never break anything
+      if (!solid(oa) || !solid(ob) || (!card(oa) && !card(ob))) return;   // shards and rooted cards never break anything
       const wm = c.getWorldManifold(null); if (!wm || !wm.points.length) return;
       const pt = { x: 0, y: 0 }; for (const p of wm.points) { pt.x += p.x / wm.points.length; pt.y += p.y / wm.points.length; }
       const n = wm.normal, va = A.getLinearVelocityFromWorldPoint(pt), vb = B.getLinearVelocityFromWorldPoint(pt);
       const closing = (va.x - vb.x) * n.x + (va.y - vb.y) * n.y;   // normal points from A to B
       if (DBG) console.log('contact closing', closing.toFixed(1), 'hot', !!hot(oa), !!hot(ob));
-      if (closing < SMASH || (!hot(oa) && !hot(ob))) { if (closing > 5) { if (card(oa)) say(oa, 'land'); if (card(ob)) say(ob, 'land'); } return; }
+      if (closing < SMASH || (!hot(oa) && !hot(ob))) { if (closing > 5) { if (card(oa) && oa.kind === 'card') say(oa, 'land'); if (card(ob) && ob.kind === 'card') say(ob, 'land'); } return; }
       const ia = A.getMass() ? 1 / A.getMass() : 0, ib = B.getMass() ? 1 / B.getMass() : 0;
       const snap = (b) => ({ v: { x: b.getLinearVelocity().x, y: b.getLinearVelocity().y }, w: b.getAngularVelocity() });
       const fast = va.x * va.x + va.y * va.y > vb.x * vb.x + vb.y * vb.y ? va : vb, fs = Math.hypot(fast.x, fast.y) || 1;
@@ -924,31 +926,30 @@
       const o = h.o; if (!objs.has(o)) return;
       const b = o.body, pos = b.getPosition(), ang = b.getAngle(), W = o.w, H = o.h, ca = Math.cos(ang), sa = Math.sin(ang);
       const bx = pos.x, by = pos.y, rx = (h.pt.x - bx) * S, ry = (h.pt.y - by) * S;
-      const ix = Math.max(0, Math.min(W, rx * ca + ry * sa + W / 2)), iy = Math.max(0, Math.min(H, -rx * sa + ry * ca + H / 2));   // impact in card space
-      const N = 11, per = 2 * (W + H), ring = [[0, 0], [W, 0], [W, H], [0, H]];
-      for (let k = 0; k < N; k++) {
-        let s = ((k + 0.2 + Math.random() * 0.6) / N) * per;
-        if (s < W) ring.push([s, 0]); else if ((s -= W) < H) ring.push([W, s]); else if ((s -= H) < W) ring.push([W - s, H]); else ring.push([0, H - (s - W)]);
-      }
-      const perim = (p) => p[1] === 0 ? p[0] : p[0] === W ? W + p[1] : p[1] === H ? W + H + (W - p[0]) : 2 * W + H + (H - p[1]);
-      ring.sort((p, q) => perim(p) - perim(q));
-      const rings = [0, 0.28, 0.62, 1], polys = [], at = (p, f) => [ix + (p[0] - ix) * f, iy + (p[1] - iy) * f];
+      // the crack web is drawn on the body's own outline, so a chunk of a card breaks the same way a whole card does
+      const out = o.poly || rectPoly(o), cen = out.reduce((m, q) => [m[0] + q[0] / out.length, m[1] + q[1] / out.length], [0, 0]);
+      let ix = rx * ca + ry * sa + W / 2, iy = -rx * sa + ry * ca + H / 2;   // impact in card space
+      for (let k = 0; k < 14 && !inside(out, ix, iy); k++) { ix = cen[0] + (ix - cen[0]) * 0.8; iy = cen[1] + (iy - cen[1]) * 0.8; }
+      const lens = out.map((q, i) => { const r = out[(i + 1) % out.length]; return Math.hypot(r[0] - q[0], r[1] - q[1]); }), per = lens.reduce((m, l) => m + l, 0);
+      const N = Math.max(3, Math.min(9, Math.round(per / 130))), ring = [];
+      let gone = 0, k = 0;
+      out.forEach((q, i) => {   // the corners, plus N random points along the outline, in order
+        const r = out[(i + 1) % out.length]; ring.push(q);
+        for (; k < N; k++) { const d = (k + 0.2 + Math.random() * 0.6) / N * per - gone; if (d >= lens[i]) break; if (d > 0) ring.push([q[0] + (r[0] - q[0]) * d / lens[i], q[1] + (r[1] - q[1]) * d / lens[i]]); }
+        gone += lens[i];
+      });
+      const rings = [0, 0.3, 0.62, 1], polys = [], at = (p, f) => [ix + (p[0] - ix) * f, iy + (p[1] - iy) * f];
       for (let k = 0; k < ring.length; k++) {
         const p = ring[k], q = ring[(k + 1) % ring.length];
         for (let r = 0; r < 3; r++) polys.push(r === 0 ? [[ix, iy], at(p, rings[1]), at(q, rings[1])] : [at(p, rings[r]), at(p, rings[r + 1]), at(q, rings[r + 1]), at(q, rings[r])]);
       }
-      const area = (ps) => Math.abs(ps.reduce((s, p, i) => { const q = ps[(i + 1) % ps.length]; return s + p[0] * q[1] - q[0] * p[1]; }, 0)) / 2;
-      const src = o.el; src.classList.remove('grabbed');
+      o.el.classList.remove('grabbed');
       for (const poly of polys) {
-        if (area(poly) < 90 || poly.some((p, i) => { const q = poly[(i + 1) % poly.length]; return Math.hypot(p[0] - q[0], p[1] - q[1]) < 3; })) continue;
-        const shape = new pl.Polygon(poly.map(([x, y]) => ({ x: (x - W / 2) / S, y: (y - H / 2) / S })));
-        if (shape.m_count !== poly.length) continue;
-        const el = cloneCard(src); el.classList.add('shard');
-        el.style.width = W + 'px'; el.style.height = H + 'px';
-        el.style.clipPath = `polygon(${poly.map(([x, y]) => `${x.toFixed(1)}px ${y.toFixed(1)}px`).join(',')})`;
-        layer.appendChild(el);
-        // the piece's body keeps the card's origin and angle, so it is drawn exactly like the card was
-        const s = addBody({ kind: 'shard', el, w: W, h: H, ex: W / 2, ey: H / 2, die: now() + 4200 + Math.random() * 1800 }, bx, by, ang, shape, { friction: 0.5, restitution: 0.2, filterGroupIndex: -1 });
+        if (polyArea(poly) < 90 || poly.some((p, i) => { const q = poly[(i + 1) % poly.length]; return Math.hypot(p[0] - q[0], p[1] - q[1]) < 3; })) continue;
+        if (new pl.Polygon(poly.map(([x, y]) => ({ x: (x - W / 2) / S, y: (y - H / 2) / S }))).m_count !== poly.length) continue;
+        // same rule as a cut: a big chunk stays and is a body like any other (grab it, stack it, cut it, smash it again), crumbs fade away
+        const s = polyArea(poly) >= 3000 ? fragment(o, poly, 'piece', { friction: 0.6, restitution: 0.12 }, {})
+          : fragment(o, poly, 'shard', { friction: 0.5, restitution: 0.2, filterGroupIndex: -1 }, { die: now() + 4200 + Math.random() * 1800 });
         const c = s.body.getWorldCenter(), dx = c.x - bx, dy = c.y - by;
         let vx = h.v.x - h.w * dy, vy = h.v.y + h.w * dx;                       // the card's own motion at this piece
         const cn = (vx - h.vo.x) * h.n.x + (vy - h.vo.y) * h.n.y;               // speed into the surface (negative)
@@ -961,7 +962,7 @@
       // a really hard hit carries on into the cards this one was touching, losing 40% of its speed per card
       const pass = h.closing * 0.6, inc = Math.hypot(h.v.x, h.v.y) > Math.hypot(h.vo.x, h.vo.y) ? h.v : h.vo;
       if (pass >= SMASH) for (let ce = b.getContactList(); ce; ce = ce.next) {
-        const c = ce.other.getUserData(); if (!c || c.kind !== 'card' || c.root || !ce.contact.isTouching()) continue;
+        const c = ce.other.getUserData(); if (!c || (c.kind !== 'card' && (c.kind !== 'piece' || c.die)) || c.root || !ce.contact.isTouching()) continue;
         const wm = ce.contact.getWorldManifold(null); if (!wm || !wm.points.length) continue;
         const q = wm.points[0], d = ce.other.getWorldCenter(), nx = d.x - q.x, ny = d.y - q.y, nl = Math.hypot(nx, ny) || 1, cv = ce.other.getLinearVelocity();
         hits.push({ o: c, pt: { x: q.x, y: q.y }, n: { x: nx / nl, y: ny / nl }, closing: pass, share: 0.5, v: { x: cv.x, y: cv.y }, w: ce.other.getAngularVelocity(), vo: { x: inc.x * 0.6, y: inc.y * 0.6 } });
@@ -1026,7 +1027,7 @@
       o.body.setGravityScale(FALL);
       for (let f = o.body.getFixtureList(); f; f = f.getNext()) f.setFilterData({ groupIndex: 0, categoryBits: 4, maskBits: 2 });   // it lands on the floor and walls but passes through cards: it cuts them instead
       if (grab && grab.o === o) { grab.joint.setFrequency(HAND_HZ); grab.joint.setDampingRatio(1); carry(o); }
-      toast('Swing the blade through a card. Double-click the katana to keep it in hand.');
+      toast('It cuts whatever the blade touches. Double-click the katana to keep it in hand.'); say(o, 'khello', true);
     }
     // double-click: the katana jumps into the hand by its grip and stays there without holding the button. Double-click again or Esc lets go
     function equip(e) {
@@ -1036,7 +1037,7 @@
       if (katObj.root) freeKatana(katObj);
       const o = katObj, g = o.body.getWorldPoint({ x: 0, y: -1.05 });
       hold(o, g.x * S, g.y * S, { pointerId: -1, clientX: e.clientX, clientY: e.clientY });
-      grab.sticky = true; grab.moved = true; o.el.classList.add('equipped');
+      grab.sticky = true; grab.moved = true; o.el.classList.add('equipped'); say(o, 'khello');
       grab.joint.setTarget({ x: (e.clientX + scrollX) / S, y: (e.clientY + scrollY) / S });
     }
     document.addEventListener('dblclick', (e) => {
@@ -1048,23 +1049,33 @@
     sheatheBtn.addEventListener('click', putBack);
     kat.addEventListener('click', (e) => { if (e.target === kat && kat.classList.contains('away')) putBack(); });
     document.addEventListener('keydown', (e) => { if (e.key !== 'Escape' || !katObj || katObj.root) return; if (grab && grab.sticky) drop(); else putBack(); });
-    // once per frame, follow two points on the blade. A point that moves fast enough cuts what its path passes through
-    const BLADE = [[13, 138], [3, 50]], CUT_SPEED = 700;   // local px from the katana's centre; px/s
+    // once per frame: the blade is the line from the guard to the tip. In the hand it cuts whatever it touches, at any speed;
+    // loose (dropped, thrown) it has to be moving fast. One touch is one clean cut right across, along the way the blade is moving
+    const BLADE = [[1, -50], [15, 146]], CUT_SPEED = 700;   // guard end and tip, local px from the katana's centre; px/s
     function bladeCuts(dt) {
       const o = katObj; if (!o || o.root || dt <= 0) return;
       const p = o.body.getPosition(), a = o.body.getAngle(), c = Math.cos(a), s = Math.sin(a);
-      const now2 = BLADE.map(([x, y]) => [p.x * S + x * c - y * s, p.y * S + x * s + y * c]);
-      const prev = o.tips; o.tips = now2; if (!prev) { o.cuts = BLADE.map(() => new Map()); return; }
-      tick++; let list = null;
-      for (let i = 0; i < BLADE.length; i++) {
-        const A = prev[i], B = now2[i], d = Math.hypot(B[0] - A[0], B[1] - A[1]), cuts = o.cuts[i];
-        if (d / dt < CUT_SPEED) { cuts.clear(); continue; }   // swung, thrown or just falling: fast enough is enough
-        if (i === 0) trail(A, B);
-        for (const t of (list = list || targets())) {
-          const xs = crossings(t.poly, A, B); if (!xs.length) continue;
-          const pts = cuts.get(t.key) || (inside(t.poly, A[0], A[1]) ? [A] : []); pts.push(...xs); cuts.set(t.key, pts);
-          if (pts.length >= 2) { cuts.delete(t.key); if (!grab || grab.o !== o) say(o, 'kcut', true); slice(t.o && objs.has(t.o) ? t.o : t.card && !t.card.classList.contains('held') ? freeCard(t.card) : null, pts[0], pts[pts.length - 1], [B[0] - A[0], B[1] - A[1]]); }
-        }
+      const [G, T] = BLADE.map(([x, y]) => [p.x * S + x * c - y * s, p.y * S + x * s + y * c]);
+      const prev = o.tips; o.tips = [G, T]; if (!prev) { o.touch = new Set(); return; }
+      const mg = [G[0] - prev[0][0], G[1] - prev[0][1]], mt = [T[0] - prev[1][0], T[1] - prev[1][1]], fast = Math.hypot(mt[0], mt[1]) / dt >= CUT_SPEED;
+      const held = !!grab && grab.o === o, was = o.touch, touch = o.touch = new Set();
+      if (fast) trail(prev[1], T);
+      if (!held && !fast) return;
+      tick++;
+      const bx = T[0] - G[0], by = T[1] - G[1], bl = Math.hypot(bx, by);
+      for (const t of targets()) {
+        const xs = crossings(t.poly, G, T), gi = inside(t.poly, G[0], G[1]); if (!xs.length && !gi) continue;
+        touch.add(t.key); if (was.has(t.key)) continue;   // still in the same touch: it has to leave before it can cut this one again
+        const e0 = gi ? G : xs[0], e1 = inside(t.poly, T[0], T[1]) ? T : xs[xs.length - 1], m = [(e0[0] + e1[0]) / 2, (e0[1] + e1[1]) / 2];
+        const f = Math.hypot(m[0] - G[0], m[1] - G[1]) / bl; let dx = mg[0] + (mt[0] - mg[0]) * f, dy = mg[1] + (mt[1] - mg[1]) * f, dl = Math.hypot(dx, dy);
+        if (dl / dt < 60) { dx = bx; dy = by; dl = bl; }   // barely moving: the cut runs along the blade itself
+        dx /= dl; dy /= dl;
+        const src = t.o && objs.has(t.o) ? t.o : t.card && !t.card.classList.contains('held') ? freeCard(t.card) : null; if (!src) continue;
+        const parts = slice(src, [m[0] - dx * 20, m[1] - dy * 20], [m[0] + dx * 20, m[1] + dy * 20], [dx, dy])
+          || slice(src, [m[0] - bx / bl * 20, m[1] - by / bl * 20], [m[0] + bx / bl * 20, m[1] + by / bl * 20], [dx, dy]);
+        if (!parts) { touch.add(src); continue; }
+        for (const q of parts) touch.add(q);
+        if (!held) say(o, 'kcut', true); else if (Math.random() < 0.4) say(o, 'kbrag');
       }
     }
 
@@ -1118,17 +1129,17 @@
       el._o = s; return s;
     }
     function slice(o, A, B, dir) {   // A, B: page points where the blade entered and left
-      if (!o || !objs.has(o)) return;
+      if (!o || !objs.has(o)) return null;
       const b = o.body, pos = b.getPosition(), ang = b.getAngle(), c = Math.cos(ang), s = Math.sin(ang), W = o.w, H = o.h;
       const loc = (p) => { const dx = p[0] - pos.x * S, dy = p[1] - pos.y * S; return [dx * c + dy * s + W / 2, -dx * s + dy * c + H / 2]; };
-      const a = loc(A), z = loc(B), ux = z[0] - a[0], uy = z[1] - a[1], ul = Math.hypot(ux, uy); if (ul < 4) return;
+      const a = loc(A), z = loc(B), ux = z[0] - a[0], uy = z[1] - a[1], ul = Math.hypot(ux, uy); if (ul < 4) return null;
       const side = (p) => ux * (p[1] - a[1]) - uy * (p[0] - a[0]), src = o.poly || rectPoly(o), L = [], R = [], cut = [];
       for (let i = 0; i < src.length; i++) {
         const p = src[i], q = src[(i + 1) % src.length], sp = side(p), sq = side(q);
         (sp >= 0 ? L : R).push(p);
         if ((sp > 0 && sq < 0) || (sp < 0 && sq > 0)) { const t = sp / (sp - sq), x = [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t]; L.push(x); R.push(x); cut.push(x); }
       }
-      if (cut.length !== 2 || !validPoly(L) || !validPoly(R)) return;
+      if (cut.length !== 2 || !validPoly(L) || !validPoly(R)) return null;
       const v = b.getLinearVelocity(), vx = v.x, vy = v.y, w = b.getAngularVelocity();
       const nx = (-uy * c - ux * s) / ul, ny = (-uy * s + ux * c) / ul;     // world normal of the cut, towards the L half
       const dl = Math.hypot(dir[0], dir[1]) || 1, dx = dir[0] / dl, dy = dir[1] / dl;
@@ -1144,6 +1155,7 @@
       for (let k = 0; k <= n; k++) spray(c0[0] + (c1[0] - c0[0]) * k / n, c0[1] + (c1[1] - c0[1]) * k / n, nx, ny);
       say(parts[0], 'slice', true);
       remove(o);
+      return parts;
     }
     // little drops and paper scraps that fly off a cut: plain points on the same clock as the physics, no bodies
     const bits = [];
