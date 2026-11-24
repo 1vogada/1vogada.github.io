@@ -701,7 +701,11 @@
   q.addEventListener('input', () => { query = q.value.trim(); render(); });
   q.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') { q.value = ''; query = ''; render(); q.blur(); }
-    if (e.key === 'Enter') { const first = visible()[0]; if (first) location.href = first.url; }
+    if (e.key === 'Enter' && !e.isComposing) {
+      // 棚 the shelf secret works from the search box too (Enter / Go on a phone keyboard): clear the box and open it
+      if (/^(tana|рафт|たな|棚)$/i.test(q.value.trim()) && window.__shelf) { e.preventDefault(); q.value = ''; query = ''; render(); q.blur(); window.__shelf(); return; }
+      const first = visible()[0]; if (first) location.href = first.url;
+    }
   });
 
   // ---- card tilt + spotlight ----
