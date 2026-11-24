@@ -7,7 +7,7 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   // Bump VER, and the ?v= on this file's script tag in index.html, whenever this file or the stylesheet changes. GitHub Pages caches each
   // file for ten minutes on its own, and a new script with an old stylesheet looks broken; the version makes them arrive as a pair
-  const VER = 12;
+  const VER = 13;
   const here = (document.currentScript && document.currentScript.src) || '/scripts/phrasebook.js';
 
   // ---- what this file knows: which occasion each list belongs to. src = which list on window.__lines, key = which entry of it ----
@@ -99,11 +99,12 @@
         { src: 'CLAW_SAY', key: 'stay', title: 'Letting you stay', when: 'A moment after you win the toss, before it closes the slip for you.' },
         { src: 'CLAW_SAY', key: 'lost', title: 'The taunt', when: 'You called it wrong. It reaches over and presses Yes for you.' },
         { src: 'CLAW_SAY', key: 'idgaf', title: 'Not bothering with the coin', when: 'One toss in ten it pockets the coin and decides for you anyway.' },
-        { src: 'CLAW_SAY', key: 'bye', title: 'Seeing you off', when: 'Its finger is on the Yes button. You are leaving.' },
+        { src: 'CLAW_SAY', key: 'waiting', title: 'Waiting on you', when: 'You lost the toss. Yes and No are back, and you have five seconds before it presses Yes for you.' },
+        { src: 'CLAW_SAY', key: 'bye', title: 'Seeing you off', when: 'You pressed neither button for five seconds, so its finger is on Yes. You are leaving.' },
         { src: 'CLAW_SAY', key: 'slap', title: 'Knocking the buttons away', when: 'The first time you reach for Heads or Tails on a visit, it slaps, backhands or slams both buttons off the slip.' },
         { src: 'CLAW_SAY', key: 'snap', title: 'Snapping', when: 'Right after the buttons go flying. It has had enough of you.' },
         { src: 'CLAW_SAY', key: 'secret', title: 'The secret is out', when: 'You bring the pointer near the bottom-right corner of the fortune slip and the hidden × rises out of it. If it was not already out, it bursts in to protest.' },
-        { src: 'CLAW_SAY', key: 'escaped', title: 'Escaped', when: 'You click the secret ×, and the slip closes under its nose.' },
+        { src: 'CLAW_SAY', key: 'escaped', title: 'Escaped', when: 'You click the secret ×, and the slip closes under its nose. Also when you lose the toss and press No anyway.' },
         { src: 'SAY', key: 'btnhi', title: 'The new buttons', when: 'After it snaps, a fresh Heads and Tails poof in and each says hello.' },
         { src: 'CLAW_SAY', key: 'yourpick', title: 'Letting you pick', when: 'Half the time after it snaps, it lets you call it after all.' },
         { src: 'CLAW_SAY', key: 'mypick', title: 'Picking for you', when: 'The other half, it pokes Heads or Tails itself.' },
