@@ -23,7 +23,7 @@
     --bg: #f7f5f1; --surface: #ffffff; --text: #1d1b19; --muted: #6b655e; --border: #e6e1d9;
     --accent: #c8372d; --accent-soft: #fbe9e6; --ink: #22344f;
     --fog: 244, 242, 238; --sky1: #f4ede3; --sky2: #e9e2f0;
-    --m1: #9aa6bd; --m2: #6d7c99; --m3: #3d4d6a; --snow: #ffffff; --sun: #d9473b;
+    --m1: #9aa6bd; --m2: #6d7c99; --m3: #3d4d6a; --snow: #ffffff; --sun: #d9473b; --torii: #d23a2c; --torii-cap: #1d1b19;
     --shadow: 0 1px 2px rgba(30, 25, 20, .05), 0 6px 18px rgba(30, 25, 20, .06);
     color-scheme: light;
   }
@@ -32,7 +32,7 @@
       --bg: #12131a; --surface: #1b1c24; --text: #ecebe8; --muted: #a29e98; --border: #2c2d37;
       --accent: #f07a6c; --accent-soft: #33201f; --ink: #9db4dc;
       --fog: 30, 31, 40; --sky1: #191a29; --sky2: #2a2036;
-      --m1: #3a4260; --m2: #2b3150; --m3: #1d2238; --snow: #c9cfe0; --sun: #e2574a;
+      --m1: #66708f; --m2: #a3adc9; --m3: #1a1f35; --snow: #f1f4ff; --sun: #e2574a; --torii: #ec4a3a; --torii-cap: #0d0f1a;
       --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
       color-scheme: dark;
     }
@@ -41,7 +41,7 @@
     --bg: #12131a; --surface: #1b1c24; --text: #ecebe8; --muted: #a29e98; --border: #2c2d37;
     --accent: #f07a6c; --accent-soft: #33201f; --ink: #9db4dc;
     --fog: 30, 31, 40; --sky1: #191a29; --sky2: #2a2036;
-    --m1: #3a4260; --m2: #2b3150; --m3: #1d2238; --snow: #c9cfe0; --sun: #e2574a;
+    --m1: #66708f; --m2: #a3adc9; --m3: #1a1f35; --snow: #f1f4ff; --sun: #e2574a; --torii: #ec4a3a; --torii-cap: #0d0f1a;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
     color-scheme: dark;
   }
@@ -314,9 +314,18 @@
       <path d="M700 420 L955 150 C962 142 972 142 980 150 L1200 380 L1200 420 Z" fill="var(--m2)"/>
       <path d="M933 173 L955 150 C962 142 972 142 980 150 L1003 174 L990 186 L978 176 L966 190 L952 178 L944 186 Z" fill="var(--snow)"/>
       <path d="M0 420 L0 360 C120 320 220 340 330 300 C430 266 520 300 620 330 C760 370 900 330 1040 350 C1110 360 1160 350 1200 340 L1200 420 Z" fill="var(--m3)"/>
-      <g fill="var(--m3)">
-        <rect x="1066" y="306" width="6" height="54"/><rect x="1108" y="306" width="6" height="54"/>
-        <rect x="1054" y="298" width="72" height="8" rx="2"/><rect x="1062" y="316" width="56" height="5"/>
+      <g class="torii">
+        <g fill="var(--torii)">
+          <path d="M1066 298 L1072.5 298 L1073.5 356 L1065 356 Z"/><path d="M1107.5 298 L1114 298 L1115 356 L1106.5 356 Z"/>
+          <rect x="1057" y="317" width="66" height="5" rx="1"/>
+          <rect x="1087" y="303" width="6" height="14"/>
+          <rect x="1055" y="299" width="70" height="5"/>
+          <path d="M1046 290 Q1090 298 1134 290 L1132 297 Q1090 303 1048 297 Z"/>
+        </g>
+        <g fill="var(--torii-cap)">
+          <path d="M1044 287 Q1090 295 1136 287 L1134 291 Q1090 298.5 1046 291 Z"/>
+          <rect x="1064" y="352" width="10.5" height="8" rx="1"/><rect x="1105.5" y="352" width="10.5" height="8" rx="1"/>
+        </g>
       </g>
     </svg>
     <canvas id="fog" aria-hidden="true"></canvas>
