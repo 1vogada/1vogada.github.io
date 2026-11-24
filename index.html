@@ -742,8 +742,8 @@
       cutting: ['AAAAAAAAA', 'IT IS IN ME', 'STOP STOP STOP', 'NOT THE MIDDLE', 'I CAN FEEL IT', '痛い痛い痛い!!', 'ААААААА!', 'боли боли боли'],
       stab: ['was I spared???', 'just a flesh wound', "I'm leaking", "that's going to scar", 'it only went in a little', 'you missed. mostly.', 'am I… alive?', 'まだ生きてる…?', 'жив съм?!'],
       kcut: ['whoops, sorry', 'slicing on my way down', 'not my fault', "don't mind me", 'it was in the way'],
-      slice: ['ow!!', "I'm in two!", 'medic!', 'half off…', 'clean cut.', 'ай!', '切られた!'],
-      smash: ['x_x', '✝', 'worth it', 'tell my repo I loved it'],
+      slice: ['AAAAAAARGH!!', 'NOOOOOOOO—', 'EEEEEEEEK!!', 'GYAAAAAAH!', 'AAAAAAAAAAA!!!', 'ААААААААА!!!', 'НЕЕЕЕЕЕЕ!', 'ぎゃああああ!!', 'うわあああ!!', 'HHHHRRRKK—'],
+      smash: ['AAAAAAAAAA—', 'NOOOOO!!', 'ААААА!!', 'ぐはっ!!', 'KRRRK—'],
     };
     const QUIET = 2000; let cutSaid = -1e9;
     const pick = (a) => a[Math.floor(Math.random() * a.length)];
@@ -755,6 +755,7 @@
       else if (kind === 'slice') { if (t - cutSaid < QUIET) return; cutSaid = t; }
       if (o.say) o.say.el.remove();
       o.said = t; o.say = { el: bubble(pick(SAY[kind])), until: t + 1300 }; run();
+      if (kind === 'slice') { const el = o.say.el; el.classList.add('agony'); el.style.setProperty('--pain', '1'); el.dataset.lvl = 2; }   // a death scream looks like one
     }
     function sayAt(x, y, text) { const el = bubble(text); el.style.translate = `calc(${x.toFixed(0)}px - 50%) ${y.toFixed(0)}px`; setTimeout(() => el.remove(), 1300); }
 
