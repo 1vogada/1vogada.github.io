@@ -213,6 +213,8 @@
   .claw { position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; overflow: visible; pointer-events: none; --flesh: #0e0c11; --rim: color-mix(in srgb, var(--accent) 80%, #000); }
   .claw.over { z-index: 36; } .claw.under { z-index: 34; }
   .claw .flesh { fill: var(--flesh); stroke: var(--rim); stroke-width: 2.2; stroke-linejoin: round; paint-order: stroke; }
+  .claw .talon { fill: #c7a352; stroke: #3a2a10; stroke-width: 1.2; stroke-linejoin: round; }
+  .claw .crease { fill: none; stroke: var(--rim); stroke-width: 1.3; stroke-linecap: round; opacity: .9; }
   .claw .vein { fill: none; stroke: var(--accent); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; opacity: .7; }
   .claw .eye { fill: #f4e9da; stroke: var(--accent); stroke-width: 2; }
   .claw .eye.happy { fill: none; stroke: var(--accent); stroke-width: 3.6; stroke-linecap: round; }
@@ -1280,12 +1282,13 @@
       caught: ['nice throw', 'CAUGHT IT', 'thanks!', 'delivery!', 'for me? again?', 'хванах!', 'ナイスパス!'],
       slip: ['slippery!', 'hey!!', 'no fair', 'my snack!'],
       snatch: ['TOO SLOW', 'YOINK', 'MINE NOW', 'enough games', 'дай тука!', 'もらった!'],
+      savour: ['shhh.', 'slowly…', 'does it hurt?', 'look at me.', 'not yet.', 'one more squeeze', 'бавно…', 'まだだよ'],
       crush: ['squish.', '*CRUNCH*', 'paper is weak', 'that is what teasing gets you', 'смачках го.', 'ぐしゃ'],
     };
     const NS = 'http://www.w3.org/2000/svg';
     // hand space: wrist at 0,0, fingers along +x. Four fingers hook towards +y, the thumb comes up from below to meet them
     const FING = [{ b: [58, -27], a: -0.36, l: [44, 33, 25], w: 12 }, { b: [66, -11], a: -0.13, l: [52, 38, 27], w: 13 }, { b: [64, 5], a: 0.09, l: [46, 34, 24], w: 12 }, { b: [56, 19], a: 0.32, l: [35, 26, 19], w: 10 }];
-    const THUMB = { b: [14, 22], a: 1.1, l: [36, 30, 23], w: 13 }, BEND = [0.3, 1.05, 0.85], GRIP = [98, 20];
+    const THUMB = { b: [14, 22], a: 1.1, l: [36, 30, 23], w: 13 }, BEND = [0.3, 1.05, 0.85], ARCH = [-0.3, 0.2, 0.24], GRIP = [98, 20];
     const PALM = [[-8, -15], [18, -25], [56, -33], [72, -12], [70, 14], [58, 27], [30, 30], [8, 27], [-8, 14]];
     const POSES = {
       lurk: { curl: 0.5, th: 0.4, spread: 0.75, eye: 0.3, pupil: 0.6, happy: 0 },
@@ -1305,7 +1308,7 @@
       const under = mk('under'), over = mk('over');   // the thumb is drawn under the cards and the rest over them, so a card really sits in its grip
       claw = { st: 'off', t: 0, until: 0, cool: 0, x: html.clientWidth + 340, y: innerHeight * 0.55, ly: innerHeight * 0.55, hy: 0, a: Math.PI, sh: innerHeight * 0.55 + 70, pose: { ...POSES.lurk },
         o: null, joint: null, snap: null, pre: null, gh: null, g: null, far: false, say: null, said: 0, strands: [], under, over,
-        thumb: path(under, 'flesh'), flesh: path(over, 'flesh'), vein: path(over, 'vein'), eye: path(over, 'eye'), pupil: path(over, 'pupil') };
+        thumb: path(under, 'flesh'), talonT: path(under, 'talon'), flesh: path(over, 'flesh'), talon: path(over, 'talon'), crease: path(over, 'crease'), vein: path(over, 'vein'), eye: path(over, 'eye'), pupil: path(over, 'pupil') };
     }
     function clawSet(st) { claw.st = st; claw.t = 0; claw.until = now() + 1500; run(); }
     // The hand comments on most things it sees, but never at once: each remark waits a random while. When a lot happens together its
@@ -1462,7 +1465,11 @@
       if (c.say) { c.say.el.remove(); c.say = null; }
       c.o = null; c.joint = null; c.snap = null; c.st = 'off'; c.cool = 0; c.x = html.clientWidth + 340; c.pose = { ...POSES.lurk }; clawDraw(0, 0, 0);
     }
-    const CRUSH = 0.85;   // seconds from snatch to pulp
+    // the crush takes its time: squeeze, stop and savour, squeeze, let it beg, squeeze, hold, and only then the crunch
+    const CRUSH_Q = [[0, 0], [0.8, 0.28], [1.7, 0.32], [2.5, 0.56], [3.7, 0.6], [4.3, 0.84], [5.0, 0.87], [5.18, 1]], CRUSH = 5.18;
+    const crushQ = (t) => { for (let i = 1; i < CRUSH_Q.length; i++) if (t < CRUSH_Q[i][0]) { const [t0, q0] = CRUSH_Q[i - 1], [t1, q1] = CRUSH_Q[i], f = (t - t0) / (t1 - t0); return q0 + (q1 - q0) * f * f * (3 - 2 * f); } return 1; };
+    const crushPause = (t) => (t > 0.8 && t < 1.7) || (t > 2.5 && t < 3.7) || (t > 4.3 && t < 5.0);
+    const BEG = ['please', 'I will be good', 'I have unmerged commits!', 'not the corners', 'we can talk about this', 'моля те…', 'やめて…', 'tell me what you want'];
     function crushStart(o) {   // the card is in its fist from here on
       o.hot = 0; o.body.setBullet(false); o.body.setGravityScale(0); o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 }); o.el.style.pointerEvents = 'none';
       const N = 6, pts = [], ph = Math.random() * 6; for (let k = 0; k < 4 * N; k++) { const f = (k % N) / N, e = Math.floor(k / N); pts.push([e === 0 ? f * o.w : e === 1 ? o.w : e === 2 ? o.w - f * o.w : 0, e === 0 ? 0 : e === 1 ? f * o.h : e === 2 ? o.h : o.h - f * o.h, 0.45 + 0.22 * Math.sin(k * 1.9 + ph) + 0.18 * Math.random()]); }
@@ -1537,7 +1544,10 @@
           } else if (c.t > 0.6) { c.o = null; c.cool = t + 600; clawSet('sulk'); clawSay('sulk'); }
         }
       } else if (c.st === 'crush') {
-        pose = { ...POSES.sulk, eye: POSES.joy.eye, pupil: POSES.joy.pupil, happy: POSES.joy.happy }; rate = 7; shake = 3 + 5 * clamp01(c.t / CRUSH); aim = Math.PI + Math.sin(c.t * 22) * 0.07; T = wristFor([vw - HOLD - 60, c.hy], aim);
+        const q = crushQ(c.t), rest = crushPause(c.t);   // the fingers close joint by joint with the squeeze; in the pauses it holds still, turns the card over and looks at it
+        pose = { curl: 0.5 + 0.62 * q, th: 0.45 + 0.6 * q, spread: 0.7 - 0.45 * q, eye: rest ? 1.3 : 0.5, pupil: rest ? 1.2 : 0.5, happy: rest && c.t > 2.5 ? 1 : 0 };
+        rate = 7; shake = rest ? 0.6 : 2 + 6 * q; aim = Math.PI + (rest ? Math.sin(c.t * 2.2) * 0.22 : Math.sin(c.t * 24) * 0.05); T = wristFor([vw - HOLD - 90, c.hy], aim);
+        if (rest && !c.sav) { c.sav = true; clawSay('savour', true); } else if (!rest) c.sav = false;
       } else if (c.st === 'gloat') {
         pose = POSES.joy; rate = 12; wig = 0.2; aim = Math.PI + Math.sin(c.t * 14) * 0.16; T = wristFor([vw - HOLD - 20, c.hy - 30 + Math.sin(c.t * 14) * 16], aim);
         if (c.t > 1.3) { c.cool = t + 1200; clawSet('lurk'); }
@@ -1597,13 +1607,15 @@
       for (const key in pose) c.pose[key] += (pose[key] - c.pose[key]) * kp;
       const Hv = gripPt(), H = [Hv[0] + scrollX, Hv[1] + scrollY];
       if (c.st === 'crush' && c.o) {   // the card crumples in the fist, screaming, and then there is no card
-        const ob = c.o, g = ob.tug, q = clamp01(c.t / CRUSH), a = g.a + g.spin * q + Math.sin(c.t * 40) * 0.05 * q, sc = 1 - 0.6 * q;
+        const ob = c.o, g = ob.tug, q = crushQ(c.t), rest = crushPause(c.t), a = g.a + g.spin * q + Math.sin(c.t * (rest ? 55 : 40)) * (rest ? 0.02 : 0.05 * q), sc = 1 - 0.6 * q;
         ob.body.setTransform({ x: H[0] / S, y: H[1] / S }, a); ob.body.setLinearVelocity({ x: 0, y: 0 }); ob.body.setAngularVelocity(0);
         ob.el.style.transform = `translate(${(H[0] - ob.ex).toFixed(2)}px, ${(H[1] - ob.ey).toFixed(2)}px) rotate(${a.toFixed(4)}rad) scale(${sc.toFixed(3)})`;
         ob.el.style.clipPath = `polygon(${g.pts.map(([x, y, r]) => `${(x + (ob.w / 2 - x) * q * r).toFixed(1)}px ${(y + (ob.h / 2 - y) * q * r).toFixed(1)}px`).join(',')})`;
         ob.el.style.filter = `saturate(${(1 + q).toFixed(2)}) sepia(${(0.4 * q).toFixed(2)}) hue-rotate(-${(30 * q).toFixed(0)}deg) brightness(${(1 - 0.25 * q).toFixed(2)})`;
-        cardSay(ob, 0.35 + 0.65 * q);
-        if (t > (g.drip || 0)) { g.drip = t + 70; gore(H[0], H[1], 0, 1, 2 + Math.round(4 * q), 0.3 + 0.4 * q); }
+        if (rest && c.t > 2.5 && c.t < 3.7) {   // in the long pause it begs
+          if (!g.beg) { g.beg = true; if (ob.say) ob.say.el.remove(); ob.said = t; ob.say = { el: bubble(pick(BEG)), until: t + 1150 }; }
+        } else if (!rest) cardSay(ob, 0.35 + 0.65 * q);
+        if (t > (g.drip || 0)) { g.drip = t + (rest ? 260 : 70); gore(H[0], H[1], 0, 1, 2 + Math.round(4 * q), 0.3 + 0.4 * q); }
         if (q >= 1) {
           gore(H[0], H[1], -1, 0, 54, 1.1); gore(H[0], H[1], 0, -1, 22, 0.8);
           const el = bubble(pick(SAY.slice)); el.classList.add('agony'); el.style.setProperty('--pain', '1'); el.dataset.lvl = 2; el.style.translate = `calc(${H[0].toFixed(0)}px - 50%) ${(H[1] - 70).toFixed(0)}px`; setTimeout(() => el.remove(), 1300);
@@ -1657,7 +1669,7 @@
       const limb = (pts, ws) => {
         let d = '';
         for (let i = 0; i < pts.length; i++) {
-          const [x, y] = pts[i], r = ws[i] / 2 * (i ? 1.14 : 1);
+          const [x, y] = pts[i], r = ws[i] / 2 * (i && i < pts.length - 1 ? 1.34 : i ? 1.05 : 1);
           d += `M${f1(x - r)} ${f1(y)}a${f1(r)} ${f1(r)} 0 1 0 ${f1(2 * r)} 0a${f1(r)} ${f1(r)} 0 1 0 ${f1(-2 * r)} 0Z`;
           if (i + 1 < pts.length) {
             const [X, Y] = pts[i + 1], dx = X - x, dy = Y - y, l = Math.hypot(dx, dy) || 1, nx = -dy / l, ny = dx / l, a = ws[i] / 2, b = ws[i + 1] / 2;
@@ -1666,13 +1678,22 @@
         }
         return d;
       };
+      // a finger is three bones on three joints. It arches back at the first knuckle and hooks at the other two, so even an open hand is a claw;
+      // curling adds to every joint. Knuckles are knobs wider than the bones, each with two crease lines, and the talon is a long curved hook
       const finger = (f, curl, sgn, spread) => {
-        let a = f.a * spread, x = f.b[0], y = f.b[1]; const loc = [[x, y]];
-        for (let j = 0; j < 3; j++) { a += sgn * curl * BEND[j]; x += Math.cos(a) * f.l[j]; y += Math.sin(a) * f.l[j]; loc.push([x, y]); }
-        a += sgn * (0.35 + curl * 0.3);   // the talon hooks further than the bone
-        const pts = loc.map(([lx, ly]) => tf(lx, ly)), w = f.w, tip = tf(x + Math.cos(a) * w * 1.9, y + Math.sin(a) * w * 1.9), L = pts[3], K = pts[2];
-        const dx = L[0] - K[0], dy = L[1] - K[1], l = Math.hypot(dx, dy) || 1, nx = -dy / l * w * 0.27, ny = dx / l * w * 0.27;
-        return { pts, d: limb(pts, [w, w * 0.8, w * 0.64, w * 0.5]) + `M${f1(L[0] + nx)} ${f1(L[1] + ny)}Q${f1(L[0] + dx / l * w + nx)} ${f1(L[1] + dy / l * w + ny)} ${f1(tip[0])} ${f1(tip[1])}Q${f1(L[0] + dx / l * w * 0.8 - nx)} ${f1(L[1] + dy / l * w * 0.8 - ny)} ${f1(L[0] - nx)} ${f1(L[1] - ny)}Z` };
+        let a = f.a * spread, x = f.b[0], y = f.b[1]; const loc = [[x, y]], dirs = [];
+        for (let j = 0; j < 3; j++) { a += sgn * (curl * BEND[j] + ARCH[j]); dirs.push(a); x += Math.cos(a) * f.l[j] * 1.1; y += Math.sin(a) * f.l[j] * 1.1; loc.push([x, y]); }
+        const pts = loc.map(([lx, ly]) => tf(lx, ly)), w = f.w * 0.86, L = pts[3], tl = w * 3.3, hook = sgn * (0.55 + curl * 0.35);
+        const P = (r, da, side) => tf(x + Math.cos(a + da) * r - Math.sin(a) * side, y + Math.sin(a + da) * r + Math.cos(a) * side), tip = P(tl, hook, 0);
+        const c1 = P(tl * 0.55, hook * 0.25, -sgn * w * 0.42), c2 = P(tl * 0.5, hook * 0.75, sgn * w * 0.3), b1 = P(-w * 0.15, 0, -sgn * w * 0.3), b2 = P(-w * 0.15, 0, sgn * w * 0.3);
+        const talon = `M${f1(b1[0])} ${f1(b1[1])}Q${f1(c1[0])} ${f1(c1[1])} ${f1(tip[0])} ${f1(tip[1])}Q${f1(c2[0])} ${f1(c2[1])} ${f1(b2[0])} ${f1(b2[1])}Z`;
+        let crease = '';
+        for (let j = 1; j < 3; j++) for (const off of [-0.16, 0.16]) {   // across the knuckle, on the outside of the bend
+          const ang = (dirs[j - 1] + dirs[j]) / 2, r = w * (j === 1 ? 0.5 : 0.42), cx = loc[j][0] + Math.cos(ang) * off * w, cy = loc[j][1] + Math.sin(ang) * off * w;
+          const q0 = tf(cx - Math.sin(ang) * r * -sgn * 0.1, cy + Math.cos(ang) * r * -sgn * 0.1), q1 = tf(cx + Math.sin(ang) * r * sgn * -1, cy - Math.cos(ang) * r * sgn * -1);
+          crease += `M${f1(q0[0])} ${f1(q0[1])}L${f1(q1[0])} ${f1(q1[1])}`;
+        }
+        return { pts, talon, crease, d: limb(pts, [w, w * 0.9, w * 0.78, w * 0.56]) };
       };
       const fs = FING.map((f, i) => finger(f, p.curl + wig * Math.sin(tm * 12 + i * 1.4), 1, p.spread));
       const th = finger(THUMB, p.th + wig * Math.sin(tm * 12 + 5), -1, 1);
@@ -1684,7 +1705,8 @@
       const mid = (q, r) => [(q[0] + r[0]) / 2, (q[1] + r[1]) / 2], m0 = mid(palm[palm.length - 1], palm[0]);
       let pd = `M${f1(m0[0])} ${f1(m0[1])}`; palm.forEach((q, i) => { const m = mid(q, palm[(i + 1) % palm.length]); pd += `Q${f1(q[0])} ${f1(q[1])} ${f1(m[0])} ${f1(m[1])}`; }); pd += 'Z';
       c.flesh.setAttribute('d', limb(arm, [44, 30, 21]) + pd + fs.map((f) => f.d).join(''));
-      c.thumb.setAttribute('d', th.d);
+      c.thumb.setAttribute('d', th.d); c.talonT.setAttribute('d', th.talon);
+      c.talon.setAttribute('d', fs.map((f) => f.talon).join('')); c.crease.setAttribute('d', fs.map((f) => f.crease).join(''));
       const line = (pts) => 'M' + pts.map((q) => `${f1(q[0])} ${f1(q[1])}`).join('L');
       c.vein.setAttribute('d', fs.map((f, i) => line([tf(FING[i].b[0] - 30, FING[i].b[1] * 0.45), ...f.pts.slice(0, 3)])).join('') + line([tf(18, 6), Wp, [ex + 3, ey + 4], [A[0], A[1] + 6]]) + line([tf(-2, -6), [ex - 2, ey - 6]]));
       // one eye on the back of the hand
