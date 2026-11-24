@@ -7,7 +7,7 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   // Bump VER, and the ?v= on this file's script tag in index.html, whenever this file or the stylesheet changes. GitHub Pages caches each
   // file for ten minutes on its own, and a new script with an old stylesheet looks broken; the version makes them arrive as a pair
-  const VER = 9;
+  const VER = 10;
   const here = (document.currentScript && document.currentScript.src) || '/scripts/phrasebook.js';
 
   // ---- what this file knows: which occasion each list belongs to. src = which list on window.__lines, key = which entry of it ----
@@ -315,7 +315,7 @@
     }
   }
   function raidSay(text, o) {
-    const r = raid, b = document.createElement('div'); b.className = 'pb-say' + (o ? '' : ' hand'); b.textContent = text; r.layer.appendChild(b);
+    const r = raid, b = document.createElement('div'); b.className = 'pb-say' + (o ? '' : ' hand'); b.textContent = text; b.style.setProperty('--tilt', (4 + Math.random() * 4).toFixed(1));   // cards lean right, the hand leans left r.layer.appendChild(b);
     if (o) { if (o.say) o.say.el.remove(); o.say = { el: b, until: r.now + 1300 }; }
     else { if (r.say) r.say.el.remove(); r.say = { el: b, until: r.now + 1500 }; r.said = r.now; }
   }
@@ -477,7 +477,7 @@
       o.el.style.transform = `translate(${(x - o.w / 2).toFixed(2)}px, ${(y - o.h / 2).toFixed(2)}px) rotate(${th.toFixed(4)}rad)`;
       if (o.say) { if (r.now > o.say.until) { o.say.el.remove(); o.say = null; } else o.say.el.style.translate = `calc(${clamp(x, 70, vw - 70).toFixed(0)}px - 50%) ${clamp(y - o.h / 2 - 36, 8, vh - 40).toFixed(0)}px`; }
     }
-    if (r.say) { if (r.now > r.say.until) { r.say.el.remove(); r.say = null; } else { const g = grip(); r.say.el.style.translate = `calc(${clamp(Math.min(c.x, g[0]) - 30, 80, vw - 90).toFixed(0)}px - 50%) ${clamp(Math.min(c.y, g[1]) - 115, 10, vh - 50).toFixed(0)}px`; } }
+    if (r.say) { if (r.now > r.say.until) { r.say.el.remove(); r.say = null; } else { const g = grip(); r.say.el.style.translate = `calc(${clamp(Math.min(c.x, g[0]) - 30, 80, vw - 90).toFixed(0)}px - 50%) ${clamp(Math.min(c.y, g[1]) - 115 - (r.held && r.held.say ? 44 : 0), 10, vh - 50).toFixed(0)}px`; } }
     {   // the patch that takes the swatting click sits over the palm and fingers, wherever they are
       const g = grip(), hx = (c.x + g[0]) / 2, hy = (c.y + g[1]) / 2, on = r.st !== 'swat' && r.st !== 'done' && hx < vw + 40;
       r.swat.style.display = on ? '' : 'none'; if (on) r.swat.style.transform = `translate(${(hx - 95).toFixed(0)}px, ${(hy - 80).toFixed(0)}px)`;
