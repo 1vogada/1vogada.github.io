@@ -1053,7 +1053,7 @@
       o.body.setGravityScale(FALL);
       for (let f = o.body.getFixtureList(); f; f = f.getNext()) f.setFilterData({ groupIndex: 0, categoryBits: 4, maskBits: 2 });   // it lands on the floor and walls but passes through cards: it cuts them instead
       if (grab && grab.o === o) { grab.joint.setFrequency(HAND_HZ); grab.joint.setDampingRatio(1); carry(o); }
-      toast('It cuts whatever the blade touches. Double-click the katana to keep it in hand.'); say(o, 'khello', true);
+      toast('Only the tip of the blade cuts. Double-click the katana to keep it in hand.'); say(o, 'khello', true);
     }
     // double-click: the katana jumps into the hand by its grip and stays there without holding the button. Double-click again or Esc lets go
     const EQUIP_ANGLE = Math.PI + 0.5;
@@ -1079,10 +1079,11 @@
     sheatheBtn.addEventListener('click', putBack);
     kat.addEventListener('click', (e) => { if (e.target === kat && kat.classList.contains('away')) putBack(); });
     document.addEventListener('keydown', (e) => { if (e.key !== 'Escape' || !katObj || katObj.root) return; if (grab && grab.sticky) drop(); else putBack(); });
-    // once per frame: the blade is the line from the guard to the tip. In the hand it cuts at any speed; loose (dropped, thrown) it has to be moving fast.
+    // once per frame: only the tip cuts, the last quarter of the blade up to the point. The rest of the blade and the hilt pass through cards without a mark.
+    // In the hand it cuts at any speed; loose (dropped, thrown) it has to be moving fast.
     // A cut has a way in and a way out: the card is opened where the blade first touched it and the cut is made when the blade leaves,
     // straight between those two points. Until then the card screams. In and out through the same side is a stab: no cut, it bleeds for a while
-    const BLADE = [[1, -50], [15, 146]], CUT_SPEED = 700;   // guard end and tip, local px from the katana's centre; px/s
+    const BLADE = [[8, 92], [15, 146]], CUT_SPEED = 700;   // where the cutting tip starts on the blade and the point itself, local px from the katana's centre; px/s
     const toLocal = (o, q) => { const p = o.body.getPosition(), a = o.body.getAngle(), c = Math.cos(a), s = Math.sin(a), dx = q[0] - p.x * S, dy = q[1] - p.y * S; return [dx * c + dy * s, -dx * s + dy * c]; };
     const toPage = (o, q) => { const p = o.body.getPosition(), a = o.body.getAngle(), c = Math.cos(a), s = Math.sin(a); return [p.x * S + q[0] * c - q[1] * s, p.y * S + q[0] * s + q[1] * c]; };
     function edgeOf(poly, q) {   // which side of the outline a point is nearest to
