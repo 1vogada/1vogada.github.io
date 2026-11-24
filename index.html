@@ -172,8 +172,8 @@
                 transform-origin: 50% 50%; will-change: transform; cursor: grab; touch-action: none; translate: none; }
   #phys .phys.grabbed { box-shadow: 0 18px 40px rgba(0,0,0,.25); }
   #phys .say { position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; white-space: nowrap; background: var(--text); color: var(--bg);
-               font-size: .82rem; font-weight: 650; padding: 4px 11px; border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,.2); animation: say 1.3s both; }
-  #phys .say::after { content: ""; position: absolute; left: 50%; bottom: -5px; width: 10px; height: 10px; background: inherit; transform: translateX(-50%) rotate(45deg); border-radius: 2px; }
+               font-size: .82rem; font-weight: 650; padding: 4px 11px; border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,.2); animation: say 1.3s both; rotate: calc(var(--tilt, 5) * 1deg); }
+  #phys .say::after { content: ""; position: absolute; left: calc(50% + var(--tail, 0px)); bottom: -5px; width: 10px; height: 10px; background: inherit; transform: translateX(-50%) rotate(45deg); border-radius: 2px; }
   #phys .say.agony { font-size: calc(.82rem + .5rem * var(--pain, 0)); animation: say 1.3s both, agony .09s linear infinite; }
   #phys .say.agony[data-lvl] { background: var(--accent); color: #fff; }
   #phys .say.agony[data-lvl="2"] { letter-spacing: .04em; }
@@ -232,7 +232,7 @@
   :root[data-theme="dark"] .claw { --rim: var(--accent); }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .claw { --rim: var(--accent); } }
   html.crazy .claw { display: none; }
-  #phys .say.claw-say { background: var(--accent); color: #fff; font-weight: 800; letter-spacing: .02em; rotate: -4deg; z-index: 5; }
+  #phys .say.claw-say { background: var(--accent); color: #fff; font-weight: 800; letter-spacing: .02em; rotate: calc(var(--tilt, 5) * -1deg); z-index: 5; }
   #phys .bit.ink { background: var(--text); }
   #phys .strand { position: absolute; left: 0; top: -2.5px; height: 5px; z-index: 1; transform-origin: 0 50%; border-radius: 3px; pointer-events: none;
                   background: linear-gradient(color-mix(in srgb, var(--surface) 70%, var(--accent)), var(--accent)); }
@@ -841,7 +841,28 @@
     };
     const QUIET = 2000; let cutSaid = -1e9;
     const pick = (a) => a[Math.floor(Math.random() * a.length)];
-    function bubble(text) { const el = document.createElement('div'); el.className = 'say'; el.textContent = text; layer.appendChild(el); return el; }
+    // who is talking shows in the lean: every bubble leans to the right by a few degrees of its own, and the hand's (.claw-say) leans the same amount to the left
+    function bubble(text) { const el = document.createElement('div'); el.className = 'say'; el.textContent = text; el.style.setProperty('--tilt', (4 + Math.random() * 4).toFixed(1)); layer.appendChild(el); return el; }
+    // The bubbles that follow something are all put on the page here, once a frame. Each has its spot (x, y: top centre) and the x of its speaker (ax).
+    // When the hand's bubble would cover a card's they slide apart, each to its speaker's side, and the tails lean back to the speakers
+    function sayLayout() {
+      const h = claw && claw.say && claw.say.x != null ? claw.say : null, all = h ? [h] : [], x0 = scrollX + 6, x1 = scrollX + html.clientWidth - 6;
+      for (const o of objs) if (o.say && o.say.x != null) all.push(o.say);
+      for (const s of all) { if (!s.w) { s.w = s.el.offsetWidth; s.h = s.el.offsetHeight; } s.x = Math.max(x0 + s.w / 2, Math.min(x1 - s.w / 2, s.x)); }
+      const hit = (a, b, pad) => Math.abs(a.x - b.x) < (a.w + b.w) / 2 + pad && Math.abs(a.y + a.h / 2 - b.y - b.h / 2) < (a.h + b.h) / 2 + 6;
+      if (h) for (const s of all) {
+        if (s === h || !hit(h, s, 10)) continue;
+        const dir = h.ax >= s.ax ? 1 : -1, need = (h.w + s.w) / 2 + 10 - (h.x - s.x) * dir;
+        h.x = Math.max(x0 + h.w / 2, Math.min(x1 - h.w / 2, h.x + dir * need / 2));
+        s.x = Math.max(x0 + s.w / 2, Math.min(x1 - s.w / 2, h.x - dir * ((h.w + s.w) / 2 + 10)));
+        if (hit(h, s, 4)) h.y = s.y - h.h - 16;   // no room side by side (the screen's edge): the hand's goes on top
+      }
+      for (const s of all) {
+        s.el.style.translate = `calc(${s.x.toFixed(1)}px - 50%) ${s.y.toFixed(1)}px`;
+        const lean = Math.max(14 - s.w / 2, Math.min(s.w / 2 - 14, s.ax - s.x)).toFixed(0);
+        if (lean !== s.lean) { s.lean = lean; s.el.style.setProperty('--tail', lean + 'px'); }
+      }
+    }
     function say(o, kind, force) {
       const t = now(); if ((o.kind === 'katana') !== (kind[0] === 'k') || (!force && o.said && t - o.said < 1400)) return;
       // one line per burst: the katana speaks once and is then quiet for 2 s of real time, and a pass that cuts ten cards gets one "ow", not ten
@@ -906,9 +927,10 @@
         if (o.say) {   // the bubble rides above the card and stays upright
           if (t > o.say.until) { o.say.el.remove(); o.say = null; continue; }
           const top = Math.abs(Math.sin(a)) * o.w / 2 + Math.abs(Math.cos(a)) * o.h / 2;
-          o.say.el.style.translate = `calc(${(p.x * S + (held ? hx : 0)).toFixed(1)}px - 50%) ${(p.y * S + (held ? hy : 0) - top - 40).toFixed(1)}px`;
+          o.say.x = o.say.ax = p.x * S + (held ? hx : 0); o.say.y = p.y * S + (held ? hy : 0) - top - 40;
         }
       }
+      sayLayout();
     }
     function frame(t) {
       if (hiddenAt) return;   // tab in the background: no stepping, no drawing. The loop is picked up again on return
@@ -1820,7 +1842,7 @@
       }
       if (c.say) {
         if (t > c.say.until) { c.say.el.remove(); c.say = null; }
-        else c.say.el.style.translate = `calc(${(Math.min(c.x, Hv[0], vw - 80) - 30 + scrollX).toFixed(0)}px - 50%) ${(Math.max(70, Math.min(c.y, Hv[1]) - 115) + scrollY).toFixed(0)}px`;
+        else { c.say.x = Math.min(c.x, Hv[0], vw - 80) - 30 + scrollX; c.say.y = Math.max(70, Math.min(c.y, Hv[1]) - 115) + scrollY; c.say.ax = c.x + scrollX; }   // put on the page in sayLayout()
       }
       clawDraw(wig, shake, strain);
     }
@@ -2418,6 +2440,6 @@
   applyMode();
   if (root.dataset.wantCrazy) askCrazy();
 </script>
-<script src="/scripts/phrasebook.js?v=8" defer></script>
+<script src="/scripts/phrasebook.js?v=9" defer></script>
 </body>
 </html>
