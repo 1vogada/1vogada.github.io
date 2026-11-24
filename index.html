@@ -724,10 +724,14 @@
       slice: ['ow!!', "I'm in two!", 'medic!', 'half off…', 'clean cut.', 'ай!', '切られた!'],
       smash: ['x_x', '✝', 'worth it', 'tell my repo I loved it'],
     };
+    const QUIET = 2000; let cutSaid = -1e9;
     const pick = (a) => a[Math.floor(Math.random() * a.length)];
     function bubble(text) { const el = document.createElement('div'); el.className = 'say'; el.textContent = text; layer.appendChild(el); return el; }
     function say(o, kind, force) {
       const t = now(); if ((o.kind === 'katana') !== (kind[0] === 'k') || (!force && o.said && t - o.said < 1400)) return;
+      // one line per burst: the katana speaks once and is then quiet for 2 s of real time, and a pass that cuts ten cards gets one "ow", not ten
+      if (o.kind === 'katana') { if (o.said && t - o.said < QUIET) return; }
+      else if (kind === 'slice') { if (t - cutSaid < QUIET) return; cutSaid = t; }
       if (o.say) o.say.el.remove();
       o.said = t; o.say = { el: bubble(pick(SAY[kind])), until: t + 1300 }; run();
     }
