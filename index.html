@@ -667,6 +667,7 @@
     document.getElementById('upd').textContent = '(last delve: ' + when.toLocaleString() + ')';
     document.getElementById('upd-calm').textContent = '(last ' + when.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) + ')';
     render();
+    setTimeout(welcomeBack, 900);
   }).catch(() => { failed = true; render(); });
 
   // ---- search ----
@@ -1364,6 +1365,9 @@
       snap: ['ENOUGH.', 'FINE. FINE!', 'ugh. you are exhausting', 'stop poking things', 'стига вече!', 'もういい!'],
       yourpick: ['go on then. pick.', 'pick. now.', 'your call. literally.', 'избирай.', '選べ。'],
       mypick: ["I'll do it myself", 'too slow. mine.', 'give me that', 'сам ще избера', '貸して'],
+      // it sent you away and you came back: it noticed, and wants a rematch
+      back: ["hmm. didn't like the repo?", 'back already?', 'oh. you again.', 'that bad, huh?', 'not your thing?', 'missed me?', 'you came back. cute.', 'върна се, а?', 'не ти хареса, а?', 'おかえり。', '気に入らなかった?'],
+      rematch: ['wanna play another coin toss?', 'another coin toss?', 'rematch. call it.', 'double or nothing?', 'same game. new coin.', 'heads or tails. again.', 'още едно хвърляне?', 'пак ли? ези или тура?', 'もう一回?', 'もう一度、表か裏か?'],
     };
     const NS = 'http://www.w3.org/2000/svg';
     // hand space: wrist at 0,0, fingers along +x. Four fingers hook towards +y, the thumb comes up from below to meet them
@@ -1915,18 +1919,20 @@
   let swatsLeft = 1;   // the first time you go for heads or tails (once per visit) it knocks the buttons away, then snaps
   // No and the × do the same thing: the hand comes out
   noBtn.addEventListener('click', () => handScene());
-  async function handScene() {
+  let showOff = 0;
+  async function handScene(back) {   // back: you returned after it sent you away, so it greets you differently
     if (scene) return;
+    clearTimeout(showOff);
     const H = window.__hand; if (!H || isCrazy()) { closeFortune(); return; }
     scene = {}; noBtn.disabled = true; root.classList.add('hand-show');
     const sr = slip.getBoundingClientRect(), vw = document.documentElement.clientWidth;
     const hx = Math.min(vw - 70, sr.right + 70), hy = sr.top + sr.height * 0.35;
     try {
       await H.come(hx, hy, 'eager');
-      await sleep(700); H.say('hello');
-      await sleep(2200);
+      await sleep(700); H.say(back ? 'back' : 'hello');
+      await sleep(back ? 2500 : 2200);
       // the toss: the coin leaves the hand and spins in the air above it until you call it
-      H.to({ pose: 'joy', bob: false }); H.say('flip');
+      H.to({ pose: 'joy', bob: false }); H.say(back ? 'rematch' : 'flip');
       const g = H.grip() || [hx, hy], coin = document.createElement('div'); coin.className = 'coin'; coin.innerHTML = '<i class="rim"></i><b class="face"></b>'; document.body.appendChild(coin);
       scene.coin = coin;
       const D = 54, THICK = 10, face = coin.querySelector('.face'), rim = coin.querySelector('.rim');
@@ -2027,13 +2033,28 @@
       await sleep(260); H.to({ x: bx + 6, y: by - 26, rate: 10 });
       await sleep(300); H.to({ pose: 'joy', tip: false, aim: Math.PI, bob: true, rate: 10 });
       await sleep(1100);
+      try { sessionStorage.setItem(SENT, goBtn.href); } catch (e) {}
       location.href = goBtn.href;
     } finally {
       if (scene && scene.coin) scene.coin.remove();
       scene = null; noBtn.disabled = false;
-      setTimeout(() => root.classList.remove('hand-show'), 2000);
+      showOff = setTimeout(() => root.classList.remove('hand-show'), 2000);
     }
   }
+  // Back on the page after the hand sent you away (Back button, a page restored from the back/forward cache, or a later
+  // visit in the same tab): it draws you another project and wants a rematch. A normal visit has no mark and gets nothing
+  const SENT = 'kiripad-sent';
+  function welcomeBack() {
+    let sent = null; try { sent = sessionStorage.getItem(SENT); } catch (e) {}
+    if (!sent || scene || !data || !data.projects.length || !window.__hand || isCrazy()) return;
+    try { sessionStorage.removeItem(SENT); } catch (e) {}
+    const list = data.projects.filter((p) => !/^https:\/\/github\.com\//.test(p.url)), fresh = list.filter((p) => p.url !== sent);
+    const from = fresh.length ? fresh : list.length ? list : data.projects;
+    swatsLeft = 0;   // it already slapped you once today
+    drawFortune(list, from[Math.floor(Math.random() * from.length)]);
+    handScene(true);
+  }
+  window.addEventListener('pageshow', (e) => { if (e.persisted) setTimeout(welcomeBack, 600); });
 
   // ---- wipeable fog over the hero ----
   const hero = document.getElementById('hero'), cv = document.getElementById('fog'), ctx = cv.getContext('2d');
@@ -2239,6 +2260,6 @@
   applyMode();
   if (root.dataset.wantCrazy) askCrazy();
 </script>
-<script src="/scripts/phrasebook.js?v=5" defer></script>
+<script src="/scripts/phrasebook.js?v=6" defer></script>
 </body>
 </html>
