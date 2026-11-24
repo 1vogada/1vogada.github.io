@@ -81,6 +81,14 @@
   html.crazy #kiri { display: none; }
   .hero .wrap { position: relative; z-index: 2; padding-top: 72px; padding-bottom: 64px; pointer-events: none; }
   .hero .wrap a, .hero .wrap button { pointer-events: auto; }
+  /* readable card for the intro text over the scene and fog */
+  .intro { width: fit-content; max-width: 600px; padding: 26px 30px 22px; border-radius: 18px;
+           background: color-mix(in srgb, var(--surface) 80%, transparent); border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+           backdrop-filter: blur(12px) saturate(1.1); -webkit-backdrop-filter: blur(12px) saturate(1.1);
+           box-shadow: 0 10px 34px rgba(20, 18, 30, .12); }
+  .intro .lede { opacity: .9; }
+  .intro .meta { margin-top: 16px; }
+  @media (max-width: 640px) { .intro { padding: 20px 18px 18px; } }
   .hello { font-size: clamp(2.2rem, 6vw, 3.6rem); line-height: 1.1; letter-spacing: -0.025em; margin: 0 0 14px; min-height: 1.15em; }
   .hello .cursor { display: inline-block; width: .08em; height: .9em; background: var(--accent); margin-left: .06em; vertical-align: -0.08em; animation: caret 1s steps(1) infinite; }
   @keyframes caret { 50% { opacity: 0; } }
@@ -324,7 +332,7 @@
       </g>
     </svg>
     <canvas id="fog" aria-hidden="true"></canvas>
-    <div class="wrap">
+    <div class="wrap"><div class="intro">
       <h1 class="hello" aria-label="Hello"><span id="hello"></span><span class="cursor" aria-hidden="true"></span></h1>
       <p class="lede">I'm Ivo. I make games, tools and odd little experiments, and this is where they live once they escape the fog.</p>
       <div class="actions">
@@ -332,7 +340,7 @@
         <a class="btn ghost" href="#projects">Browse all</a>
       </div>
       <p class="meta"><span id="count-calm">…</span> projects · list updates itself <span id="upd-calm"></span></p>
-    </div>
+    </div></div>
     <div class="hint" id="hint">✋ wipe the fog</div>
   </section>
 
