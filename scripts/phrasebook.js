@@ -7,7 +7,7 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   // Bump VER, and the ?v= on this file's script tag in index.html, whenever this file or the stylesheet changes. GitHub Pages caches each
   // file for ten minutes on its own, and a new script with an old stylesheet looks broken; the version makes them arrive as a pair
-  const VER = 15;
+  const VER = 16;
   const here = (document.currentScript && document.currentScript.src) || '/scripts/phrasebook.js';
 
   // ---- what this file knows: which occasion each list belongs to. src = which list on window.__lines, key = which entry of it ----
@@ -108,7 +108,7 @@
         { src: 'MORE', key: null, title: 'Still scrolling', when: 'Half the time it does not let go after that, and shakes the scroll for a few seconds more.' },
         { src: 'HIDE', key: null, title: 'Hiding', when: 'The other half it lets go, says this, and hides off the screen for a few seconds as if it was never there.' },
         { fig: 'scroll' },
-        { src: 'CLAW_SAY', key: 'ask', title: 'The question', when: 'Surprise me draws you a fortune and a project. It leans in beside the slip and asks.' },
+        { src: 'CLAW_SAY', key: 'ask', title: 'The question', when: 'Surprise me draws you a fortune and a project. It leans in beside the slip and asks, and asks once more if you have done nothing for seven seconds.' },
         { src: 'CLAW_SAY', key: 'hello', title: 'Answering a no', when: 'Surprise me offers you a project and you say No. The Hand comes out to see about that.' },
         { src: 'CLAW_SAY', key: 'smashbtn', title: 'Smashing Yes and No', when: 'A few moments after it greets you, it slams itself down on the Yes and No buttons. They fly off the page in pieces.' },
         { src: 'CLAW_SAY', key: 'better', title: 'Its own buttons', when: 'It snaps two fingers, and Heads and Tails poof in where Yes and No were.' },
@@ -129,7 +129,8 @@
         { src: 'CLAW_SAY', key: 'escaped', title: 'Escaped', when: 'You click the secret ×, and the slip closes under its nose. Also when you lose the toss and press No anyway.' },
         { src: 'SAY', key: 'btnhi', title: 'The new buttons', when: 'After it snaps, a fresh Heads and Tails poof in and each says hello.' },
         { src: 'CLAW_SAY', key: 'yourpick', title: 'Letting you pick', when: 'Half the time after it snaps, it lets you call it after all.' },
-        { src: 'CLAW_SAY', key: 'mypick', title: 'Picking for you', when: 'The other half, it pokes Heads or Tails itself.' },
+        { src: 'CLAW_SAY', key: 'callit', title: 'Hurry up', when: 'The coin is spinning and you have not called it. Four seconds in it nags you.' },
+        { src: 'CLAW_SAY', key: 'mypick', title: 'Picking for you', when: 'The other half of the time after it snaps, it pokes Heads or Tails itself. It also does when you leave the coin spinning for nine seconds.' },
         { src: 'CLAW_SAY', key: 'back', title: 'You came back', when: 'It pressed Yes for you, and now you are on this page again. It noticed.' },
         { src: 'CLAW_SAY', key: 'rematch', title: 'The rematch', when: 'It draws you another project and tosses the coin again.' },
       ] },
@@ -431,7 +432,10 @@
   // ---- stay too long and the hand gets bored: after 30 s in the menu it reaches in, pulls the cards out one by one and throws them
   // at the left edge of the screen, where they break. The hand is the page's own (window.__hand): while its state is 'book' the page
   // leaves it alone and this file poses it. The thrown cards are real bodies in a small planck world the size of the window. ----
-  const LINGER = 5000, S = 100, DT = 1 / 240, GRAV = 85, FALL = 0.25, SMASH = 13, GRIP = [98, 20];
+  // every wait and bubble time comes from the page's one table (TIMING in index.html); the numbers after ?? are only for a page without it
+  const TM = window.__timing, LINGER = TM ? TM.wait.book : 5000, HELP_WAIT = (TM ? TM.wait.help : 8000) / 1000, GAP = TM ? TM.gap.raid : 1300, ASK_GAP = TM ? TM.gap.raidAsk : 2900;
+  const talk = (el, floor) => (TM ? TM.talk(el, TM.floor[floor]) : 1300);
+  const S = 100, DT = 1 / 240, GRAV = 85, FALL = 0.25, SMASH = 13, GRIP = [98, 20];
   let raid = null, armT = 0, armed = 0;
   const pick = (a) => window.__pick ? window.__pick(a) : a[Math.floor(Math.random() * a.length)], clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   function raidArm() {   // counts only the time the menu is really in front of someone
@@ -477,13 +481,13 @@
       c.x = document.documentElement.clientWidth + 340; c.pose = { ...H.POSES.lurk }; c.a = Math.PI; H.draw(0, 0, 0); c.st = 'off'; if (r.prev !== 'off') H.set('lurk');
     }
   }
-  function raidSay(text, o, ms) {
+  function raidSay(text, o, floor) {   // floor: a key of TIMING.floor for a line that wants longer than its length gives
     const r = raid, b = document.createElement('div'); b.className = 'pb-say' + (o ? '' : ' hand'); b.textContent = text;
     b.style.setProperty('--tilt', (4 + Math.random() * 4).toFixed(1));   // cards lean right, the hand leans left
-    if (ms) b.style.animationDuration = ms + 'ms';
+    const ms = talk(b, floor || (o ? null : 'hand'));
     r.layer.appendChild(b);
-    if (o) { if (o.say) o.say.el.remove(); o.say = { el: b, until: r.now + (ms || 1300) }; }
-    else { if (r.say) r.say.el.remove(); r.say = { el: b, until: r.now + (ms || 1500) }; r.said = r.now; }
+    if (o) { if (o.say) o.say.el.remove(); o.say = { el: b, until: r.now + ms }; }
+    else { if (r.say) r.say.el.remove(); r.say = { el: b, until: r.now + ms }; r.said = r.now; }
   }
   function raidCrumbs(x, y, n, dir) {
     const r = raid;
@@ -501,7 +505,7 @@
     piece.body.setLinearVelocity({ x: -7 - Math.random() * 4, y: -5 }); piece.body.setAngularVelocity(-2 - Math.random() * 3);
     raidCrumbs(o.x - st / 2, o.y, 14, -0.3); raidCrumbs(o.x - st / 2, o.y, 8, 0.3);
     o.st = 0; r.pull = null; r.ripped++;
-    const L = window.__lines, lines = L && L.CLAW_SAY && L.CLAW_SAY.rip; raidSay(lines ? pick(lines) : 'RIIIP', null, 1700);
+    const L = window.__lines, lines = L && L.CLAW_SAY && L.CLAW_SAY.rip; raidSay(lines ? pick(lines) : 'RIIIP', null, 'rip');
     const card = q('.pb-card'); card.classList.remove('pb-jolt'); void card.offsetWidth; card.classList.add('pb-jolt');
   }
   function raidSwat(x, y) {
@@ -547,7 +551,7 @@
     o.el.remove();
     const vw = document.documentElement.clientWidth, X = clamp(h.x * S, 0, vw), Y = clamp(h.y * S, 0, innerHeight);
     for (let i = 0; i < 16; i++) { const e = document.createElement('div'); e.className = 'pb-bit'; const sz = 3 + Math.random() * 5; e.style.width = e.style.height = sz + 'px'; r.layer.appendChild(e); const a = Math.random() * Math.PI * 2, sp = 200 + Math.random() * 700; r.bits.push({ el: e, x: X, y: Y, vx: h.n[0] * (200 + Math.random() * 500) + Math.cos(a) * sp * 0.6, vy: h.n[1] * 300 + Math.sin(a) * sp * 0.6 - 200, life: 0.6 + Math.random() * 0.6, t: 0 }); }
-    const L = window.__lines, sm = L && L.SAY && L.SAY.smash; if (sm) { const s = document.createElement('div'); s.className = 'pb-say scream'; s.textContent = pick(sm); s.style.translate = `calc(${clamp(X, 90, vw - 90).toFixed(0)}px - 50%) ${clamp(Y - 60, 12, innerHeight - 50).toFixed(0)}px`; r.layer.appendChild(s); setTimeout(() => s.remove(), 1300); }
+    const L = window.__lines, sm = L && L.SAY && L.SAY.smash; if (sm) { const s = document.createElement('div'); s.className = 'pb-say scream'; s.textContent = pick(sm); s.style.translate = `calc(${clamp(X, 90, vw - 90).toFixed(0)}px - 50%) ${clamp(Y - 60, 12, innerHeight - 50).toFixed(0)}px`; r.layer.appendChild(s); setTimeout(() => s.remove(), talk(s)); }
     const card = q('.pb-card'); card.classList.remove('pb-jolt'); void card.offsetWidth; card.classList.add('pb-jolt');
   }
   function raidFrame(t) {
@@ -627,7 +631,7 @@
       }
     } else if (r.st === 'wind') {   // back it goes, cocked over its shoulder
       pose = P.clamp; rate = 9; aim = Math.PI + 0.95; T = wristFor([vw - 90, clamp(r.y0 - 60, 110, vh - 110)], aim);
-      if (r.t > 0.2 && r.now - r.said > 1300) raidSay(pick(RAID_SAY));
+      if (r.t > 0.2 && r.now - r.said > GAP) raidSay(pick(RAID_SAY));
       if (r.t > (angry ? 0.4 : 0.62)) set('throw');
     } else if (r.st === 'throw') {   // and the whip forward: the card leaves the fingers with the speed they had
       rate = 34; aim = Math.PI - 0.3; T = wristFor([vw - 420, clamp(r.y0 + 10, 110, vh - 110)], aim); pose = r.held ? P.clamp : P.lunge;
@@ -651,9 +655,9 @@
         rate = 10; wig = 0.2; shake = r.pull ? 1 + 3 * strain : 0;
         const gx = clamp(vw * 0.5 + o.w / 2, Math.min(o.w + 24, vw - 70), vw - 70) + (r.pull ? 0 : Math.sin(r.t * 3.2) * 9) - o.st * 0.2;
         T = wristFor([gx, clamp(r.y0, 110, vh - 110)], aim);
-        if (!r.pull && r.t > 0.3 && (!o.asked || r.now - r.said > 2900) && r.t < 7) { o.asked = true; raidSay(pick(HELP_SAY), null, 2400); }
+        if (!r.pull && r.t > 0.3 && (!o.asked || r.now - r.said > ASK_GAP) && r.t < HELP_WAIT - 1) { o.asked = true; raidSay(pick(HELP_SAY), null, 'help'); }
         if (r.pull && o.st >= need) { raidRip(); set('eat'); }
-        else if (!r.pull && r.t > 8) { o.st = 0; o.el.classList.remove('pb-offer'); raidSay(pick(ALONE_SAY)); r.act = 'throw'; set('wind'); }
+        else if (!r.pull && r.t > HELP_WAIT) { o.st = 0; o.el.classList.remove('pb-offer'); raidSay(pick(ALONE_SAY)); r.act = 'throw'; set('wind'); }
       }
     } else if (r.st === 'eat') {   // it drags the card off the right edge of the screen, to where its mouth must be
       const o = r.held; if (!o) end(0.4);
@@ -662,7 +666,7 @@
         if (r.t < 0.55) { rate = 20; T = [c.x, c.y]; } else { rate = 6; vmax = 260 + 520 * Math.min(1, (r.t - 0.55) / 0.5); T = wristFor([vw + o.w + 160, clamp(r.y0, 110, vh - 110)], aim); }
         if (o.x - o.w / 2 > vw + 4 || r.t > 4.5) {
           if (o.say) o.say.el.remove(); o.el.remove(); r.held = null; r.eaten++; r.y0 = clamp(o.y, 90, vh - 90);
-          const L = window.__lines, lines = L && L.CLAW_SAY && L.CLAW_SAY.eat; raidSay(lines ? pick(lines) : 'nom.', null, 1600); set('chew');
+          const L = window.__lines, lines = L && L.CLAW_SAY && L.CLAW_SAY.eat; raidSay(lines ? pick(lines) : 'nom.', null, 'eat'); set('chew');
         }
       }
     } else if (r.st === 'chew') {   // crumbs come flying back in
@@ -690,7 +694,7 @@
         if (r.t > r.dur) {   // three seconds, give or take one. Then it either goes on, or lets go and hides
           r.scrolled.push(Math.round(r.now - r.t0));
           if (!angry && r.bouts < 2 && Math.random() < 0.5) { r.bouts++; r.t = 0; r.t0 = r.now; r.dur = 2 + Math.random() * 2; r.s0 = f; r.ph = Math.PI - r.ph; raidSay(pick(MORE_SAY)); }
-          else { r.grabbed = false; r.bouts = 0; if (angry) end(0.2); else { r.hide = 2.5 + Math.random() * 2; raidSay(pick(HIDE_SAY), null, 1900); set('hide'); } }
+          else { r.grabbed = false; r.bouts = 0; if (angry) end(0.2); else { r.hide = 2.5 + Math.random() * 2; raidSay(pick(HIDE_SAY), null, 'hide'); set('hide'); } }
         }
       }
     }

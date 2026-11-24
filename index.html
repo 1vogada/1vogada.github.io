@@ -172,9 +172,9 @@
                 transform-origin: 50% 50%; will-change: transform; cursor: grab; touch-action: none; translate: none; }
   #phys .phys.grabbed { box-shadow: 0 18px 40px rgba(0,0,0,.25); }
   #phys .say { position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; white-space: nowrap; background: var(--text); color: var(--bg);
-               font-size: .82rem; font-weight: 650; padding: 4px 11px; border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,.2); animation: say 1.3s both; rotate: calc(var(--tilt, 5) * 1deg); }
+               font-size: .82rem; font-weight: 650; padding: 4px 11px; border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,.2); animation: say var(--say, 1.3s) both; rotate: calc(var(--tilt, 5) * 1deg); }
   #phys .say::after { content: ""; position: absolute; left: calc(50% + var(--tail, 0px)); bottom: -5px; width: 10px; height: 10px; background: inherit; transform: translateX(-50%) rotate(45deg); border-radius: 2px; }
-  #phys .say.agony { font-size: calc(.82rem + .5rem * var(--pain, 0)); animation: say 1.3s both, agony .09s linear infinite; }
+  #phys .say.agony { font-size: calc(.82rem + .5rem * var(--pain, 0)); animation: say var(--say, 1.3s) both, agony .09s linear infinite; }
   #phys .say.agony[data-lvl] { background: var(--accent); color: #fff; }
   #phys .say.agony[data-lvl="2"] { letter-spacing: .04em; }
   @keyframes agony { 0% { margin: 0; } 25% { margin: calc(-2px * var(--pain)) 0 0 calc(2px * var(--pain)); } 75% { margin: calc(2px * var(--pain)) 0 0 calc(-2px * var(--pain)); } }
@@ -318,7 +318,7 @@
   @keyframes puff { from { transform: scale(.3); opacity: 1; } to { transform: scale(1.5); opacity: 0; } }
   /* a button's bubble looks like the katana's and the cards': solid dark, light text. A greyed-out button would make it see-through, so it is not greyed while it talks */
   .btn-say { position: absolute; bottom: calc(100% + 9px); left: 50%; translate: -50% 0; white-space: nowrap; pointer-events: none; z-index: 2;
-             background: var(--text); color: var(--bg); border-radius: 12px; padding: 4px 11px; font-size: .82rem; font-weight: 650; box-shadow: 0 6px 16px rgba(0,0,0,.2); animation: btnsay 2.6s ease forwards; }
+             background: var(--text); color: var(--bg); border-radius: 12px; padding: 4px 11px; font-size: .82rem; font-weight: 650; box-shadow: 0 6px 16px rgba(0,0,0,.2); animation: btnsay var(--say, 2.6s) ease forwards; }
   .btn-say::after { content: ''; position: absolute; top: 100%; left: 50%; margin: -5px 0 0 -5px; width: 10px; height: 10px; background: inherit; rotate: 45deg; border-radius: 2px; }
   .omi-actions .btn[disabled]:has(.btn-say) { opacity: 1; }
   @keyframes btnsay { 0% { opacity: 0; transform: translateY(6px) scale(.8); } 10%, 85% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-4px); } }
@@ -742,6 +742,39 @@
     requestAnimationFrame(tick);
   })();
 
+  // ---- timing: how long every speech bubble stays up, how long anyone waits before speaking again, and how long you get to answer ----
+  // All in ms of real time. Change the numbers here, never at the call sites; the phrasebook (scripts/phrasebook.js) reads the same table from window.__timing.
+  // A bubble stays up long enough to read: read.base + read.perChar for every character, never shorter than read.min or longer than read.max.
+  // Some lines want longer than their length gives (a scream, a request): those have a floor in `floor`
+  const TIMING = {
+    read: { base: 800, perChar: 50, min: 1300, max: 3800 },
+    floor: { rip: 1900, eat: 1600, help: 2400, hide: 1900, btn: 2600, hand: 1500 },
+    // the shortest time between two lines from the same speaker. A forced line (something important just happened) may cut in sooner
+    gap: { card: 1400, katana: 2000, scream: 2000, hand: 2000, handIdle: 2400, handLate: 1200, sev: 2200, sevForce: 900, notme: 2600, raid: 1300, raidAsk: 2900 },
+    // the hand's remarks about what it sees come after a random wait: min + up to spread, shortened by up to `calm` when a lot is going on
+    react: { min: 700, spread: 2100, calm: 0.65, flinch: 1500 },
+    // how long you get to answer before it acts, and when it nags you in between
+    wait: {
+      tease: [1400, 2200], teaseAgain: [1200, 2000],   // holding a card in its zone: [at least, plus up to] before it snatches
+      ask: 7000,                     // "go there?" beside the slip: it asks once more if you have done nothing
+      secret: 350,                   // the secret × rose: it protests this long after it arrives
+      hello: 2200, back: 2500,       // Surprise me: greeting, then the smash
+      better: 2100,                  // its own buttons are in: then the toss
+      callNag: 4000, call: 9000,     // heads or tails: it nags, then calls it for you and presses the button itself
+      result: 1800, verdict: 2100,   // the coin shows its side; the verdict before what follows
+      yesNag: 2400, yes: 5000,       // you lost: Yes and No are yours, then it presses Yes
+      escaped: 1700,                 // you pressed No again: it lets you go after this
+      sevRest: 15000,                // a severed hand that sat down gets up at the latest after this, even if nothing moves the page
+      book: 5000, help: 8000,        // phrasebook: the hand comes in after the menu has been open this long; it waits this long for help ripping a card
+    },
+  };
+  // Japanese and Chinese characters carry about a word each, so they count twice
+  TIMING.ms = (text, floor) => { const r = TIMING.read, t = String(text), n = [...t].length + (t.match(/[\u3040-\u9fff]/g) || []).length; return Math.max(floor || 0, Math.min(r.max, Math.max(r.min, r.base + r.perChar * n))); };
+  TIMING.span = ([a, b]) => a + Math.random() * b;
+  // gives a bubble its life: the fade in its CSS runs for the same time (var --say), and the time is returned for whoever removes it
+  TIMING.talk = (el, floor) => { const ms = TIMING.ms(el.textContent, floor); el.style.setProperty('--say', ms + 'ms'); return ms; };
+  window.__timing = TIMING;
+
   // ---- card physics (planck.js, a Box2D port, in /vendor) ----
   // Cards are rooted in the grid by a spring. Pull one far enough and the root tears: from then on it is a rigid body
   // that hangs from the point you hold it by, falls to the bottom of the page, collides and stacks.
@@ -863,7 +896,7 @@
       slice: ['AAAAAAARGH!!', 'NOOOOOOOO—', 'EEEEEEEEK!!', 'GYAAAAAAH!', 'AAAAAAAAAAA!!!', 'ААААААААА!!!', 'НЕЕЕЕЕЕЕ!', 'ぎゃああああ!!', 'うわあああ!!', 'HHHHRRRKK—'],
       smash: ['AAAAAAAAAA—', 'NOOOOO!!', 'ААААА!!', 'ぐはっ!!', 'KRRRK—'],
     };
-    const QUIET = 2000; let cutSaid = -1e9;
+    let cutSaid = -1e9;
     // Lines are not drawn blindly: the line said last (from this list, or by anyone) never comes straight back, and one said a few lines ago
     // only has a tenth of a fresh line's chance. Each list remembers what it gave out lately, and the last line said anywhere is kept too
     const pickMem = new WeakMap(); let pickSaid = null;
@@ -885,6 +918,10 @@
       const h = claw && claw.say && claw.say.x != null ? claw.say : null, all = h ? [h] : [], x0 = scrollX + 6, x1 = scrollX + html.clientWidth - 6;
       for (const o of objs) if (o.say && o.say.x != null) all.push(o.say);
       for (const s of all) { if (!s.w) { s.w = s.el.offsetWidth; s.h = s.el.offsetHeight; } s.x = Math.max(x0 + s.w / 2, Math.min(x1 - s.w / 2, s.x)); }
+      // something it holds up (the coin) is never covered by what it says: the bubble moves to the left of it
+      const dodge = h && claw.dodge && claw.dodge.isConnected && claw.dodge.getBoundingClientRect();
+      if (dodge && dodge.width && Math.abs(h.x - scrollX - (dodge.left + dodge.right) / 2) < (h.w + dodge.width) / 2 + 10 && h.y - scrollY < dodge.bottom + 10 && h.y - scrollY + h.h > dodge.top - 10)
+        h.x = Math.max(x0 + h.w / 2, dodge.left + scrollX - 14 - h.w / 2);
       // leaning makes a bubble taller by about 7% of its width at each end. A pair that was slid apart stays apart until it is well clear, so it does not flicker
       const hit = (a, b, pad) => Math.abs(a.x - b.x) < (a.w + b.w) / 2 + pad && Math.abs(a.y + a.h / 2 - b.y - b.h / 2) < (a.h + b.h) / 2 + 0.07 * (a.w + b.w) + pad - 4;
       if (h) for (const s of all) {
@@ -903,15 +940,20 @@
       }
     }
     function say(o, kind, force) {
-      const t = now(); if ((o.kind === 'katana') !== (kind[0] === 'k') || (!force && o.said && t - o.said < 1400)) return;
+      const t = now(); if ((o.kind === 'katana') !== (kind[0] === 'k') || (!force && o.said && t - o.said < TIMING.gap.card)) return;
       // one line per burst: the katana speaks once and is then quiet for 2 s of real time, and a pass that cuts ten cards gets one "ow", not ten
-      if (o.kind === 'katana') { if (o.said && t - o.said < QUIET) return; }
-      else if (kind === 'slice') { if (t - cutSaid < QUIET) return; cutSaid = t; }
-      if (o.say) o.say.el.remove();
-      o.said = t; o.say = { el: bubble(pick(SAY[kind])), until: t + 1300 }; run();
-      if (kind === 'slice') { const el = o.say.el; el.classList.add('agony'); el.style.setProperty('--pain', '1'); el.dataset.lvl = 2; }   // a death scream looks like one
+      if (o.kind === 'katana') { if (o.said && t - o.said < TIMING.gap.katana) return; }
+      else if (kind === 'slice') { if (t - cutSaid < TIMING.gap.scream) return; cutSaid = t; }
+      talkOn(o, pick(SAY[kind]));
+      if (kind === 'slice') scream(o.say.el);   // a death scream looks like one
     }
-    function sayAt(x, y, text) { const el = bubble(text); el.style.translate = `calc(${x.toFixed(0)}px - 50%) ${y.toFixed(0)}px`; setTimeout(() => el.remove(), 1300); }
+    // a bubble that rides above a body (o.say), and one left standing at a page point. Both last as long as their text takes to read
+    function talkOn(o, text, floor) {
+      const t = now(); if (o.say) o.say.el.remove();
+      const el = bubble(text); o.said = t; o.say = { el, until: t + TIMING.talk(el, floor) }; run(); return el;
+    }
+    function scream(el) { el.classList.add('agony'); el.style.setProperty('--pain', '1'); el.dataset.lvl = 2; return el; }
+    function sayAt(x, y, text, cls) { const el = bubble(text); if (cls === 'scream') scream(el); el.style.translate = `calc(${x.toFixed(0)}px - 50%) ${y.toFixed(0)}px`; setTimeout(() => el.remove(), TIMING.talk(el)); }
 
     // ---- loop: fixed 240 Hz steps on the real clock, drawn with interpolation ----
     function step() {
@@ -1459,6 +1501,7 @@
       yourpick: ['go on then. pick.', 'pick. now.', 'your call. literally.', 'избирай.', '選べ。'],
       secret: ['NOOOOOOO', 'NOOO! not the secret!', 'who told you about that?!', 'stop. right. there.', 'that is NOT for you', 'you were never supposed to find that', 'НЕЕЕЕЕ!', 'намери тайната!', 'не пипай това!', 'だめーーー!', 'ひみつが!', 'バレた!'],
       escaped: ['...fine.', 'cheater.', 'I will remember this', 'nobody likes a sneak', 'ずるい', 'измамник.'],
+      callit: ['call it already', 'heads? tails? anything?', 'the coin is getting dizzy', 'I can do this all day', 'it is a coin, not a test', 'ези или тура? хайде!', 'はやく決めて'],
       mypick: ["I'll do it myself", 'too slow. mine.', 'give me that', 'сам ще избера', '貸して'],
       // it sent you away and you came back: it noticed, and wants a rematch
       back: ["hmm. didn't like the repo?", 'back already?', 'oh. you again.', 'that bad, huh?', 'not your thing?', 'missed me?', 'you came back. cute.', 'върна се, а?', 'не ти хареса, а?', 'おかえり。', '気に入らなかった?'],
@@ -1501,24 +1544,24 @@
       claw.st = st; claw.t = 0; claw.until = now() + 1500; run(); }
     // The hand comments on most things it sees, but never at once: each remark waits a random while. When a lot happens together its
     // agitation fills up and the wait gets shorter, and there are always at least 2 s of real time between two things it says
-    const REACT_GAP = 2000;
+    const REACT_GAP = TIMING.gap.hand;
     function notice(kind) {
       const c = claw; if (!c || c.st === 'off' || isCrazy()) return;
-      const t = now(); c.agit = Math.min(6, (c.agit || 0) + 1);
-      const wait = (700 + Math.random() * 2100) * (1 - 0.65 * clamp01((c.agit - 1) / 4));
+      const t = now(), R = TIMING.react; c.agit = Math.min(6, (c.agit || 0) + 1);
+      const wait = (R.min + Math.random() * R.spread) * (1 - R.calm * clamp01((c.agit - 1) / 4));
       if (!c.react) c.react = { kind, at: t + wait, born: t }; else { c.react.at = Math.min(c.react.at, t + wait); if (Math.random() < 0.5) c.react.kind = kind; }
       run();
     }
     function clawSay(kind, force) {
-      const c = claw, t = now(); if (!force && t - c.said < 2400) return;
+      const c = claw, t = now(); if (!force && t - c.said < TIMING.gap.handIdle) return;
       // never two lines within 2 s: what it does is not held up, but an important line waits its turn and an unimportant one is dropped
-      if (t - c.said < REACT_GAP) { if (force) c.later = { kind, at: c.said + REACT_GAP }; return; }
+      if (t - c.said < REACT_GAP) { if (force) c.later = { kind, at: c.said + REACT_GAP }; return 0; }
       c.later = null;
       if (c.say) c.say.el.remove();
       // the first rip it gets to shout about after every page load is always the cheese pull; after that the rip lines come at random again
       const first = kind === 'rip' && !clawSay.cheesed; if (first) clawSay.cheesed = true;
-      const el = bubble(first ? CLAW_SAY.rip[0] : pick(CLAW_SAY[kind])), ms = kind === 'rip' ? 1900 : 1300; el.classList.add('claw-say'); el.style.animationDuration = ms + 'ms';
-      c.said = t; c.say = { el, until: t + ms }; run();
+      const el = bubble(first ? CLAW_SAY.rip[0] : pick(CLAW_SAY[kind])), ms = TIMING.talk(el, TIMING.floor[kind]); el.classList.add('claw-say');
+      c.said = t; c.say = { el, until: t + ms }; run(); return ms;
     }
     const gripPt = () => { const c = claw, ca = Math.cos(c.a), sa = Math.sin(c.a); return [c.x + GRIP[0] * ca + GRIP[1] * sa, c.y + GRIP[0] * sa - GRIP[1] * ca]; };
     const wristFor = (H, a) => { const ca = Math.cos(a), sa = Math.sin(a); return [H[0] - GRIP[0] * ca - GRIP[1] * sa, H[1] - GRIP[0] * sa + GRIP[1] * ca]; };
@@ -1615,15 +1658,14 @@
           const w = q.body.getWorldCenter(); if (Math.hypot(w.x - w0.x, w.y - w0.y) > 6.5) continue;
           q.body.applyLinearImpulse({ x: (Math.random() - 0.5) * q.body.getMass() * 0.5 * (0.3 + fear), y: -q.body.getMass() * 0.35 * (0.3 + fear) * Math.random() }, w, true);
           q.body.applyAngularImpulse(q.body.getInertia() * (Math.random() - 0.5) * (0.3 + fear), true);
-          if (t - (c.notme || 0) > 2600 && Math.random() < 0.3 && !q.say) { c.notme = t; if (q.say) q.say.el.remove(); q.said = t; q.say = { el: bubble(pick(NOTME)), until: t + 1300 }; }
+          if (t - (c.notme || 0) > TIMING.gap.notme && Math.random() < 0.3 && !q.say) { c.notme = t; talkOn(q, pick(NOTME)); }
         }
       }
     }
     function cardSay(o, pain, LINES = AGONY) {
       const t = now(), lvl = pain > 0.62 ? 2 : pain > 0.3 ? 1 : 0; if (o.said && t - o.said < 1500 - 950 * pain && lvl <= (o.lvl || 0)) return;
-      if (o.say) o.say.el.remove();
-      const el = bubble(pick(LINES[lvl])); el.classList.add('agony'); el.style.setProperty('--pain', pain.toFixed(2)); if (lvl) el.dataset.lvl = lvl;
-      o.said = t; o.lvl = lvl; o.say = { el, until: t + 1300 };
+      const el = talkOn(o, pick(LINES[lvl])); el.classList.add('agony'); el.style.setProperty('--pain', pain.toFixed(2)); if (lvl) el.dataset.lvl = lvl;
+      o.lvl = lvl;
     }
     function clawSlip(P, H) {   // a sharp yank right after it grabs and the claws slide off
       const o = claw.o; clawUntug(o, P, H); claw.o = null; claw.cool = now() + 2500;
@@ -1713,7 +1755,7 @@
       }
       if (c.st === 'off') { T[0] = vw + 340; if (ripped.size) clawSet('lurk'); }
       else if (c.st === 'lurk') {
-        if (held) { c.ly += (Math.max(80, Math.min(vh - 80, P[1])) - c.ly) * (1 - Math.exp(-dt * 3)); if (t > c.cool && P[0] > Z.tease && !nearShelf(P)) { clawSet('eager'); clawSay('eager'); c.patience = 1.4 + Math.random() * 2.2; } }
+        if (held) { c.ly += (Math.max(80, Math.min(vh - 80, P[1])) - c.ly) * (1 - Math.exp(-dt * 3)); if (t > c.cool && P[0] > Z.tease && !nearShelf(P)) { clawSet('eager'); clawSay('eager'); c.patience = TIMING.span(TIMING.wait.tease) / 1000; } }
         else {   // nobody is holding anything: is there something lying on the shelf?
           const q = shelfSnack(); if (shelf) shelf.want = !!q;
           if (!q) c.eyed = null; else if (q !== c.eyed) { c.eyed = q; c.eyedAt = t; } else if (t > c.cool && t - c.eyedAt > 700) { c.o = q; c.eyed = null; clawSet('reach'); clawSay('shelf', true); }
@@ -1743,7 +1785,7 @@
         if (!held) clawSet('sulk');
         else if (nearShelf(P)) clawSet('lurk');   // you are putting it on the shelf: it pulls back and waits for you to look away
         else if (P[0] < Z.tease - 60) { if (Math.random() < 0.5) snatch(held); else { clawSet('sulk'); clawSay('sulk', true); } }   // teased: it sulks, or it loses its temper
-        else if (c.t > c.patience && P[0] < vw - NEAR) { if (Math.random() < 0.6) snatch(held); else { c.patience = c.t + 1.2 + Math.random() * 2; clawSay('eager', true); } }
+        else if (c.t > c.patience && P[0] < vw - NEAR) { if (Math.random() < 0.6) snatch(held); else { c.patience = c.t + TIMING.span(TIMING.wait.teaseAgain) / 1000; clawSay('eager', true); } }
         else {
           c.ly = Math.max(80, Math.min(vh - 80, P[1])); T = [vw - 10, P[1]]; aim = Math.atan2(P[1] - c.y, P[0] - c.x); if (Math.cos(aim) > -0.4) aim = Math.PI;
           if (c.far && P[0] > vw - NEAR) { c.o = held; c.pre = clawPre(held); clawSet('lunge'); } else if (c.t > 2.6) clawSay('eager');
@@ -1846,11 +1888,11 @@
         if (c.t > 1.6) clawSet('lurk');
       }
       c.agit = Math.max(0, (c.agit || 0) - dt * 0.6);
-      if (c.later && t >= c.later.at) { const l = c.later; c.later = null; if (t - l.at < 1200) clawSay(l.kind, true); }
+      if (c.later && t >= c.later.at) { const l = c.later; c.later = null; if (t - l.at < TIMING.gap.handLate) clawSay(l.kind, true); }
       if (c.react) {
         const idle = c.st === 'lurk' || c.st === 'sulk';
         if (t - c.react.born > 6000) c.react = null;   // it was busy for too long: the moment has passed
-        else if (idle && t >= c.react.at && t - (c.said || 0) >= REACT_GAP) { clawSay(c.react.kind, true); c.flinch = t + 1500; c.mood = c.react.kind; c.react = null; }
+        else if (idle && t >= c.react.at && t - (c.said || 0) >= REACT_GAP) { clawSay(c.react.kind, true); c.flinch = t + TIMING.react.flinch; c.mood = c.react.kind; c.react = null; }
       }
       if (t < (c.flinch || 0) && (c.st === 'lurk' || c.st === 'sulk')) {   // it leans in to say it: fingers drumming, or a fist for the things it disapproves of
         T = [vw + 36, c.ly]; rate = 10; wig = 0.3; aim = Math.PI + Math.sin(c.t * 9) * 0.06; pose = c.mood === 'katana' || c.mood === 'smash' ? POSES.sulk : c.mood === 'kdrop' || c.mood === 'stab' ? POSES.joy : POSES.eager;
@@ -1866,12 +1908,12 @@
         ob.el.style.clipPath = `polygon(${g.pts.map(([x, y, r]) => `${(x + (ob.w / 2 - x) * q * r).toFixed(1)}px ${(y + (ob.h / 2 - y) * q * r).toFixed(1)}px`).join(',')})`;
         ob.el.style.filter = `saturate(${(1 + q).toFixed(2)}) sepia(${(0.4 * q).toFixed(2)}) hue-rotate(-${(30 * q).toFixed(0)}deg) brightness(${(1 - 0.25 * q).toFixed(2)})`;
         if (rest && c.t > 2.5 && c.t < 3.7) {   // in the long pause it begs
-          if (!g.beg) { g.beg = true; if (ob.say) ob.say.el.remove(); ob.said = t; ob.say = { el: bubble(pick(BEG)), until: t + 1150 }; }
+          if (!g.beg) { g.beg = true; talkOn(ob, pick(BEG)); }
         } else if (!rest) cardSay(ob, 0.35 + 0.65 * q);
         if (t > (g.drip || 0)) { g.drip = t + (rest ? 260 : 70); gore(H[0], H[1], 0, 1, 2 + Math.round(4 * q), 0.3 + 0.4 * q); }
         if (q >= 1) {
           gore(H[0], H[1], -1, 0, 54, 1.1); gore(H[0], H[1], 0, -1, 22, 0.8);
-          const el = bubble(pick(SAY.slice)); el.classList.add('agony'); el.style.setProperty('--pain', '1'); el.dataset.lvl = 2; el.style.translate = `calc(${H[0].toFixed(0)}px - 50%) ${(H[1] - 70).toFixed(0)}px`; setTimeout(() => el.remove(), 1300);
+          sayAt(H[0], H[1] - 70, pick(SAY.slice), 'scream');
           ob.tug = null; remove(ob); c.o = null;
           const m = document.getElementById('projects'); m.classList.remove('shake'); void m.offsetWidth; m.classList.add('shake');
           clawSet('gloat'); clawSay('crush', true);
@@ -2023,9 +2065,8 @@
     };
     const sevBusy = () => { for (const o of sevs) if (o.ai.st !== 'rest') return true; return false; };
     function sevSay(o, kind, force) {
-      const t = now(); if (t - (o.said || -1e9) < (force ? 900 : 2200)) return;
-      if (o.say) o.say.el.remove();
-      const el = bubble(pick(SEV_SAY[kind])); el.classList.add('claw-say'); o.said = t; o.say = { el, until: t + 1300 }; run();
+      const t = now(); if (t - (o.said || -1e9) < (force ? TIMING.gap.sevForce : TIMING.gap.sev)) return;
+      talkOn(o, pick(SEV_SAY[kind])).classList.add('claw-say');
     }
     function sevSpawn(px, py, a, pose) {   // page px of the middle of the palm, and the way the fingers point
       if (sevs.size >= 3) { const old = sevs.values().next().value, w = old.body.getPosition(); gore(w.x * S, w.y * S, 0, -1, 26, 0.9); remove(old); }   // three is a crowd
@@ -2127,7 +2168,7 @@
           if (t > (a.drip || 0)) { a.drip = t + (pause ? 240 : 80); gore(w.x * S, w.y * S, 0, 1, 2 + Math.round(3 * sq), 0.3 + 0.4 * sq); }
           if (u >= 1) {
             gore(w.x * S, w.y * S, -1, 0, 30, 1); gore(w.x * S, w.y * S, 1, 0, 30, 1); gore(w.x * S, w.y * S, 0, -1, 20, 0.8);
-            const el = bubble(pick(SAY.slice)); el.classList.add('agony'); el.style.setProperty('--pain', '1'); el.dataset.lvl = 2; el.style.translate = `calc(${(w.x * S).toFixed(0)}px - 50%) ${(w.y * S - 110).toFixed(0)}px`; setTimeout(() => el.remove(), 1300);
+            sayAt(w.x * S, w.y * S - 110, pick(SAY.slice), 'scream');
             q.sq = null; remove(q); a.prey = null; a.cool = t + 5000; sevSay(o, 'crush', true); sevSet(o, 'gloat');
           }
         },
@@ -2138,7 +2179,7 @@
       // sitting down with its eye shut. Anything that touches it, or a while of real time, and it is up again
       rest: {
         pose: 'rest',
-        enter(o, a) { sevSay(o, 'rest', true); o.body.setAngularDamping(2.5); a.wake = now() + 7000 + Math.random() * 7000; setTimeout(() => { if (objs.has(o) && a.st === 'rest') sevSet(o, 'rise'); }, 15000); },
+        enter(o, a) { sevSay(o, 'rest', true); o.body.setAngularDamping(2.5); a.wake = now() + 7000 + Math.random() * 7000; setTimeout(() => { if (objs.has(o) && a.st === 'rest') sevSet(o, 'rise'); }, TIMING.wait.sevRest); },
         tick(o, a, dt, t) { a.wig = 0; if (t > a.wake || o.body.getLinearVelocity().length() > 1.5) sevSet(o, 'rise'); },
       },
     };
@@ -2327,7 +2368,7 @@
         claw.show = { x, y, pose: pose || 'eager', rate: 6, bob: true }; claw.y = y; claw.ly = y; claw.sh = y + 70; clawSet('show');
       },
       to(o) { if (claw && claw.st === 'show') { Object.assign(claw.show, o); claw.t = 0; run(); } },
-      say(kind) { if (claw) clawSay(kind, true); },
+      say(kind) { return claw ? clawSay(kind, true) || 0 : 0; },   // how long the line will be up (0: it was held back a moment)
       grip() { return claw ? gripPt() : null; },
       leave() { if (claw && claw.st === 'show') { claw.show = null; clawSet('sulk'); } },
     };
@@ -2423,16 +2464,19 @@
     // the hand was not out: it bursts in to protest
     peek = true; clearTimeout(showOff); root.classList.add('hand-show');
     const vw = document.documentElement.clientWidth;
-    H.come(Math.min(vw - 70, r.right + 70), r.top + r.height * 0.6, 'clamp').then(() => { if (peek) setTimeout(() => peek && H.say('secret'), 350); });
+    H.come(Math.min(vw - 70, r.right + 70), r.top + r.height * 0.6, 'clamp').then(() => { if (peek) setTimeout(() => peek && H.say('secret'), TIMING.wait.secret); });
   });
   // nothing on the slip talks: the hand leans in beside it and asks the question itself
   function askHand() {
     const H = window.__hand; if (!H || isCrazy() || scene || peek || omi.hidden) return;
     peek = true; clearTimeout(showOff); root.classList.add('hand-show');
     const r = slip.getBoundingClientRect(), vw = document.documentElement.clientWidth;
-    H.come(Math.min(vw - 70, r.right + 70), r.top + r.height * 0.35, 'eager').then(() => setTimeout(() => peek && !scene && !omi.hidden && H.say('ask'), 600));
+    const asking = () => peek && !scene && !omi.hidden;
+    // it asks, and if you do nothing for a while it asks once more
+    H.come(Math.min(vw - 70, r.right + 70), r.top + r.height * 0.35, 'eager').then(() => setTimeout(() => { if (!asking()) return; H.say('ask'); clearTimeout(askAgain); askAgain = setTimeout(() => asking() && H.say('ask'), TIMING.wait.ask); }, 600));
   }
-  function unpeek() { if (!peek) return; peek = false; const H = window.__hand; if (H) H.leave(); showOff = setTimeout(() => root.classList.remove('hand-show'), 2000); }
+  let askAgain = 0;
+  function unpeek() { clearTimeout(askAgain); if (!peek) return; peek = false; const H = window.__hand; if (H) H.leave(); showOff = setTimeout(() => root.classList.remove('hand-show'), 2000); }
   secret.addEventListener('click', () => {
     const H = window.__hand, out = peek || scene;
     if (scene) scene.kill();   // stop the coin game wherever it is
@@ -2466,8 +2510,8 @@
     const hx = Math.min(vw - 70, sr.right + 70), hy = sr.top + sr.height * 0.35;
     try {
       await H.come(hx, hy, 'eager');
-      await sleep(700); H.say(back ? 'back' : 'hello');
-      await sleep(back ? 2500 : 2200);
+      await sleep(700);
+      await sleep(Math.max(back ? TIMING.wait.back : TIMING.wait.hello, H.say(back ? 'back' : 'hello')));   // long enough to read it
       let heads, tails, go;
       const makeBtns = () => {
         heads = document.createElement('button'); tails = document.createElement('button');
@@ -2512,13 +2556,13 @@
         await sleep(160);
         makeBtns(); heads.disabled = tails.disabled = true; actEl.style.minHeight = '';
         for (const el of [heads, tails]) { el.classList.add('poof'); const puff = document.createElement('i'); puff.className = 'omi-puff'; el.appendChild(puff); setTimeout(() => puff.remove(), 520); }
-        await sleep(900); H.say('better'); H.to({ pose: 'joy', rate: 10, bob: true });
-        await sleep(2100);
+        await sleep(900); const ms = H.say('better'); H.to({ pose: 'joy', rate: 10, bob: true });
+        await sleep(Math.max(TIMING.wait.better, ms));
       }
       // the toss: the coin leaves the hand and spins in the air above it until you call it
       H.to({ pose: 'joy', bob: false }); H.say(back ? 'rematch' : 'flip');
       const g = H.grip() || [hx, hy], coin = document.createElement('div'); coin.className = 'coin'; coin.innerHTML = '<i class="rim"></i><b class="face"></b>'; document.body.appendChild(coin);
-      my.coin = coin; my.coinEl = coin;
+      my.coin = coin; my.coinEl = coin; H.get().dodge = coin.querySelector('.face');
       const D = 54, THICK = 10, face = coin.querySelector('.face'), rim = coin.querySelector('.rim');
       // th = how far it is turned (0 = face to you). The face shrinks with cos, the rim (its thickness, seen edge-on) grows with sin
       const turn = (th, label) => {
@@ -2541,11 +2585,27 @@
         H.to({ x: bx, y: by, rate: 22 }); await sleep(120); btn.classList.add('pressed'); await sleep(260);
         H.to({ x: bx + 6, y: by - 26, rate: 10 }); await sleep(300);
       };
+      // you have TIMING.wait.call to call it, with a nag halfway. Then it calls it itself and presses the button for you. The clock starts over
+      // whenever the buttons are yours again
+      let nagT = 0, outT = 0;
+      const stopClock = () => { clearTimeout(nagT); clearTimeout(outT); };
       const call = await new Promise((res, rej) => {
-        my.fails.push(() => rej(GONE));
+        my.fails.push(() => { stopClock(); rej(GONE); });
         let busy = false;
+        const clock = () => {
+          stopClock();
+          nagT = setTimeout(() => !busy && !my.dead && H.say('callit'), TIMING.wait.callNag);
+          outT = setTimeout(() => go && go(null).catch((e) => { if (e !== GONE) throw e; }), TIMING.wait.call);
+        };
+        const myPick = async () => {   // it picks for you: one finger on Heads or Tails
+          heads.disabled = tails.disabled = true;
+          const mine = Math.random() < 0.5 ? 'heads' : 'tails'; H.say('mypick');
+          await poke(mine === 'heads' ? heads : tails); hover(); res(mine);
+        };
         go = async (side, btn) => {
           if (busy) return;
+          stopClock();
+          if (side === null) { busy = true; await myPick(); return; }   // you took too long
           if (swatsLeft <= 0) { res(side); return; }
           busy = true; swatsLeft--;
           // it knocks both buttons off the slip, one of three ways: a slap (sweep left), a backhand (sweep right) or a slam (straight down)
@@ -2574,24 +2634,24 @@
           const hi = window.__lines.SAY.btnhi, a = Math.floor(Math.random() * hi.length), b2 = (a + 1 + Math.floor(Math.random() * (hi.length - 1))) % hi.length;
           [heads, tails].forEach((el, i) => {
             el.classList.add('poof'); const puff = document.createElement('i'); puff.className = 'omi-puff'; el.appendChild(puff); setTimeout(() => puff.remove(), 520);
-            setTimeout(() => { const t = document.createElement('span'); t.className = 'btn-say'; t.textContent = hi[i ? b2 : a]; el.appendChild(t); setTimeout(() => t.remove(), 2700); }, 250 + i * 450);
+            setTimeout(() => { const t = document.createElement('span'); t.className = 'btn-say'; t.textContent = hi[i ? b2 : a]; el.appendChild(t); setTimeout(() => t.remove(), TIMING.talk(t, TIMING.floor.btn) + 100); }, 250 + i * 450);
           });
           await sleep(2600);
-          if (Math.random() < 0.5) { H.say('yourpick'); hover(); heads.disabled = tails.disabled = false; busy = false; return; }
-          const mine = Math.random() < 0.5 ? 'heads' : 'tails'; H.say('mypick');
-          await poke(mine === 'heads' ? heads : tails); hover(); res(mine);
+          if (Math.random() < 0.5) { H.say('yourpick'); hover(); heads.disabled = tails.disabled = false; busy = false; clock(); return; }
+          await myPick();
         };
-      });
+        clock();
+      }).finally(stopClock);
       heads.disabled = tails.disabled = true;
       const r = Math.random(), side = r < 0.45 ? 'heads' : r < 0.9 ? 'tails' : null;
       await sleep(500);
       if (!side) { my.coin = null; coin.remove(); H.to({ pose: 'clamp' }); H.say('idgaf'); }
       else {
         my.coin = null; turn(0.55, side === 'heads' ? 'H' : 'T'); coin.style.translate = `${cx.toFixed(0)}px ${(g[1] - 40).toFixed(0)}px`;
-        H.say(side); await sleep(1800);
+        H.say(side); await sleep(TIMING.wait.result);
         if (side === call) {   // spared
-          await sleep(300); H.to({ pose: 'sulk', bob: false }); H.say('won');
-          await sleep(2100); coin.remove(); H.say('stay');
+          await sleep(300); H.to({ pose: 'sulk', bob: false }); const ms = H.say('won');
+          await sleep(Math.max(TIMING.wait.verdict, ms)); coin.remove(); H.say('stay');
           await sleep(1500); await poke($('omi-x'));   // it closes the slip for you, then goes back where it came from
           omi.hidden = true; H.leave();
           qEl.textContent = 'Go there?'; actEl.innerHTML = ''; actEl.append(goBtn, noBtn); goBtn.classList.remove('pressed');
@@ -2601,16 +2661,16 @@
         setTimeout(() => coin.remove(), 1500);
       }
       // it reaches over and presses Yes for you
-      await sleep(2100);
+      await sleep(TIMING.wait.verdict);
       actEl.innerHTML = ''; actEl.append(goBtn, noBtn); noBtn.disabled = false;
       const b = goBtn.getBoundingClientRect(), bx = b.left + b.width * 0.62, by = b.top + b.height * 0.5;
       // Yes and No are yours again for 5 seconds, and it keeps its hand off them. Only if you press neither does it press Yes itself
       H.to({ x: hx, y: hy, pose: 'point', tip: false, aim: Math.PI, rate: 10, bob: true });
-      const nag = setTimeout(() => my.pick && H.say('waiting'), 2400);
-      const own = await new Promise((res, rej) => { my.fails.push(() => rej(GONE)); const t = setTimeout(() => res(null), 5000); my.pick = (c) => { clearTimeout(t); res(c); }; }).finally(() => { my.pick = null; clearTimeout(nag); });
+      const nag = setTimeout(() => my.pick && H.say('waiting'), TIMING.wait.yesNag);
+      const own = await new Promise((res, rej) => { my.fails.push(() => rej(GONE)); const t = setTimeout(() => res(null), TIMING.wait.yes); my.pick = (c) => { clearTimeout(t); res(c); }; }).finally(() => { my.pick = null; clearTimeout(nag); });
       if (own === 'no') {   // you said no again, and this time it lets you
         noBtn.disabled = true; H.to({ x: hx, y: hy, pose: 'sulk', tip: false, aim: Math.PI, rate: 10, bob: false }); H.say('escaped');
-        await sleep(1700); omi.hidden = true; H.leave(); qEl.textContent = 'Go there?'; return;
+        await sleep(TIMING.wait.escaped); omi.hidden = true; H.leave(); qEl.textContent = 'Go there?'; return;
       }
       noBtn.disabled = true;
       H.to({ x: bx + 10, y: by - 34, pose: 'point', tip: true, aim: Math.PI - 0.5, rate: 12, bob: false });   // one finger out, hovering over Yes
@@ -2859,6 +2919,6 @@
   applyMode();
   if (root.dataset.wantCrazy) askCrazy();
 </script>
-<script src="/scripts/phrasebook.js?v=15" defer></script>
+<script src="/scripts/phrasebook.js?v=16" defer></script>
 </body>
 </html>
