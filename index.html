@@ -156,6 +156,10 @@
   #phys .phys { position: absolute; left: 0; top: 0; margin: 0; pointer-events: auto; animation: none !important; opacity: 1; transition: none !important;
                 transform-origin: 50% 50%; will-change: transform; cursor: grab; touch-action: none; translate: none; }
   #phys .phys.grabbed { box-shadow: 0 18px 40px rgba(0,0,0,.25); }
+  #phys .say { position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; white-space: nowrap; background: var(--text); color: var(--bg);
+               font-size: .82rem; font-weight: 650; padding: 4px 11px; border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,.2); animation: say 1.3s both; }
+  #phys .say::after { content: ""; position: absolute; left: 50%; bottom: -5px; width: 10px; height: 10px; background: inherit; transform: translateX(-50%) rotate(45deg); border-radius: 2px; }
+  @keyframes say { 0% { opacity: 0; scale: .4; } 12% { opacity: 1; scale: 1.12; } 20% { scale: 1; } 80% { opacity: 1; } 100% { opacity: 0; scale: .9; } }
   #phys .shard { pointer-events: none; box-shadow: none; background: color-mix(in srgb, var(--surface) 93%, var(--text)); }
   html.throwing, html.throwing * { cursor: grabbing !important; user-select: none; }
   html.throwing .grid .card { pointer-events: none; }
@@ -558,11 +562,11 @@
     if (reduced) return;
     const gridEl = document.getElementById('grid');
     const S = 100;              // px per metre. A card is about 3 m wide, the size Box2D is tuned for
-    const DT = 1 / 120;         // fixed physics step, seconds
-    const GRAVITY = 26;         // m/s²
-    const RIP = 1.2;            // m the hand spring must stretch before the root tears (the pointer travels about 200 px)
-    const ROOT_HZ = 5, PULL_HZ = 4, HAND_HZ = 30;   // spring rates: root, hand while rooted, hand once free
-    const SPIN = 0.6, HELD_SPIN = 4;              // angular damping: free, and while hanging from the hand
+    const DT = 1 / 240;         // fixed physics step, seconds. Steps follow the clock, never the frame rate
+    const GRAVITY = 85;         // m/s² = 8500 px/s². Anything near the usual 1000 to 2600 px/s² looks like the moon at this size
+    const STRAIN = 1.3, RIP = 2.8;   // m of hand-spring stretch: past STRAIN the root slowly loses its grip, past RIP it tears at once (160 and 350 px of pointer travel)
+    const ROOT_HZ = 14, PULL_HZ = 7, HAND_HZ = 60;   // spring rates: root, hand while rooted, hand once free
+    const SPIN = 0.5, HELD_SPIN = 3;              // angular damping: free, and while hanging from the hand
     const HOT = 9;              // m/s release speed that counts as a throw
     const SMASH = 13;           // m/s closing speed a throw needs to shatter
     let pl = null, loading = null, world = null, ground = null, layer = null, wallFx = [], size = { W: 0, H: 0 };
@@ -622,27 +626,47 @@
       return el;
     }
     function addBody(o, x, y, angle, shape, opt) {
-      o.body = world.createBody({ type: 'dynamic', position: { x, y }, angle, linearDamping: 0.1, angularDamping: SPIN });
+      o.body = world.createBody({ type: 'dynamic', position: { x, y }, angle, linearDamping: 0.05, angularDamping: SPIN });
       o.body.createFixture({ shape, density: 1, friction: 0.7, restitution: 0.06, ...opt });
       o.body.setUserData(o); o.px = x; o.py = y; o.pa = angle;
       objs.add(o); return o;
     }
     function remove(o) {
       if (grab && grab.o === o) drop();
+      if (o.say) { o.say.el.remove(); o.say = null; }
       world.destroyBody(o.body); objs.delete(o);
       if (o.root) { rootOf.delete(o.el); o.el.classList.remove('pulling'); o.el.style.transform = ''; }
       else o.el.remove();
     }
 
-    // ---- loop: fixed 120 Hz steps, drawn with interpolation ----
+    // ---- cards talk back ----
+    const SAY = {
+      pull: ['hey!', 'nope.', 'let go!', 'I live here', 'hands off', 'не!', 'やめて!', 'excuse me?'],
+      strain: ['nnngh!', 'holding… on…', 'not… today', 'stop iiit', 'my roots!!', 'ъъъгх'],
+      back: ['ha!', 'told you', 'too weak', 'nice try', 'stubborn > you'],
+      rip: ['AAAH!', 'nooo!', 'rude.', 'ау!', 'I was comfy!', 'put me back!'],
+      throw: ['wheee', 'NOOO', 'not the wall!', 'I can fly?!', 'aaaaaa'],
+      land: ['oof', 'ow', 'ugh', "I'm fine", 'ох…', 'my corner!'],
+      smash: ['x_x', '✝', 'worth it', 'tell my repo I loved it'],
+    };
+    const pick = (a) => a[Math.floor(Math.random() * a.length)];
+    function bubble(text) { const el = document.createElement('div'); el.className = 'say'; el.textContent = text; layer.appendChild(el); return el; }
+    function say(o, kind, force) {
+      const t = now(); if (!force && o.said && t - o.said < 1400) return;
+      if (o.say) o.say.el.remove();
+      o.said = t; o.say = { el: bubble(pick(SAY[kind])), until: t + 1300 }; run();
+    }
+    function sayAt(x, y, text) { const el = bubble(text); el.style.translate = `calc(${x.toFixed(0)}px - 50%) ${y.toFixed(0)}px`; setTimeout(() => el.remove(), 1300); }
+
+    // ---- loop: fixed 240 Hz steps on the real clock, drawn with interpolation ----
     function step() {
       for (const o of objs) {
         const b = o.body, p = b.getPosition();
         o.px = p.x; o.py = p.y; o.pa = b.getAngle();
         if (o.root) {           // the root: a damped spring back to the slot, and one that keeps the card level
-          const v = b.getLinearVelocity(), m = b.getMass(), wn = 2 * Math.PI * ROOT_HZ, wa = 2 * Math.PI * 3.5;
-          b.applyForceToCenter({ x: -m * (wn * wn * (p.x - o.root.x) + 0.6 * wn * v.x), y: -m * (wn * wn * (p.y - o.root.y) + 0.6 * wn * v.y) }, true);
-          b.applyTorque(-b.getInertia() * (wa * wa * o.pa + 0.7 * wa * b.getAngularVelocity()), true);
+          const v = b.getLinearVelocity(), m = b.getMass(), wn = 2 * Math.PI * ROOT_HZ, wa = 2 * Math.PI * 9, k = 0.45 + 0.55 * o.grip;   // a root that is losing its grip gives way
+          b.applyForceToCenter({ x: -m * (k * wn * wn * (p.x - o.root.x) + 0.6 * wn * v.x), y: -m * (k * wn * wn * (p.y - o.root.y) + 0.6 * wn * v.y) }, true);
+          b.applyTorque(-b.getInertia() * (k * wa * wa * o.pa + 0.7 * wa * b.getAngularVelocity() + (o.grip < 1 ? (Math.random() - 0.5) * 900 * (1 - o.grip) : 0)), true);
         }
       }
       if (grab) grab.joint.setTarget({ x: (grab.cx + scrollX) / S, y: (grab.cy + scrollY) / S });
@@ -662,32 +686,45 @@
         if (!o.root) continue;
         const b = o.body, p = b.getPosition(), d = Math.hypot(p.x - o.root.x, p.y - o.root.y);
         if (grab && grab.o === o) {   // the pull is the stretch of the hand spring: how far the pointer is from the spot it holds
-          const a = grab.joint.getAnchorB(), g = grab.joint.getTarget();
-          if (Math.hypot(g.x - a.x, g.y - a.y) > RIP) tear(o);
+          const a = grab.joint.getAnchorB(), g = grab.joint.getTarget(), pull = Math.hypot(g.x - a.x, g.y - a.y);
+          if (pull > STRAIN) { o.grip -= DT * (0.4 + 2 * (pull - STRAIN) / (RIP - STRAIN)); if (!o.strained) { o.strained = true; say(o, 'strain', true); } else say(o, 'strain'); }
+          else o.grip = Math.min(1, o.grip + DT * 0.7);
+          if (pull > RIP || o.grip <= 0) tear(o);
         }
-        else if (d < 0.004 && Math.abs(b.getAngle()) < 0.004 && b.getLinearVelocity().length() < 0.05 && Math.abs(b.getAngularVelocity()) < 0.05) remove(o);
+        else if ((o.grip = Math.min(1, o.grip + DT)) && d < 0.004 && Math.abs(b.getAngle()) < 0.004 && b.getLinearVelocity().length() < 0.05 && Math.abs(b.getAngularVelocity()) < 0.05) remove(o);
       }
     }
     function draw(k) {
       const t = now();
+      // the held card is drawn with the grabbed spot exactly on the pointer: the joint's last few px of give never show.
+      // The correction fades out when the card is far behind, which only happens when something blocks it
+      let hx = 0, hy = 0;
+      if (grab && !grab.o.root) {
+        const a = grab.joint.getAnchorB(), dx = grab.cx + scrollX - a.x * S, dy = grab.cy + scrollY - a.y * S, d = Math.hypot(dx, dy);
+        const f = d < 24 ? 1 : Math.max(0, 1 - (d - 24) / 40); hx = dx * f; hy = dy * f;
+      }
       for (const o of objs) {
-        const p = o.body.getPosition(), a = o.body.getAngle();
-        const x = (o.px + (p.x - o.px) * k) * S - o.ex, y = (o.py + (p.y - o.py) * k) * S - o.ey;
-        o.el.style.transform = `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px) rotate(${(o.pa + (a - o.pa) * k).toFixed(4)}rad)`;
+        const p = o.body.getPosition(), a = o.body.getAngle(), held = grab && grab.o === o && !o.root;
+        const x = held ? p.x * S + hx - o.ex : (o.px + (p.x - o.px) * k) * S - o.ex, y = held ? p.y * S + hy - o.ey : (o.py + (p.y - o.py) * k) * S - o.ey;
+        o.el.style.transform = `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px) rotate(${(held ? a : o.pa + (a - o.pa) * k).toFixed(4)}rad)`;
         if (o.die && o.die - t < 900) o.el.style.opacity = Math.max(0, (o.die - t) / 900);
+        if (o.say) {   // the bubble rides above the card and stays upright
+          if (t > o.say.until) { o.say.el.remove(); o.say = null; continue; }
+          const top = Math.abs(Math.sin(a)) * o.w / 2 + Math.abs(Math.cos(a)) * o.h / 2;
+          o.say.el.style.translate = `calc(${(p.x * S + (held ? hx : 0)).toFixed(1)}px - 50%) ${(p.y * S + (held ? hy : 0) - top - 40).toFixed(1)}px`;
+        }
       }
     }
     function frame(t) {
       if (!objs.size) { loopOn = false; return; }
-      const ms = Math.min(50, t - (last || t)); last = t; acc += ms / 1000;
+      const ms = Math.min(250, t - (last || t)); last = t; acc += ms / 1000;   // real elapsed time: a slow or a fast screen gets the same motion
       if (grab && !grab.o.root) {   // resting a carried card at the top or bottom edge of the screen scrolls the page
         const edge = 44, y = grab.cy, d = y < edge ? y - edge : y > innerHeight - edge ? y - (innerHeight - edge) : 0;
         grab.edge = d ? (grab.edge || 0) + ms : 0;
         if (grab.edge > 350) scrollBy({ top: d * 0.35 * ms / 16, behavior: 'instant' });
       }
-      let n = 0; while (acc >= DT && n++ < 8) { step(); acc -= DT; }
-      if (acc >= DT) acc = 0;
-      let busy = !!grab; if (!busy) for (const o of objs) if (o.root || o.die || o.body.isAwake()) { busy = true; break; }
+      while (acc >= DT) { step(); acc -= DT; }
+      let busy = !!grab; if (!busy) for (const o of objs) if (o.root || o.die || o.say || o.body.isAwake()) { busy = true; break; }
       draw(busy ? acc / DT : 1);
       if (busy) requestAnimationFrame(frame); else loopOn = false;
     }
@@ -695,7 +732,7 @@
 
     // ---- the hand: a soft joint at the exact point that was grabbed, so the card swings around it ----
     function hold(o, px, py, e) {
-      const joint = world.createJoint(new pl.MouseJoint({ maxForce: 1500 * o.body.getMass(), frequencyHz: o.root ? PULL_HZ : HAND_HZ, dampingRatio: o.root ? 0.8 : 1 }, ground, o.body, { x: px / S, y: py / S }));
+      const joint = world.createJoint(new pl.MouseJoint({ maxForce: 4000 * o.body.getMass(), frequencyHz: o.root ? PULL_HZ : HAND_HZ, dampingRatio: o.root ? 0.8 : 1 }, ground, o.body, { x: px / S, y: py / S }));
       grab = { o, joint, id: e.pointerId, cx: e.clientX, cy: e.clientY, sx: e.clientX, sy: e.clientY, moved: !!o.root, h: [] };
       o.body.setAwake(true); o.hot = 0;
       if (!o.root) carry(o);
@@ -718,8 +755,8 @@
           if (sp > 60) { v = { x: v.x * 60 / sp, y: v.y * 60 / sp }; sp = 60; }
           b.setLinearVelocity(v);
           if (DBG) console.log('release speed', sp.toFixed(1));
-          if (sp > HOT) o.hot = now() + 2500; else b.setBullet(false);
-        }
+          if (sp > HOT) { o.hot = now() + 1500; say(o, 'throw', true); } else b.setBullet(false);
+        } else if (g.moved) say(o, 'back', true);
         if (g.moved) { suppress = true; setTimeout(() => { suppress = false; }, 0); }
         return;
       }
@@ -743,11 +780,11 @@
       if (o) return hold(o, e.clientX + scrollX, e.clientY + scrollY, e);   // caught again while springing back
       card.classList.add('pulling', 'settled'); card.style.transform = 'none';
       const r = card.getBoundingClientRect(), hx = r.left + r.width / 2 + scrollX, hy = r.top + r.height / 2 + scrollY;
-      o = addBody({ kind: 'card', el: card, w: r.width, h: r.height, ex: hx, ey: hy, key: card.dataset.key, root: { x: hx / S, y: hy / S } },
+      o = addBody({ kind: 'card', el: card, w: r.width, h: r.height, ex: hx, ey: hy, key: card.dataset.key, grip: 1, root: { x: hx / S, y: hy / S } },
         hx / S, hy / S, 0, new pl.Box(r.width / 2 / S, r.height / 2 / S), { filterMaskBits: 0 });
       o.body.setGravityScale(0);
       rootOf.set(card, o);
-      hold(o, p.px, p.py, e);
+      hold(o, p.px, p.py, e); say(o, 'pull', true);
     }
     function tear(o) {
       const card = o.el, el = cloneCard(card);
@@ -757,7 +794,7 @@
       o.body.setGravityScale(1);
       o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF });
       if (grab && grab.o === o) { grab.joint.setFrequency(HAND_HZ); grab.joint.setDampingRatio(1); carry(o); }
-      showReset();
+      showReset(); say(o, 'rip', true);
       if (ripped.size === 1) toast('Ripped it out! Stack them, or throw one hard to smash it.');
     }
     function onMove(e) {
@@ -790,14 +827,13 @@
     function onContact(c) {
       const A = c.getFixtureA().getBody(), B = c.getFixtureB().getBody(), oa = A.getUserData(), ob = B.getUserData();
       const card = (o) => o && o.kind === 'card' && !o.root, hot = (o) => card(o) && (o.hot || (grab && grab.o === o));
-      if (!hot(oa) && !hot(ob)) return;
-      if ((oa && !card(oa)) || (ob && !card(ob))) return;   // shards and rooted cards never break anything
+      if ((oa && !card(oa)) || (ob && !card(ob)) || (!card(oa) && !card(ob))) return;   // shards and rooted cards never break anything   // shards and rooted cards never break anything
       const wm = c.getWorldManifold(null); if (!wm || !wm.points.length) return;
       const pt = { x: 0, y: 0 }; for (const p of wm.points) { pt.x += p.x / wm.points.length; pt.y += p.y / wm.points.length; }
       const n = wm.normal, va = A.getLinearVelocityFromWorldPoint(pt), vb = B.getLinearVelocityFromWorldPoint(pt);
       const closing = (va.x - vb.x) * n.x + (va.y - vb.y) * n.y;   // normal points from A to B
       if (DBG) console.log('contact closing', closing.toFixed(1), 'hot', !!hot(oa), !!hot(ob));
-      if (closing < SMASH) return;
+      if (closing < SMASH || (!hot(oa) && !hot(ob))) { if (closing > 9) { if (card(oa)) say(oa, 'land'); if (card(ob)) say(ob, 'land'); } return; }
       const ia = A.getMass() ? 1 / A.getMass() : 0, ib = B.getMass() ? 1 / B.getMass() : 0;
       const snap = (b) => ({ v: { x: b.getLinearVelocity().x, y: b.getLinearVelocity().y }, w: b.getAngularVelocity() });
       const fast = va.x * va.x + va.y * va.y > vb.x * vb.x + vb.y * vb.y ? va : vb, fs = Math.hypot(fast.x, fast.y) || 1;
@@ -853,6 +889,7 @@
         const q = wm.points[0], d = ce.other.getWorldCenter(), nx = d.x - q.x, ny = d.y - q.y, nl = Math.hypot(nx, ny) || 1, cv = ce.other.getLinearVelocity();
         hits.push({ o: c, pt: { x: q.x, y: q.y }, n: { x: nx / nl, y: ny / nl }, closing: pass, share: 0.5, v: { x: cv.x, y: cv.y }, w: ce.other.getAngularVelocity(), vo: { x: inc.x * 0.6, y: inc.y * 0.6 } });
       }
+      sayAt(bx * S, by * S - 20, pick(SAY.smash));
       remove(o);
       const m = document.getElementById('projects'); m.classList.remove('shake'); void m.offsetWidth; m.classList.add('shake');
       smashed++;
