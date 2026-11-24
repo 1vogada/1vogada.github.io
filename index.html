@@ -170,24 +170,19 @@
   .grid .card { cursor: grab; }
   .grid .card, #phys .phys { user-select: none; -webkit-user-select: none; }
   /* katana */
-  .katana { position: absolute; left: max(18px, calc(50vw - 674px)); bottom: 0; width: 40px; height: 300px; padding: 0; border: 0; background: none; overflow: hidden; pointer-events: none; }
-  .katana-in { display: block; height: 300px; transform: translateY(284px); transition: transform .55s cubic-bezier(.3,1.7,.5,1), opacity .2s; }
+  .katana { position: absolute; left: calc(max(18px, 50vw - 674px) - 130px); bottom: 0; width: 300px; height: 420px; overflow: hidden; pointer-events: none; }
+  .katana-in { position: absolute; left: 130px; bottom: 0; width: 40px; height: 300px; transform: translateY(284px); transition: transform .55s cubic-bezier(.3,1.7,.5,1), opacity .2s; touch-action: none; }
   .katana.found { z-index: 3; }
   .katana.found .katana-in { transform: translateY(190px); pointer-events: auto; cursor: grab; }
-  .katana.found:not(.drawn) .katana-in:hover { transform: translateY(178px); }
-  .katana.drawn .katana-in { transform: translateY(0); transition: transform .34s cubic-bezier(.2,.9,.3,1), opacity .2s; }
-  .katana.away .katana-in { opacity: 0; transform: translateY(190px); }
-  .katana.away::after { content: ""; position: absolute; left: 6px; bottom: 1px; width: 28px; height: 6px; border-radius: 50%; background: rgba(0,0,0,.4); pointer-events: auto; cursor: pointer; }
-  .katana:focus-visible { outline: 2px solid var(--accent); }
-  #blade { position: fixed; left: 0; top: 0; z-index: 70; pointer-events: none; transform-origin: 14px 160px; filter: drop-shadow(0 6px 8px rgba(0,0,0,.3)); }
-  #blade[hidden] { display: none; }
-  #blade svg { display: block; width: 28px; height: 210px; }
-  html.sword, html.sword * { cursor: none !important; user-select: none; -webkit-user-select: none; }
-  html.sword button, html.sword input, html.sword header.top *, html.sword footer * { cursor: pointer !important; }
-  html.sword .grid .card, html.sword #phys .phys { pointer-events: none; }
+  .katana.found .katana-in:hover { transform: translateY(180px); }
+  .katana-in.pulling { transition: none; }
+  .katana.away .katana-in { opacity: 0; pointer-events: none; }
+  .katana.away::after { content: ""; position: absolute; left: 136px; bottom: 1px; width: 28px; height: 6px; border-radius: 50%; background: rgba(0,0,0,.4); }
+  #phys .katana-body { width: 40px; height: 300px; filter: drop-shadow(0 6px 8px rgba(0,0,0,.3)); z-index: 2; }
+  #phys .katana-body svg, .katana-in svg { display: block; }
   .sheathe { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: 62px; z-index: 45; box-shadow: var(--shadow); }
   .sheathe[hidden] { display: none; }
-  html.crazy .katana, html.crazy #blade, html.crazy .sheathe { display: none; }
+  html.crazy .katana, html.crazy .sheathe { display: none; }
   #phys .piece { cursor: grab; }
   #phys .bit { position: absolute; left: 0; top: 0; z-index: 4; border-radius: 50%; background: var(--accent); pointer-events: none; }
   #phys .bit.paper { border-radius: 1px; background: var(--surface); border: 1px solid var(--border); }
@@ -636,7 +631,7 @@
       size = { W, H }; layer.style.width = W + 'px'; layer.style.height = H + 'px';
       for (const f of wallFx) ground.destroyFixture(f);
       const w = W / S, h = H / S, T = 5;
-      const box = (cx, cy, hw, hh) => ground.createFixture({ shape: new pl.Box(hw, hh, { x: cx, y: cy }, 0), friction: 0.8 });
+      const box = (cx, cy, hw, hh) => ground.createFixture({ shape: new pl.Box(hw, hh, { x: cx, y: cy }, 0), friction: 0.8, filterCategoryBits: 3 });
       wallFx = [box(w / 2, h + T, w / 2 + 2 * T, T), box(w / 2, -T, w / 2 + 2 * T, T), box(-T, h / 2, T, h / 2 + 2 * T), box(w + T, h / 2, T, h / 2 + 2 * T)];
       for (const o of objs) {
         if (o.root) continue;
@@ -666,6 +661,7 @@
     function remove(o) {
       if (grab && grab.o === o) drop();
       if (o.say) { o.say.el.remove(); o.say = null; }
+      if (o === katObj) katObj = null;
       world.destroyBody(o.body); objs.delete(o);
       if (o.root) { rootOf.delete(o.el); o.el.classList.remove('pulling'); o.el.style.transform = ''; }
       else o.el.remove();
@@ -685,7 +681,7 @@
     const pick = (a) => a[Math.floor(Math.random() * a.length)];
     function bubble(text) { const el = document.createElement('div'); el.className = 'say'; el.textContent = text; layer.appendChild(el); return el; }
     function say(o, kind, force) {
-      const t = now(); if (!force && o.said && t - o.said < 1400) return;
+      const t = now(); if (o.kind === 'katana' || (!force && o.said && t - o.said < 1400)) return;
       if (o.say) o.say.el.remove();
       o.said = t; o.say = { el: bubble(pick(SAY[kind])), until: t + 1300 }; run();
     }
@@ -757,7 +753,7 @@
         if (grab.edge > 350) scrollBy({ top: d * 0.35 * ms / 16, behavior: 'instant' });
       }
       while (acc >= DT) { step(); acc -= DT; }
-      moveBits(ms / 1000);
+      moveBits(ms / 1000); bladeCuts(ms / 1000);
       let busy = !!grab || bits.length > 0; if (!busy) for (const o of objs) if (o.root || o.die || o.say || o.body.isAwake()) { busy = true; break; }
       draw(busy ? acc / DT : 1);
       if (busy) requestAnimationFrame(frame); else loopOn = false;
@@ -774,7 +770,6 @@
     }
     function carry(o) { o.body.setGravityScale(1); o.body.setBullet(true); o.body.setAngularDamping(HELD_SPIN); o.el.classList.add('grabbed'); }
     function drop(e) {
-      if (stroke && (!e || e.pointerId === stroke.id)) { if (stroke.moved) { suppress = true; setTimeout(() => { suppress = false; }, 0); } stroke = null; return; }
       if (grab && (!e || e.pointerId === grab.id)) {
         const g = grab, o = g.o, b = o.body; grab = null;
         world.destroyJoint(g.joint); html.classList.remove('throwing');
@@ -802,7 +797,7 @@
     // ---- rooted cards ----
     gridEl.addEventListener('pointerdown', (e) => {
       const card = e.target.closest('.card');
-      if (!card || sword || isCrazy() || e.button > 0 || press || grab || card.classList.contains('held')) return;
+      if (!card || isCrazy() || e.button > 0 || press || grab || card.classList.contains('held')) return;
       press = { card, x: e.clientX, y: e.clientY, px: e.clientX + scrollX, py: e.clientY + scrollY, id: e.pointerId, armed: e.pointerType === 'mouse' };
       load().catch(() => {});
       if (e.pointerType === 'mouse') e.preventDefault();   // no text selection or link drag; the click still fires
@@ -821,6 +816,7 @@
       hold(o, p.px, p.py, e); say(o, 'pull', true);
     }
     function tear(o) {
+      if (o.kind === 'katana') return freeKatana(o);
       const card = o.el, el = cloneCard(card);
       el.style.width = o.w + 'px'; el.style.height = o.h + 'px'; el._o = o; layer.appendChild(el);
       rootOf.delete(card); card.classList.remove('pulling'); card.style.transform = ''; card.classList.add('held');
@@ -832,8 +828,6 @@
       if (ripped.size === 1) toast('Ripped it out! Stack them, or throw one hard to smash it.');
     }
     function onMove(e) {
-      if (sword && e.pointerType === 'mouse') moveBlade(e);
-      if (stroke && e.pointerId === stroke.id) { if (e.pointerType !== 'mouse') moveBlade(e); strokeMove(e); return; }
       if (grab && e.pointerId === grab.id) {
         grab.h.push([e.clientX + scrollX, e.clientY + scrollY, now()]); if (grab.h.length > 12) grab.h.shift();
         grab.cx = e.clientX; grab.cy = e.clientY;
@@ -847,14 +841,14 @@
     }
     addEventListener('pointermove', onMove);
     addEventListener('pointerup', drop); addEventListener('pointercancel', drop);
-    addEventListener('touchmove', (e) => { if (grab || stroke || press?.armed) e.preventDefault(); }, { passive: false });
+    addEventListener('touchmove', (e) => { if (grab || press?.armed) e.preventDefault(); }, { passive: false });
     document.addEventListener('click', (e) => { if (suppress || e.target.closest?.('.shard, .piece')) { e.preventDefault(); e.stopPropagation(); } }, true);
     document.addEventListener('dragstart', (e) => { if (e.target.closest?.('.card')) e.preventDefault(); });
 
     // loose cards can be picked up again anywhere on them
     document.addEventListener('pointerdown', (e) => {
       const el = e.target.closest?.('#phys .phys'), o = el && el._o;
-      if (!o || sword || (o.kind !== 'card' && o.kind !== 'piece') || grab || e.button > 0) return;
+      if (!o || (o.kind !== 'card' && o.kind !== 'piece' && o.kind !== 'katana') || grab || e.button > 0) return;
       e.preventDefault(); hold(o, e.clientX + scrollX, e.clientY + scrollY, e);
     });
 
@@ -941,34 +935,70 @@
       <rect x="13" y="6" width="14" height="86" rx="3" fill="#1c2333"/>${[12, 25, 38, 51, 64, 77].map((y) => `<path d="M20 ${y} l5.5 6.5 l-5.5 6.5 l-5.5 -6.5z" fill="#eadfc6"/><circle cx="20" cy="${y + 6.5}" r="1.4" fill="#c8372d"/>`).join('')}
       <rect x="12" y="2" width="16" height="8" rx="3" fill="#c9a24a"/></svg>`;
     const hero = document.getElementById('hero');
-    const kat = document.createElement('button'); kat.type = 'button'; kat.className = 'katana'; kat.setAttribute('aria-label', 'Katana'); kat.tabIndex = -1;
-    kat.innerHTML = `<span class="katana-in">${katanaSvg('kat-a')}</span>`;
+    const kat = document.createElement('div'); kat.className = 'katana';
+    kat.innerHTML = `<span class="katana-in" role="img" aria-label="Katana">${katanaSvg('kat-a')}</span>`;
     hero.querySelector('.scene').after(kat);   // before the fog canvas, so the fog covers it
-    const blade = document.createElement('div'); blade.id = 'blade'; blade.hidden = true; blade.innerHTML = katanaSvg('kat-b'); document.body.appendChild(blade);
+    const katIn = kat.firstChild;
     const sheatheBtn = document.createElement('button'); sheatheBtn.type = 'button'; sheatheBtn.className = 'btn ghost sheathe'; sheatheBtn.hidden = true; sheatheBtn.textContent = 'Put the katana back';
     document.body.appendChild(sheatheBtn);
-    let found = false, near = 0, lastWipe = null, sword = false, stroke = null, tick = 0, bladeA = 135, bladeV = 0;
+    let found = false, near = 0, lastWipe = null, katObj = null, tick = 0;
     hero.addEventListener('pointermove', (e) => {   // the same strokes that wipe the fog uncover it
       if (found || isCrazy()) return;
       const r = kat.getBoundingClientRect();
-      if (Math.hypot(e.clientX - (r.left + 20), e.clientY - (r.bottom - 50)) > 120) { lastWipe = null; return; }
+      if (Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.bottom - 50)) > 120) { lastWipe = null; return; }
       if (lastWipe) near += Math.hypot(e.clientX - lastWipe.x, e.clientY - lastWipe.y);
       lastWipe = { x: e.clientX, y: e.clientY };
-      if (near > 260) { found = true; kat.classList.add('found'); kat.tabIndex = 0; toast('A katana?! Pull it out.'); load().catch(() => {}); }
+      if (near > 260) { found = true; kat.classList.add('found'); toast('A katana?! Pull it out of the ground.'); load().catch(() => {}); }
     });
-    function unsheathe() {
+    // planted, it is rooted like a card: grab the hilt and pull. Out of the ground it is a body you carry, swing and drop
+    const KAT_REST = 190;   // px the planted katana sits below its box: the blade is in the ground
+    katIn.addEventListener('pointerdown', (e) => {
+      if (!found || grab || press || e.button > 0 || isCrazy() || kat.classList.contains('away')) return;
+      e.preventDefault();
       load().then(() => {
-        init(); kat.classList.add('drawn');
-        setTimeout(() => { kat.classList.add('away'); sword = true; html.classList.add('sword'); sheatheBtn.hidden = false; toast('Katana drawn. Swipe across a card. Esc puts it back.'); }, 340);
+        if (grab || (katObj && !katObj.root)) return;
+        init();
+        if (!katObj) {
+          katIn.classList.add('pulling'); katIn.style.transform = `translateY(${KAT_REST}px)`;
+          const r = katIn.getBoundingClientRect(), hx = r.left + r.width / 2 + scrollX, hy = r.top + r.height / 2 + scrollY;
+          katObj = addBody({ kind: 'katana', el: katIn, w: 40, h: 300, ex: hx, ey: hy - KAT_REST, grip: 1, root: { x: hx / S, y: hy / S } },
+            hx / S, hy / S, 0, new pl.Box(0.08, 0.52, { x: 0, y: -0.96 }, 0), { density: 2.2, filterCategoryBits: 4, filterMaskBits: 0 });   // the hilt carries most of the weight
+          katObj.body.createFixture({ shape: new pl.Box(0.06, 0.96, { x: 0, y: 0.52 }, 0), density: 0.7, friction: 0.6, restitution: 0.1, filterCategoryBits: 4, filterMaskBits: 0 });
+        }
+        hold(katObj, e.clientX + scrollX, e.clientY + scrollY, e);
       }).catch(() => {});
+    });
+    function freeKatana(o) {   // the root tore: from the banner into the world
+      const el = document.createElement('div'); el.className = 'phys katana-body'; el.innerHTML = katanaSvg('kat-b'); el._o = o; layer.appendChild(el);
+      katIn.classList.remove('pulling'); katIn.style.transform = ''; kat.classList.add('away'); sheatheBtn.hidden = false;
+      o.el = el; o.ex = 20; o.ey = 150; o.root = null; o.tips = null;
+      o.body.setGravityScale(FALL);
+      for (let f = o.body.getFixtureList(); f; f = f.getNext()) f.setFilterData({ groupIndex: 0, categoryBits: 4, maskBits: 2 });   // it lands on the floor and walls but passes through cards: it cuts them instead
+      if (grab && grab.o === o) { grab.joint.setFrequency(HAND_HZ); grab.joint.setDampingRatio(1); carry(o); }
+      toast('Swing the blade through a card.');
     }
-    function sheathe() { sword = false; stroke = null; html.classList.remove('sword'); blade.hidden = true; sheatheBtn.hidden = true; kat.classList.remove('drawn', 'away'); }
-    kat.addEventListener('click', () => { if (found) sword ? sheathe() : kat.classList.contains('drawn') || unsheathe(); });
-    sheatheBtn.addEventListener('click', sheathe);
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && sword) sheathe(); });
-    function moveBlade(e) {
-      bladeV += (Math.max(-55, Math.min(55, e.movementX * 2.5)) - bladeV) * 0.35; bladeA = 135 + bladeV;
-      blade.hidden = false; blade.style.transform = `translate(${e.clientX - 14}px, ${e.clientY - 160}px) rotate(${bladeA.toFixed(1)}deg)`;
+    function putBack() { if (katObj) remove(katObj); katObj = null; kat.classList.remove('away'); sheatheBtn.hidden = true; }
+    sheatheBtn.addEventListener('click', putBack);
+    kat.addEventListener('click', (e) => { if (e.target === kat && kat.classList.contains('away')) putBack(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && katObj && !katObj.root) putBack(); });
+    // once per frame, follow two points on the blade. A point that moves fast enough cuts what its path passes through
+    const BLADE = [[0, 138], [0, 50]], CUT_SPEED = 700;   // local px from the katana's centre; px/s
+    function bladeCuts(dt) {
+      const o = katObj; if (!o || o.root || dt <= 0) return;
+      const p = o.body.getPosition(), a = o.body.getAngle(), c = Math.cos(a), s = Math.sin(a);
+      const now2 = BLADE.map(([x, y]) => [p.x * S + x * c - y * s, p.y * S + x * s + y * c]);
+      const prev = o.tips; o.tips = now2; if (!prev) { o.cuts = BLADE.map(() => new Map()); return; }
+      tick++; let list = null;
+      for (let i = 0; i < BLADE.length; i++) {
+        const A = prev[i], B = now2[i], d = Math.hypot(B[0] - A[0], B[1] - A[1]), cuts = o.cuts[i];
+        if (d / dt < CUT_SPEED || !((grab && grab.o === o) || o.hot)) { cuts.clear(); continue; }   // only a swing or a throw cuts, a katana that is just falling does not
+        if (i === 0) trail(A, B);
+        for (const t of (list = list || targets())) {
+          const xs = crossings(t.poly, A, B); if (!xs.length) continue;
+          const pts = cuts.get(t.key) || (inside(t.poly, A[0], A[1]) ? [A] : []); pts.push(...xs); cuts.set(t.key, pts);
+          if (pts.length >= 2) { cuts.delete(t.key); slice(t.o && objs.has(t.o) ? t.o : t.card && !t.card.classList.contains('held') ? freeCard(t.card) : null, pts[0], pts[pts.length - 1], [B[0] - A[0], B[1] - A[1]]); }
+        }
+      }
     }
 
     const polyArea = (ps) => Math.abs(ps.reduce((s, p, i) => { const q = ps[(i + 1) % ps.length]; return s + p[0] * q[1] - q[0] * p[1]; }, 0)) / 2;
@@ -1021,7 +1051,7 @@
       el._o = s; return s;
     }
     function slice(o, A, B, dir) {   // A, B: page points where the blade entered and left
-      if (!objs.has(o)) return;
+      if (!o || !objs.has(o)) return;
       const b = o.body, pos = b.getPosition(), ang = b.getAngle(), c = Math.cos(ang), s = Math.sin(ang), W = o.w, H = o.h;
       const loc = (p) => { const dx = p[0] - pos.x * S, dy = p[1] - pos.y * S; return [dx * c + dy * s + W / 2, -dx * s + dy * c + H / 2]; };
       const a = loc(A), z = loc(B), ux = z[0] - a[0], uy = z[1] - a[1], ul = Math.hypot(ux, uy); if (ul < 4) return;
@@ -1072,23 +1102,6 @@
       el.style.transform = `translate(${a[0].toFixed(1)}px, ${a[1].toFixed(1)}px) rotate(${Math.atan2(b[1] - a[1], b[0] - a[0]).toFixed(3)}rad)`;
       layer.appendChild(el); setTimeout(() => el.remove(), 280);
     }
-    addEventListener('pointerdown', (e) => {
-      if (!sword || isCrazy() || e.button > 0 || e.target.closest?.('button, input, .reader, .warn, header.top, footer')) return;
-      e.preventDefault(); moveBlade(e);
-      const x = e.clientX + scrollX, y = e.clientY + scrollY;
-      stroke = { id: e.pointerId, x, y, cuts: new Map(), moved: false };
-      for (const t of targets()) if (inside(t.poly, x, y)) stroke.cuts.set(t.key, [[x, y]]);   // starting on a card counts as the way in
-    }, true);
-    function strokeMove(e) {
-      const a = [stroke.x, stroke.y], b = [e.clientX + scrollX, e.clientY + scrollY]; if (Math.hypot(b[0] - a[0], b[1] - a[1]) < 3) return;
-      stroke.moved = true; stroke.x = b[0]; stroke.y = b[1]; tick++; trail(a, b);
-      for (const t of targets()) {
-        const xs = crossings(t.poly, a, b); if (!xs.length) continue;
-        const list = stroke.cuts.get(t.key) || []; list.push(...xs); stroke.cuts.set(t.key, list);
-        if (list.length >= 2) { stroke.cuts.delete(t.key); slice(t.o || freeCard(t.card), list[0], list[list.length - 1], [b[0] - a[0], b[1] - a[1]]); }
-      }
-    }
-
     // ---- put everything back ----
     function showReset() {
       if (resetBtn) { resetBtn.hidden = false; return; }
@@ -1098,15 +1111,16 @@
     function resetAll() {
       for (const o of [...objs]) remove(o);
       for (const p of bits.splice(0)) p.el.remove();
+      kat.classList.remove('away'); sheatheBtn.hidden = true;
       hits.length = 0; blasts.length = 0; ripped.clear(); resetBtn.hidden = true;
       document.querySelectorAll('#grid .card.held').forEach((c) => { c.classList.remove('held'); c.classList.add('regrow'); setTimeout(() => c.classList.replace('regrow', 'settled'), 700); });
     }
     // the grid re-renders on search or theme changes: keep torn-out cards out of it
     document.addEventListener('cards-rendered', () => {
-      for (const o of [...objs]) if (o.root) remove(o);
+      for (const o of [...objs]) if (o.root && o.kind === 'card') remove(o);
       document.querySelectorAll('#grid .card').forEach((c) => { if (ripped.has(c.dataset.key)) c.classList.add('held'); });
     });
-    window.__cards = { objs, S, bits, state: () => ({ grab, press, loopOn, size, sword, found }) };   // for browser tests
+    window.__cards = { objs, S, bits, state: () => ({ grab, press, loopOn, size, found, katana: katObj }) };   // for browser tests
   })();
 
   // ---- greeting typewriter: Bulgarian, Japanese, English ----
