@@ -7,7 +7,7 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   // Bump VER, and the ?v= on this file's script tag in index.html, whenever this file or the stylesheet changes. GitHub Pages caches each
   // file for ten minutes on its own, and a new script with an old stylesheet looks broken; the version makes them arrive as a pair
-  const VER = 9;
+  const VER = 10;
   const here = (document.currentScript && document.currentScript.src) || '/scripts/phrasebook.js';
 
   // ---- what this file knows: which occasion each list belongs to. src = which list on window.__lines, key = which entry of it ----
@@ -63,6 +63,16 @@
         { src: 'CLAW_SAY', key: 'crush', title: 'The crunch', when: 'The card it snatched is finally crushed.' },
         { fig: 'fist' },
         { src: 'CLAW_SAY', key: 'shelf', title: 'The shelf', when: 'There is a secret written under the fog in the top right corner of the banner. With the shelf out, you leave a card lying on it and let go: it reaches for it, slowly.' },
+        { src: 'CLAW_SAY', key: 'severed', title: 'Its hand cut off', when: 'The very tip of the katana passes through its arm while the arm is out on the screen. The hand drops, and the arm whips back out of sight.' },
+        { src: 'CLAW_SAY', key: 'regrow', title: 'A new hand', when: 'Some eight seconds after losing one. It comes back to show it off.' },
+        { src: 'SEV_SAY', key: 'cut', title: 'The cut-off hand: just fallen', when: 'Said by the hand that was cut off, lying where it fell and twitching.' },
+        { src: 'SEV_SAY', key: 'rise', title: 'The cut-off hand: up on two fingers', when: 'After a couple of seconds it stands up on its first two fingers and walks off on tiptoe.' },
+        { src: 'SEV_SAY', key: 'held', title: 'The cut-off hand: picked up', when: 'You take it in your hand. It wriggles.' },
+        { src: 'SEV_SAY', key: 'thrown', title: 'The cut-off hand: thrown', when: 'You let it go at more than 900 px a second.' },
+        { src: 'SEV_SAY', key: 'hunt', title: 'The cut-off hand: it has seen a card', when: 'A loose card lies within about 500 px of it, on its level. It tiptoes over, faster.' },
+        { src: 'SEV_SAY', key: 'squeeze', title: 'The cut-off hand: squeezing', when: 'It has climbed onto the card and closed around it, in the pause before the last squeeze.' },
+        { src: 'SEV_SAY', key: 'crush', title: 'The cut-off hand: crushed it', when: 'There is no card any more. It does a little dance.' },
+        { src: 'SEV_SAY', key: 'rest', title: 'The cut-off hand: sitting down', when: 'After a while of walking with nothing to catch. It gets up again by itself, or when something bumps it.' },
         { src: 'CLAW_SAY', key: 'caught', title: 'A catch', when: 'You throw a card towards the right edge, and it plucks it out of the air.' },
         { src: 'CLAW_SAY', key: 'slip', title: 'Losing its grip', when: 'You yank the card away the moment it grabs, or take back the card it was celebrating with.' },
         { src: 'CLAW_SAY', key: 'cut', title: 'Watching a cut', when: 'It saw the katana divide a card.' },
@@ -116,6 +126,7 @@
     'いい切れ味': 'a fine edge', 'режи, режи…': 'cut, cut…', 'бум!': 'boom!', 'もったいない': 'what a waste', 'дай го насам': 'hand it over here', 'かっこつけ': 'show-off',
     'какво имаме тук…': 'what have we here…', 'いただきます…': 'thanks for the meal… (said before eating)',
     'ъъъ… хора?': 'uhh… guys?', 'あれ、こっち来てる?': 'huh, is it coming this way?', 'ПОМОЩ!': 'HELP!', 'こっち来ないで!': 'do not come over here!', 'НЕ МЕ ЯЖ!!': 'DO NOT EAT ME!!', '助けてぇぇ!!': 'heeelp!!', 'вземи него!': 'take him!', 'あっちだよ!': 'it is that one, over there!',
+    'РЪКАТА МИ!!': 'MY HAND!!', '手がぁぁ!!': 'my haaand!!', 'нова-новеничка': 'brand new', '生えた。': 'it grew back.', 'ъъ?': 'uh?', 'сам съм си шеф': 'I am my own boss', '自由だ!': 'I am free!', 'пусни ме!': 'let me go!', 'はなせ!': 'let go!', 'ааааа!': 'aaaaa!', 'ела тук': 'come here', 'みーつけた': 'found you', 'ねむい…': 'sleepy…',
     'хванах!': 'caught it!', 'ナイスパス!': 'nice pass!', 'дай тука!': 'give it here!', 'もらった!': 'mine now!', 'бавно…': 'slowly…', 'まだだよ': 'not yet', 'смачках го.': 'I crushed it.', 'скука.': 'boring.', 'ау!': 'ow!', 'боли!': 'it hurts!', '痛っ!': 'ouch!', 'ひどい!': 'how mean!', 'полека…': 'easy does it…', 'そーっと…': 'ever so quietly…', 'сега ще видиш!': 'now you will see!', 'もう怒った!': 'now I am angry!', 'нагоре-надолу!': 'up and down!', 'ぐるぐる〜': 'round and round', 'つまらない': 'boring', 'ポイ': 'the sound of tossing something away',
   };
   const langOf = (s) => /[぀-ヿ一-鿿]/.test(s) ? 'JP' : /[Ѐ-ӿ]/.test(s) ? 'BG' : '';
