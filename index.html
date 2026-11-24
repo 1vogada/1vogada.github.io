@@ -1516,7 +1516,7 @@
     function snatch(o) { claw.o = o; clawSet('snatch'); }
     function clawTick(dt) {
       if (!claw) { if (!ripped.size || isCrazy()) return; clawInit(); }
-      const c = claw; if (isCrazy()) return;
+      const c = claw; if (isCrazy() || c.st === 'book') return;
       const vw = html.clientWidth, vh = innerHeight, t = now(); c.t += dt;
       if (c.o && !objs.has(c.o)) { c.o = null; c.joint = null; c.snap = null; if (c.st !== 'off' && c.st !== 'lurk') { clawSet('sulk'); clawSay('sulk'); } }   // someone cut or smashed what it was holding
       if (grab !== c.g) { c.g = grab; c.far = false; }
@@ -1776,6 +1776,8 @@
     });
     window.__cards = { objs, S, bits, state: () => ({ grab, press, loopOn, size, found, katana: katObj, claw }) };   // for browser tests
     window.__lines = { SAY, CLAW_SAY, AGONY, BEG };   // every line anything here can say: the phrasebook (scripts/phrasebook.js) prints them from these lists
+    // the phrasebook borrows the hand: while its state is 'book' the tick below leaves it alone and the book poses and draws it itself
+    window.__hand = { get: () => { if (!claw) clawInit(); return claw; }, draw: clawDraw, set: clawSet, POSES, katanaSvg };
   })();
 
   // ---- greeting typewriter: Bulgarian, Japanese, English ----
