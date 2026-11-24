@@ -77,6 +77,10 @@
         { src: 'CLAW_SAY', key: 'lost', title: 'The taunt', when: 'You called it wrong. It reaches over and presses Yes for you.' },
         { src: 'CLAW_SAY', key: 'idgaf', title: 'Not bothering with the coin', when: 'One toss in ten it pockets the coin and decides for you anyway.' },
         { src: 'CLAW_SAY', key: 'bye', title: 'Seeing you off', when: 'Its finger is on the Yes button. You are leaving.' },
+        { src: 'CLAW_SAY', key: 'slap', title: 'Slapping your hand away', when: 'The first time you reach for Heads or Tails on a visit, it slaps the button aside. Twice.' },
+        { src: 'CLAW_SAY', key: 'snap', title: 'Snapping', when: 'After the second slap. It has had enough of you.' },
+        { src: 'CLAW_SAY', key: 'yourpick', title: 'Letting you pick', when: 'Half the time after it snaps, it lets you call it after all.' },
+        { src: 'CLAW_SAY', key: 'mypick', title: 'Picking for you', when: 'The other half, it pokes Heads or Tails itself.' },
       ] },
   ];
   // the only lines that live in this file: what the hand says while it empties this menu
@@ -87,6 +91,7 @@
   const SCROLL_SAY = ['lost your place?', 'where were we?', 'up! down! up!', 'wheeee', 'нагоре-надолу!', 'ぐるぐる〜'];
   // what the Bulgarian and Japanese lines mean. A line that is missing here is simply printed without a gloss
   const GLOSS = {
+    'чакай!': 'wait!', 'だめ!': 'no!', 'стига вече!': 'enough already!', 'もういい!': 'that is enough!', 'избирай.': 'pick.', '選べ。': 'pick.', 'сам ще избера': 'I will pick myself', '貸して': 'give it here',
     'здрасти.': 'hi.', 'やあ。': 'hey.', 'ези или тура?': 'heads or tails?', '表か裏か?': 'heads or tails?', 'пф. късмет.': 'pff. luck.', 'ちっ': 'tch',
     'не позна!': 'wrong guess!', 'ハズレ!': 'miss!', 'майната ѝ на монетата': 'to hell with the coin', 'どうでもいい。行け。': 'whatever. go.', 'ЧАО-ЧАО!': 'BYE-BYE!', 'バイバイ!': 'bye-bye!',
     'не!': 'no!', 'やめて!': 'stop it!', 'ъъъгх': 'nnngh', 'ау!': 'ow!', 'ох…': 'oh…', 'おっと': 'oops', 'опа!': 'whoops!',
