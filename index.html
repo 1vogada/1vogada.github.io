@@ -1268,6 +1268,7 @@
       keep: ['mine.', 'hehehe', 'no take-backs', 'finders keepers', 'хе-хе'],
       toss: ['bored.', 'catch.', 'yeet', 'tastes like JavaScript', 'いらない'],
       sulk: ['aww.', 'tease.', 'rude.', 'fine.', 'ケチ', 'пф.'],
+      caught: ['nice throw', 'CAUGHT IT', 'thanks!', 'delivery!', 'for me? again?', 'хванах!', 'ナイスパス!'],
       slip: ['slippery!', 'hey!!', 'no fair', 'my snack!'],
       snatch: ['TOO SLOW', 'YOINK', 'MINE NOW', 'enough games', 'дай тука!', 'もらった!'],
       crush: ['squish.', '*CRUNCH*', 'paper is weak', 'that is what teasing gets you', 'смачках го.', 'ぐしゃ'],
@@ -1440,6 +1441,11 @@
       c.o = null; c.joint = null; c.snap = null; c.st = 'off'; c.cool = 0; c.x = html.clientWidth + 340; c.pose = { ...POSES.lurk }; clawDraw(0, 0, 0);
     }
     const CRUSH = 0.85;   // seconds from snatch to pulp
+    function crushStart(o) {   // the card is in its fist from here on
+      o.hot = 0; o.body.setBullet(false); o.body.setGravityScale(0); o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 }); o.el.style.pointerEvents = 'none';
+      const N = 6, pts = [], ph = Math.random() * 6; for (let k = 0; k < 4 * N; k++) { const f = (k % N) / N, e = Math.floor(k / N); pts.push([e === 0 ? f * o.w : e === 1 ? o.w : e === 2 ? o.w - f * o.w : 0, e === 0 ? 0 : e === 1 ? f * o.h : e === 2 ? o.h : o.h - f * o.h, 0.45 + 0.22 * Math.sin(k * 1.9 + ph) + 0.18 * Math.random()]); }
+      o.tug = { crush: true, a: o.body.getAngle(), pts, spin: (Math.random() - 0.5) * 1.6 }; claw.hy = Math.max(110, Math.min(innerHeight - 110, claw.y));
+    }
     function snatch(o) { claw.o = o; clawSet('snatch'); }
     function clawTick(dt) {
       if (!claw) { if (!ripped.size || isCrazy()) return; clawInit(); }
@@ -1452,6 +1458,13 @@
       const ripE = Math.min(330, 0.3 * Math.min(vw, vh)), strainE = 0.4 * ripE;
       if (P && P[0] < vw - FAR) c.far = true;   // a card has to be brought over, not just be there
       let T = [vw + 150, c.ly], rate = 6, aim = Math.PI, pose = POSES.lurk, wig = 0.05, shake = 0, strain = 0;
+      if (!c.o && (c.st === 'lurk' || c.st === 'eager' || c.st === 'sulk' || c.st === 'gloat')) {   // a card thrown its way: it goes for the catch
+        for (const q of objs) {
+          if (q.kind !== 'card' || q.root || q.tug || (grab && grab.o === q)) continue;
+          const v = q.body.getLinearVelocity(), w = q.body.getWorldCenter(), sx = w.x * S - scrollX, sy = w.y * S - scrollY;
+          if (v.x > 5 && Math.hypot(v.x, v.y) > 8 && sx > vw - EAGER && sx < vw + 40 && sy > 20 && sy < vh - 20) { c.o = q; clawSet('catch'); break; }
+        }
+      }
       if (c.st === 'off') { T[0] = vw + 340; if (ripped.size) clawSet('lurk'); }
       else if (c.st === 'lurk') {
         if (held) { c.ly += (Math.max(80, Math.min(vh - 80, P[1])) - c.ly) * (1 - Math.exp(-dt * 3)); if (t > c.cool && P[0] > vw - EAGER) { clawSet('eager'); clawSay('eager'); c.patience = 1.4 + Math.random() * 2.2; } }
@@ -1480,11 +1493,26 @@
           const w = o.body.getWorldCenter(), Hc = [w.x * S - scrollX, w.y * S - scrollY], q = gripPt();
           aim = Math.atan2(Hc[1] - c.y, Hc[0] - c.x); if (Math.cos(aim) > -0.2) aim = Math.PI; T = wristFor(Hc, aim);
           if (Math.hypot(q[0] - Hc[0], q[1] - Hc[1]) < 34) {   // got it: out of your hand and into its fist
-            drop(); o.hot = 0; o.body.setBullet(false); o.body.setGravityScale(0); o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 }); o.el.style.pointerEvents = 'none';
-            const N = 6, pts = [], ph = Math.random() * 6; for (let k = 0; k < 4 * N; k++) { const f = (k % N) / N, e = Math.floor(k / N); pts.push([e === 0 ? f * o.w : e === 1 ? o.w : e === 2 ? o.w - f * o.w : 0, e === 0 ? 0 : e === 1 ? f * o.h : e === 2 ? o.h : o.h - f * o.h, 0.45 + 0.22 * Math.sin(k * 1.9 + ph) + 0.18 * Math.random()]); }
-            o.tug = { crush: true, a: o.body.getAngle(), pts, spin: (Math.random() - 0.5) * 1.6 }; c.hy = Math.max(110, Math.min(vh - 110, c.y));
+            drop(); crushStart(o);
             clawSet('crush'); clawSay('snatch', true);
           } else if (c.t > 0.9) { c.o = null; clawSet('sulk'); clawSay('sulk'); }
+        }
+      } else if (c.st === 'catch') {   // the arm shoots out to where the card is and plucks it out of the air
+        pose = POSES.lunge; rate = 44; const o = c.o;
+        if (!o || (grab && grab.o === o)) { c.o = null; clawSet('lurk'); }
+        else {
+          const w = o.body.getWorldCenter(), Hc = [w.x * S - scrollX, w.y * S - scrollY], q = gripPt(), dist = Math.hypot(q[0] - Hc[0], q[1] - Hc[1]);
+          aim = Math.atan2(Hc[1] - c.y, Hc[0] - c.x); if (Math.cos(aim) > -0.2) aim = Math.PI; T = wristFor(Hc, aim);
+          if (dist < 70) {
+            o.body.setLinearVelocity({ x: 0, y: 0 }); o.body.setAngularVelocity(o.body.getAngularVelocity() * 0.2); o.hot = 0; o.body.setBullet(false);
+            say(o, 'pull', true); clawSay('caught', true);
+            if (Math.random() < 0.3) { crushStart(o); clawSet('crush'); }   // sometimes it does not feel like sharing
+            else {
+              o.body.setAngularDamping(HELD_SPIN); c.gh = [0, 0]; c.pre = {}; c.snap = null; c.hy = Math.max(110, Math.min(vh - 110, Hc[1]));
+              c.joint = world.createJoint(new pl.MouseJoint({ maxForce: 4000 * o.body.getMass(), frequencyHz: 30, dampingRatio: 1 }, ground, o.body, { x: w.x, y: w.y }));
+              clawSet('has');
+            }
+          } else if (c.t > 0.6) { c.o = null; c.cool = t + 600; clawSet('sulk'); clawSay('sulk'); }
         }
       } else if (c.st === 'crush') {
         pose = { ...POSES.sulk, eye: POSES.joy.eye, pupil: POSES.joy.pupil, happy: POSES.joy.happy }; rate = 7; shake = 3 + 5 * clamp01(c.t / CRUSH); aim = Math.PI + Math.sin(c.t * 22) * 0.07; T = wristFor([vw - HOLD - 60, c.hy], aim);
