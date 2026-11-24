@@ -135,10 +135,13 @@
                  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%); }
   .card:hover::after { opacity: 1; }
   .band { height: 46px; display: block; background: color-mix(in srgb, var(--c1) 9%, var(--surface)); border-bottom: 1px solid var(--border); }
-  .band svg { display: block; width: 100%; height: 100%; transition: transform .6s ease; }
-  .card:hover .band svg { transform: translateX(-18px); }
-  :root[data-theme="dark"] .band svg { filter: brightness(1.45) saturate(1.1); }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .band svg { filter: brightness(1.45) saturate(1.1); } }
+  /* the motif tiles seamlessly, always a whole number across, and slides with the card's tilt (--bx) */
+  .band { position: relative; overflow: hidden; }
+  .band::before { content: ""; position: absolute; inset: 0; background-image: var(--tile); background-size: 44px 46px;
+                  background-repeat: round no-repeat; background-position: var(--bx, 0px) 0; transition: background-position .35s ease-out; }
+  #phys .band::before, .card.pulling .band::before { transition: none; }
+  :root[data-theme="dark"] .band::before { filter: brightness(1.45) saturate(1.1); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .band::before { filter: brightness(1.45) saturate(1.1); } }
   .card .body { padding: 14px 18px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
   .card h3 { margin: 0; font-size: 1.08rem; font-weight: 650; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .card h3 a { color: var(--text); text-decoration: none; }
@@ -435,8 +438,10 @@
       for (const [a, b] of [[x, y], [y, x]]) for (const [px, py] of [[a, b], [n - 1 - a, b], [a, n - 1 - b], [n - 1 - a, n - 1 - b]])
         cells.push(`<rect x="${px * cell}" y="${py * cell}" width="${cell}" height="${cell}" fill="${col}"/>`);
     }
-    const w = (n + 2) * cell, id = 'm' + i;
-    return { c1, svg: `<svg aria-hidden="true" preserveAspectRatio="xMinYMid slice" viewBox="0 0 ${w * 12} 46"><defs><pattern id="${id}" width="${w}" height="46" patternUnits="userSpaceOnUse"><g transform="translate(${cell} 5)" opacity=".85">${[...new Set(cells)].join('')}</g></pattern></defs><rect width="${w * 12}" height="46" fill="url(#${id})"/></svg>` };
+    // one motif per tile; CSS repeats it with background-repeat: round, so a whole number of motifs always fills the band
+    const w = (n + 2) * cell;
+    const tile = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="46" viewBox="0 0 ${w} 46"><g transform="translate(${cell} 5)" opacity=".85">${[...new Set(cells)].join('')}</g></svg>`;
+    return { c1, style: `--tile:url(&quot;data:image/svg+xml,${encodeURIComponent(tile)}&quot;)` };
   }
 
   // ---- items: auto projects + posts, arranged by site.json (written by the site editor) ----
@@ -484,7 +489,7 @@
     return `
       <div class="card${post ? ' post' : ''}" style="--i:${i};--c1:${b.c1}" data-key="${esc(p.key)}">
         ${p.pinned && query ? '<span class="pin">Pinned</span>' : ''}
-        <span class="band">${b.svg}</span>
+        <span class="band" style="${b.style}"></span>
         <div class="body">
           <h3><a href="${esc(p.page || p.url)}">${esc(p.name)}</a>${pill}</h3>
           <p${p.description ? '' : ' class="none"'}>${esc(p.description || 'No description yet.')}</p>
@@ -550,7 +555,7 @@
     const post = m && (site.posts || []).find((p) => p.id === m[1] && !p.draft);
     if (!post) { reader.hidden = true; reader.innerHTML = ''; document.body.style.overflow = ''; return; }
     const b = band('post:' + post.id, 0);
-    reader.innerHTML = `<article><span class="band" style="--c1:${b.c1}">${b.svg}</span><div class="body">
+    reader.innerHTML = `<article><span class="band" style="--c1:${b.c1};${b.style}"></span><div class="body">
       <a class="btn ghost close" href="#projects">Close</a>
       <h1>${esc(post.title)}</h1><p class="date">${esc(post.date ? fmtDate(post.date) : '')}</p>
       <div class="md">${markdown(post.body)}</div></div></article>`;
@@ -589,12 +594,28 @@
       card.style.setProperty('--rx', ((0.5 - y) * 7).toFixed(2) + 'deg');
       card.style.setProperty('--mx', (x * 100).toFixed(1) + '%');
       card.style.setProperty('--my', (y * 100).toFixed(1) + '%');
+      card.style.setProperty('--bx', ((x - 0.5) * 26).toFixed(1) + 'px'); // embroidery slides toward the tilt
     });
     grid.addEventListener('pointerout', (e) => {
       const card = e.target.closest('.card');
-      if (card && !card.contains(e.relatedTarget)) { card.style.removeProperty('--rx'); card.style.removeProperty('--ry'); }
+      if (card && !card.contains(e.relatedTarget)) { card.style.removeProperty('--rx'); card.style.removeProperty('--ry'); card.style.removeProperty('--bx'); }
     });
   }
+
+  // ---- embroidery follows the rotation of cards that are pulled, held or falling (reads the transform the physics sets) ----
+  (function bandRoll() {
+    const ROT = /rotate\((-?[\d.e-]+)rad\)/;
+    function tick() {
+      requestAnimationFrame(tick);
+      if (document.hidden || isCrazy()) return;
+      for (const el of document.querySelectorAll('#phys .phys, .grid .card.pulling')) {
+        const m = ROT.exec(el.style.transform);
+        const bx = m ? (parseFloat(m[1]) * 60).toFixed(1) + 'px' : '0px';
+        if (el.style.getPropertyValue('--bx') !== bx) el.style.setProperty('--bx', bx);
+      }
+    }
+    requestAnimationFrame(tick);
+  })();
 
   // ---- card physics (planck.js, a Box2D port, in /vendor) ----
   // Cards are rooted in the grid by a spring. Pull one far enough and the root tears: from then on it is a rigid body
