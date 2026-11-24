@@ -662,7 +662,9 @@
     const ripped = new Set();   // keys of cards torn out of the grid
     let press = null, grab = null, smashed = 0, resetBtn = null, loopOn = false, last = 0, acc = 0, suppress = false;
     const hits = [], blasts = [];
-    const now = () => performance.now(), DBG = location.search === '?dbg';
+    // the cards' own clock: it stops while the tab is in the background, so nothing ages, expires or jumps while nobody is looking
+    let away = 0, hiddenAt = document.hidden ? performance.now() : 0;
+    const now = () => (hiddenAt || performance.now()) - away, DBG = location.search === '?dbg';
     const html = document.documentElement;
 
     function load() {
@@ -817,6 +819,7 @@
       }
     }
     function frame(t) {
+      if (hiddenAt) return;   // tab in the background: no stepping, no drawing. The loop is picked up again on return
       if (!objs.size && !bits.length && !clawBusy()) { loopOn = false; return; }
       const ms = Math.min(250, t - (last || t)); last = t; acc += ms / 1000;   // real elapsed time: a slow or a fast screen gets the same motion
       if (grab && !grab.o.root) {   // resting a carried card at the top or bottom edge of the screen scrolls the page
@@ -830,6 +833,12 @@
       draw(busy ? acc / DT : 1);
       if (busy) requestAnimationFrame(frame); else loopOn = false;
     }
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) { if (!hiddenAt) hiddenAt = performance.now(); return; }
+      if (!hiddenAt) return;
+      away += performance.now() - hiddenAt; hiddenAt = 0;
+      if (loopOn) { last = 0; acc = 0; requestAnimationFrame(frame); }   // start from this frame: the time away is not simulated
+    });
     function run() { if (!loopOn && (objs.size || bits.length || clawBusy())) { loopOn = true; last = 0; acc = 0; requestAnimationFrame(frame); } }
 
     // ---- the hand: a soft joint at the exact point that was grabbed, so the card swings around it ----
