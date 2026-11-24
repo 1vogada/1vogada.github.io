@@ -1,23 +1,80 @@
 {
   "note": "Layout of kiripad.dev. Written from the site editor artifact; projects.json (the auto list) is separate. Items not listed here show up at the end, uncategorized.",
   "categories": [
-    { "id": "games", "name": "Games" },
-    { "id": "tools", "name": "Tools" },
-    { "id": "experiments", "name": "Experiments" }
+    {
+      "id": "games",
+      "name": "Games"
+    },
+    {
+      "id": "tools",
+      "name": "Tools"
+    },
+    {
+      "id": "experiments",
+      "name": "Experiments"
+    }
   ],
   "items": [
-    { "key": "project:hive", "category": "tools", "pinned": false },
-    { "key": "project:max68he-web", "category": "tools", "pinned": false },
-    { "key": "project:airdrums", "category": "tools", "pinned": false },
-    { "key": "project:driftwall", "category": "tools", "pinned": false },
-    { "key": "project:gridburst", "category": "games", "pinned": false },
-    { "key": "project:palisade", "category": "games", "pinned": false },
-    { "key": "project:purrwood", "category": "games", "pinned": false },
-    { "key": "project:cybertale", "category": "games", "pinned": false },
-    { "key": "project:minitype", "category": "games", "pinned": false },
-    { "key": "project:apiTest", "category": "experiments", "pinned": false },
-    { "key": "project:porch", "category": "experiments", "pinned": false },
-    { "key": "project:roomDesign", "category": "experiments", "pinned": false }
+    {
+      "key": "project:driftwall",
+      "category": "tools",
+      "pinned": false
+    },
+    {
+      "key": "project:purrwood",
+      "category": "games",
+      "pinned": false
+    },
+    {
+      "key": "project:porch",
+      "category": "games",
+      "pinned": false
+    },
+    {
+      "key": "project:cybertale",
+      "category": "games",
+      "pinned": false
+    },
+    {
+      "key": "project:gridburst",
+      "category": "games",
+      "pinned": false
+    },
+    {
+      "key": "project:airdrums",
+      "category": "games",
+      "pinned": false
+    },
+    {
+      "key": "project:apiTest",
+      "category": "experiments",
+      "pinned": false
+    },
+    {
+      "key": "project:roomDesign",
+      "category": "experiments",
+      "pinned": false
+    },
+    {
+      "key": "project:hive",
+      "category": "tools",
+      "pinned": true
+    },
+    {
+      "key": "project:max68he-web",
+      "category": "tools",
+      "pinned": true
+    },
+    {
+      "key": "project:palisade",
+      "category": "games",
+      "pinned": true
+    },
+    {
+      "key": "project:minitype",
+      "category": "games",
+      "pinned": true
+    }
   ],
   "posts": []
 }
