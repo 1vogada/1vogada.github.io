@@ -7,7 +7,7 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   // Bump VER, and the ?v= on this file's script tag in index.html, whenever this file or the stylesheet changes. GitHub Pages caches each
   // file for ten minutes on its own, and a new script with an old stylesheet looks broken; the version makes them arrive as a pair
-  const VER = 10;
+  const VER = 11;
   const here = (document.currentScript && document.currentScript.src) || '/scripts/phrasebook.js';
 
   // ---- what this file knows: which occasion each list belongs to. src = which list on window.__lines, key = which entry of it ----
