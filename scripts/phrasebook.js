@@ -63,10 +63,18 @@
         { src: 'CLAW_SAY', key: 'throw', title: 'Watching a throw', when: 'It saw you throw a card.' },
         { src: 'CLAW_SAY', key: 'katana', title: 'On the katana', when: 'It saw you draw the katana, or take it in hand.' },
         { src: 'CLAW_SAY', key: 'kdrop', title: 'On the katana, dropped', when: 'It saw you drop the katana.' },
+        { src: 'CLAW_SAY', key: 'hello', title: 'Answering a no', when: 'Surprise me offers you a project and you say No. The Hand comes out to see about that.' },
+        { src: 'CLAW_SAY', key: 'flip', title: 'The toss', when: 'It throws a coin and makes you call it, heads or tails.' },
+        { src: 'CLAW_SAY', key: 'won', title: 'Beaten by a coin', when: 'You called it right. You may stay on the page.' },
+        { src: 'CLAW_SAY', key: 'lost', title: 'The taunt', when: 'You called it wrong. It reaches over and presses Yes for you.' },
+        { src: 'CLAW_SAY', key: 'idgaf', title: 'Not bothering with the coin', when: 'One toss in ten it pockets the coin and decides for you anyway.' },
+        { src: 'CLAW_SAY', key: 'bye', title: 'Seeing you off', when: 'Its finger is on the Yes button. You are leaving.' },
       ] },
   ];
   // what the Bulgarian and Japanese lines mean. A line that is missing here is simply printed without a gloss
   const GLOSS = {
+    'здрасти.': 'hi.', 'やあ。': 'hey.', 'ези или тура?': 'heads or tails?', '表か裏か?': 'heads or tails?', 'пф. късмет.': 'pff. luck.', 'ちっ': 'tch',
+    'не позна!': 'wrong guess!', 'ハズレ!': 'miss!', 'майната ѝ на монетата': 'to hell with the coin', 'どうでもいい。行け。': 'whatever. go.', 'ЧАО-ЧАО!': 'BYE-BYE!', 'バイバイ!': 'bye-bye!',
     'не!': 'no!', 'やめて!': 'stop it!', 'ъъъгх': 'nnngh', 'ау!': 'ow!', 'ох…': 'oh…', 'おっと': 'oops', 'опа!': 'whoops!',
     '世界一切れる刀です': 'I am the sharpest sword in the world', 'най-острата катана на света, здрасти!': 'the sharpest katana in the world, hello!',
     'スパッ': 'the sound of a clean cut', 'като масло': 'like butter', '痛い痛い痛い!!': 'it hurts, it hurts, it hurts!!', 'ААААААА!': 'a scream', 'боли боли боли': 'hurts, hurts, hurts',
