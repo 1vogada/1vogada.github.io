@@ -843,7 +843,19 @@
       smash: ['AAAAAAAAAA—', 'NOOOOO!!', 'ААААА!!', 'ぐはっ!!', 'KRRRK—'],
     };
     const QUIET = 2000; let cutSaid = -1e9;
-    const pick = (a) => a[Math.floor(Math.random() * a.length)];
+    // Lines are not drawn blindly: the line said last (from this list, or by anyone) never comes straight back, and one said a few lines ago
+    // only has a tenth of a fresh line's chance. Each list remembers what it gave out lately, and the last line said anywhere is kept too
+    const pickMem = new WeakMap(); let pickSaid = null;
+    function pick(a) {
+      if (a.length < 2) return a[0];
+      let m = pickMem.get(a); if (!m) pickMem.set(a, m = []);
+      const keep = Math.min(3, a.length - 2), w = a.map((s, i) => i === m[0] || s === pickSaid ? 0 : m.indexOf(i) > 0 ? 0.1 : 1);
+      let sum = 0; for (const v of w) sum += v;
+      let i = 0; if (sum > 0) { let r = Math.random() * sum; while (i < a.length - 1 && (r -= w[i]) >= 0) i++; } else i = (m[0] + 1) % a.length;
+      m.unshift(i); m.length = Math.min(m.length, keep + 1); if (typeof a[i] === 'string') pickSaid = a[i];
+      return a[i];
+    }
+    window.__pick = pick;   // the phrasebook's hand draws its lines through the same memory
     // who is talking shows in the lean: every bubble leans to the right by a few degrees of its own, and the hand's (.claw-say) leans the same amount to the left
     function bubble(text) { const el = document.createElement('div'); el.className = 'say'; el.textContent = text; el.style.setProperty('--tilt', (4 + Math.random() * 4).toFixed(1)); layer.appendChild(el); return el; }
     // The bubbles that follow something are all put on the page here, once a frame. Each has its spot (x, y: top centre) and the x of its speaker (ax).
@@ -852,9 +864,12 @@
       const h = claw && claw.say && claw.say.x != null ? claw.say : null, all = h ? [h] : [], x0 = scrollX + 6, x1 = scrollX + html.clientWidth - 6;
       for (const o of objs) if (o.say && o.say.x != null) all.push(o.say);
       for (const s of all) { if (!s.w) { s.w = s.el.offsetWidth; s.h = s.el.offsetHeight; } s.x = Math.max(x0 + s.w / 2, Math.min(x1 - s.w / 2, s.x)); }
-      const hit = (a, b, pad) => Math.abs(a.x - b.x) < (a.w + b.w) / 2 + pad && Math.abs(a.y + a.h / 2 - b.y - b.h / 2) < (a.h + b.h) / 2 + 6;
+      // leaning makes a bubble taller by about 7% of its width at each end. A pair that was slid apart stays apart until it is well clear, so it does not flicker
+      const hit = (a, b, pad) => Math.abs(a.x - b.x) < (a.w + b.w) / 2 + pad && Math.abs(a.y + a.h / 2 - b.y - b.h / 2) < (a.h + b.h) / 2 + 0.07 * (a.w + b.w) + pad - 4;
       if (h) for (const s of all) {
-        if (s === h || !hit(h, s, 10)) continue;
+        if (s === h) continue;
+        if (!hit(h, s, h.apart === s ? 34 : 10)) { if (h.apart === s) h.apart = null; continue; }
+        h.apart = s;
         const dir = h.ax >= s.ax ? 1 : -1, need = (h.w + s.w) / 2 + 10 - (h.x - s.x) * dir;
         h.x = Math.max(x0 + h.w / 2, Math.min(x1 - h.w / 2, h.x + dir * need / 2));
         s.x = Math.max(x0 + s.w / 2, Math.min(x1 - s.w / 2, h.x - dir * ((h.w + s.w) / 2 + 10)));
