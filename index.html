@@ -1436,6 +1436,10 @@
       regrow: ['grew a new one.', 'ta-da.', 'I have spares', 'that one was old anyway', 'good as new', 'нова-новеничка', '生えた。'],
       crush: ['squish.', '*CRUNCH*', 'paper is weak', 'that is what teasing gets you', 'смачках го.', 'ぐしゃ'],
       // "Surprise me": you said no, so it settles it with a coin
+      ask: ['go there?', 'well? go there?', 'this one. go?', 'I picked this for you. go?', 'shall we?', 'отиваме ли?', '行く?'],
+      heads: ['heads.', 'it is heads.', 'heads it is', 'ези.', '表。'],
+      tails: ['tails.', 'it is tails.', 'tails it is', 'тура.', '裏。'],
+      stay: ['you may stay. this time.', 'stay. for now.', 'you got lucky. stay.', 'остани. засега.', '今回だけだぞ。'],
       hello: ['oh? a "no"?', 'hello there.', 'you said no. to ME?', 'hi. I live here.', 'picky, are we', 'здрасти.', 'やあ。'],
       smashbtn: ['no "no".', 'WRONG BUTTONS.', 'not these.', 'I hate these two', 'my game. my buttons.', 'BAM.', 'не тези!', 'このボタン、きらい'],
       better: ['much better.', 'much better now.', 'there. better.', 'now we play MY game', 'see? nicer.', 'така е по-добре.', 'これでよし。'],
@@ -2303,7 +2307,7 @@
     for (const x of FORTUNES) { if ((r -= x[3]) < 0) { f = x; break; } }
     $('omi-kanji').textContent = f[0]; $('omi-name').textContent = f[1]; { const t = Array.isArray(f[2]) ? f[2][Math.floor(Math.random() * f[2].length)] : [f[2], '']; $('omi-text').textContent = t[0]; $('omi-text').title = t[1]; $('omi-text').lang = Array.isArray(f[2]) ? 'ja' : ''; }
     $('omi-proj').textContent = pick.name; $('omi-desc').textContent = pick.description || '';
-    goBtn.href = pick.url; qEl.textContent = 'Go there?';
+    goBtn.href = pick.url; qEl.textContent = window.__hand && !isCrazy() ? '' : 'Go there?';
     { const b = band(pick.name, 0); slip.style.setProperty('--c1', b.c1); slip.style.setProperty('--tile', b.style.slice(b.style.indexOf(':') + 1).replaceAll('&quot;', '"')); }   // the project's own embroidery
     actEl.innerHTML = ''; actEl.append(goBtn, noBtn); goBtn.classList.remove('pressed'); noBtn.disabled = false;
     slip.classList.toggle('curse', f[0] === '凶');
@@ -2311,6 +2315,7 @@
     slip.style.animation = 'none'; void slip.offsetWidth; slip.style.animation = '';
     const seal = slip.querySelector('.omi-seal'); seal.style.animation = 'none'; void seal.offsetWidth; seal.style.animation = '';
     goBtn.focus({ preventScroll: true });
+    setTimeout(askHand, 700);
   }
   function closeFortune() { if (scene) return; omi.hidden = true; unpeek(); surprise.focus({ preventScroll: true }); }
   // keep the slip on screen when the page is pinch-zoomed: fixed boxes follow the layout viewport, so sit on the visible one instead
@@ -2336,6 +2341,13 @@
     const vw = document.documentElement.clientWidth;
     H.come(Math.min(vw - 70, r.right + 70), r.top + r.height * 0.6, 'clamp').then(() => { if (peek) setTimeout(() => peek && H.say('secret'), 350); });
   });
+  // nothing on the slip talks: the hand leans in beside it and asks the question itself
+  function askHand() {
+    const H = window.__hand; if (!H || isCrazy() || scene || peek || omi.hidden) return;
+    peek = true; clearTimeout(showOff); root.classList.add('hand-show');
+    const r = slip.getBoundingClientRect(), vw = document.documentElement.clientWidth;
+    H.come(Math.min(vw - 70, r.right + 70), r.top + r.height * 0.35, 'eager').then(() => setTimeout(() => peek && !scene && !omi.hidden && H.say('ask'), 600));
+  }
   function unpeek() { if (!peek) return; peek = false; const H = window.__hand; if (H) H.leave(); showOff = setTimeout(() => root.classList.remove('hand-show'), 2000); }
   secret.addEventListener('click', () => {
     const H = window.__hand, out = peek || scene;
@@ -2488,14 +2500,14 @@
       heads.disabled = tails.disabled = true;
       const r = Math.random(), side = r < 0.45 ? 'heads' : r < 0.9 ? 'tails' : null;
       await sleep(500);
-      if (!side) { my.coin = null; coin.remove(); H.to({ pose: 'clamp' }); H.say('idgaf'); qEl.textContent = 'The hand pocketed the coin.'; }
+      if (!side) { my.coin = null; coin.remove(); H.to({ pose: 'clamp' }); H.say('idgaf'); }
       else {
         my.coin = null; turn(0.55, side === 'heads' ? 'H' : 'T'); coin.style.translate = `${cx.toFixed(0)}px ${(g[1] - 40).toFixed(0)}px`;
-        qEl.textContent = `${side === 'heads' ? 'Heads' : 'Tails'}. You called ${call}.`;
+        H.say(side); await sleep(1800);
         if (side === call) {   // spared
           await sleep(300); H.to({ pose: 'sulk', bob: false }); H.say('won');
-          await sleep(1800); coin.remove(); qEl.textContent = 'You may stay. This time.';
-          await sleep(600); await poke($('omi-x'));   // it closes the slip for you, then goes back where it came from
+          await sleep(2100); coin.remove(); H.say('stay');
+          await sleep(1500); await poke($('omi-x'));   // it closes the slip for you, then goes back where it came from
           omi.hidden = true; H.leave();
           qEl.textContent = 'Go there?'; actEl.innerHTML = ''; actEl.append(goBtn, noBtn); goBtn.classList.remove('pressed');
           return;
@@ -2753,6 +2765,6 @@
   applyMode();
   if (root.dataset.wantCrazy) askCrazy();
 </script>
-<script src="/scripts/phrasebook.js?v=11" defer></script>
+<script src="/scripts/phrasebook.js?v=12" defer></script>
 </body>
 </html>

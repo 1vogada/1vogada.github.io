@@ -7,7 +7,7 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   // Bump VER, and the ?v= on this file's script tag in index.html, whenever this file or the stylesheet changes. GitHub Pages caches each
   // file for ten minutes on its own, and a new script with an old stylesheet looks broken; the version makes them arrive as a pair
-  const VER = 11;
+  const VER = 12;
   const here = (document.currentScript && document.currentScript.src) || '/scripts/phrasebook.js';
 
   // ---- what this file knows: which occasion each list belongs to. src = which list on window.__lines, key = which entry of it ----
@@ -86,11 +86,15 @@
         { src: 'GRUDGE', key: null, title: 'Back, and careful', when: 'About half the time it returns from a swat wary, and creeps towards the next card slowly.' },
         { src: 'ANGRY', key: null, title: 'Back, and angry', when: 'The other half of the time it returns furious: it reaches fast, throws three cards in a row, and may take hold of the scroll.' },
         { src: 'SCROLL', key: null, title: 'Shaking the scroll', when: 'In a temper it grabs the right edge of the menu and yanks the page up and down so you lose your place.' },
+        { src: 'CLAW_SAY', key: 'ask', title: 'The question', when: 'Surprise me draws you a fortune and a project. It leans in beside the slip and asks.' },
         { src: 'CLAW_SAY', key: 'hello', title: 'Answering a no', when: 'Surprise me offers you a project and you say No. The Hand comes out to see about that.' },
         { src: 'CLAW_SAY', key: 'smashbtn', title: 'Smashing Yes and No', when: 'A few moments after it greets you, it slams itself down on the Yes and No buttons. They fly off the page in pieces.' },
         { src: 'CLAW_SAY', key: 'better', title: 'Its own buttons', when: 'It snaps two fingers, and Heads and Tails poof in where Yes and No were.' },
         { src: 'CLAW_SAY', key: 'flip', title: 'The toss', when: 'It throws a coin and makes you call it, heads or tails.' },
+        { src: 'CLAW_SAY', key: 'heads', title: 'Heads', when: 'The coin lands heads up, and it reads it out.' },
+        { src: 'CLAW_SAY', key: 'tails', title: 'Tails', when: 'The coin lands tails up, and it reads it out.' },
         { src: 'CLAW_SAY', key: 'won', title: 'Beaten by a coin', when: 'You called it right. You may stay on the page.' },
+        { src: 'CLAW_SAY', key: 'stay', title: 'Letting you stay', when: 'A moment after you win the toss, before it closes the slip for you.' },
         { src: 'CLAW_SAY', key: 'lost', title: 'The taunt', when: 'You called it wrong. It reaches over and presses Yes for you.' },
         { src: 'CLAW_SAY', key: 'idgaf', title: 'Not bothering with the coin', when: 'One toss in ten it pockets the coin and decides for you anyway.' },
         { src: 'CLAW_SAY', key: 'bye', title: 'Seeing you off', when: 'Its finger is on the Yes button. You are leaving.' },
