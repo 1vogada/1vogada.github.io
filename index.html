@@ -174,6 +174,10 @@
   #phys .say { position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; white-space: nowrap; background: var(--text); color: var(--bg);
                font-size: .82rem; font-weight: 650; padding: 4px 11px; border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,.2); animation: say 1.3s both; }
   #phys .say::after { content: ""; position: absolute; left: 50%; bottom: -5px; width: 10px; height: 10px; background: inherit; transform: translateX(-50%) rotate(45deg); border-radius: 2px; }
+  #phys .say.agony { font-size: calc(.82rem + .5rem * var(--pain, 0)); animation: say 1.3s both, agony .09s linear infinite; }
+  #phys .say.agony[data-lvl] { background: var(--accent); color: #fff; }
+  #phys .say.agony[data-lvl="2"] { letter-spacing: .04em; }
+  @keyframes agony { 0% { margin: 0; } 25% { margin: calc(-2px * var(--pain)) 0 0 calc(2px * var(--pain)); } 75% { margin: calc(2px * var(--pain)) 0 0 calc(-2px * var(--pain)); } }
   @keyframes say { 0% { opacity: 0; scale: .4; } 12% { opacity: 1; scale: 1.12; } 20% { scale: 1; } 80% { opacity: 1; } 100% { opacity: 0; scale: .9; } }
   #phys .shard { pointer-events: none; box-shadow: none; background: color-mix(in srgb, var(--surface) 93%, var(--text)); }
   html.throwing, html.throwing * { cursor: grabbing !important; user-select: none; }
@@ -1318,14 +1322,22 @@
       const cf = Math.cos(g.phi), sf = Math.sin(g.phi), a = (g.gp[0] * cf + g.gp[1] * sf) * s, b = (-g.gp[0] * sf + g.gp[1] * cf) * tt, cp = Math.cos(psi), sp = Math.sin(psi);
       const cx = P[0] - (a * cp - b * sp), cy = P[1] - (a * sp + b * cp);
       o.body.setTransform({ x: cx / S, y: cy / S }, psi - g.phi); o.body.setLinearVelocity({ x: 0, y: 0 }); o.body.setAngularVelocity(0); o.body.setAwake(true);
-      o.el.style.transform = `translate(${(cx - o.ex).toFixed(2)}px, ${(cy - o.ey).toFixed(2)}px) rotate(${psi.toFixed(4)}rad) scale(${s.toFixed(4)}, ${tt.toFixed(4)}) rotate(${(-g.phi).toFixed(4)}rad)`;
-      const waist = 0.72 * Math.pow(clamp01((s - 1) / 1.5), 0.8);
+      // pain: 0 slack, 1 about to tear. Near the limit the whole card trembles (real time, not frames)
+      const pain = clamp01((d - g.d0) / (g.rip || 300)), tm = now(), shake = 2.6 * pain * pain * pain, jx = shake * Math.sin(tm * 0.083) * -sp + shake * 0.4 * Math.sin(tm * 0.131) * cp, jy = shake * Math.sin(tm * 0.083) * cp + shake * 0.4 * Math.sin(tm * 0.131) * sp;
+      o.el.style.transform = `translate(${(cx - o.ex + jx).toFixed(2)}px, ${(cy - o.ey + jy).toFixed(2)}px) rotate(${psi.toFixed(4)}rad) scale(${s.toFixed(4)}, ${tt.toFixed(4)}) rotate(${(-g.phi).toFixed(4)}rad)`;
+      const waist = Math.min(0.86, 0.5 * Math.pow(pain, 0.7) + 0.4 * pain * pain), crack = clamp01((pain - 0.45) / 0.55);
+      // the paper goes thin where it necks: you start to see through the middle, and it reddens under the strain
+      const nx = g.gp[0] + 0.5 * g.dn * cf + o.w / 2, ny = g.gp[1] + 0.5 * g.dn * sf + o.h / 2, thin = (1 - 0.6 * pain * pain).toFixed(3), r0 = 0.1 * g.dn, r1 = (0.2 + 0.25 * pain) * g.dn;
+      o.el.style.maskImage = o.el.style.webkitMaskImage = pain < 0.08 ? '' : `radial-gradient(circle at ${nx.toFixed(1)}px ${ny.toFixed(1)}px, rgba(0,0,0,${thin}) ${r0.toFixed(1)}px, #000 ${r1.toFixed(1)}px)`;
+      o.el.style.filter = pain < 0.3 ? '' : `saturate(${(1 + 0.8 * pain).toFixed(2)}) sepia(${(0.35 * (pain - 0.3)).toFixed(2)}) hue-rotate(-${(28 * (pain - 0.3)).toFixed(0)}deg)`;
       if (waist < 0.02) o.el.style.clipPath = '';
       else {
-        const W = o.w, Hh = o.h, pts = [], N = 10;
+        const W = o.w, Hh = o.h, pts = [], N = 26;
         for (let k = 0; k < 4 * N; k++) {
           const f = (k % N) / N, e = Math.floor(k / N), x = e === 0 ? f * W : e === 1 ? W : e === 2 ? W - f * W : 0, y = e === 0 ? 0 : e === 1 ? f * Hh : e === 2 ? Hh : Hh - f * Hh;
-          const rx = x - W / 2 - g.gp[0], ry = y - Hh / 2 - g.gp[1], al = rx * cf + ry * sf, pe = (-rx * sf + ry * cf) * (1 - waist * Math.exp(-Math.pow((al / g.dn - 0.5) / 0.24, 2)));
+          const rx = x - W / 2 - g.gp[0], ry = y - Hh / 2 - g.gp[1], al = rx * cf + ry * sf, bell = Math.exp(-Math.pow((al / g.dn - 0.5) / (0.3 - 0.1 * pain), 2));
+          // necking, and past the halfway point little tears open along the neck: every other point bites inwards by a fixed, uneven amount
+          const bite = crack * bell * (k % 2 ? 0.1 + 0.5 * (Math.sin(k * 12.9898) * 43758.5453 % 1 + 1) % 1 : 0), pe = (-rx * sf + ry * cf) * (1 - waist * bell) * (1 - bite);
           pts.push(`${(g.gp[0] + al * cf - pe * sf + W / 2).toFixed(1)}px ${(g.gp[1] + al * sf + pe * cf + Hh / 2).toFixed(1)}px`);
         }
         o.el.style.clipPath = `polygon(${pts.join(',')})`;
@@ -1335,7 +1347,7 @@
     function clawUntug(o, P, H) {   // back to an ordinary card, at its own size
       const g = o.tug, dx = H[0] - P[0], dy = H[1] - P[1], d = Math.hypot(dx, dy) || 1;
       tugDraw(o, P, [P[0] + dx / d * g.d0, P[1] + dy / d * g.d0]);
-      o.tug = null; o.el.style.clipPath = '';
+      o.tug = null; o.el.style.clipPath = ''; o.el.style.maskImage = o.el.style.webkitMaskImage = ''; o.el.style.filter = '';
       o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF });
       const p = o.body.getPosition(); o.px = p.x; o.py = p.y; o.pa = o.body.getAngle();
     }
@@ -1348,16 +1360,24 @@
       }
       run();
     }
-    function cardSay(o) {   // the card has opinions about this too
-      const t = now(); if (o.said && t - o.said < 1500) return;
+    // the card screams, and the further it is stretched the louder, the bigger and the more often
+    const AGONY = [
+      ['uh oh', 'not again', 'too… long…', 'I bend, I do not br—', 'pick a side!', 'ъъъгх', 'のびてる!'],
+      ['IT HURTS', 'STOP PULLING', 'MY MIDDLE!!', 'I am not cheese!', 'LET GO LET GO', 'БОЛИИИ!', '痛い!!'],
+      ['AAAAAAAAAAAAAA', 'I CAN SEE MY INSIDES', 'I AM COMING APART', 'NOT LIKE THIS', 'МАМООООО', 'ぎゃああああ!!', 'AAAAAAA—'],
+    ];
+    function cardSay(o, pain) {
+      const t = now(), lvl = pain > 0.62 ? 2 : pain > 0.3 ? 1 : 0; if (o.said && t - o.said < 1500 - 950 * pain && lvl <= (o.lvl || 0)) return;
       if (o.say) o.say.el.remove();
-      o.said = t; o.say = { el: bubble(pick(['not again', 'I bend, I do not br—', 'too… long…', 'help?!', 'ъъъгх', 'のびてる!', 'pick a side!'])), until: t + 1300 };
+      const el = bubble(pick(AGONY[lvl])); el.classList.add('agony'); el.style.setProperty('--pain', pain.toFixed(2)); if (lvl) el.dataset.lvl = lvl;
+      o.said = t; o.lvl = lvl; o.say = { el, until: t + 1300 };
     }
     function clawSlip(P, H) {   // a sharp yank right after it grabs and the claws slide off
       const o = claw.o; clawUntug(o, P, H); claw.o = null; claw.cool = now() + 2500;
       clawSet('sulk'); clawSay('slip', true);
     }
     function clawRip(P, H) {   // P, H: page px of the pointer and of the claw's grip
+      { const el = claw.o.el; el.style.maskImage = el.style.webkitMaskImage = ''; el.style.filter = ''; }   // the pieces are copies of this element: they must not inherit the stretch look
       const c = claw, o = c.o, g = o.tug, W = o.w, Hh = o.h, cf = Math.cos(g.phi), sf = Math.sin(g.phi);
       const mx = (g.gp[0] + g.gh[0]) / 2 + W / 2, my = (g.gp[1] + g.gh[1]) / 2 + Hh / 2, side = (p) => (p[0] - mx) * cf + (p[1] - my) * sf;
       const src = rectPoly(o), hs = [], us = [], cut = [];
@@ -1487,10 +1507,11 @@
       const Hv = gripPt(), H = [Hv[0] + scrollX, Hv[1] + scrollY];
       if (c.st === 'tug' && c.o && c.o.tug && grab && grab.o === c.o) {
         const g = c.o.tug, Pp = [grab.cx + scrollX, grab.cy + scrollY];
-        tugDraw(c.o, Pp, H);
+        g.rip = ripE; tugDraw(c.o, Pp, H);
+        if (g.e > 24) cardSay(c.o, clamp01(g.e / ripE));
         const st = clamp01((g.e - strainE) / (ripE - strainE));
         if (g.e > strainE) {
-          g.grip -= dt * (0.35 + 1.8 * st); clawSay('tug'); cardSay(c.o);
+          g.grip -= dt * (0.1 + 1.6 * st * st); clawSay('tug');
           if (st > 0.4 && t > (g.drip || 0)) { g.drip = t + 120; gore((Pp[0] + H[0]) / 2, (Pp[1] + H[1]) / 2, 0, 1, 2, 0.35); }   // it starts to drip before it goes
         } else g.grip = Math.min(1, g.grip + dt * 0.6);
         const h = grab.h, n = h.length;
