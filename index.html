@@ -1144,7 +1144,7 @@
         if (!ok || tm > w.until) { wounds.splice(i, 1); continue; }
         if (tm < w.next) continue; w.next = tm + 70 + Math.random() * 90;
         const q = w.o ? toPage(w.o, w.p) : w.p, el = document.createElement('i'), sz = 3 + Math.random() * 4; el.className = 'bit';
-        el.style.width = el.style.height = sz.toFixed(1) + 'px'; layer.appendChild(el);
+        el.style.width = el.style.height = sz.toFixed(1) + 'px'; el.style.transform = `translate(${q[0].toFixed(1)}px, ${q[1].toFixed(1)}px)`; layer.appendChild(el);
         bits.push({ el, x: q[0], y: q[1], vx: (Math.random() - 0.5) * 90, vy: -60 - Math.random() * 110, t: 0, life: 0.5 + Math.random() * 0.5 });
       }
     }
@@ -1232,7 +1232,7 @@
     function spray(x, y, nx, ny) {
       for (let k = 0; k < 4; k++) {
         const el = document.createElement('i'), sz = 3 + Math.random() * 6; el.className = Math.random() < 0.72 ? 'bit' : 'bit paper';
-        el.style.width = el.style.height = sz.toFixed(1) + 'px'; layer.appendChild(el);
+        el.style.width = el.style.height = sz.toFixed(1) + 'px'; el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`; layer.appendChild(el);
         const sg = Math.random() < 0.5 ? -1 : 1, an = (Math.random() - 0.5) * 1.7, ca = Math.cos(an), sa = Math.sin(an), sp = 120 + Math.random() * 620;
         bits.push({ el, x, y, vx: sg * (nx * ca - ny * sa) * sp, vy: sg * (nx * sa + ny * ca) * sp - 160, t: 0, life: 0.45 + Math.random() * 0.65 });
       }
@@ -1254,7 +1254,7 @@
     // ---- the claw: something lives past the right edge of the screen and it wants your cards.
     // Carry a loose card to that edge and it takes one end. Pull the other end: the card stretches, then tears, and it keeps its half ----
     const CLAW_SAY = {
-      eager: ['gimme', 'ooh. snack.', 'closer…', 'for me?', 'yes yes yes', 'дай!', 'ちょうだい'],
+      eager: ['gimme', 'ooh. snack.', 'closer…', 'GIVE.', 'yes yes yes', 'do not test me', 'I will take it', 'дай!', 'ちょうだい'],
       grab: ['mine.', 'GOT IT', 'thank you!', 'мое!', 'いただき!'],
       tug: ['stretchy…', 'let gooo', 'pull harder', 'hnnngh', "it's MINE", 'разтяга се…', 'のびる…'],
       rip: ['CHEESE PULL!!!!', 'CHEESE PULL!!!!', 'CHEESE PULL!!!!', 'RIIIP', 'half is fine!', 'again! again!', 'チーズ!!!', 'СИРЕНЕ!!!'],
@@ -1263,6 +1263,8 @@
       toss: ['bored.', 'catch.', 'yeet', 'tastes like JavaScript', 'いらない'],
       sulk: ['aww.', 'tease.', 'rude.', 'fine.', 'ケチ', 'пф.'],
       slip: ['slippery!', 'hey!!', 'no fair', 'my snack!'],
+      snatch: ['TOO SLOW', 'YOINK', 'MINE NOW', 'enough games', 'дай тука!', 'もらった!'],
+      crush: ['squish.', '*CRUNCH*', 'paper is weak', 'that is what teasing gets you', 'смачках го.', 'ぐしゃ'],
     };
     const NS = 'http://www.w3.org/2000/svg';
     // hand space: wrist at 0,0, fingers along +x. Four fingers hook towards +y, the thumb comes up from below to meet them
@@ -1356,7 +1358,7 @@
     function gore(x, y, nx, ny, n, pow) {
       for (let k = 0; k < n; k++) {
         const el = document.createElement('i'), r = Math.random(), sz = 3 + Math.random() * 9; el.className = r < 0.55 ? 'bit' : r < 0.8 ? 'bit ink' : 'bit paper';
-        el.style.width = el.style.height = sz.toFixed(1) + 'px'; layer.appendChild(el);
+        el.style.width = el.style.height = sz.toFixed(1) + 'px'; el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`; layer.appendChild(el);
         const an = (Math.random() - 0.5) * 2.4, ca = Math.cos(an), sa = Math.sin(an), sp = (120 + Math.random() * 720) * pow;
         bits.push({ el, x, y, vx: (nx * ca - ny * sa) * sp, vy: (nx * sa + ny * ca) * sp - 180 * pow, t: 0, life: 0.5 + Math.random() * 0.8 });
       }
@@ -1431,6 +1433,8 @@
       if (c.say) { c.say.el.remove(); c.say = null; }
       c.o = null; c.joint = null; c.snap = null; c.st = 'off'; c.cool = 0; c.x = html.clientWidth + 340; c.pose = { ...POSES.lurk }; clawDraw(0, 0, 0);
     }
+    const CRUSH = 0.85;   // seconds from snatch to pulp
+    function snatch(o) { claw.o = o; clawSet('snatch'); }
     function clawTick(dt) {
       if (!claw) { if (!ripped.size || isCrazy()) return; clawInit(); }
       const c = claw; if (isCrazy()) return;
@@ -1438,23 +1442,24 @@
       if (c.o && !objs.has(c.o)) { c.o = null; c.joint = null; c.snap = null; if (c.st !== 'off' && c.st !== 'lurk') { clawSet('sulk'); clawSay('sulk'); } }   // someone cut or smashed what it was holding
       if (grab !== c.g) { c.g = grab; c.far = false; }
       const P = grab ? [grab.cx, grab.cy] : null, held = grab && grab.o.kind === 'card' && !grab.o.root ? grab.o : null, o = c.o;
-      const NEAR = Math.min(170, vw * 0.3), FAR = Math.min(270, vw * 0.5), EAGER = Math.min(560, vw * 0.8), HOLD = Math.min(110, vw * 0.2);
+      const NEAR = Math.min(230, vw * 0.34), FAR = Math.min(300, vw * 0.5), EAGER = Math.min(760, vw * 0.85), HOLD = Math.min(110, vw * 0.2);
       const ripE = Math.min(330, 0.3 * Math.min(vw, vh)), strainE = 0.4 * ripE;
       if (P && P[0] < vw - FAR) c.far = true;   // a card has to be brought over, not just be there
       let T = [vw + 150, c.ly], rate = 6, aim = Math.PI, pose = POSES.lurk, wig = 0.05, shake = 0, strain = 0;
       if (c.st === 'off') { T[0] = vw + 340; if (ripped.size) clawSet('lurk'); }
       else if (c.st === 'lurk') {
-        if (held) { c.ly += (Math.max(80, Math.min(vh - 80, P[1])) - c.ly) * (1 - Math.exp(-dt * 3)); if (t > c.cool && P[0] > vw - EAGER) { clawSet('eager'); clawSay('eager'); } }
+        if (held) { c.ly += (Math.max(80, Math.min(vh - 80, P[1])) - c.ly) * (1 - Math.exp(-dt * 3)); if (t > c.cool && P[0] > vw - EAGER) { clawSet('eager'); clawSay('eager'); c.patience = 1.4 + Math.random() * 2.2; } }
       } else if (c.st === 'eager') {
         pose = POSES.eager; wig = 0.34; rate = 9;
         if (!held) clawSet('sulk');
-        else if (P[0] < vw - EAGER - 60) { clawSet('sulk'); clawSay('sulk', true); }
+        else if (P[0] < vw - EAGER - 60) { if (Math.random() < 0.5) snatch(held); else { clawSet('sulk'); clawSay('sulk', true); } }   // teased: it sulks, or it loses its temper
+        else if (c.t > c.patience && P[0] < vw - NEAR) { if (Math.random() < 0.6) snatch(held); else { c.patience = c.t + 1.2 + Math.random() * 2; clawSay('eager', true); } }
         else {
           c.ly = Math.max(80, Math.min(vh - 80, P[1])); T = [vw - 10, P[1]]; aim = Math.atan2(P[1] - c.y, P[0] - c.x); if (Math.cos(aim) > -0.4) aim = Math.PI;
           if (c.far && P[0] > vw - NEAR) { c.o = held; c.pre = clawPre(held); clawSet('lunge'); } else if (c.t > 2.6) clawSay('eager');
         }
       } else if (c.st === 'lunge') {
-        pose = POSES.lunge; rate = 26;
+        pose = POSES.lunge; rate = 38;
         if (held !== o) { c.o = null; clawSet('sulk'); clawSay('sulk'); }
         else {
           const hw = o.body.getWorldPoint(c.pre.ghm), pw = o.body.getWorldPoint(c.pre.gpm), Hc = [hw.x * S - scrollX, hw.y * S - scrollY];
@@ -1462,6 +1467,24 @@
           const q = gripPt(), dist = Math.hypot(q[0] - Hc[0], q[1] - Hc[1]);
           if (dist < 20 || c.t > 0.4) { if (dist < 90) clawTug(o); else { c.o = null; clawSet('sulk'); clawSay('sulk'); } }
         }
+      } else if (c.st === 'snatch') {   // out of patience: the arm shoots all the way out to the card, wherever it is
+        pose = POSES.lunge; rate = 34;
+        if (held !== o) { c.o = null; clawSet('sulk'); clawSay('sulk'); }
+        else {
+          const w = o.body.getWorldCenter(), Hc = [w.x * S - scrollX, w.y * S - scrollY], q = gripPt();
+          aim = Math.atan2(Hc[1] - c.y, Hc[0] - c.x); if (Math.cos(aim) > -0.2) aim = Math.PI; T = wristFor(Hc, aim);
+          if (Math.hypot(q[0] - Hc[0], q[1] - Hc[1]) < 34) {   // got it: out of your hand and into its fist
+            drop(); o.hot = 0; o.body.setBullet(false); o.body.setGravityScale(0); o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 }); o.el.style.pointerEvents = 'none';
+            const N = 6, pts = [], ph = Math.random() * 6; for (let k = 0; k < 4 * N; k++) { const f = (k % N) / N, e = Math.floor(k / N); pts.push([e === 0 ? f * o.w : e === 1 ? o.w : e === 2 ? o.w - f * o.w : 0, e === 0 ? 0 : e === 1 ? f * o.h : e === 2 ? o.h : o.h - f * o.h, 0.45 + 0.22 * Math.sin(k * 1.9 + ph) + 0.18 * Math.random()]); }
+            o.tug = { crush: true, a: o.body.getAngle(), pts, spin: (Math.random() - 0.5) * 1.6 }; c.hy = Math.max(110, Math.min(vh - 110, c.y));
+            clawSet('crush'); clawSay('snatch', true);
+          } else if (c.t > 0.9) { c.o = null; clawSet('sulk'); clawSay('sulk'); }
+        }
+      } else if (c.st === 'crush') {
+        pose = { ...POSES.sulk, eye: POSES.joy.eye, pupil: POSES.joy.pupil, happy: POSES.joy.happy }; rate = 7; shake = 3 + 5 * clamp01(c.t / CRUSH); aim = Math.PI + Math.sin(c.t * 22) * 0.07; T = wristFor([vw - HOLD - 60, c.hy], aim);
+      } else if (c.st === 'gloat') {
+        pose = POSES.joy; rate = 12; wig = 0.2; aim = Math.PI + Math.sin(c.t * 14) * 0.16; T = wristFor([vw - HOLD - 20, c.hy - 30 + Math.sin(c.t * 14) * 16], aim);
+        if (c.t > 1.3) { c.cool = t + 1200; clawSet('lurk'); }
       } else if (c.st === 'tug') {
         const g = o.tug;
         if (!grab || grab.o !== o) {   // you let go: it has the whole card, which snaps back to its shape
@@ -1486,11 +1509,11 @@
           const hard = Math.random() < 0.3; world.destroyJoint(c.joint); c.joint = null; c.o = null;
           o.body.setGravityScale(FALL); o.body.setAngularDamping(SPIN); o.body.setLinearVelocity(hard ? { x: -24, y: -8 } : { x: -9, y: -7 }); o.body.setAngularVelocity((Math.random() - 0.5) * 8);
           if (hard) { o.hot = t + 1500; o.body.setBullet(true); say(o, 'throw', true); }
-          c.cool = t + 2500; clawSet('lurk'); clawSay('toss', true);
+          c.cool = t + 1200; clawSet('lurk'); clawSay('toss', true);
         }
       } else if (c.st === 'triumph') {
         pose = POSES.joy; rate = 16; wig = 0.05; aim = Math.PI + Math.sin(c.t * 16) * 0.14; T = wristFor([vw - HOLD - 30, c.hy - 50 + Math.sin(c.t * 16) * 22], aim);
-        if (grab && grab.o === o) { world.destroyJoint(c.joint); c.joint = null; c.o = null; o.body.setAngularDamping(HELD_SPIN); c.cool = t + 2500; clawSet('sulk'); clawSay('slip', true); }
+        if (grab && grab.o === o) { world.destroyJoint(c.joint); c.joint = null; c.o = null; o.body.setAngularDamping(HELD_SPIN); c.cool = t + 1200; clawSet('sulk'); clawSay('slip', true); }
         else if (c.t > 1.4 && o) { o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 }); o.el.style.pointerEvents = 'none'; clawSet('eat'); }
         else if (!o) clawSet('lurk');
       } else if (c.st === 'eat') {   // it drags its half off the screen
@@ -1507,7 +1530,22 @@
       c.x += (T[0] - c.x) * k; c.y += (T[1] - c.y) * k; c.a += wrapA(aim - c.a) * ka; c.sh += (c.y + 70 - c.sh) * (1 - Math.exp(-dt * 4));
       for (const key in pose) c.pose[key] += (pose[key] - c.pose[key]) * kp;
       const Hv = gripPt(), H = [Hv[0] + scrollX, Hv[1] + scrollY];
-      if (c.st === 'tug' && c.o && c.o.tug && grab && grab.o === c.o) {
+      if (c.st === 'crush' && c.o) {   // the card crumples in the fist, screaming, and then there is no card
+        const ob = c.o, g = ob.tug, q = clamp01(c.t / CRUSH), a = g.a + g.spin * q + Math.sin(c.t * 40) * 0.05 * q, sc = 1 - 0.6 * q;
+        ob.body.setTransform({ x: H[0] / S, y: H[1] / S }, a); ob.body.setLinearVelocity({ x: 0, y: 0 }); ob.body.setAngularVelocity(0);
+        ob.el.style.transform = `translate(${(H[0] - ob.ex).toFixed(2)}px, ${(H[1] - ob.ey).toFixed(2)}px) rotate(${a.toFixed(4)}rad) scale(${sc.toFixed(3)})`;
+        ob.el.style.clipPath = `polygon(${g.pts.map(([x, y, r]) => `${(x + (ob.w / 2 - x) * q * r).toFixed(1)}px ${(y + (ob.h / 2 - y) * q * r).toFixed(1)}px`).join(',')})`;
+        ob.el.style.filter = `saturate(${(1 + q).toFixed(2)}) sepia(${(0.4 * q).toFixed(2)}) hue-rotate(-${(30 * q).toFixed(0)}deg) brightness(${(1 - 0.25 * q).toFixed(2)})`;
+        cardSay(ob, 0.35 + 0.65 * q);
+        if (t > (g.drip || 0)) { g.drip = t + 70; gore(H[0], H[1], 0, 1, 2 + Math.round(4 * q), 0.3 + 0.4 * q); }
+        if (q >= 1) {
+          gore(H[0], H[1], -1, 0, 54, 1.1); gore(H[0], H[1], 0, -1, 22, 0.8);
+          const el = bubble(pick(SAY.slice)); el.classList.add('agony'); el.style.setProperty('--pain', '1'); el.dataset.lvl = 2; el.style.translate = `calc(${H[0].toFixed(0)}px - 50%) ${(H[1] - 70).toFixed(0)}px`; setTimeout(() => el.remove(), 1300);
+          ob.tug = null; remove(ob); c.o = null;
+          const m = document.getElementById('projects'); m.classList.remove('shake'); void m.offsetWidth; m.classList.add('shake');
+          clawSet('gloat'); clawSay('crush', true);
+        }
+      } else if (c.st === 'tug' && c.o && c.o.tug && grab && grab.o === c.o) {
         const g = c.o.tug, Pp = [grab.cx + scrollX, grab.cy + scrollY];
         g.rip = ripE; tugDraw(c.o, Pp, H);
         if (g.e > 24) cardSay(c.o, clamp01(g.e / ripE));
