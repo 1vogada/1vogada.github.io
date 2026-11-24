@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>kiripad.dev</title>
+<meta name="theme-color" content="#c8372d">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23c8372d'/%3E%3Cpath fill='white' d='M10 23h12.5a5 5 0 0 0 1-9.9A6.7 6.7 0 0 0 10.4 12 5.6 5.6 0 0 0 10 23z'/%3E%3C/svg%3E">
+<!-- Template for pages written in the site editor. Copied to p/<slug>/index.html; it reads its text from /site.json. -->
+<script>
+  try { const t = localStorage.getItem('kiripad-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<style>
+  :root { --bg: #f7f5f1; --surface: #ffffff; --text: #1d1b19; --muted: #6b655e; --border: #e6e1d9; --accent: #c8372d; --accent-soft: #fbe9e6;
+          --shadow: 0 1px 2px rgba(30,25,20,.05), 0 6px 18px rgba(30,25,20,.06); color-scheme: light; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #12131a; --surface: #1b1c24; --text: #ecebe8; --muted: #a29e98; --border: #2c2d37;
+          --accent: #f07a6c; --accent-soft: #33201f; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25); color-scheme: dark; } }
+  :root[data-theme="dark"] { --bg: #12131a; --surface: #1b1c24; --text: #ecebe8; --muted: #a29e98; --border: #2c2d37;
+          --accent: #f07a6c; --accent-soft: #33201f; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25); color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+  header { border-bottom: 1px solid var(--border); background: var(--surface); }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; max-width: 1080px; }
+  .brand { display: flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none; font-weight: 650; }
+  .logo { width: 30px; height: 30px; border-radius: 6px; background: var(--accent); display: grid; place-items: center; transform: rotate(-4deg); }
+  .back { color: var(--muted); text-decoration: none; font-size: .9rem; }
+  .back:hover { color: var(--text); }
+  article { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; margin: 32px 0 48px; }
+  .band { height: 52px; border-bottom: 1px solid var(--border); }
+  .band svg { display: block; width: 100%; height: 100%; }
+  .body { padding: 24px 30px 32px; }
+  h1 { margin: 0 0 10px; font-size: clamp(1.7rem, 5vw, 2.4rem); letter-spacing: -0.02em; line-height: 1.15; text-wrap: balance; }
+  .lede { color: var(--muted); margin: 0 0 18px; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 22px; }
+  .btn { font-weight: 600; font-size: .92rem; border-radius: 999px; padding: 9px 18px; text-decoration: none; border: 1px solid var(--border); color: var(--text); background: var(--surface); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .md { line-height: 1.75; }
+  .md h2, .md h3, .md h4 { margin: 1.5em 0 .4em; line-height: 1.25; }
+  .md a { color: var(--accent); }
+  .md code { background: var(--accent-soft); border-radius: 4px; padding: 1px 5px; font-size: .9em; }
+  .md img { max-width: 100%; border-radius: 10px; }
+  .missing { color: var(--muted); text-align: center; padding: 60px 0; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  @media (max-width: 600px) { .body { padding: 18px 18px 24px; } article { margin-top: 16px; } }
+</style>
+</head>
+<body>
+  <header><div class="wrap">
+    <a class="brand" href="/"><span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path fill="#fff" d="M6.5 19h11a4.5 4.5 0 0 0 .9-8.91A6 6 0 0 0 6.8 9.03 5 5 0 0 0 6.5 19z"/></svg></span>kiripad.dev</a>
+    <a class="back" href="/#projects">← All projects</a>
+  </div></header>
+  <main class="wrap" id="main"><p class="missing">Loading…</p></main>
+<script>
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const host = (u) => u.replace(/^https:\/\//, '').replace(/\/$/, '');
+  const PALETTES = [['#c8372d', '#22344f'], ['#22344f', '#c8372d'], ['#b5402a', '#3f6b4f'], ['#7a2e46', '#c99a2e'], ['#2f5d7c', '#c8372d'], ['#c8372d', '#c99a2e']];
+  function seeded(str) {
+    let h = 2166136261;
+    for (const ch of str) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+    return () => { h = Math.imul(h ^ (h >>> 15), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); return ((h ^= h >>> 16) >>> 0) / 4294967296; };
+  }
+  function band(name) {
+    const rnd = seeded(name), [c1, c2] = PALETTES[Math.floor(rnd() * PALETTES.length)];
+    const n = 9, half = 5, cell = 4, cells = new Set();
+    for (let y = 0; y < half; y++) for (let x = y; x < half; x++) {
+      const r = rnd(); if (r > 0.55) continue;
+      const col = r < 0.18 ? c2 : c1;
+      for (const [a, b] of [[x, y], [y, x]]) for (const [px, py] of [[a, b], [n - 1 - a, b], [a, n - 1 - b], [n - 1 - a, n - 1 - b]])
+        cells.add(`<rect x="${px * cell}" y="${py * cell}" width="${cell}" height="${cell}" fill="${col}"/>`);
+    }
+    const w = (n + 2) * cell;
+    return { c1, svg: `<svg aria-hidden="true" preserveAspectRatio="xMinYMid slice" viewBox="0 0 ${w * 16} 46"><defs><pattern id="m" width="${w}" height="46" patternUnits="userSpaceOnUse"><g transform="translate(${cell} 5)" opacity=".85">${[...cells].join('')}</g></pattern></defs><rect width="${w * 16}" height="46" fill="url(#m)"/></svg>` };
+  }
+  function inline(t) {
+    return esc(t).replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/!\[([^\]]*)\]\((https:\/\/[^)\s]+)\)/g, '<img alt="$1" src="$2">')
+      .replace(/\[([^\]]+)\]\((https:\/\/[^)\s]+)\)/g, '<a href="$2">$1</a>')
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  }
+  function markdown(md) {
+    const out = []; let para = [], list = null;
+    const flush = () => { if (para.length) out.push('<p>' + inline(para.join(' ')) + '</p>'); para = []; if (list) { out.push('<ul>' + list.map((l) => '<li>' + inline(l) + '</li>').join('') + '</ul>'); list = null; } };
+    for (const line of String(md || '').split(/\r?\n/)) {
+      const h = line.match(/^(#{1,3})\s+(.*)/), li = line.match(/^\s*[-*]\s+(.*)/);
+      if (!line.trim()) flush();
+      else if (h) { flush(); const n = h[1].length + 1; out.push(`<h${n}>${inline(h[2])}</h${n}>`); }
+      else if (li) { if (para.length) { const l = list; list = null; flush(); list = l; } (list = list || []).push(li[1]); }
+      else { if (list) flush(); para.push(line.trim()); }
+    }
+    flush(); return out.join('');
+  }
+  const slug = location.pathname.split('/').filter(Boolean).pop();
+  const main = document.getElementById('main');
+  Promise.all([fetch('/site.json', { cache: 'no-store' }).then((r) => r.json()), fetch('/projects.json', { cache: 'no-store' }).then((r) => r.json())]).then(([site, list]) => {
+    const it = (site.items || []).find((i) => i.page && i.page.slug === slug);
+    if (!it) { main.innerHTML = '<p class="missing">This page does not exist (anymore). <a href="/">Back to kiripad.dev</a></p>'; return; }
+    const name = it.key.replace(/^project:/, '');
+    const p = (list.projects || []).find((x) => x.name === name) || { name, url: '', description: '' };
+    document.title = p.name + ' · kiripad.dev';
+    const b = band(p.name);
+    main.innerHTML = `<article><div class="band" style="background:color-mix(in srgb, ${b.c1} 9%, var(--surface))">${b.svg}</div><div class="body">
+      <h1>${esc(p.name)}</h1>${p.description ? `<p class="lede">${esc(p.description)}</p>` : ''}
+      <div class="actions">${/^https:\/\//.test(p.url) ? `<a class="btn primary" href="${esc(p.url)}">Open ${esc(host(p.url))}</a>` : ''}${p.code && p.code !== p.url && /^https:\/\//.test(p.code) ? `<a class="btn" href="${esc(p.code)}">Source</a>` : ''}</div>
+      <div class="md">${markdown(it.page.body)}</div></div></article>`;
+  }).catch(() => { main.innerHTML = '<p class="missing">Could not load this page. Please refresh.</p>'; });
+</script>
+</body>
+</html>
