@@ -316,10 +316,11 @@
   .omi-puff { position: absolute; left: 50%; top: 50%; width: 90px; height: 90px; margin: -45px 0 0 -45px; border-radius: 50%; pointer-events: none;
               background: radial-gradient(circle, color-mix(in srgb, var(--muted) 45%, transparent) 0 30%, transparent 62%); animation: puff .5s ease-out forwards; }
   @keyframes puff { from { transform: scale(.3); opacity: 1; } to { transform: scale(1.5); opacity: 0; } }
+  /* a button's bubble looks like the katana's and the cards': solid dark, light text. A greyed-out button would make it see-through, so it is not greyed while it talks */
   .btn-say { position: absolute; bottom: calc(100% + 9px); left: 50%; translate: -50% 0; white-space: nowrap; pointer-events: none; z-index: 2;
-             background: var(--surface); color: var(--ink); border: 1px solid var(--border); border-radius: 10px; padding: 3px 9px; font-size: .78rem; font-weight: 650;
-             box-shadow: var(--shadow); animation: btnsay 2.6s ease forwards; }
-  .btn-say::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -5px; border: 5px solid transparent; border-top-color: var(--border); }
+             background: var(--text); color: var(--bg); border-radius: 12px; padding: 4px 11px; font-size: .82rem; font-weight: 650; box-shadow: 0 6px 16px rgba(0,0,0,.2); animation: btnsay 2.6s ease forwards; }
+  .btn-say::after { content: ''; position: absolute; top: 100%; left: 50%; margin: -5px 0 0 -5px; width: 10px; height: 10px; background: inherit; rotate: 45deg; border-radius: 2px; }
+  .omi-actions .btn[disabled]:has(.btn-say) { opacity: 1; }
   @keyframes btnsay { 0% { opacity: 0; transform: translateY(6px) scale(.8); } 10%, 85% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-4px); } }
   .omi-flung { position: fixed; margin: 0; z-index: 4; pointer-events: none; }
   .omi-bit { position: fixed; left: 0; top: 0; z-index: 4; pointer-events: none; border-radius: 3px; }
@@ -1451,6 +1452,7 @@
       won: ['…fine.', 'lucky.', 'tch. stay then.', 'next time.', 'пф. късмет.', 'ちっ'],
       lost: ['WRONG.', 'ha. wrong side.', 'the coin has spoken', 'loser walks', 'не позна!', 'ハズレ!'],
       idgaf: ['you know what? idgaf.', 'actually, forget the coin', "you're going anyway", 'coin? what coin.', 'майната ѝ на монетата', 'どうでもいい。行け。'],
+      waiting: ['well?', 'tick tock', 'go on. press it.', 'or I press it for you', '3… 2…', 'хайде де', 'はやく'],
       bye: ['BYE BYE', 'BYE BYEEE', 'HAHAHA BYE', 'see ya never', 'ЧАО-ЧАО!', 'バイバイ!'],
       slap: ['no.', 'not yet!', '*slap*', 'hands off', 'I am not done', 'чакай!', 'だめ!'],
       snap: ['ENOUGH.', 'FINE. FINE!', 'ugh. you are exhausting', 'stop poking things', 'стига вече!', 'もういい!'],
@@ -2432,7 +2434,8 @@
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   let swatsLeft = 1;   // the first time you go for heads or tails (once per visit) it knocks the buttons away, then snaps
   // No and the × do the same thing: the hand comes out
-  noBtn.addEventListener('click', () => handScene());
+  noBtn.addEventListener('click', () => (scene && scene.pick ? scene.pick('no') : handScene()));
+  goBtn.addEventListener('click', () => { if (scene && scene.pick) scene.kill(); });   // your own Yes: the link takes you there, and the scene is over
   let showOff = 0; const GONE = new Error('slip closed');
   async function handScene(back) {   // back: you returned after it sent you away, so it greets you differently
     if (scene) return;
@@ -2584,8 +2587,17 @@
       }
       // it reaches over and presses Yes for you
       await sleep(2100);
-      actEl.innerHTML = ''; actEl.append(goBtn, noBtn); noBtn.disabled = true;
+      actEl.innerHTML = ''; actEl.append(goBtn, noBtn); noBtn.disabled = false;
       const b = goBtn.getBoundingClientRect(), bx = b.left + b.width * 0.62, by = b.top + b.height * 0.5;
+      // Yes and No are yours again for 5 seconds, and it keeps its hand off them. Only if you press neither does it press Yes itself
+      H.to({ x: hx, y: hy, pose: 'point', tip: false, aim: Math.PI, rate: 10, bob: true });
+      const nag = setTimeout(() => my.pick && H.say('waiting'), 2400);
+      const own = await new Promise((res, rej) => { my.fails.push(() => rej(GONE)); const t = setTimeout(() => res(null), 5000); my.pick = (c) => { clearTimeout(t); res(c); }; }).finally(() => { my.pick = null; clearTimeout(nag); });
+      if (own === 'no') {   // you said no again, and this time it lets you
+        noBtn.disabled = true; H.to({ x: hx, y: hy, pose: 'sulk', tip: false, aim: Math.PI, rate: 10, bob: false }); H.say('escaped');
+        await sleep(1700); omi.hidden = true; H.leave(); qEl.textContent = 'Go there?'; return;
+      }
+      noBtn.disabled = true;
       H.to({ x: bx + 10, y: by - 34, pose: 'point', tip: true, aim: Math.PI - 0.5, rate: 12, bob: false });   // one finger out, hovering over Yes
       await sleep(700);
       H.to({ x: bx, y: by, rate: 22 }); await sleep(120); goBtn.classList.add('pressed'); H.say('bye');   // poke
@@ -2832,6 +2844,6 @@
   applyMode();
   if (root.dataset.wantCrazy) askCrazy();
 </script>
-<script src="/scripts/phrasebook.js?v=12" defer></script>
+<script src="/scripts/phrasebook.js?v=13" defer></script>
 </body>
 </html>
