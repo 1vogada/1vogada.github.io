@@ -1515,7 +1515,9 @@
       if (t - c.said < REACT_GAP) { if (force) c.later = { kind, at: c.said + REACT_GAP }; return; }
       c.later = null;
       if (c.say) c.say.el.remove();
-      const el = bubble(pick(CLAW_SAY[kind])), ms = kind === 'rip' ? 1900 : 1300; el.classList.add('claw-say'); el.style.animationDuration = ms + 'ms';
+      // the first rip it gets to shout about after every page load is always the cheese pull; after that the rip lines come at random again
+      const first = kind === 'rip' && !clawSay.cheesed; if (first) clawSay.cheesed = true;
+      const el = bubble(first ? CLAW_SAY.rip[0] : pick(CLAW_SAY[kind])), ms = kind === 'rip' ? 1900 : 1300; el.classList.add('claw-say'); el.style.animationDuration = ms + 'ms';
       c.said = t; c.say = { el, until: t + ms }; run();
     }
     const gripPt = () => { const c = claw, ca = Math.cos(c.a), sa = Math.sin(c.a); return [c.x + GRIP[0] * ca + GRIP[1] * sa, c.y + GRIP[0] * sa - GRIP[1] * ca]; };
