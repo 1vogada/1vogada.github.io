@@ -957,7 +957,7 @@
       o.body.setGravityScale(FALL);
       o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF });
       if (grab && grab.o === o) { grab.joint.setFrequency(HAND_HZ); grab.joint.setDampingRatio(1); carry(o); }
-      showReset(); say(o, 'rip', true); notice('rip');
+      showReset(); say(o, 'rip', true); notice('loose');
       if (ripped.size === 1) toast('Ripped it out! Stack them, or throw one hard to smash it.');
     }
     function onMove(e) {
@@ -1323,7 +1323,7 @@
       cut: ['ooh, sharp.', 'save me a slice', 'messy.', 'I could do that with my nails', 'thinner! thinner!', 'いい切れ味', 'режи, режи…'],
       stab: ['finish it!', 'so close.', 'amateur.', 'I smell blood', 'again, deeper'],
       smash: ['what a waste of a snack', 'boom.', 'I felt that', 'again!', 'бум!', 'もったいない'],
-      rip: ['fresh one!', 'bring it here', 'ooh, a loose one', 'that one looks tasty', 'дай го насам'],
+      loose: ['fresh one!', 'bring it here', 'ooh, a loose one', 'that one looks tasty', 'дай го насам'],
       throw: ['wheee', 'over here!', 'pass it!', 'nice arm'],
       katana: ['show-off.', 'I prefer claws', 'pointy.', 'keep that away from me', 'かっこつけ'],
       kdrop: ['butterfingers', 'clumsy.', 'ha.', 'and you call ME grabby'],
