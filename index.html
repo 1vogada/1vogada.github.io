@@ -1939,10 +1939,58 @@
       squeeze: ['shhh.', 'no arm needed', 'I remember how', 'бавно…'],
       crush: ['*crunch*', 'still got it', 'squish.', 'смачках го.', 'ぐしゃ'],
       rest: ['zzz', 'five minutes…', 'tired fingers', 'ねむい…'],
+      drag: ['…ow', 'everything hurts', 'just… a bit… further', 'legs. I need legs.', 'ох, ох, ох'],
+      flee: ['NOT AGAIN', 'keep that thing away!', 'nope nope nope', 'I have seen what it does', 'не, не пак!', 'やだやだやだ!'],
     };
+    // How it walks. Feet are planted on the ground and stay where they are while the body travels over them; a foot that has fallen too far
+    // behind its place under the body swings forward in an arc to a spot ahead of it, and never while the foot next to it is in the air.
+    // The body is held at hh above the ground and leans. flat: palm down, fingers forward, every finger and the thumb a leg (the classic crawling hand);
+    // otherwise upright on the first two fingers. home: where each foot belongs, px ahead of the body's middle (4 is the thumb).
+    const GAIT = {
+      tiptoe: { hh: 1.5, speed: 1.25, lean: 0.07, step: 62, lift: 24, swing: 0.2, bob: 0.05, home: { 0: 12, 1: -12 } },                       // strolling
+      sneak: { hh: 1.2, speed: 0.6, lean: 0.24, step: 44, lift: 46, swing: 0.4, bob: 0.02, home: { 0: 16, 1: -10 } },                        // stalking: low, slow, each foot lifted high and put down with care
+      scuttle: { flat: true, hh: 0.52, speed: 2.4, lean: 0.06, step: 50, lift: 13, swing: 0.11, bob: 0.03, home: { 0: 104, 1: 86, 2: 66, 3: 46, 4: 2 } },   // the spider walk
+      run: { flat: true, hh: 0.6, speed: 4.4, lean: -0.14, step: 74, lift: 20, swing: 0.07, bob: 0.07, home: { 0: 110, 1: 90, 2: 68, 3: 46, 4: -4 } },    // panic: nose up, legs a blur
+      crawl: { flat: true, drag: true, hh: 0.3, speed: 1.5, lean: 0, step: 64, lift: 9, swing: 0.3, bob: 0, home: { 0: 122, 1: 104 } },       // hurt: on its belly, two fingers reach out and pull the rest along
+    };
+    const NEXT = { 0: [1, 4], 1: [0, 2], 2: [1, 3], 3: [2], 4: [0] };   // which feet are neighbours: two neighbours are never in the air together
+    function sevGround(x, y) {   // the ground under a page point, looking from a little above it down (page px)
+      let best = null; const p1 = { x: x / S, y: y / S - 0.5 }, p2 = { x: x / S, y: y / S + 2.6 };
+      world.rayCast(p1, p2, (f, pt, n, frac) => { const u = f.getBody().getUserData(); if ((u && u.kind === 'hand') || f.isSensor() || !(f.getFilterMaskBits() & 1)) return -1; best = pt.y * S; return frac; });
+      return best;
+    }
+    function sevFeet(o, a, dt) {
+      const g = GAIT[a.gait], b = o.body, p = b.getPosition(), bx = p.x * S, by = p.y * S, v = b.getLinearVelocity(), floor = by + a.hh * S;
+      if (!a.feet || a.feetGait !== a.gait) {   // a new way of walking: the feet it needs are set down where they belong, the others are lifted off
+        const old = a.feet || {}; a.feet = {}; a.feetGait = a.gait;
+        for (const k in g.home) { const hx = bx + a.dir * g.home[k]; a.feet[k] = old[k] || { x: hx, y: sevGround(hx, by) ?? floor, sw: 0 }; }
+      }
+      let air = 0; for (const k in a.feet) if (a.feet[k].sw) air++;
+      for (const k in a.feet) {
+        const f = a.feet[k], hx = bx + a.dir * g.home[k];
+        if (f.sw) {   // in the air: an arc from where it was to where it is going
+          f.u = Math.min(1, f.u + dt / g.swing); const e = f.u * f.u * (3 - 2 * f.u);
+          f.x = f.x0 + (f.x1 - f.x0) * e; f.y = f.y0 + (f.y1 - f.y0) * e - g.lift * Math.sin(Math.PI * f.u);
+          if (f.u >= 1) { f.sw = 0; f.x = f.x1; f.y = f.y1; }
+          continue;
+        }
+        const e = (f.x - hx) * a.dir, far = Math.hypot(f.x - bx, f.y - by) > 190;   // how far ahead of its place it is; negative is behind
+        if (far) { f.x = hx; f.y = sevGround(hx, by) ?? floor; continue; }   // the body was thrown or fell: the foot is simply back under it
+        if ((e < -g.step / 2 || e > g.step * 0.8) && !NEXT[k].some((n) => a.feet[n] && a.feet[n].sw) && air < 2) {
+          const lead = Math.min(g.step * 0.75, g.step / 2 + Math.abs(v.x) * S * g.swing * 0.9), x1 = hx + (Math.abs(v.x) > 0.2 ? a.dir * lead : 0);
+          f.sw = 1; f.u = 0; f.x0 = f.x; f.y0 = f.y; f.x1 = x1; f.y1 = sevGround(x1, by) ?? floor; air++;
+        }
+      }
+      a.air = air;
+      const out = [null, null, null, null, null]; for (const k in a.feet) out[k] = [a.feet[k].x - scrollX, a.feet[k].y - 22 - scrollY];   // the joint above the pointed tip
+      o.hand.feet = out;
+    }
     const sevs = new Set(), SEV_POSE = {
       limp: { curl: 0.55, th: 0.5, spread: 0.8, eye: 0.12, pupil: 0.4, happy: 0, point: 0, legs: 0 },
       walk: { curl: 0.9, th: 0.95, spread: 0.5, eye: 1.15, pupil: 1, happy: 0, point: 0, legs: 1 },
+      sneak: { curl: 0.9, th: 0.95, spread: 0.5, eye: 1.45, pupil: 0.45, happy: 0, point: 0, legs: 1 },
+      run: { curl: 0.9, th: 0.95, spread: 0.5, eye: 1.5, pupil: 0.35, happy: 0, point: 0, legs: 1 },
+      crawl: { curl: 0.6, th: 0.5, spread: 0.7, eye: 0.3, pupil: 0.5, happy: 0, point: 0, legs: 0.45 },
       held: { curl: 0.25, th: 0.2, spread: 1.3, eye: 1.4, pupil: 0.5, happy: 0, point: 0, legs: 0 },
       grip: { curl: 0.7, th: 0.75, spread: 0.6, eye: 0.9, pupil: 0.8, happy: 0, point: 0, legs: 0 },
       fist: { curl: 1.1, th: 1.05, spread: 0.3, eye: 0.35, pupil: 0.45, happy: 0, point: 0, legs: 0 },
@@ -1961,7 +2009,7 @@
       const o = addBody({ kind: 'hand', el, w: 104, h: 92, ex: 52, ey: 46 }, px / S, py / S, a, new pl.Box(0.4, 0.28), { density: 1.3, friction: 0.9, restitution: 0.05 });
       el._o = o; o.body.setAngularDamping(2.5);
       o.hand = { ...handParts('sev'), arm: false, m: 1, x: 0, y: 0, a, sh: 0, pose: { legs: 0, ...pose }, gait: 0, reach: 100 };
-      o.ai = { st: 'limp', t: 0, dir: Math.random() < 0.5 ? -1 : 1, vx: 0, ph: 0, hh: 1, up: false, cool: 0, born: now() };
+      o.ai = { st: 'limp', t: 0, dir: Math.random() < 0.5 ? -1 : 1, vx: 0, hh: 0.4, gait: 'crawl', stroll: 'tiptoe', up: false, cool: 0, born: now(), hurt: now() + 7500, flee: 0 };
       sevs.add(o); SEV.limp.enter(o, o.ai); run();
       return o;
     }
@@ -1988,36 +2036,41 @@
           if (a.t > (t - a.born < 4000 ? 2.6 : 0.9) && o.body.getLinearVelocity().length() < 1.2) sevSet(o, 'rise');
         },
       },
-      // up onto two fingers
+      // getting up: on its belly first if it is hurt, otherwise straight onto its fingers
       rise: {
         pose: 'walk', up: true,
-        enter(o, a) { a.vx = 0; a.hh = 0.45; o.body.setAngularDamping(0.5); },
-        tick(o, a, dt, t) { a.hh += (o.hand.reach / S - a.hh) * (1 - Math.exp(-dt * 5)); if (a.t > 0.5 && !a.said1) { a.said1 = true; sevSay(o, 'rise', true); } if (a.t > 0.9) sevSet(o, 'walk'); },
+        enter(o, a) { a.vx = 0; a.hh = Math.min(a.hh, 0.42); a.gait = now() < a.hurt ? 'crawl' : a.stroll; o.body.setAngularDamping(0.5); },
+        tick(o, a, dt, t) { if (a.t > 0.5 && !a.said1 && a.gait !== 'crawl') { a.said1 = true; sevSay(o, 'rise', true); } if (a.t > 0.8) sevSet(o, 'walk'); },
       },
-      // tiptoeing about on the first two fingers. It heads for the nearest loose card it can see; with none around it wanders, turns at walls, and after a while sits down
+      // walking. How depends on what is going on: dragging itself along while it is hurt, strolling on tiptoe or scuttling like a spider with nothing to do,
+      // stalking a card it has seen and scuttling the last stretch, and running for it when the katana comes near
       walk: {
         pose: 'walk', up: true,
-        enter(o, a) { a.turn = now() + 2500 + Math.random() * 4000; a.tired = now() + 12000 + Math.random() * 8000; a.stuck = 0; },
+        enter(o, a) { a.turn = now() + 2500 + Math.random() * 4000; a.tired = now() + 14000 + Math.random() * 9000; a.stuck = 0; },
         tick(o, a, dt, t) {
           const b = o.body, p = b.getPosition(), v = b.getLinearVelocity();
-          a.hh += ((o.hand.reach - 3 - 5 * Math.abs(Math.sin(a.ph))) / S - a.hh) * (1 - Math.exp(-dt * 10));
           if (t > (a.look || 0)) {   // look around a few times a second
             a.look = t + 250; a.food = null; let best = 520;
             if (t > a.cool) for (const q of objs) { if (!sevFood(q)) continue; const w = q.body.getWorldCenter(), dx = (w.x - p.x) * S, dy = (w.y - p.y) * S; if (dy > -90 && dy < 240 && Math.abs(dx) < best && q.body.getLinearVelocity().length() < 2.5) { best = Math.abs(dx); a.food = q; } }
             if (a.food && !a.hunting) sevSay(o, 'hunt'); a.hunting = !!a.food;
+            const k = katObj && !katObj.root && katObj.tips ? katObj.tips : null;   // the blade that cut it off
+            if (k && Math.hypot(k[0] - p.x * S, k[1] - p.y * S) < 280) { if (t > a.flee) sevSay(o, 'flee', true); a.flee = t + 2200; a.dir = k[0] < p.x * S ? 1 : -1; }
           }
-          const f = a.food && sevFood(a.food) && objs.has(a.food) ? a.food : null;
+          const f = a.food && sevFood(a.food) && objs.has(a.food) ? a.food : null, was = a.gait;
           a.stuck = Math.abs(v.x) < 0.25 ? a.stuck + dt : 0;
-          if (f) {
-            const w = f.body.getWorldCenter(), dx = (w.x - p.x) * S; a.dir = dx < 0 ? -1 : 1; a.vx = a.dir * 2.1;
+          if (t < a.flee) { a.gait = 'run'; if (p.x * S < 70) a.dir = 1; else if (p.x * S > size.W - 70) a.dir = -1; }
+          else if (t < a.hurt) { a.gait = 'crawl'; sevSay(o, 'drag'); if (p.x * S < 90) a.dir = 1; else if (p.x * S > size.W - 90) a.dir = -1; }
+          else if (f) {
+            const w = f.body.getWorldCenter(), dx = (w.x - p.x) * S; a.dir = dx < 0 ? -1 : 1; a.gait = Math.abs(dx) > f.w / 2 + 150 ? 'sneak' : 'scuttle';
             if ((Math.abs(dx) < 46 || (a.stuck > 0.2 && Math.abs(dx) < f.w / 2 + 110)) && Math.abs(w.y - p.y) * S < 260) { a.prey = f; return sevSet(o, 'crush'); }   // over it, or up against its side: it climbs on
           } else {
-            a.vx = a.dir * 1.25;
-            if (p.x * S < 70) a.dir = 1; else if (p.x * S > size.W - 70) a.dir = -1; else if (t > a.turn) { a.dir = -a.dir; a.turn = t + 2500 + Math.random() * 5000; }
+            a.gait = a.stroll;
+            if (p.x * S < 70) a.dir = 1; else if (p.x * S > size.W - 70) a.dir = -1; else if (t > a.turn) { a.dir = -a.dir; a.turn = t + 2500 + Math.random() * 5000; a.stroll = Math.random() < 0.6 ? 'tiptoe' : 'scuttle'; }
             if (t > a.tired) return sevSet(o, 'rest');
           }
           if (a.stuck > 0.7) { a.stuck = 0; if (f) { a.cool = t + 2500; a.food = null; } a.dir = -a.dir; a.turn = t + 2000 + Math.random() * 3000; }
-          a.ph += Math.abs(v.x) * S * dt * Math.PI / 66; a.wig = 0.03;
+          const g = GAIT[a.gait]; a.vx = a.dir * g.speed * (g.drag ? (a.air ? 0.12 : 1) : 1);   // dragging: it only moves while both fingers have hold of the ground
+          a.wig = 0.03; a.look2 = a.gait === 'sneak' ? 'sneak' : a.gait === 'run' ? 'run' : a.gait === 'crawl' ? 'crawl' : 'walk';
         },
       },
       // in your hand: it does not like it
@@ -2057,7 +2110,7 @@
         leave(o, a) { if (a.prey) sevUnsquash(a.prey); a.prey = null; a.poseSet = false; if (objs.has(o)) o.body.setGravityScale(grab && grab.o === o ? 1 : FALL); },
       },
       // a little dance on the spot
-      gloat: { pose: 'joy', up: true, enter(o, a) { a.vx = 0; }, tick(o, a, dt, t) { a.ph += dt * 16; a.hh += ((o.hand.reach - 4 - 10 * Math.abs(Math.sin(a.t * 9))) / S - a.hh) * (1 - Math.exp(-dt * 14)); if (a.t > 1.5) sevSet(o, 'walk'); } },
+      gloat: { pose: 'joy', up: true, enter(o, a) { a.vx = 0; a.gait = 'tiptoe'; }, tick(o, a, dt, t) { a.hop = 0.16 * Math.abs(Math.sin(a.t * 9)); if (a.t > 1.5) { a.hop = 0; sevSet(o, 'walk'); } } },
       // sitting down with its eye shut. Anything that touches it, or a while of real time, and it is up again
       rest: {
         pose: 'rest',
@@ -2065,16 +2118,17 @@
         tick(o, a, dt, t) { a.wig = 0; if (t > a.wake || o.body.getLinearVelocity().length() > 1.5) sevSet(o, 'rise'); },
       },
     };
-    // inside the physics step: a standing hand is held up by its legs (a spring to the ground under it), kept upright, and pushed along
+    // inside the physics step: a walking hand is held up by its legs (a spring to the ground under it), turned to the angle its gait wants, and pushed along
     function sevStep(o) {
       const a = o.ai; if (!a.up || (grab && grab.o === o)) return;
-      const b = o.body, p = b.getPosition(), v = b.getLinearVelocity(), m = b.getMass(), L = a.hh + 0.5; let fr = 1;
+      const g = GAIT[a.gait], b = o.body, p = b.getPosition(), v = b.getLinearVelocity(), m = b.getMass(), L = a.hh + 0.5; let fr = 1;
       world.rayCast(p, { x: p.x, y: p.y + L }, (f, pt, n, frac) => { if (f.getBody() === b || f.isSensor() || !(f.getFilterMaskBits() & 1)) return -1; fr = frac; return frac; });
       const h = fr * L, on = fr < 1 && h < a.hh + 0.14; let fx = 0, fy = 0;
-      if (fr < 1 && h < a.hh + 0.3) fy = -m * Math.max(0, Math.min(170, GRAVITY * FALL + 520 * (a.hh - h) + 42 * v.y));
-      if (on) fx = m * (a.vx - v.x) * 14;
+      if (!g.drag && fr < 1 && h < a.hh + 0.3) fy = -m * Math.max(0, Math.min(170, GRAVITY * FALL + 520 * (a.hh - h) + 42 * v.y));
+      if (on) fx = m * (a.vx - v.x) * (g.drag ? 30 : 14);
       b.applyForceToCenter({ x: fx, y: fy }, true);
-      b.applyTorque(b.getInertia() * (900 * wrapA(Math.PI / 2 - b.getAngle()) - 54 * b.getAngularVelocity()), true);
+      const want = g.flat ? (a.dir > 0 ? 0 : Math.PI) - a.dir * g.lean : Math.PI / 2 + a.dir * g.lean * Math.min(1, Math.abs(v.x) + 0.4);
+      b.applyTorque(b.getInertia() * (900 * wrapA(want - b.getAngle()) - 54 * b.getAngularVelocity()), true);
     }
     // once per frame: every cut-off hand thinks, and is drawn where its body is
     function sevTick(dt) {
@@ -2086,9 +2140,14 @@
         SEV[a.st].tick(o, a, dt, t);
         if (!objs.has(o)) continue;
         const b = o.body, p = b.getPosition(), ang = b.getAngle(), pose = SEV_POSE[SEV[a.st].pose], kp = 1 - Math.exp(-dt * 10);
-        if (!a.poseSet) for (const key in pose) h.pose[key] = (h.pose[key] || 0) + (pose[key] - (h.pose[key] || 0)) * kp;
-        if (a.up) h.m = a.dir;   // it faces the way it walks
-        h.a = ang; h.gait = a.ph; h.x = p.x * S - scrollX - 35 * Math.cos(ang); h.y = p.y * S - scrollY - 35 * Math.sin(ang);
+        const look = a.st === 'walk' && a.look2 ? SEV_POSE[a.look2] : pose;
+        if (!a.poseSet) for (const key in look) h.pose[key] = (h.pose[key] || 0) + (look[key] - (h.pose[key] || 0)) * kp;
+        if (a.up) {   // the palm faces back, the knuckles lead; height follows the gait, with a dip each time a foot is in the air
+          h.m = -a.dir; const g = GAIT[a.gait];
+          a.hh += (g.hh - (a.air ? g.bob : 0) - (a.hop || 0) - a.hh) * (1 - Math.exp(-dt * 9));
+          sevFeet(o, a, dt);
+        } else { h.feet = null; a.feet = null; }
+        h.a = ang; h.x = p.x * S - scrollX - 35 * Math.cos(ang); h.y = p.y * S - scrollY - 35 * Math.sin(ang);
         handDraw(h, a.wig || 0, 0, 0);
       }
     }
@@ -2116,9 +2175,15 @@
       };
       // a finger is three bones on three joints. It arches back at the first knuckle and hooks at the other two, so even an open hand is a claw;
       // curling adds to every joint. Knuckles are knobs wider than the bones, each with two crease lines, and the talon is a long curved hook
-      const finger = (f, curl, sgn, spread, swing = 0) => {
-        let a = f.a * spread + swing, x = f.b[0], y = f.b[1]; const loc = [[x, y]], dirs = [];
-        for (let j = 0; j < 3; j++) { a += sgn * (curl * BEND[j] + ARCH[j]); dirs.push(a); x += Math.cos(a) * f.l[j] * 1.1; y += Math.sin(a) * f.l[j] * 1.1; loc.push([x, y]); }
+      // With a foot (hand space) the finger is a leg: its tip is put exactly there and the joints are solved backwards from it, knee towards the back of the hand
+      const finger = (f, curl, sgn, spread, foot) => {
+        let a = f.a * spread, x = f.b[0], y = f.b[1]; const loc = [[x, y]], dirs = [];
+        if (foot) {
+          const L1 = f.l[0] * 1.1, L2 = f.l[1] * 1.1, L3 = f.l[2] * 1.1, B = L2 + L3 * 0.94, d = Math.max(Math.abs(L1 - B) + 2, Math.min((L1 + B) * 0.995, Math.hypot(foot[0] - x, foot[1] - y))), ang = Math.atan2(foot[1] - y, foot[0] - x);
+          const a1 = ang - Math.acos(Math.max(-1, Math.min(1, (L1 * L1 + d * d - B * B) / (2 * L1 * d)))), kx = x + L1 * Math.cos(a1), ky = y + L1 * Math.sin(a1), fx = x + d * Math.cos(ang), fy = y + d * Math.sin(ang);
+          const a2 = Math.atan2(fy - ky, fx - kx) - 0.16, jx = kx + L2 * Math.cos(a2), jy = ky + L2 * Math.sin(a2), a3 = Math.atan2(fy - jy, fx - jx);
+          dirs.push(a1, a2, a3); loc.push([kx, ky], [jx, jy], [fx, fy]); a = a3; x = fx; y = fy; sgn = 1;
+        } else for (let j = 0; j < 3; j++) { a += sgn * (curl * BEND[j] + ARCH[j]); dirs.push(a); x += Math.cos(a) * f.l[j] * 1.1; y += Math.sin(a) * f.l[j] * 1.1; loc.push([x, y]); }
         const pts = loc.map(([lx, ly]) => tf(lx, ly)), w = f.w * 0.86, L = pts[3], tl = w * 2.4, hook = sgn * (0.55 + curl * 0.35);
         const P = (r, da, side) => tf(x + Math.cos(a + da) * r - Math.sin(a) * side, y + Math.sin(a + da) * r + Math.cos(a) * side), tip = P(tl, hook, 0);
         const c1 = P(tl * 0.55, hook * 0.25, -sgn * w * 0.42), c2 = P(tl * 0.5, hook * 0.75, sgn * w * 0.3), b1 = P(-w * 0.15, 0, -sgn * w * 0.3), b2 = P(-w * 0.15, 0, sgn * w * 0.3);
@@ -2131,16 +2196,14 @@
         }
         return { pts, talon, crease, tip, d: limb(pts, [w, w * 0.9, w * 0.78, w * 0.56]) };
       };
-      // legs: the first two fingers are legs. Each in turn lifts (bends) and swings forward, then plants and pushes back; the other two stay in a fist
-      const pt = p.point || 0, lg = p.legs || 0, gp = c.gait || 0, fs = FING.map((f, i) => {
+      // feet: where each finger's tip stands (viewport px; 0 to 3 the fingers, 4 the thumb). A finger with no foot curls by the pose; pose.legs makes a fist of those
+      const pt = p.point || 0, lg = p.legs || 0, ft = c.feet, toL = (q) => { const dx = q[0] - ox, dy = q[1] - oy; return [dx * ca + dy * sa, mr * (dx * sa - dy * ca)]; }, fs = FING.map((f, i) => {
         let cu = (p.curl + wig * Math.sin(tm * 12 + i * 1.4)) * (1 - pt) + (i ? 1.1 : -0.22) * pt;   // point: the first finger straightens, the others close
-        if (p.pinch) cu = cu * (1 - p.pinch) + p.pinch * (i === 1 ? 0.5 : i ? 1.1 : 0.05);   // pinch: the middle finger comes down to the thumb, the first stays out
-        if (lg) cu = cu * (1 - lg) + lg * (i < 2 ? 0.06 + 0.4 * Math.max(0, Math.sin(gp + i * Math.PI)) : 1.15);
-        return finger(f, cu, 1, p.spread * (1 - lg) + 0.3 * lg, i < 2 ? -0.32 * lg * Math.cos(gp + i * Math.PI) : 0);
+        if (lg) cu = cu * (1 - lg) + lg * 1.15;
+        return finger(f, cu, 1, p.spread * (1 - lg) + 0.3 * lg, ft && ft[i] ? toL(ft[i]) : null);
       });
-      c.tip = fs[0].tip; c.tip2 = fs[1].tip;
-      if (lg) c.reach = Math.max((fs[0].tip[0] - ox) * ca + (fs[0].tip[1] - oy) * sa, (fs[1].tip[0] - ox) * ca + (fs[1].tip[1] - oy) * sa) - 35;   // how far below the palm the lower foot is
-      const th = finger(THUMB, p.th + wig * Math.sin(tm * 12 + 5), -1, 1);
+      c.tip = fs[0].tip;
+      const th = finger(THUMB, p.th + wig * Math.sin(tm * 12 + 5), -1, 1, ft && ft[4] ? toL(ft[4]) : null);
       // arm: in from past the edge, a bony elbow, a bend that straightens under strain
       const A = [vw + 90, c.sh], Wp = [ox, oy], ax = Wp[0] - A[0], ay = Wp[1] - A[1], al = Math.hypot(ax, ay) || 1, bend = (10 + 44 * (1 - strain));
       let ex = (A[0] + Wp[0]) / 2 + ay / al * bend, ey = (A[1] + Wp[1]) / 2 - ax / al * bend; if (ax > 0) { ex = (A[0] + Wp[0]) / 2; ey = (A[1] + Wp[1]) / 2; }
@@ -2742,6 +2805,6 @@
   applyMode();
   if (root.dataset.wantCrazy) askCrazy();
 </script>
-<script src="/scripts/phrasebook.js?v=11" defer></script>
+<script src="/scripts/phrasebook.js?v=12" defer></script>
 </body>
 </html>
