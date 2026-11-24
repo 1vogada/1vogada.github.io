@@ -291,11 +291,12 @@
   html.hand-show .claw.over { z-index: 58; } html.hand-show .claw.under { z-index: 57; } html.hand-show #phys { z-index: 58; }
   .omi-actions .btn.pressed { transform: scale(.9); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 35%, transparent); }
   .omi-actions .btn[disabled] { opacity: .5; cursor: default; }
-  .coin { position: fixed; left: 0; top: 0; z-index: 59; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; pointer-events: none;
-          background: radial-gradient(circle at 35% 30%, #fff3c4, #e2b23c 55%, #9c7116); border: 2px solid #7a5a12; color: #5a3f08;
-          display: grid; place-items: center; font: 800 .8rem/1 system-ui, sans-serif; box-shadow: 0 6px 14px rgba(0,0,0,.25); }
-  .coin.spin { animation: coinspin .24s linear infinite; }
-  @keyframes coinspin { 0% { transform: scaleY(1); } 50% { transform: scaleY(.08); } 100% { transform: scaleY(1); } }
+  /* the coin: a thick gold disc. JS turns it about its horizontal axis: the face squashes and the rim shows below it */
+  .coin { position: fixed; left: 0; top: 0; z-index: 59; width: 0; height: 0; pointer-events: none; }
+  .coin .face { position: absolute; left: -27px; width: 54px; border-radius: 50%; background: #ebbb45; color: #9a6a12;
+                display: grid; place-items: center; overflow: hidden; font: 800 1.3rem/1 system-ui, sans-serif;
+                box-shadow: inset 0 0 0 4px #d9a232, inset 0 0 0 6px #f4d27a; }
+  .coin .rim { position: absolute; left: -27px; width: 54px; border-radius: 50%; background: #a8741c; }
   .omi-call { margin: 12px 0 0; font-weight: 700; }
   @media (prefers-reduced-motion: reduce) { .slip, .omi-seal { animation: none; } .omi-seal { opacity: 1; transform: rotate(-8deg); } }
   /* flashing-lights warning before crazy mode */
@@ -1897,11 +1898,20 @@
       await sleep(2200);
       // the toss: the coin leaves the hand and spins in the air above it until you call it
       H.to({ pose: 'joy', bob: false }); H.say('flip');
-      const g = H.grip() || [hx, hy], coin = document.createElement('div'); coin.className = 'coin spin'; coin.textContent = '?'; document.body.appendChild(coin);
+      const g = H.grip() || [hx, hy], coin = document.createElement('div'); coin.className = 'coin'; coin.innerHTML = '<i class="rim"></i><b class="face"></b>'; document.body.appendChild(coin);
       scene.coin = coin;
+      const D = 54, THICK = 10, face = coin.querySelector('.face'), rim = coin.querySelector('.rim');
+      // th = how far it is turned (0 = face to you). The face shrinks with cos, the rim (its thickness, seen edge-on) grows with sin
+      const turn = (th, label) => {
+        const c = Math.abs(Math.cos(th)), h = Math.max(1.5, D * c), e = THICK * Math.abs(Math.sin(th)) + 2;
+        face.style.height = h.toFixed(1) + 'px'; face.style.top = (-(h + e) / 2).toFixed(1) + 'px'; face.style.fontSize = (1.3 * c).toFixed(2) + 'rem'; face.textContent = c > 0.3 ? label : '';
+        rim.style.height = h.toFixed(1) + 'px'; rim.style.top = (-(h + e) / 2 + e).toFixed(1) + 'px';
+        rim.style.boxShadow = `0 ${(-e / 2).toFixed(1)}px 0 #b98325`;
+      };
+      scene.turn = turn;
       const t0 = performance.now(), cx = Math.min(vw - 40, g[0]), top = Math.max(60, g[1] - 140);
-      const fly = () => { if (!scene.coin) return; const s = Math.min(1, (performance.now() - t0) / 450), y = g[1] + (top - g[1]) * (1 - (1 - s) * (1 - s)) + (s >= 1 ? Math.sin(performance.now() / 160) * 6 : 0);
-        coin.style.translate = `${cx.toFixed(0)}px ${y.toFixed(0)}px`; requestAnimationFrame(fly); };
+      const fly = () => { if (!scene.coin) return; const tn = performance.now(), s = Math.min(1, (tn - t0) / 450), y = g[1] + (top - g[1]) * (1 - (1 - s) * (1 - s)) + (s >= 1 ? Math.sin(tn / 160) * 6 : 0);
+        coin.style.translate = `${cx.toFixed(0)}px ${y.toFixed(0)}px`; turn((tn - t0) / 1000 * Math.PI * 5, '?'); requestAnimationFrame(fly); };   // 2.5 turns a second, real time
       requestAnimationFrame(fly);
       qEl.textContent = 'Call it:';
       const heads = document.createElement('button'), tails = document.createElement('button');
@@ -1911,10 +1921,9 @@
       heads.disabled = tails.disabled = true;
       const r = Math.random(), side = r < 0.45 ? 'heads' : r < 0.9 ? 'tails' : null;
       await sleep(500);
-      coin.classList.remove('spin');
       if (!side) { scene.coin = null; coin.remove(); H.to({ pose: 'clamp' }); H.say('idgaf'); qEl.textContent = 'The hand pocketed the coin.'; }
       else {
-        scene.coin = null; coin.textContent = side === 'heads' ? 'H' : 'T'; coin.style.translate = `${cx.toFixed(0)}px ${(g[1] - 40).toFixed(0)}px`;
+        scene.coin = null; turn(0.55, side === 'heads' ? 'H' : 'T'); coin.style.translate = `${cx.toFixed(0)}px ${(g[1] - 40).toFixed(0)}px`;
         qEl.textContent = `${side === 'heads' ? 'Heads' : 'Tails'}. You called ${call}.`;
         if (side === call) {   // spared
           await sleep(300); H.to({ pose: 'sulk', bob: false }); H.say('won');
