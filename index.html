@@ -311,6 +311,9 @@
   .omi-actions .btn.pressed { transform: scale(.9); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 35%, transparent); }
   .omi-actions .btn[disabled] { opacity: .5; cursor: default; }
   .omi-actions .btn { position: relative; }
+  /* two buttons greeting at once lean apart, so their bubbles never touch: the left one's grows leftwards, the right one's rightwards */
+  .omi-actions .btn:first-child .btn-say { translate: calc(-100% + 22px) 0; } .omi-actions .btn:first-child .btn-say::after { left: calc(100% - 22px); }
+  .omi-actions .btn:last-child:not(:first-child) .btn-say { translate: -22px 0; } .omi-actions .btn:last-child:not(:first-child) .btn-say::after { left: 22px; }
   .omi-actions .btn.poof { animation: poof .45s cubic-bezier(.3,1.6,.5,1) both; }
   @keyframes poof { 0% { transform: scale(.2); opacity: 0; filter: blur(4px); } 60% { transform: scale(1.15); opacity: 1; filter: none; } 100% { transform: none; } }
   .omi-puff { position: absolute; left: 50%; top: 50%; width: 90px; height: 90px; margin: -45px 0 0 -45px; border-radius: 50%; pointer-events: none;
@@ -539,7 +542,7 @@
   function toast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg; t.classList.add('show');
-    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), window.__timing ? __timing.ms(msg, __timing.floor.toast) : 2400);
   }
 
   // ---- embroidery band: a symmetric shevitsa-style motif seeded by the project name ----
@@ -747,10 +750,11 @@
   // A bubble stays up long enough to read: read.base + read.perChar for every character, never shorter than read.min or longer than read.max.
   // Some lines want longer than their length gives (a scream, a request): those have a floor in `floor`
   const TIMING = {
-    read: { base: 800, perChar: 50, min: 1300, max: 3800 },
-    floor: { rip: 1900, eat: 1600, help: 2400, hide: 1900, btn: 2600, hand: 1500 },
+    read: { base: 600, perChar: 65, cjk: 220, min: 1300, max: 3500 },
+    floor: { rip: 1900, eat: 1600, help: 2400, hide: 1900, btn: 2600, hand: 1500, toast: 2400,
+             flip: 4000, rematch: 4000, yourpick: 4000, callit: 3500, ask: 4000, waiting: 2600 },   // questions stay up while you think (until the nag)
     // the shortest time between two lines from the same speaker. A forced line (something important just happened) may cut in sooner
-    gap: { card: 1400, katana: 2000, scream: 2000, hand: 2000, handIdle: 2400, handLate: 1200, sev: 2200, sevForce: 900, notme: 2600, raid: 1300, raidAsk: 2900 },
+    gap: { show: 600, after: 500, card: 1400, katana: 2000, scream: 2000, hand: 2000, handIdle: 2400, handLate: 1200, sev: 2200, sevForce: 900, notme: 2600, raid: 1300, raidAsk: 2900 },
     // the hand's remarks about what it sees come after a random wait: min + up to spread, shortened by up to `calm` when a lot is going on
     react: { min: 700, spread: 2100, calm: 0.65, flinch: 1500 },
     // how long you get to answer before it acts, and when it nags you in between
@@ -768,8 +772,8 @@
       book: 5000, help: 8000,        // phrasebook: the hand comes in after the menu has been open this long; it waits this long for help ripping a card
     },
   };
-  // Japanese and Chinese characters carry about a word each, so they count twice
-  TIMING.ms = (text, floor) => { const r = TIMING.read, t = String(text), n = [...t].length + (t.match(/[\u3040-\u9fff]/g) || []).length; return Math.max(floor || 0, Math.min(r.max, Math.max(r.min, r.base + r.perChar * n))); };
+  // Japanese and Chinese characters carry about a word each, so they take cjk ms instead of perChar
+  TIMING.ms = (text, floor) => { const r = TIMING.read, t = String(text), k = (t.match(/[\u3040-\u9fff]/g) || []).length, n = [...t].length - k; return Math.max(floor || 0, Math.min(r.max, Math.max(r.min, r.base + r.perChar * n + r.cjk * k))); };
   TIMING.span = ([a, b]) => a + Math.random() * b;
   // gives a bubble its life: the fade in its CSS runs for the same time (var --say), and the time is returned for whoever removes it
   TIMING.talk = (el, floor) => { const ms = TIMING.ms(el.textContent, floor); el.style.setProperty('--say', ms + 'ms'); return ms; };
@@ -942,6 +946,7 @@
     function say(o, kind, force) {
       const t = now(); if ((o.kind === 'katana') !== (kind[0] === 'k') || (!force && o.said && t - o.said < TIMING.gap.card)) return;
       // one line per burst: the katana speaks once and is then quiet for 2 s of real time, and a pass that cuts ten cards gets one "ow", not ten
+      if (force && kind !== 'slice' && o.say && t - o.said < TIMING.gap.show) return;   // a bubble is up long enough to be seen before another replaces it
       if (o.kind === 'katana') { if (o.said && t - o.said < TIMING.gap.katana) return; }
       else if (kind === 'slice') { if (t - cutSaid < TIMING.gap.scream) return; cutSaid = t; }
       talkOn(o, pick(SAY[kind]));
@@ -1553,15 +1558,16 @@
       run();
     }
     function clawSay(kind, force) {
-      const c = claw, t = now(); if (!force && t - c.said < TIMING.gap.handIdle) return;
+      const c = claw, t = now(); if (!force && (t - c.said < TIMING.gap.handIdle || t < (c.sayEnd || 0) + TIMING.gap.after)) return;
       // never two lines within 2 s: what it does is not held up, but an important line waits its turn and an unimportant one is dropped
-      if (t - c.said < REACT_GAP) { if (force) c.later = { kind, at: c.said + REACT_GAP }; return 0; }
+      // a line that belongs to this moment cuts in on the last one, once that has been up long enough to be seen; a remark waits for it to end
+      if (t - c.said < TIMING.gap.show) { if (force) c.later = { kind, at: c.said + TIMING.gap.show }; return 0; }
       c.later = null;
       if (c.say) c.say.el.remove();
       // the first rip it gets to shout about after every page load is always the cheese pull; after that the rip lines come at random again
       const first = kind === 'rip' && !clawSay.cheesed; if (first) clawSay.cheesed = true;
       const el = bubble(first ? CLAW_SAY.rip[0] : pick(CLAW_SAY[kind])), ms = TIMING.talk(el, TIMING.floor[kind]); el.classList.add('claw-say');
-      c.said = t; c.say = { el, until: t + ms }; run(); return ms;
+      c.said = t; c.sayEnd = t + ms; c.say = { el, until: t + ms }; run(); return ms;
     }
     const gripPt = () => { const c = claw, ca = Math.cos(c.a), sa = Math.sin(c.a); return [c.x + GRIP[0] * ca + GRIP[1] * sa, c.y + GRIP[0] * sa - GRIP[1] * ca]; };
     const wristFor = (H, a) => { const ca = Math.cos(a), sa = Math.sin(a); return [H[0] - GRIP[0] * ca - GRIP[1] * sa, H[1] - GRIP[0] * sa + GRIP[1] * ca]; };
@@ -1892,7 +1898,7 @@
       if (c.react) {
         const idle = c.st === 'lurk' || c.st === 'sulk';
         if (t - c.react.born > 6000) c.react = null;   // it was busy for too long: the moment has passed
-        else if (idle && t >= c.react.at && t - (c.said || 0) >= REACT_GAP) { clawSay(c.react.kind, true); c.flinch = t + TIMING.react.flinch; c.mood = c.react.kind; c.react = null; }
+        else if (idle && t >= c.react.at && t - (c.said || 0) >= REACT_GAP && t >= (c.sayEnd || 0) + TIMING.gap.after) { clawSay(c.react.kind, true); c.flinch = t + TIMING.react.flinch; c.mood = c.react.kind; c.react = null; }
       }
       if (t < (c.flinch || 0) && (c.st === 'lurk' || c.st === 'sulk')) {   // it leans in to say it: fingers drumming, or a fist for the things it disapproves of
         T = [vw + 36, c.ly]; rate = 10; wig = 0.3; aim = Math.PI + Math.sin(c.t * 9) * 0.06; pose = c.mood === 'katana' || c.mood === 'smash' ? POSES.sulk : c.mood === 'kdrop' || c.mood === 'stab' ? POSES.joy : POSES.eager;
