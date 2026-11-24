@@ -1053,7 +1053,7 @@
       o.body.setGravityScale(FALL);
       for (let f = o.body.getFixtureList(); f; f = f.getNext()) f.setFilterData({ groupIndex: 0, categoryBits: 4, maskBits: 2 });   // it lands on the floor and walls but passes through cards: it cuts them instead
       if (grab && grab.o === o) { grab.joint.setFrequency(HAND_HZ); grab.joint.setDampingRatio(1); carry(o); }
-      toast('Only the tip of the blade cuts. Double-click the katana to keep it in hand.'); say(o, 'khello', true);
+      toast('The very tip of the blade cuts, however slowly. Double-click the katana to keep it in hand.'); say(o, 'khello', true);
     }
     // double-click: the katana jumps into the hand by its grip and stays there without holding the button. Double-click again or Esc lets go
     const EQUIP_ANGLE = Math.PI + 0.5;
@@ -1079,11 +1079,10 @@
     sheatheBtn.addEventListener('click', putBack);
     kat.addEventListener('click', (e) => { if (e.target === kat && kat.classList.contains('away')) putBack(); });
     document.addEventListener('keydown', (e) => { if (e.key !== 'Escape' || !katObj || katObj.root) return; if (grab && grab.sticky) drop(); else putBack(); });
-    // once per frame: only the tip cuts, the last quarter of the blade up to the point. The rest of the blade and the hilt pass through cards without a mark.
-    // In the hand it cuts at any speed; loose (dropped, thrown) it has to be moving fast.
-    // A cut has a way in and a way out: the card is opened where the blade first touched it and the cut is made when the blade leaves,
-    // straight between those two points. Until then the card screams. In and out through the same side is a stab: no cut, it bleeds for a while
-    const BLADE = [[8, 92], [15, 146]], CUT_SPEED = 700;   // where the cutting tip starts on the blade and the point itself, local px from the katana's centre; px/s
+    // once per frame: the katana has one cutting point, the very tip of the blade, and it cuts at any speed, in the hand or loose. The rest of the sword passes through cards.
+    // The tip's path is followed through each card: where it crosses the outline on the way in is the entry, where it crosses on the way out is the exit.
+    // Out through another side: the card is cut straight between the two points. Out through the side it came in: a stab, no cut, it bleeds for a while. Inside, the card screams
+    const TIP = [15, 146], TRAIL_SPEED = 700;   // the point of the blade, local px from the katana's centre; px/s above which the tip leaves a streak
     const toLocal = (o, q) => { const p = o.body.getPosition(), a = o.body.getAngle(), c = Math.cos(a), s = Math.sin(a), dx = q[0] - p.x * S, dy = q[1] - p.y * S; return [dx * c + dy * s, -dx * s + dy * c]; };
     const toPage = (o, q) => { const p = o.body.getPosition(), a = o.body.getAngle(), c = Math.cos(a), s = Math.sin(a); return [p.x * S + q[0] * c - q[1] * s, p.y * S + q[0] * s + q[1] * c]; };
     function edgeOf(poly, q) {   // which side of the outline a point is nearest to
@@ -1099,29 +1098,27 @@
     function bladeCuts(dt) {
       bleed();
       const o = katObj; if (!o || o.root || dt <= 0) return;
-      const p = o.body.getPosition(), a = o.body.getAngle(), c = Math.cos(a), s = Math.sin(a);
-      const [G, T] = BLADE.map(([x, y]) => [p.x * S + x * c - y * s, p.y * S + x * s + y * c]);
-      const prev = o.tips; o.tips = [G, T]; if (!prev) { o.open = new Map(); return; }
-      const mg = [G[0] - prev[0][0], G[1] - prev[0][1]], mt = [T[0] - prev[1][0], T[1] - prev[1][1]], fast = Math.hypot(mt[0], mt[1]) / dt >= CUT_SPEED;
-      const held = !!grab && grab.o === o, open = o.open, seen = new Set(), bl = Math.hypot(T[0] - G[0], T[1] - G[1]);
-      if (fast) trail(prev[1], T);
-      if (!held && !fast && !open.size) return;
+      const T = toPage(o, TIP), prev = o.tips; o.tips = T; if (!prev) { o.open = new Map(); return; }
+      const held = !!grab && grab.o === o, open = o.open, seen = new Set(), step = Math.hypot(T[0] - prev[0], T[1] - prev[1]);
+      if (step / dt >= TRAIL_SPEED) trail(prev, T);
+      if (!step && !open.size) return;
       tick++;
       for (const t of targets()) {
-        const xs = crossings(t.poly, G, T), gi = inside(t.poly, G[0], G[1]); if (!xs.length && !gi) continue;
-        let rec = open.get(t.key); if (!rec && !held && !fast) continue;
-        const e0 = gi ? G : xs[0], e1 = inside(t.poly, T[0], T[1]) ? T : xs[xs.length - 1], m = [(e0[0] + e1[0]) / 2, (e0[1] + e1[1]) / 2], depth = Math.hypot(e1[0] - e0[0], e1[1] - e0[1]);
-        const f = Math.hypot(m[0] - G[0], m[1] - G[1]) / bl, mv = [mg[0] + (mt[0] - mg[0]) * f, mg[1] + (mt[1] - mg[1]) * f];   // how that spot on the blade moved this frame
-        const here = (q) => t.o ? toLocal(t.o, q) : q;   // a loose card moves while it is being cut: remember the points on the card itself
-        seen.add(t.key);
-        if (!rec) {
-          open.set(t.key, rec = { t, a: here([m[0] - mv[0], m[1] - mv[1]]), depth: -1 });
-          const tm = now(); if (tm - screamed > 700) { screamed = tm; if (t.o) say(t.o, 'cutting', true); else sayAt(m[0], Math.min(...t.poly.map((q) => q[1])) - 34, pick(SAY.cutting)); }
+        const here = (q) => t.o ? toLocal(t.o, q) : [q[0], q[1]];   // a loose card moves while it is being cut: remember the points on the card itself
+        const rec = open.get(t.key), xs = crossings(t.poly, prev, T), isIn = inside(t.poly, T[0], T[1]);
+        if (rec) {
+          seen.add(t.key); rec.t = t;
+          if (isIn) { const q = here(T), d = Math.hypot(q[0] - rec.a[0], q[1] - rec.a[1]); rec.z = q; if (d > rec.depth) { rec.depth = d; rec.w = q; } continue; }
+          if (xs.length) rec.z = here(xs[xs.length - 1]);   // the tip left: this is the way out
+          open.delete(t.key); endCut(o, rec, held); continue;
         }
-        rec.z = here([m[0] + mv[0], m[1] + mv[1]]);
-        if (depth > rec.depth) { rec.depth = depth; rec.w = here(e1); }
+        if (!xs.length) continue;   // the tip did not cross this outline
+        const a = here(xs[0]);
+        if (!isIn) { if (xs.length > 1) { const z = here(xs[xs.length - 1]); endCut(o, { t, a, z, w: z }, held); } continue; }   // in and out again within one frame
+        seen.add(t.key); open.set(t.key, { t, a, z: here(T), w: here(T), depth: 0 });
+        const tm = now(); if (tm - screamed > 700) { screamed = tm; if (t.o) say(t.o, 'cutting', true); else sayAt(T[0], Math.min(...t.poly.map((q) => q[1])) - 34, pick(SAY.cutting)); }
       }
-      for (const [key, rec] of open) if (!seen.has(key)) { open.delete(key); endCut(o, rec, held); }
+      for (const key of [...open.keys()]) if (!seen.has(key)) open.delete(key);   // the card is gone
     }
     function endCut(k, rec, held) {
       const t = rec.t, alive = t.o ? objs.has(t.o) : t.card.isConnected && !t.card.classList.contains('held'); if (!alive) return;
