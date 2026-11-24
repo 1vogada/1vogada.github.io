@@ -762,6 +762,17 @@
     // the cards' own clock: it stops while the tab is in the background, so nothing ages, expires or jumps while nobody is looking
     let away = 0, hiddenAt = document.hidden ? performance.now() : 0;
     const now = () => (hiddenAt || performance.now()) - away, DBG = location.search === '?dbg';
+    // where the hand reacts, in viewport x (any scroll, full height): a held card teases it from `tease` rightwards (the last card column of the content),
+    // a thrown card is caught from `grab` rightwards (the gutter right of the content; never narrower than a card can get into). ?debug=zones draws both
+    const zones = (vw) => {
+      const W = Math.min(1080, vw), cr = (vw + W) / 2 - 16, cw = W - 32, cols = Math.max(1, Math.floor((cw + 16) / 306));
+      return { tease: cols > 1 ? cr - (cw - 16 * (cols - 1)) / cols - 16 : cr - cw * 0.4, edge: cr, grab: Math.min(cr, vw - Math.min(220, vw * 0.4)) };
+    };
+    if (/[?&]debug=zones\b/.test(location.search)) {
+      const mk = (col, name) => { const d = document.createElement('div'); d.textContent = name; d.style.cssText = 'position:fixed;top:0;bottom:0;z-index:9999;pointer-events:none;box-sizing:border-box;border:3px solid ' + col + ';color:' + col + ';font:700 12px/1.6 monospace;padding:2px 6px'; document.body.appendChild(d); return d; };
+      const r = mk('#e11', 'tease'), b = mk('#000', 'catch'), lay = () => { const vw = document.documentElement.clientWidth, z = zones(vw); r.style.left = z.tease + 'px'; r.style.width = z.edge - z.tease + 'px'; b.style.left = z.grab + 'px'; b.style.width = vw - z.grab + 'px'; };
+      lay(); addEventListener('resize', lay);
+    }
     const html = document.documentElement;
 
     function load() {
@@ -1677,7 +1688,7 @@
       if (c.o && !objs.has(c.o)) { c.o = null; c.joint = null; c.snap = null; if (c.st !== 'off' && c.st !== 'lurk') { clawSet('sulk'); clawSay('sulk'); } }   // someone cut or smashed what it was holding
       if (grab !== c.g) { c.g = grab; c.far = false; }
       const P = grab ? [grab.cx, grab.cy] : null, held = grab && grab.o.kind === 'card' && !grab.o.root ? grab.o : null, o = c.o;
-      const NEAR = Math.min(230, vw * 0.34), FAR = Math.min(300, vw * 0.5), EAGER = Math.min(760, vw * 0.85), HOLD = Math.min(110, vw * 0.2);
+      const NEAR = Math.min(230, vw * 0.34), FAR = Math.min(300, vw * 0.5), Z = zones(vw), HOLD = Math.min(110, vw * 0.2);
       const ripE = Math.min(330, 0.3 * Math.min(vw, vh)), strainE = 0.4 * ripE;
       if (P && P[0] < vw - FAR) c.far = true;   // a card has to be brought over, not just be there
       let T = [vw + 150, c.ly], rate = 6, aim = Math.PI, pose = POSES.lurk, wig = 0.05, shake = 0, strain = 0;
@@ -1685,12 +1696,12 @@
         for (const q of objs) {
           if (q.kind !== 'card' || q.root || q.tug || (grab && grab.o === q)) continue;
           const v = q.body.getLinearVelocity(), w = q.body.getWorldCenter(), sx = w.x * S - scrollX, sy = w.y * S - scrollY;
-          if (v.x > 5 && Math.hypot(v.x, v.y) > 8 && sx > vw - EAGER && sx < vw + 40 && sy > 20 && sy < vh - 20) { c.o = q; clawSet('catch'); break; }
+          if (v.x > 5 && Math.hypot(v.x, v.y) > 8 && sx > Z.grab && sx < vw + 40 && sy > 20 && sy < vh - 20) { c.o = q; clawSet('catch'); break; }
         }
       }
       if (c.st === 'off') { T[0] = vw + 340; if (ripped.size) clawSet('lurk'); }
       else if (c.st === 'lurk') {
-        if (held) { c.ly += (Math.max(80, Math.min(vh - 80, P[1])) - c.ly) * (1 - Math.exp(-dt * 3)); if (t > c.cool && P[0] > vw - EAGER && !nearShelf(P)) { clawSet('eager'); clawSay('eager'); c.patience = 1.4 + Math.random() * 2.2; } }
+        if (held) { c.ly += (Math.max(80, Math.min(vh - 80, P[1])) - c.ly) * (1 - Math.exp(-dt * 3)); if (t > c.cool && P[0] > Z.tease && !nearShelf(P)) { clawSet('eager'); clawSay('eager'); c.patience = 1.4 + Math.random() * 2.2; } }
         else {   // nobody is holding anything: is there something lying on the shelf?
           const q = shelfSnack(); if (shelf) shelf.want = !!q;
           if (!q) c.eyed = null; else if (q !== c.eyed) { c.eyed = q; c.eyedAt = t; } else if (t > c.cool && t - c.eyedAt > 700) { c.o = q; c.eyed = null; clawSet('reach'); clawSay('shelf', true); }
@@ -1719,7 +1730,7 @@
         pose = POSES.eager; wig = 0.34; rate = 9;
         if (!held) clawSet('sulk');
         else if (nearShelf(P)) clawSet('lurk');   // you are putting it on the shelf: it pulls back and waits for you to look away
-        else if (P[0] < vw - EAGER - 60) { if (Math.random() < 0.5) snatch(held); else { clawSet('sulk'); clawSay('sulk', true); } }   // teased: it sulks, or it loses its temper
+        else if (P[0] < Z.tease - 60) { if (Math.random() < 0.5) snatch(held); else { clawSet('sulk'); clawSay('sulk', true); } }   // teased: it sulks, or it loses its temper
         else if (c.t > c.patience && P[0] < vw - NEAR) { if (Math.random() < 0.6) snatch(held); else { c.patience = c.t + 1.2 + Math.random() * 2; clawSay('eager', true); } }
         else {
           c.ly = Math.max(80, Math.min(vh - 80, P[1])); T = [vw - 10, P[1]]; aim = Math.atan2(P[1] - c.y, P[0] - c.x); if (Math.cos(aim) > -0.4) aim = Math.PI;
