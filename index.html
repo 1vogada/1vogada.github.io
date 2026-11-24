@@ -259,6 +259,33 @@
   .reader .close { float: right; }
   @media (max-width: 640px) { .reader { padding: 16px 10px; } .reader .body { padding: 18px 18px 24px; } }
 
+  /* Surprise me: an omikuji fortune slip */
+  .omikuji { position: fixed; inset: 0; z-index: 55; display: grid; place-items: center; padding: 16px;
+             background: color-mix(in srgb, var(--bg) 55%, transparent); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+  .omikuji[hidden] { display: none; }
+  .slip { position: relative; width: min(340px, 100%); background: #fbf6ea; color: #2a2522; border-radius: 4px; padding: 26px 26px 22px; text-align: center;
+          box-shadow: 0 24px 60px rgba(0,0,0,.28); border-top: 10px solid var(--accent); border-bottom: 10px solid var(--accent);
+          transform-origin: 50% 0; animation: unroll .7s cubic-bezier(.2,1.2,.4,1) both; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .slip::before { content: ""; position: absolute; inset: 6px; border: 1px solid rgba(200,55,45,.35); pointer-events: none; }
+  @keyframes unroll { from { transform: scaleY(.04) rotate(-4deg); opacity: 0; } 60% { opacity: 1; } to { transform: none; } }
+  .omi-x { position: absolute; top: 6px; right: 10px; border: 0; background: none; font-size: 1.4rem; color: #8a7f76; cursor: pointer; z-index: 1; }
+  .omi-kanji { font-size: 4.2rem; line-height: 1; margin: 6px 0 4px; font-weight: 800; color: var(--accent); letter-spacing: .05em;
+               font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif; }
+  .omi-name { margin: 0; font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; color: #8a7f76; }
+  .omi-text { margin: 12px 0 16px; font-size: 1.02rem; }
+  .omi-pick { border-top: 1px dashed rgba(42,37,34,.25); border-bottom: 1px dashed rgba(42,37,34,.25); padding: 12px 4px; display: grid; gap: 2px; }
+  .omi-pick small { color: #8a7f76; font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; }
+  .omi-pick b { font-size: 1.3rem; }
+  .omi-pick span { color: #6b625b; font-size: .9rem; }
+  .omi-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+  .omi-actions .btn.primary { min-width: 0; }
+  .omi-actions .btn.ghost { background: transparent; color: #2a2522; border-color: rgba(42,37,34,.25); }
+  .omi-seal { position: absolute; left: 18px; top: 20px; width: 46px; height: 46px; border: 3px solid var(--accent); border-radius: 6px; color: var(--accent);
+              display: grid; place-items: center; font-size: 1.5rem; font-weight: 800; opacity: 0; transform: rotate(-12deg) scale(2.2);
+              animation: stamp .35s .75s cubic-bezier(.3,1.6,.5,1) forwards; pointer-events: none; }
+  @keyframes stamp { to { opacity: .8; transform: rotate(-12deg) scale(1); } }
+  .slip.curse .omi-kanji { color: #3d4d6a; }
+  @media (prefers-reduced-motion: reduce) { .slip, .omi-seal { animation: none; } .omi-seal { opacity: .8; transform: rotate(-12deg); } }
   /* flashing-lights warning before crazy mode */
   .warn { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px;
           background: color-mix(in srgb, #000 55%, transparent); }
@@ -415,6 +442,17 @@
   <div class="toast" id="toast" role="status"></div>
 
   <div class="reader" id="reader" hidden></div>
+  <div class="omikuji" id="omikuji" hidden role="dialog" aria-modal="true" aria-labelledby="omi-kanji">
+    <div class="slip" id="slip">
+      <button class="omi-x" id="omi-x" type="button" aria-label="Close">×</button>
+      <p class="omi-kanji" id="omi-kanji"></p>
+      <p class="omi-name" id="omi-name"></p>
+      <p class="omi-text" id="omi-text"></p>
+      <div class="omi-pick"><small>your project today</small><b id="omi-proj"></b><span id="omi-desc"></span></div>
+      <div class="omi-actions"><a class="btn primary" id="omi-go" href="#">Take me there →</a><button class="btn ghost" id="omi-again" type="button">Draw again</button></div>
+      <span class="omi-seal" aria-hidden="true">霧</span>
+    </div>
+  </div>
 
   <div class="warn" id="warn" hidden role="dialog" aria-modal="true" aria-labelledby="warn-h">
     <div class="warn-box">
@@ -1754,7 +1792,7 @@
     }
   })();
 
-  // ---- surprise me: slot-machine through project names, then go ----
+  // ---- surprise me: slot-machine through project names, then draw an omikuji fortune ----
   const surprise = document.getElementById('surprise'), label = document.getElementById('surprise-label');
   surprise.addEventListener('click', async () => {
     if (!data || !data.projects.length || surprise.classList.contains('rolling')) return;
@@ -1766,10 +1804,46 @@
       label.textContent = list[Math.floor(Math.random() * list.length)].name;
       await new Promise((r) => setTimeout(r, 40 + s * s * 1.6));
     }
-    label.textContent = pick.name;
+    label.textContent = 'Surprise me';
     surprise.classList.remove('rolling');
-    toast(`Off to ${pick.name} →`);
-    setTimeout(() => { location.href = pick.url; }, 700);
+    drawFortune(list, pick);
+  });
+
+  // the surprise is an omikuji: a fortune slip with a project picked for you
+  const FORTUNES = [
+    ['大吉', 'Great blessing · Голям късмет', 'The fog parts just for you today.', 3],
+    ['中吉', 'Middle blessing · Среден късмет', 'Something you build today will compile on the first try.', 3],
+    ['小吉', 'Small blessing · Малък късмет', 'A small bug will flee before you.', 3],
+    ['吉', 'Blessing · Късмет', 'The katana is on your side. Mostly.', 3],
+    ['末吉', 'Future blessing · Бъдещ късмет', 'Patience. The fog always rolls back.', 2],
+    ['凶', 'Curse · Лош късмет', 'Tie this slip to a tree and draw again.', 1],
+  ];
+  const omi = document.getElementById('omikuji'), slip = document.getElementById('slip');
+  function drawFortune(list, pick) {
+    const total = FORTUNES.reduce((a, f) => a + f[3], 0);
+    let r = Math.random() * total, f = FORTUNES[0];
+    for (const x of FORTUNES) { if ((r -= x[3]) < 0) { f = x; break; } }
+    document.getElementById('omi-kanji').textContent = f[0];
+    document.getElementById('omi-name').textContent = f[1];
+    document.getElementById('omi-text').textContent = f[2];
+    document.getElementById('omi-proj').textContent = pick.name;
+    document.getElementById('omi-desc').textContent = pick.description || '';
+    document.getElementById('omi-go').href = pick.url;
+    document.getElementById('omi-again').textContent = f[0] === '凶' ? 'Tie it to a tree, draw again' : 'Draw again';
+    slip.classList.toggle('curse', f[0] === '凶');
+    omi.hidden = false;
+    slip.style.animation = 'none'; void slip.offsetWidth; slip.style.animation = '';
+    const seal = slip.querySelector('.omi-seal'); seal.style.animation = 'none'; void seal.offsetWidth; seal.style.animation = '';
+    omi._list = list;
+    document.getElementById('omi-go').focus({ preventScroll: true });
+  }
+  function closeFortune() { omi.hidden = true; surprise.focus({ preventScroll: true }); }
+  document.getElementById('omi-x').addEventListener('click', closeFortune);
+  omi.addEventListener('click', (e) => { if (e.target === omi) closeFortune(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !omi.hidden) closeFortune(); });
+  document.getElementById('omi-again').addEventListener('click', () => {
+    const list = omi._list || [];
+    if (list.length) drawFortune(list, list[Math.floor(Math.random() * list.length)]);
   });
 
   // ---- wipeable fog over the hero ----
