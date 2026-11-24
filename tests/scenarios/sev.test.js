@@ -1,0 +1,106 @@
+'use strict';
+// Severed hand: the hand that was cut off lives on as a creature with a table of behaviours (SEV). Limp, rise, walk and turn;
+// picked up and dropped; it hunts a card and crushes it; never more than three of them.
+const { scenario, assert } = require('../helpers/harness');
+const G = 'sev';
+
+const hands = () => [...window.__sev.list].map((o) => { const p = o.body.getPosition(), a = o.ai;
+  return { st: a.st, gait: a.gait, fd: a.fd, face: a.face, x: p.x * 100, y: p.y * 100, feet: a.feet ? Object.fromEntries(Object.entries(a.feet).map(([k, f]) => [k, { x: f.x, sw: f.sw }])) : null }; });
+const kinds = () => { const k = {}; for (const o of window.__cards.objs) k[o.kind] = (k[o.kind] || 0) + 1; return k; };
+
+// the world exists once something has been pulled: rip a card, then put everything back. Then scroll to the floor of the page
+async function world(s) {
+  const [px, py] = await s.rip(0);
+  await s.run(200);
+  await s.up();
+  await s.press('.reset-cards');
+  await s.run(800);
+  const bottom = await s.eval(() => document.documentElement.scrollHeight - innerHeight);
+  await s.scrollTo(bottom);
+  return s.eval(() => window.__cards.state().size);
+}
+const spawn = (s, x, y) => s.eval(([x, y]) => { window.__sev.spawn(x, y, 0.3, window.__sev.POSES.limp); }, [x, y]);
+
+scenario(G, 'limp, rise, walk and turn', { rand: 0.5 }, async (s) => {
+  const size = await world(s);
+  await spawn(s, size.W / 2, size.H - 300);
+  let h = (await s.eval(hands))[0];
+  assert.equal(h.st, 'limp', 'it starts limp where it fell');
+  await s.runUntil(() => window.__sev.list.values().next().value.ai.st === 'walk', null, { max: 6000 });
+  h = (await s.eval(hands))[0];
+  assert.equal(h.gait, 'crawl', 'freshly cut off, it drags itself along on two fingers');
+  assert.ok(await s.said('SEV_SAY.cut'), 'it twitches and mutters');
+  await s.run(1500);
+  assert.ok(await s.said('SEV_SAY.drag'));
+  // the hurt passes after 7.5 s: up on its fingers. Watch the feet and the facing for a while
+  // (it turns by flipping a.fd in the walk behaviour; the edge-on turning animation only runs when a.dir changes, which walk never does)
+  const seen = { fd: new Set(), slid: 0, planted: 0, gaits: new Set() };
+  let prev = null;
+  for (let i = 0; i < 260; i++) {
+    await s.run(50, 50);
+    const [q] = await s.eval(hands);
+    seen.fd.add(q.fd); seen.gaits.add(q.gait);
+    if (prev && prev.feet && q.feet && q.gait === prev.gait && q.fd === prev.fd) for (const k in q.feet) {
+      if (prev.feet[k] && !prev.feet[k].sw && !q.feet[k].sw) { seen.planted++; if (Math.abs(prev.feet[k].x - q.feet[k].x) > 0.01) seen.slid++; }
+    }
+    prev = q;
+  }
+  assert.ok(seen.gaits.has('tiptoe') || seen.gaits.has('scuttle'), `it strolls once it is not hurt any more (${[...seen.gaits]})`);
+  assert.equal(seen.fd.size, 2, 'it turned round');
+  assert.ok(seen.planted > 50 && seen.slid === 0, `a planted foot never slides (${seen.slid} of ${seen.planted})`);
+  assert.equal((await s.eval(hands))[0].st, 'walk');
+});
+
+scenario(G, 'held and crush', async (s) => {
+  const size = await world(s);
+  await spawn(s, size.W / 2, size.H - 300);
+  await s.runUntil(() => { const o = window.__sev.list.values().next().value; return o.ai.st === 'walk' && performance.now() > o.ai.hurt; }, null, { max: 12000, step: 100 });
+  // pick it up by its palm
+  const sy = await s.scrollY();
+  const [h] = await s.eval(hands);
+  const at = [h.x, h.y - sy];
+  await s.move(at[0], at[1]); await s.down();
+  assert.equal((await s.eval(hands))[0].st, 'held', 'in your hand it wriggles');
+  assert.ok(await s.said('SEV_SAY.held'));
+  await s.line(at[0], at[1], at[0] - 150, at[1] - 200, 15);
+  await s.run(2800);
+  await s.up();
+  assert.equal((await s.eval(hands))[0].st, 'limp', 'let go, it drops limp');
+  await s.runUntil(() => window.__sev.list.values().next().value.ai.st === 'walk', null, { max: 5000 });
+  // now a card for it: torn out at the top of the page and carried down next to it
+  await s.scrollTo(0);
+  const [px, py] = await s.rip(1);
+  await s.run(300);
+  const bottom = await s.scrollHolding();
+  const [q] = await s.eval(hands);
+  const tx = Math.max(200, Math.min(size.W - 200, q.x + (q.x < size.W / 2 ? 260 : -260)));
+  await s.line(px, py, tx, 900 - 260, 20);
+  await s.run(800);
+  await s.up();
+  await s.runUntil(() => window.__sev.list.values().next().value.ai.st === 'crush', null, { max: 15000, step: 100 });
+  assert.ok(await s.said('SEV_SAY.hunt'), 'it has seen the card');
+  assert.ok(await s.said('SAY.pull'), 'the card notices it has been caught');
+  await s.runUntil(() => window.__sev.list.values().next().value.ai.st === 'gloat', null, { max: 5000 });
+  assert.ok(!(await s.eval(kinds)).card, 'no card left');
+  assert.ok(await s.said('SEV_SAY.crush'));
+  assert.ok((await s.bubbles()).some((b) => b.key.startsWith('SAY.slice') && b.lvl === '2'), 'the card died screaming');
+  await s.runUntil(() => window.__sev.list.values().next().value.ai.st === 'walk', null, { max: 3000 });
+});
+
+scenario(G, 'three-hand cap', async (s) => {
+  const size = await world(s);
+  for (let i = 0; i < 3; i++) await spawn(s, 300 + i * 300, size.H - 300);
+  await s.run(500);
+  const first = await s.eval(() => { window.__first = window.__sev.list.values().next().value; return window.__sev.list.size; });
+  assert.equal(first, 3);
+  await spawn(s, 1100, size.H - 300);
+  const r = await s.eval(() => ({ n: window.__sev.list.size, gone: !window.__sev.list.has(window.__first) && !window.__cards.objs.has(window.__first), svgs: document.querySelectorAll('svg.claw.sev').length }));
+  assert.deepEqual(r, { n: 3, gone: true, svgs: 6 }, 'three is a crowd: the oldest goes');
+  await s.run(2000, 100);
+  // spawned through the hook, they do not bring the reset button out: a card torn loose does
+  await s.scrollTo(0);
+  await s.rip(0);
+  await s.up();
+  await s.press('.reset-cards');
+  assert.deepEqual(await s.eval(() => ({ n: window.__sev.list.size, svgs: document.querySelectorAll('svg.claw.sev').length })), { n: 0, svgs: 0 }, 'reset clears them');
+});

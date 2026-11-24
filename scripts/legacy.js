@@ -1,0 +1,2398 @@
+
+  const root = document.documentElement;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hype = ['🔥 HOT', '✨ NEW', '🚀 VIRAL', '💎 PREMIUM', '🤖 AI'];
+  const blurbs = ['A paradigm-shifting solution that redefines what\'s possible.', 'Seamlessly empowering users across the digital landscape.',
+                  'Unleash the power of next-gen synergy.', 'It\'s not just an app. It\'s a movement.'];
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const host = (u) => u.replace(/^https:\/\//, '').replace(/\/$/, '');
+  const isCrazy = () => root.classList.contains('crazy');
+  let data = null, site = { categories: [], items: [], posts: [] }, failed = false, query = '';
+
+  // ---- toast ----
+  let toastTimer;
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), window.__timing ? __timing.ms(msg, __timing.floor.toast) : 2400);
+  }
+
+  // ---- embroidery band: a symmetric shevitsa-style motif seeded by the project name ----
+  const PALETTES = [['#c8372d', '#22344f'], ['#22344f', '#c8372d'], ['#b5402a', '#3f6b4f'], ['#7a2e46', '#c99a2e'], ['#2f5d7c', '#c8372d'], ['#c8372d', '#c99a2e']];
+  function seeded(str) {
+    let h = 2166136261;
+    for (const ch of str) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+    return () => { h = Math.imul(h ^ (h >>> 15), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); return ((h ^= h >>> 16) >>> 0) / 4294967296; };
+  }
+  function band(name, i) {
+    const rnd = seeded(name), [c1, c2] = PALETTES[Math.floor(rnd() * PALETTES.length)];
+    const n = 9, half = 5, cell = 4, cells = [];
+    for (let y = 0; y < half; y++) for (let x = y; x < half; x++) {
+      const r = rnd(); if (r > 0.55) continue;
+      const col = r < 0.18 ? c2 : c1;
+      for (const [a, b] of [[x, y], [y, x]]) for (const [px, py] of [[a, b], [n - 1 - a, b], [a, n - 1 - b], [n - 1 - a, n - 1 - b]])
+        cells.push(`<rect x="${px * cell}" y="${py * cell}" width="${cell}" height="${cell}" fill="${col}"/>`);
+    }
+    // one motif per tile; CSS repeats it with background-repeat: round, so a whole number of motifs always fills the band
+    const w = (n + 2) * cell;
+    const tile = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="46" viewBox="0 0 ${w} 46"><g transform="translate(${cell} 5)" opacity=".85">${[...new Set(cells)].join('')}</g></svg>`;
+    return { c1, style: `--tile:url(&quot;data:image/svg+xml,${encodeURIComponent(tile)}&quot;)` };
+  }
+
+  // ---- items: auto projects + posts, arranged by site.json (written by the site editor) ----
+  const excerpt = (md) => String(md || '').replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/[#*`>_-]/g, '').replace(/\s+/g, ' ').trim().slice(0, 140);
+  function items() {
+    if (!data) return [];
+    const src = new Map();
+    for (const p of data.projects) src.set('project:' + p.name, { kind: 'project', name: p.name, url: p.url, description: p.description, code: p.code });
+    for (const p of site.posts || []) if (!p.draft && p.id && p.title)
+      src.set('post:' + p.id, { kind: 'post', name: p.title, url: '#post-' + p.id, description: excerpt(p.body), date: p.date || '', id: p.id });
+    const out = [], seen = new Set(), cats = new Set((site.categories || []).map((c) => c.id));
+    for (const it of site.items || []) {
+      const s = src.get(it.key); if (!s || seen.has(it.key)) continue;
+      seen.add(it.key);
+      const page = s.kind === 'project' && it.page && /^[a-z0-9-]+$/.test(it.page.slug || '') ? '/p/' + it.page.slug + '/' : null;
+      out.push({ ...s, key: it.key, category: cats.has(it.category) ? it.category : '', pinned: !!it.pinned, page });
+    }
+    for (const [key, s] of src) if (!seen.has(key)) out.push({ ...s, key, category: '', pinned: false });
+    return out;
+  }
+  function visible() {
+    const all = items();
+    if (isCrazy() || !query) return all;
+    const q = query.toLowerCase();
+    return all.filter((p) => (p.name + ' ' + (p.description || '')).toLowerCase().includes(q));
+  }
+  function sections(list) {
+    if (query) return [{ title: '', list }];
+    const out = [], pinned = list.filter((p) => p.pinned);
+    if (pinned.length) out.push({ title: 'Pinned', list: pinned });
+    for (const c of site.categories || []) {
+      const l = list.filter((p) => !p.pinned && p.category === c.id);
+      if (l.length) out.push({ title: c.name, list: l });
+    }
+    const rest = list.filter((p) => !p.pinned && !p.category);
+    if (rest.length) out.push({ title: out.length ? 'More' : '', list: rest });
+    return out;
+  }
+
+  function calmCard(p, i) {
+    const b = band(p.kind === 'post' ? p.key : p.name, i);
+    const post = p.kind === 'post';
+    const pill = post ? `<span class="pill postpill">post${p.date ? ' · ' + esc(fmtDate(p.date)) : ''}</span>`
+                      : /^https:\/\/github\.com\//.test(p.url) ? '<span class="pill">code only</span>' : '';
+    return `
+      <div class="card${post ? ' post' : ''}" style="--i:${i};--c1:${b.c1}" data-key="${esc(p.key)}">
+        ${p.pinned && query ? '<span class="pin">Pinned</span>' : ''}
+        <span class="band" style="${b.style}"></span>
+        <div class="body">
+          <h3><a href="${esc(p.page || p.url)}">${esc(p.name)}</a>${pill}</h3>
+          <p${p.description ? '' : ' class="none"'}>${esc(p.description || 'No description yet.')}</p>
+          <div class="links">
+            ${post ? `<a href="${esc(p.url)}">Read</a>` : `${p.page ? `<a href="${esc(p.page)}">About</a>` : ''}<a href="${esc(p.url)}">${esc(host(p.url))}</a>`}
+            ${p.code && p.code !== p.url ? `<a href="${esc(p.code)}">Source</a>` : ''}
+          </div>
+        </div>
+      </div>`;
+  }
+  const fmtDate = (d) => { const t = new Date(d); return isNaN(t) ? d : t.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }); };
+
+  function render() {
+    const grid = document.getElementById('grid');
+    const crazy = isCrazy();
+    if (failed) { grid.innerHTML = crazy ? '<p>💥 Oops! Our AI hallucinated. Try again.</p>' : '<p>Could not load the project list. Please refresh.</p>'; return; }
+    if (!data) return;
+    const all = items(), list = visible();
+    if (!all.length) { grid.innerHTML = crazy ? '<p>🤔 No projects yet. The AI is thinking.</p>' : '<p>No projects yet.</p>'; return; }
+    document.getElementById('shown').textContent = query ? `${list.length} of ${all.length}` : all.length;
+    if (!list.length) { grid.innerHTML = `<p class="empty">Nothing here but fog. Try another word.</p>`; return; }
+    if (crazy) {
+      grid.innerHTML = list.map((p, i) => `
+      <div class="card">
+        <h2><a href="${esc(p.page || p.url)}">${p.kind === 'post' ? '📰' : '🚀'} ${esc(p.name)}</a> <span class="badge">${hype[i % hype.length]}</span></h2>
+        <p>${esc(p.description || '')} ${blurbs[i % blurbs.length]}</p>
+        ${p.kind === 'post' ? '' : `<a class="u" href="${esc(p.url)}">${esc(host(p.url))}</a>`}
+        ${p.code && p.code !== p.url ? `<a class="src" href="${esc(p.code)}">📦 source code (open source!!)</a>` : ''}
+      </div>`).join('');
+      return;
+    }
+    let i = 0;
+    grid.innerHTML = sections(list).map((sec) =>
+      (sec.title ? `<h3 class="sec">${esc(sec.title)}</h3>` : '') + sec.list.map((p) => calmCard(p, i++)).join('')).join('');
+    document.dispatchEvent(new Event('cards-rendered'));
+  }
+
+  // ---- blog post reader (#post-<id>) with a tiny, safe markdown renderer ----
+  function inline(t) {
+    return esc(t)
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/!\[([^\]]*)\]\((https:\/\/[^)\s]+)\)/g, '<img alt="$1" src="$2">')
+      .replace(/\[([^\]]+)\]\((https:\/\/[^)\s]+)\)/g, '<a href="$2">$1</a>')
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  }
+  function markdown(md) {
+    const out = []; let para = [], list = null;
+    const flush = () => { if (para.length) out.push('<p>' + inline(para.join(' ')) + '</p>'); para = []; if (list) { out.push('<ul>' + list.map((l) => '<li>' + inline(l) + '</li>').join('') + '</ul>'); list = null; } };
+    for (const line of String(md || '').split(/\r?\n/)) {
+      const h = line.match(/^(#{1,3})\s+(.*)/), li = line.match(/^\s*[-*]\s+(.*)/);
+      if (!line.trim()) flush();
+      else if (h) { flush(); const n = h[1].length + 1; out.push(`<h${n}>${inline(h[2])}</h${n}>`); }
+      else if (li) { if (para.length) { const l = list; list = null; flush(); list = l; } (list = list || []).push(li[1]); }
+      else { if (list) flush(); para.push(line.trim()); }
+    }
+    flush();
+    return out.join('');
+  }
+  const reader = document.getElementById('reader');
+  function route() {
+    const m = location.hash.match(/^#post-([\w-]+)$/);
+    const post = m && (site.posts || []).find((p) => p.id === m[1] && !p.draft);
+    if (!post) { reader.hidden = true; reader.innerHTML = ''; document.body.style.overflow = ''; return; }
+    const b = band('post:' + post.id, 0);
+    reader.innerHTML = `<article><span class="band" style="--c1:${b.c1};${b.style}"></span><div class="body">
+      <a class="btn ghost close" href="#projects">Close</a>
+      <h1>${esc(post.title)}</h1><p class="date">${esc(post.date ? fmtDate(post.date) : '')}</p>
+      <div class="md">${markdown(post.body)}</div></div></article>`;
+    reader.hidden = false; document.body.style.overflow = 'hidden';
+  }
+  reader.addEventListener('click', (e) => { if (e.target === reader) location.hash = 'projects'; });
+  window.addEventListener('hashchange', route);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !reader.hidden) location.hash = 'projects'; });
+
+  fetch('site.json', { cache: 'no-store' }).then((r) => r.ok ? r.json() : null).then((d) => { if (d) { site = d; render(); route(); } }).catch(() => {});
+  fetch('projects.json', { cache: 'no-store' }).then((r) => r.json()).then((d) => {
+    data = d;
+    const when = new Date(d.updated);
+    document.getElementById('count').textContent = d.projects.length;
+    document.getElementById('count-calm').textContent = d.projects.length;
+    document.getElementById('upd').textContent = '(last delve: ' + when.toLocaleString() + ')';
+    document.getElementById('upd-calm').textContent = '(last ' + when.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) + ')';
+    render();
+    setTimeout(welcomeBack, 900);
+  }).catch(() => { failed = true; render(); });
+
+  // ---- search ----
+  const q = document.getElementById('q');
+  q.addEventListener('input', () => { query = q.value.trim(); render(); });
+  q.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { q.value = ''; query = ''; render(); q.blur(); }
+    if (e.key === 'Enter' && !e.isComposing) {
+      // 棚 the shelf secret works from the search box too (Enter / Go on a phone keyboard): clear the box and open it
+      if (/^(tana|рафт|たな|棚)$/i.test(q.value.trim()) && window.__shelf) { e.preventDefault(); q.value = ''; query = ''; render(); q.blur(); window.__shelf(); return; }
+      const first = visible()[0]; if (first) location.href = first.url;
+    }
+  });
+
+  // ---- card tilt + spotlight ----
+  const grid = document.getElementById('grid');
+  if (!reduced && matchMedia('(hover: hover)').matches) {
+    grid.addEventListener('pointermove', (e) => {
+      const card = e.target.closest('.card'); if (!card || isCrazy() || root.classList.contains('throwing')) return;
+      const r = card.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+      card.style.setProperty('--ry', ((x - 0.5) * 7).toFixed(2) + 'deg');
+      card.style.setProperty('--rx', ((0.5 - y) * 7).toFixed(2) + 'deg');
+      card.style.setProperty('--mx', (x * 100).toFixed(1) + '%');
+      card.style.setProperty('--my', (y * 100).toFixed(1) + '%');
+      card.style.setProperty('--bx', ((x - 0.5) * 26).toFixed(1) + 'px'); // embroidery slides toward the tilt
+    });
+    grid.addEventListener('pointerout', (e) => {
+      const card = e.target.closest('.card');
+      if (card && !card.contains(e.relatedTarget)) { card.style.removeProperty('--rx'); card.style.removeProperty('--ry'); card.style.removeProperty('--bx'); }
+    });
+  }
+
+  // ---- embroidery follows the rotation of cards that are pulled, held or falling (reads the transform the physics sets) ----
+  (function bandRoll() {
+    const ROT = /rotate\((-?[\d.e-]+)rad\)/;
+    function tick() {
+      requestAnimationFrame(tick);
+      if (document.hidden || isCrazy()) return;
+      for (const el of document.querySelectorAll('#phys .phys, .grid .card.pulling')) {
+        const m = ROT.exec(el.style.transform);
+        const bx = m ? (parseFloat(m[1]) * 60).toFixed(1) + 'px' : '0px';
+        if (el.style.getPropertyValue('--bx') !== bx) el.style.setProperty('--bx', bx);
+      }
+    }
+    requestAnimationFrame(tick);
+  })();
+
+  // ---- timing: how long every speech bubble stays up, how long anyone waits before speaking again, and how long you get to answer ----
+  // All in ms of real time. Change the numbers here, never at the call sites; the phrasebook (scripts/phrasebook.js) reads the same table from window.__timing.
+  // A bubble stays up long enough to read: read.base + read.perChar for every character, never shorter than read.min or longer than read.max.
+  // Some lines want longer than their length gives (a scream, a request): those have a floor in `floor`
+  const TIMING = {
+    read: { base: 600, perChar: 65, cjk: 220, min: 1300, max: 3500 },
+    floor: { rip: 1900, eat: 1600, help: 2400, hide: 1900, btn: 2600, hand: 1500, toast: 2400,
+             flip: 4000, rematch: 4000, yourpick: 4000, callit: 3500, ask: 4000, waiting: 2600 },   // questions stay up while you think (until the nag)
+    // the shortest time between two lines from the same speaker. A forced line (something important just happened) may cut in sooner
+    gap: { show: 600, after: 500, card: 1400, katana: 2000, scream: 2000, hand: 2000, handIdle: 2400, handLate: 1200, sev: 2200, sevForce: 900, notme: 2600, raid: 1300, raidAsk: 2900 },
+    // the hand's remarks about what it sees come after a random wait: min + up to spread, shortened by up to `calm` when a lot is going on
+    react: { min: 700, spread: 2100, calm: 0.65, flinch: 1500 },
+    // how long you get to answer before it acts, and when it nags you in between
+    wait: {
+      tease: [1400, 2200], teaseAgain: [1200, 2000],   // holding a card in its zone: [at least, plus up to] before it snatches
+      ask: 7000,                     // "go there?" beside the slip: it asks once more if you have done nothing
+      secret: 350,                   // the secret × rose: it protests this long after it arrives
+      hello: 2200, back: 2500,       // Surprise me: greeting, then the smash
+      better: 2100,                  // its own buttons are in: then the toss
+      callNag: 4000, call: 9000,     // heads or tails: it nags, then calls it for you and presses the button itself
+      result: 1800, verdict: 2100,   // the coin shows its side; the verdict before what follows
+      yesNag: 2400, yes: 5000,       // you lost: Yes and No are yours, then it presses Yes
+      escaped: 1700,                 // you pressed No again: it lets you go after this
+      sevRest: 15000,                // a severed hand that sat down gets up at the latest after this, even if nothing moves the page
+      book: 5000, help: 8000,        // phrasebook: the hand comes in after the menu has been open this long; it waits this long for help ripping a card
+    },
+  };
+  // Japanese and Chinese characters carry about a word each, so they take cjk ms instead of perChar
+  TIMING.ms = (text, floor) => { const r = TIMING.read, t = String(text), k = (t.match(/[\u3040-\u9fff]/g) || []).length, n = [...t].length - k; return Math.max(floor || 0, Math.min(r.max, Math.max(r.min, r.base + r.perChar * n + r.cjk * k))); };
+  TIMING.span = ([a, b]) => a + Math.random() * b;
+  // gives a bubble its life: the fade in its CSS runs for the same time (var --say), and the time is returned for whoever removes it
+  TIMING.talk = (el, floor) => { const ms = TIMING.ms(el.textContent, floor); el.style.setProperty('--say', ms + 'ms'); return ms; };
+  window.__timing = TIMING;
+
+  // ---- card physics (planck.js, a Box2D port, in /vendor) ----
+  // Cards are rooted in the grid by a spring. Pull one far enough and the root tears: from then on it is a rigid body
+  // that hangs from the point you hold it by, falls to the bottom of the page, collides and stacks.
+  // Thrown fast enough into a wall or another card it shatters from the point of impact.
+  (function cardPhysics() {
+    if (reduced) return;
+    const gridEl = document.getElementById('grid');
+    const S = 100;              // px per metre. A card is about 3 m wide, the size Box2D is tuned for
+    const DT = 1 / 240;         // fixed physics step, seconds. Steps follow the clock, never the frame rate
+    const GRAVITY = 85;         // m/s² = 8500 px/s². Anything near the usual 1000 to 2600 px/s² looks like the moon at this size
+    const STRAIN = 1.6, RIP = 3.5;   // m the hand has pulled away from where it took hold: past STRAIN the root slowly loses its grip, past RIP it tears at once
+    const ROOT_HZ = 14, PULL_HZ = 7, HAND_HZ = 60;   // spring rates: root, hand while rooted, hand once free
+    const SPIN = 0.5, HELD_SPIN = 3;              // angular damping: free, and while hanging from the hand
+    const FALL = 0.25;          // loose cards feel a quarter of the gravity, so they fall at half the speed. A held card keeps all of it and swings as before
+    const HOT = 9;              // m/s release speed that counts as a throw
+    const SMASH = 13;           // m/s closing speed a throw needs to shatter
+    let pl = null, loading = null, world = null, ground = null, layer = null, wallFx = [], size = { W: 0, H: 0 };
+    const objs = new Set();     // { kind: 'card' | 'shard', body, el, w, h, ex, ey, root?, hot?, die? }
+    const rootOf = new Map();   // grid card element -> its rooted object while it is being pulled or springing back
+    const ripped = new Set();   // keys of cards torn out of the grid
+    let press = null, grab = null, smashed = 0, resetBtn = null, loopOn = false, last = 0, acc = 0, suppress = false;
+    const hits = [], blasts = [];
+    // the cards' own clock: it stops while the tab is in the background, so nothing ages, expires or jumps while nobody is looking
+    let away = 0, hiddenAt = document.hidden ? performance.now() : 0;
+    const now = () => (hiddenAt || performance.now()) - away, DBG = location.search === '?dbg';
+    // where the hand reacts, in viewport x (any scroll, full height): a held card teases it from `tease` rightwards (the last card column of the content),
+    // a thrown card is caught from `grab` rightwards (the gutter right of the content; never narrower than a card can get into). ?debug=zones draws both
+    const zones = (vw) => {
+      const W = Math.min(1080, vw), cr = (vw + W) / 2 - 16, cw = W - 32, cols = Math.max(1, Math.floor((cw + 16) / 306));
+      return { tease: cols > 1 ? cr - (cw - 16 * (cols - 1)) / cols - 16 : cr - cw * 0.4, edge: cr, grab: Math.min(cr, vw - Math.min(220, vw * 0.4)) };
+    };
+    if (/[?&]debug=zones\b/.test(location.search)) {
+      const mk = (col, name) => { const d = document.createElement('div'); d.textContent = name; d.style.cssText = 'position:fixed;top:0;bottom:0;z-index:9999;pointer-events:none;box-sizing:border-box;border:3px solid ' + col + ';color:' + col + ';font:700 12px/1.6 monospace;padding:2px 6px'; document.body.appendChild(d); return d; };
+      const r = mk('#e11', 'tease'), b = mk('#000', 'catch'), lay = () => { const vw = document.documentElement.clientWidth, z = zones(vw); r.style.left = z.tease + 'px'; r.style.width = z.edge - z.tease + 'px'; b.style.left = z.grab + 'px'; b.style.width = vw - z.grab + 'px'; };
+      lay(); addEventListener('resize', lay);
+    }
+    const html = document.documentElement;
+
+    function load() {
+      if (window.planck) return Promise.resolve(pl = window.planck);
+      return loading || (loading = new Promise((res, rej) => {
+        const s = document.createElement('script'); s.src = '/vendor/planck-1.4.2.min.js';
+        s.onload = () => res(pl = window.planck); s.onerror = rej; document.head.appendChild(s);
+      }));
+    }
+    gridEl.addEventListener('pointerover', () => load().catch(() => {}), { once: true });
+
+    function init() {
+      if (world) return;
+      world = new pl.World({ gravity: { x: 0, y: GRAVITY } });
+      ground = world.createBody();
+      layer = document.createElement('div'); layer.id = 'phys'; document.body.appendChild(layer);
+      buildWalls();
+      world.on('begin-contact', onContact);
+      addEventListener('resize', buildWalls);
+      new ResizeObserver(buildWalls).observe(document.body);
+    }
+    // the world is the whole page: floor at the bottom of the page, walls at its sides, a lid at the very top
+    function buildWalls() {
+      const foot = document.querySelector('footer.bottom').getBoundingClientRect();
+      const W = html.clientWidth, H = Math.max(innerHeight, Math.round(foot.bottom + scrollY));
+      if (W === size.W && H === size.H) return;
+      size = { W, H }; layer.style.width = W + 'px'; layer.style.height = H + 'px';
+      for (const f of wallFx) ground.destroyFixture(f);
+      const w = W / S, h = H / S, T = 5;
+      const box = (cx, cy, hw, hh) => ground.createFixture({ shape: new pl.Box(hw, hh, { x: cx, y: cy }, 0), friction: 0.8, filterCategoryBits: 3 });
+      wallFx = [box(w / 2, h + T, w / 2 + 2 * T, T), box(w / 2, -T, w / 2 + 2 * T, T), box(-T, h / 2, T, h / 2 + 2 * T), box(w + T, h / 2, T, h / 2 + 2 * T)];
+      for (const o of objs) {
+        if (o.root) continue;
+        const p = o.body.getPosition();
+        if (p.y > h || p.x < 0 || p.x > w) o.body.setTransform({ x: Math.max(0.5, Math.min(w - 0.5, p.x)), y: Math.min(p.y, h - 1) }, o.body.getAngle());
+        o.body.setAwake(true);
+      }
+      if (shelf) { const y = shelf.y; shelfOff(); shelfOn(y); }
+      run();
+    }
+
+    function cloneCard(card) {
+      const el = card.cloneNode(true);
+      const uid = 'p' + Math.random().toString(36).slice(2, 8);
+      el.querySelectorAll('pattern[id]').forEach((pt) => { const old = pt.id; pt.id = old + uid; el.querySelectorAll('rect[fill]').forEach((x) => { if (x.getAttribute('fill') === `url(#${old})`) x.setAttribute('fill', `url(#${old + uid})`); }); });
+      const c1 = card.style.getPropertyValue('--c1');
+      el.removeAttribute('style'); el.style.setProperty('--c1', c1);
+      el.classList.remove('held', 'pulling', 'regrow', 'settled', 'grab-ready', 'grabbed'); el.classList.add('phys');
+      return el;
+    }
+    function addBody(o, x, y, angle, shape, opt) {
+      o.body = world.createBody({ type: 'dynamic', position: { x, y }, angle, linearDamping: 0.05, angularDamping: SPIN });
+      o.body.createFixture({ shape, density: 1, friction: 0.7, restitution: 0.06, ...opt });
+      o.body.setGravityScale(o.root ? 0 : FALL);
+      o.body.setUserData(o); o.px = x; o.py = y; o.pa = angle;
+      objs.add(o); return o;
+    }
+    function remove(o) {
+      if (grab && grab.o === o) drop();
+      if (o.say) { o.say.el.remove(); o.say = null; }
+      if (o === katObj) katObj = null;
+      if (o.kind === 'hand') sevGone(o);
+      world.destroyBody(o.body); objs.delete(o);
+      if (o.root) { rootOf.delete(o.el); o.el.classList.remove('pulling'); o.el.style.transform = ''; }
+      else o.el.remove();
+    }
+
+    // ---- cards talk back ----
+    const SAY = {
+      pull: ['hey!', 'nope.', 'let go!', 'I live here', 'hands off', 'не!', 'やめて!', 'excuse me?'],
+      strain: ['nnngh!', 'holding… on…', 'not… today', 'stop iiit', 'my roots!!', 'ъъъгх'],
+      back: ['ha!', 'told you', 'too weak', 'nice try', 'stubborn > you'],
+      rip: ['AAAH!', 'nooo!', 'rude.', 'ау!', 'I was comfy!', 'put me back!'],
+      throw: ['wheee', 'NOOO', 'not the wall!', 'I can fly?!', 'aaaaaa'],
+      land: ['oof', 'ow', 'ugh', "I'm fine", 'ох…', 'my corner!'],
+      kdrop: ['oops.', 'I meant to do that', 'gravity wins again', 'catch me?!', 'timber!', 'butterfingers', 'おっと', 'опа!'],
+      btnhi: ['hi!', 'hello again', 'we are back', 'miss us?', 'pick me!', 'no, me!', 'hey there', 'ta-da', 'здрасти!', 'ей!', 'ето ни пак', 'やあ!', 'こんにちは', 'ただいま', 'おっす'],   // the new Heads/Tails buttons, as they poof in
+      khello: ["hello! I'm the sharpest katana ever!", 'careful: I cut things just by touching them', 'sharpest blade in the world, hi!', "don't touch anything you like with me", '世界一切れる刀です', 'най-острата катана на света, здрасти!'],
+      kbrag: ['told you. sharpest ever.', "I didn't even try", 'one touch is all it takes', 'I barely touched it!', 'too sharp, sorry', 'スパッ', 'като масло'],
+      cutting: ['AAAAAAAAA', 'IT IS IN ME', 'STOP STOP STOP', 'NOT THE MIDDLE', 'I CAN FEEL IT', '痛い痛い痛い!!', 'ААААААА!', 'боли боли боли'],
+      stab: ['was I spared???', 'just a flesh wound', "I'm leaking", "that's going to scar", 'it only went in a little', 'you missed. mostly.', 'am I… alive?', 'まだ生きてる…?', 'жив съм?!'],
+      kcut: ['whoops, sorry', 'slicing on my way down', 'not my fault', "don't mind me", 'it was in the way'],
+      slice: ['AAAAAAARGH!!', 'NOOOOOOOO—', 'EEEEEEEEK!!', 'GYAAAAAAH!', 'AAAAAAAAAAA!!!', 'ААААААААА!!!', 'НЕЕЕЕЕЕЕ!', 'ぎゃああああ!!', 'うわあああ!!', 'HHHHRRRKK—'],
+      smash: ['AAAAAAAAAA—', 'NOOOOO!!', 'ААААА!!', 'ぐはっ!!', 'KRRRK—'],
+    };
+    let cutSaid = -1e9;
+    // Lines are not drawn blindly: the line said last (from this list, or by anyone) never comes straight back, and one said a few lines ago
+    // only has a tenth of a fresh line's chance. Each list remembers what it gave out lately, and the last line said anywhere is kept too
+    const pickMem = new WeakMap(); let pickSaid = null;
+    function pick(a) {
+      if (a.length < 2) return a[0];
+      let m = pickMem.get(a); if (!m) pickMem.set(a, m = []);
+      const keep = Math.min(3, a.length - 2), w = a.map((s, i) => i === m[0] || s === pickSaid ? 0 : m.indexOf(i) > 0 ? 0.1 : 1);
+      let sum = 0; for (const v of w) sum += v;
+      let i = 0; if (sum > 0) { let r = Math.random() * sum; while (i < a.length - 1 && (r -= w[i]) >= 0) i++; } else i = (m[0] + 1) % a.length;
+      m.unshift(i); m.length = Math.min(m.length, keep + 1); if (typeof a[i] === 'string') pickSaid = a[i];
+      return a[i];
+    }
+    window.__pick = pick;   // the phrasebook's hand draws its lines through the same memory
+    // who is talking shows in the lean: every bubble leans to the right by a few degrees of its own, and the hand's (.claw-say) leans the same amount to the left
+    function bubble(text) { const el = document.createElement('div'); el.className = 'say'; el.textContent = text; el.style.setProperty('--tilt', (4 + Math.random() * 4).toFixed(1)); layer.appendChild(el); return el; }
+    // The bubbles that follow something are all put on the page here, once a frame. Each has its spot (x, y: top centre) and the x of its speaker (ax).
+    // When the hand's bubble would cover a card's they slide apart, each to its speaker's side, and the tails lean back to the speakers
+    function sayLayout() {
+      const h = claw && claw.say && claw.say.x != null ? claw.say : null, all = h ? [h] : [], x0 = scrollX + 6, x1 = scrollX + html.clientWidth - 6;
+      for (const o of objs) if (o.say && o.say.x != null) all.push(o.say);
+      for (const s of all) { if (!s.w) { s.w = s.el.offsetWidth; s.h = s.el.offsetHeight; } s.x = Math.max(x0 + s.w / 2, Math.min(x1 - s.w / 2, s.x)); }
+      // something it holds up (the coin) is never covered by what it says: the bubble moves to the left of it
+      const dodge = h && claw.dodge && claw.dodge.isConnected && claw.dodge.getBoundingClientRect();
+      if (dodge && dodge.width && Math.abs(h.x - scrollX - (dodge.left + dodge.right) / 2) < (h.w + dodge.width) / 2 + 10 && h.y - scrollY < dodge.bottom + 10 && h.y - scrollY + h.h > dodge.top - 10)
+        h.x = Math.max(x0 + h.w / 2, dodge.left + scrollX - 14 - h.w / 2);
+      // leaning makes a bubble taller by about 7% of its width at each end. A pair that was slid apart stays apart until it is well clear, so it does not flicker
+      const hit = (a, b, pad) => Math.abs(a.x - b.x) < (a.w + b.w) / 2 + pad && Math.abs(a.y + a.h / 2 - b.y - b.h / 2) < (a.h + b.h) / 2 + 0.07 * (a.w + b.w) + pad - 4;
+      if (h) for (const s of all) {
+        if (s === h) continue;
+        if (!hit(h, s, h.apart === s ? 34 : 10)) { if (h.apart === s) h.apart = null; continue; }
+        h.apart = s;
+        const dir = h.ax >= s.ax ? 1 : -1, need = (h.w + s.w) / 2 + 10 - (h.x - s.x) * dir;
+        h.x = Math.max(x0 + h.w / 2, Math.min(x1 - h.w / 2, h.x + dir * need / 2));
+        s.x = Math.max(x0 + s.w / 2, Math.min(x1 - s.w / 2, h.x - dir * ((h.w + s.w) / 2 + 10)));
+        if (hit(h, s, 4)) h.y = s.y - h.h - 16;   // no room side by side (the screen's edge): the hand's goes on top
+      }
+      for (const s of all) {
+        s.el.style.translate = `calc(${s.x.toFixed(1)}px - 50%) ${s.y.toFixed(1)}px`;
+        const lean = Math.max(14 - s.w / 2, Math.min(s.w / 2 - 14, s.ax - s.x)).toFixed(0);
+        if (lean !== s.lean) { s.lean = lean; s.el.style.setProperty('--tail', lean + 'px'); }
+      }
+    }
+    function say(o, kind, force) {
+      const t = now(); if ((o.kind === 'katana') !== (kind[0] === 'k') || (!force && o.said && t - o.said < TIMING.gap.card)) return;
+      // one line per burst: the katana speaks once and is then quiet for 2 s of real time, and a pass that cuts ten cards gets one "ow", not ten
+      if (force && kind !== 'slice' && o.say && t - o.said < TIMING.gap.show) return;   // a bubble is up long enough to be seen before another replaces it
+      if (o.kind === 'katana') { if (o.said && t - o.said < TIMING.gap.katana) return; }
+      else if (kind === 'slice') { if (t - cutSaid < TIMING.gap.scream) return; cutSaid = t; }
+      talkOn(o, pick(SAY[kind]));
+      if (kind === 'slice') scream(o.say.el);   // a death scream looks like one
+    }
+    // a bubble that rides above a body (o.say), and one left standing at a page point. Both last as long as their text takes to read
+    function talkOn(o, text, floor) {
+      const t = now(); if (o.say) o.say.el.remove();
+      const el = bubble(text); o.said = t; o.say = { el, until: t + TIMING.talk(el, floor) }; run(); return el;
+    }
+    function scream(el) { el.classList.add('agony'); el.style.setProperty('--pain', '1'); el.dataset.lvl = 2; return el; }
+    function sayAt(x, y, text, cls) { const el = bubble(text); if (cls === 'scream') scream(el); el.style.translate = `calc(${x.toFixed(0)}px - 50%) ${y.toFixed(0)}px`; setTimeout(() => el.remove(), TIMING.talk(el)); }
+
+    // ---- loop: fixed 240 Hz steps on the real clock, drawn with interpolation ----
+    function step() {
+      for (const o of objs) {
+        const b = o.body, p = b.getPosition();
+        o.px = p.x; o.py = p.y; o.pa = b.getAngle();
+        if (o.kind === 'hand') sevStep(o);
+        if (o.root) {           // the root: a damped spring back to the slot, and one that keeps the card level
+          const v = b.getLinearVelocity(), m = b.getMass(), wn = 2 * Math.PI * ROOT_HZ, wa = 2 * Math.PI * 9, k = 0.45 + 0.55 * o.grip;   // a root that is losing its grip gives way
+          b.applyForceToCenter({ x: -m * (k * wn * wn * (p.x - o.root.x) + 0.6 * wn * v.x), y: -m * (k * wn * wn * (p.y - o.root.y) + 0.6 * wn * v.y) }, true);
+          b.applyTorque(-b.getInertia() * (k * wa * wa * o.pa + 0.7 * wa * b.getAngularVelocity() + (o.grip < 1 ? (Math.random() - 0.5) * 900 * (1 - o.grip) : 0)), true);
+        }
+      }
+      if (grab) grab.joint.setTarget({ x: (grab.cx + scrollX) / S, y: (grab.cy + scrollY) / S });
+      world.step(DT, 10, 6);
+      const t = now();
+      while (hits.length) shatter(hits.shift());
+      for (const q of blasts.splice(0)) for (const o of objs) {   // the shock shoves whatever stands next to the impact, mostly the way the throw was going
+        if (o.kind !== 'card' || o.root) continue;
+        const c = o.body.getWorldCenter(), ax = c.x - q.pt.x, ay = c.y - q.pt.y, dist = Math.hypot(ax, ay) || 1;
+        if (dist > 8) continue;
+        const j = o.body.getMass() * q.closing * 0.35 * (1 - dist / 8);
+        o.body.applyLinearImpulse({ x: (0.5 * ax / dist + 0.8 * q.dir.x) * j, y: (0.5 * ay / dist + 0.8 * q.dir.y) * j }, { x: c.x, y: c.y - 0.4 }, true);
+      }
+      for (const o of [...objs]) {
+        if (o.die && t > o.die) { remove(o); continue; }
+        if (o.hot && t > o.hot) { o.hot = 0; if (!grab || grab.o !== o) o.body.setBullet(false); }
+        if (!o.root) continue;
+        const b = o.body, p = b.getPosition(), d = Math.hypot(p.x - o.root.x, p.y - o.root.y);
+        if (grab && grab.o === o) {   // the pull is the stretch of the hand spring: how far the pointer is from the spot it holds
+          const g = grab.joint.getTarget(), pull = Math.hypot(g.x - grab.hx, g.y - grab.hy);   // how far the hand is from where it took hold
+          if (pull > STRAIN) { o.grip -= DT * (0.4 + 2 * (pull - STRAIN) / (RIP - STRAIN)); if (!o.strained) { o.strained = true; say(o, 'strain', true); } else say(o, 'strain'); }
+          else o.grip = Math.min(1, o.grip + DT * 0.7);
+          if (pull > RIP || o.grip <= 0 || Math.abs(b.getAngle()) > 1.1) tear(o);
+        }
+        else if ((o.grip = Math.min(1, o.grip + DT)) && d < 0.004 && Math.abs(b.getAngle()) < 0.004 && b.getLinearVelocity().length() < 0.05 && Math.abs(b.getAngularVelocity()) < 0.05) remove(o);
+      }
+    }
+    function draw(k) {
+      const t = now();
+      // the held card is drawn with the grabbed spot exactly on the pointer: the joint's last few px of give never show.
+      // The correction fades out when the card is far behind, which only happens when something blocks it
+      let hx = 0, hy = 0;
+      if (grab && !grab.o.root) {
+        const a = grab.joint.getAnchorB(), dx = grab.cx + scrollX - a.x * S, dy = grab.cy + scrollY - a.y * S, d = Math.hypot(dx, dy);
+        const f = d < 24 ? 1 : Math.max(0, 1 - (d - 24) / 40); hx = dx * f; hy = dy * f;
+      }
+      for (const o of objs) {
+        const p = o.body.getPosition(), a = o.body.getAngle(), held = grab && grab.o === o && !o.root;
+        const x = held ? p.x * S + hx - o.ex : (o.px + (p.x - o.px) * k) * S - o.ex, y = held ? p.y * S + hy - o.ey : (o.py + (p.y - o.py) * k) * S - o.ey;
+        if (!o.tug) o.el.style.transform = `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px) rotate(${(held ? a : o.pa + (a - o.pa) * k).toFixed(4)}rad)`;
+        if (o.die && o.die - t < 900) o.el.style.opacity = Math.max(0, (o.die - t) / 900);
+        if (o.say) {   // the bubble rides above the card and stays upright
+          if (t > o.say.until) { o.say.el.remove(); o.say = null; continue; }
+          const top = Math.abs(Math.sin(a)) * o.w / 2 + Math.abs(Math.cos(a)) * o.h / 2;
+          o.say.x = o.say.ax = p.x * S + (held ? hx : 0); o.say.y = p.y * S + (held ? hy : 0) - top - 40;
+        }
+      }
+      sayLayout();
+    }
+    function frame(t) {
+      if (hiddenAt) return;   // tab in the background: no stepping, no drawing. The loop is picked up again on return
+      if (!objs.size && !bits.length && !clawBusy()) { loopOn = false; return; }
+      const ms = Math.min(250, t - (last || t)); last = t; acc += ms / 1000;   // real elapsed time: a slow or a fast screen gets the same motion
+      if (grab && !grab.o.root) {   // resting a carried card at the top or bottom edge of the screen scrolls the page
+        const edge = 44, y = grab.cy, d = y < edge ? y - edge : y > innerHeight - edge ? y - (innerHeight - edge) : 0;
+        grab.edge = d ? (grab.edge || 0) + ms : 0;
+        if (grab.edge > 350) scrollBy({ top: d * 0.35 * ms / 16, behavior: 'instant' });
+      }
+      while (acc >= DT) { step(); acc -= DT; }
+      moveBits(ms / 1000); bladeCuts(ms / 1000); clawTick(ms / 1000); sevTick(ms / 1000);
+      let busy = !!grab || bits.length > 0 || clawBusy(); if (!busy) for (const o of objs) if (o.root || o.die || o.say || o.body.isAwake()) { busy = true; break; }
+      draw(busy ? acc / DT : 1);
+      if (busy) requestAnimationFrame(frame); else loopOn = false;
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) { if (!hiddenAt) hiddenAt = performance.now(); return; }
+      if (!hiddenAt) return;
+      away += performance.now() - hiddenAt; hiddenAt = 0;
+      if (loopOn) { last = 0; acc = 0; requestAnimationFrame(frame); }   // start from this frame: the time away is not simulated
+    });
+    function run() { if (!loopOn && (objs.size || bits.length || clawBusy())) { loopOn = true; last = 0; acc = 0; requestAnimationFrame(frame); } }
+
+    // ---- the hand: a soft joint at the exact point that was grabbed, so the card swings around it ----
+    function hold(o, px, py, e) {
+      const joint = world.createJoint(new pl.MouseJoint({ maxForce: 4000 * o.body.getMass(), frequencyHz: o.root ? PULL_HZ : HAND_HZ, dampingRatio: o.root ? 0.8 : 1 }, ground, o.body, { x: px / S, y: py / S }));
+      grab = { o, joint, id: e.pointerId, cx: e.clientX, cy: e.clientY, sx: e.clientX, sy: e.clientY, hx: px / S, hy: py / S, moved: !!o.root, h: [] };
+      o.body.setAwake(true); o.hot = 0;
+      if (!o.root) carry(o);
+      html.classList.add('throwing'); run();
+    }
+    function carry(o) { o.body.setGravityScale(1); o.body.setBullet(true); o.body.setAngularDamping(HELD_SPIN); o.el.classList.add('grabbed'); }
+    function drop(e) {
+      if (grab && grab.sticky && e) return;   // an equipped katana stays in the hand when the button comes up
+      if (grab && (!e || e.pointerId === grab.id)) {
+        const g = grab, o = g.o, b = o.body; grab = null;
+        world.destroyJoint(g.joint); html.classList.remove('throwing');
+        if (!o.root) {
+          o.el.classList.remove('grabbed', 'equipped'); b.setAngularDamping(SPIN); b.setGravityScale(FALL); if (b.isFixedRotation()) b.setFixedRotation(false);
+          if (o.kind === 'katana') { say(o, 'kdrop', true); notice('kdrop'); }
+          // a hand slows down in the last few ms before it lets go: throw with the speed it had over the last 80 ms if that was faster
+          const t = now(), h = g.h.filter((q) => t - q[2] < 80), a = h[0], z = h[h.length - 1];
+          let v = b.getLinearVelocity(), sp = v.length();
+          if (h.length > 1 && z[2] - a[2] > 8 && t - z[2] < 40) {
+            const hx = (z[0] - a[0]) / (z[2] - a[2]) * 1000 / S, hy = (z[1] - a[1]) / (z[2] - a[2]) * 1000 / S, hs = Math.hypot(hx, hy);
+            if (hs > sp) { v = { x: hx, y: hy }; sp = hs; }
+          }
+          if (sp > 60) { v = { x: v.x * 60 / sp, y: v.y * 60 / sp }; sp = 60; }
+          b.setLinearVelocity(v);
+          if (DBG) console.log('release speed', sp.toFixed(1));
+          if (o.kind === 'hand') { b.setBullet(false); if (sp > HOT) sevSay(o, 'thrown', true); }
+          else if (sp > HOT) { o.hot = now() + 1500; say(o, 'throw', true); if (o.kind !== 'katana') notice('throw'); } else b.setBullet(false);
+        } else if (g.moved) say(o, 'back', true);
+        if (g.moved) { suppress = true; setTimeout(() => { suppress = false; }, 0); }
+        return;
+      }
+      if (!press || (e && e.pointerId !== press.id)) return;
+      clearTimeout(press.timer); press.card.classList.remove('grab-ready'); press = null;
+    }
+
+    // ---- rooted cards ----
+    gridEl.addEventListener('pointerdown', (e) => {
+      const card = e.target.closest('.card');
+      if (!card || isCrazy() || e.button > 0 || press || grab || card.classList.contains('held')) return;
+      press = { card, x: e.clientX, y: e.clientY, px: e.clientX + scrollX, py: e.clientY + scrollY, id: e.pointerId, armed: e.pointerType === 'mouse' };
+      load().catch(() => {});
+      if (e.pointerType === 'mouse') e.preventDefault();   // no text selection or link drag; the click still fires
+      else press.timer = setTimeout(() => { if (press) { press.armed = true; card.classList.add('grab-ready'); navigator.vibrate?.(12); } }, 200);
+    });
+    function startPull(p, e) {
+      init();
+      const card = p.card; card.classList.remove('grab-ready');
+      let o = rootOf.get(card);
+      if (o) return hold(o, e.clientX + scrollX, e.clientY + scrollY, e);   // caught again while springing back
+      card.classList.add('pulling', 'settled'); card.style.transform = 'none';
+      const r = card.getBoundingClientRect(), hx = r.left + r.width / 2 + scrollX, hy = r.top + r.height / 2 + scrollY;
+      o = addBody({ kind: 'card', el: card, w: r.width, h: r.height, ex: hx, ey: hy, key: card.dataset.key, grip: 1, root: { x: hx / S, y: hy / S } },
+        hx / S, hy / S, 0, new pl.Box(r.width / 2 / S, r.height / 2 / S), { filterMaskBits: 0 });
+      rootOf.set(card, o);
+      hold(o, p.px, p.py, e); say(o, 'pull', true);
+    }
+    function tear(o) {
+      if (o.kind === 'katana') return freeKatana(o);
+      const card = o.el, el = cloneCard(card);
+      el.style.width = o.w + 'px'; el.style.height = o.h + 'px'; el._o = o; layer.appendChild(el);
+      rootOf.delete(card); card.classList.remove('pulling'); card.style.transform = ''; card.classList.add('held');
+      o.el = el; o.ex = o.w / 2; o.ey = o.h / 2; o.root = null; ripped.add(o.key);
+      o.body.setGravityScale(FALL);
+      o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF });
+      if (grab && grab.o === o) { grab.joint.setFrequency(HAND_HZ); grab.joint.setDampingRatio(1); carry(o); }
+      showReset(); say(o, 'rip', true); notice('loose');
+      if (ripped.size === 1) toast('Ripped it out! Stack them, or throw one hard to smash it.');
+    }
+    function onMove(e) {
+      if (grab && (e.pointerId === grab.id || grab.sticky)) {
+        grab.h.push([e.clientX + scrollX, e.clientY + scrollY, now()]); if (grab.h.length > 12) grab.h.shift();
+        grab.cx = e.clientX; grab.cy = e.clientY;
+        if (Math.hypot(e.clientX - grab.sx, e.clientY - grab.sy) > 4) grab.moved = true;
+        return;
+      }
+      if (!press || e.pointerId !== press.id) return;
+      const d = Math.hypot(e.clientX - press.x, e.clientY - press.y);
+      if (!press.armed) { if (d > 10) { clearTimeout(press.timer); press = null; } return; }
+      if (d > 4 && pl) { const p = press; press = null; startPull(p, e); }
+    }
+    addEventListener('pointermove', onMove);
+    addEventListener('pointerup', drop); addEventListener('pointercancel', drop);
+    addEventListener('touchmove', (e) => { if (grab || press?.armed) e.preventDefault(); }, { passive: false });
+    document.addEventListener('click', (e) => { if (suppress || e.target.closest?.('.shard, .piece')) { e.preventDefault(); e.stopPropagation(); } }, true);
+    document.addEventListener('dragstart', (e) => { if (e.target.closest?.('.card')) e.preventDefault(); });
+
+    // loose cards can be picked up again anywhere on them
+    document.addEventListener('pointerdown', (e) => {
+      const el = e.target.closest?.('#phys .phys'), o = el && el._o;
+      if (!o || (o.kind !== 'card' && o.kind !== 'piece' && o.kind !== 'katana' && o.kind !== 'hand') || grab || e.button > 0) return;
+      e.preventDefault(); hold(o, e.clientX + scrollX, e.clientY + scrollY, e);
+    });
+
+    // ---- impacts ----
+    // begin-contact fires before the solver, so the velocities read here are still the ones the bodies came in with
+    function onContact(c) {
+      const A = c.getFixtureA().getBody(), B = c.getFixtureB().getBody(), oa = A.getUserData(), ob = B.getUserData();
+      const card = (o) => o && (o.kind === 'card' || (o.kind === 'piece' && !o.die)) && !o.root, hot = (o) => card(o) && !!o.hot && !(grab && grab.o === o);   // only a card that was thrown breaks things. One in the hand never does: dragging it out of a pile shoves the others hard, and that is not an impact
+      const solid = (o) => !o || card(o) || o.kind === 'piece';
+      if (!solid(oa) || !solid(ob) || (!card(oa) && !card(ob))) return;   // shards and rooted cards never break anything
+      const wm = c.getWorldManifold(null); if (!wm || !wm.points.length) return;
+      const pt = { x: 0, y: 0 }; for (const p of wm.points) { pt.x += p.x / wm.points.length; pt.y += p.y / wm.points.length; }
+      const n = wm.normal, va = A.getLinearVelocityFromWorldPoint(pt), vb = B.getLinearVelocityFromWorldPoint(pt);
+      const closing = (va.x - vb.x) * n.x + (va.y - vb.y) * n.y;   // normal points from A to B
+      if (DBG) console.log('contact closing', closing.toFixed(1), 'hot', !!hot(oa), !!hot(ob));
+      if (closing < SMASH || (!hot(oa) && !hot(ob))) { if (closing > 5) { if (card(oa) && oa.kind === 'card') say(oa, 'land'); if (card(ob) && ob.kind === 'card') say(ob, 'land'); } return; }
+      const ia = A.getMass() ? 1 / A.getMass() : 0, ib = B.getMass() ? 1 / B.getMass() : 0;
+      const snap = (b) => ({ v: { x: b.getLinearVelocity().x, y: b.getLinearVelocity().y }, w: b.getAngularVelocity() });
+      const fast = va.x * va.x + va.y * va.y > vb.x * vb.x + vb.y * vb.y ? va : vb, fs = Math.hypot(fast.x, fast.y) || 1;
+      blasts.push({ pt, closing, dir: { x: fast.x / fs, y: fast.y / fs } });
+      if (card(oa)) hits.push({ o: oa, pt, n: { x: -n.x, y: -n.y }, closing, share: ia / (ia + ib), ...snap(A), vo: { x: vb.x, y: vb.y } });
+      if (card(ob)) hits.push({ o: ob, pt, n: { x: n.x, y: n.y }, closing, share: ib / (ia + ib), ...snap(B), vo: { x: va.x, y: va.y } });
+    }
+    // break the card into a web of pieces around the impact point; each piece keeps the card's motion,
+    // bounces off the surface that was hit and is pushed away from the impact
+    function shatter(h) {
+      const o = h.o; if (!objs.has(o)) return;
+      const b = o.body, pos = b.getPosition(), ang = b.getAngle(), W = o.w, H = o.h, ca = Math.cos(ang), sa = Math.sin(ang);
+      const bx = pos.x, by = pos.y, rx = (h.pt.x - bx) * S, ry = (h.pt.y - by) * S;
+      // the crack web is drawn on the body's own outline, so a chunk of a card breaks the same way a whole card does
+      const out = o.poly || rectPoly(o), cen = out.reduce((m, q) => [m[0] + q[0] / out.length, m[1] + q[1] / out.length], [0, 0]);
+      let ix = rx * ca + ry * sa + W / 2, iy = -rx * sa + ry * ca + H / 2;   // impact in card space
+      for (let k = 0; k < 14 && !inside(out, ix, iy); k++) { ix = cen[0] + (ix - cen[0]) * 0.8; iy = cen[1] + (iy - cen[1]) * 0.8; }
+      const lens = out.map((q, i) => { const r = out[(i + 1) % out.length]; return Math.hypot(r[0] - q[0], r[1] - q[1]); }), per = lens.reduce((m, l) => m + l, 0);
+      const N = Math.max(3, Math.min(9, Math.round(per / 130))), ring = [];
+      let gone = 0, k = 0;
+      out.forEach((q, i) => {   // the corners, plus N random points along the outline, in order
+        const r = out[(i + 1) % out.length]; ring.push(q);
+        for (; k < N; k++) { const d = (k + 0.2 + Math.random() * 0.6) / N * per - gone; if (d >= lens[i]) break; if (d > 0) ring.push([q[0] + (r[0] - q[0]) * d / lens[i], q[1] + (r[1] - q[1]) * d / lens[i]]); }
+        gone += lens[i];
+      });
+      const rings = [0, 0.3, 0.62, 1], polys = [], at = (p, f) => [ix + (p[0] - ix) * f, iy + (p[1] - iy) * f];
+      for (let k = 0; k < ring.length; k++) {
+        const p = ring[k], q = ring[(k + 1) % ring.length];
+        for (let r = 0; r < 3; r++) polys.push(r === 0 ? [[ix, iy], at(p, rings[1]), at(q, rings[1])] : [at(p, rings[r]), at(p, rings[r + 1]), at(q, rings[r + 1]), at(q, rings[r])]);
+      }
+      o.el.classList.remove('grabbed');
+      for (const poly of polys) {
+        if (polyArea(poly) < 90 || poly.some((p, i) => { const q = poly[(i + 1) % poly.length]; return Math.hypot(p[0] - q[0], p[1] - q[1]) < 3; })) continue;
+        if (new pl.Polygon(poly.map(([x, y]) => ({ x: (x - W / 2) / S, y: (y - H / 2) / S }))).m_count !== poly.length) continue;
+        // same rule as a cut: a big chunk stays and is a body like any other (grab it, stack it, cut it, smash it again), crumbs fade away
+        const s = polyArea(poly) >= 3000 ? fragment(o, poly, 'piece', { friction: 0.6, restitution: 0.12 }, {})
+          : fragment(o, poly, 'shard', { friction: 0.5, restitution: 0.2, filterGroupIndex: -1 }, { die: now() + 4200 + Math.random() * 1800 });
+        const c = s.body.getWorldCenter(), dx = c.x - bx, dy = c.y - by;
+        let vx = h.v.x - h.w * dy, vy = h.v.y + h.w * dx;                       // the card's own motion at this piece
+        const cn = (vx - h.vo.x) * h.n.x + (vy - h.vo.y) * h.n.y;               // speed into the surface (negative)
+        if (cn < 0) { const j = -(1.1 + Math.random() * 0.35) * cn * h.share; vx += j * h.n.x; vy += j * h.n.y; }
+        const ax = c.x - h.pt.x, ay = c.y - h.pt.y, dist = Math.max(0.15, Math.hypot(ax, ay));
+        const burst = h.closing * (0.06 + Math.random() * 0.26) * Math.min(1, 0.9 / dist);
+        s.body.setLinearVelocity({ x: vx + ax / dist * burst, y: vy + ay / dist * burst });
+        s.body.setAngularVelocity(h.w + (Math.random() - 0.5) * h.closing * 0.5);
+      }
+      // a really hard hit carries on into the cards this one was touching, losing 40% of its speed per card
+      const pass = h.closing * 0.6, inc = Math.hypot(h.v.x, h.v.y) > Math.hypot(h.vo.x, h.vo.y) ? h.v : h.vo;
+      if (pass >= SMASH) for (let ce = b.getContactList(); ce; ce = ce.next) {
+        const c = ce.other.getUserData(); if (!c || (c.kind !== 'card' && (c.kind !== 'piece' || c.die)) || c.root || !ce.contact.isTouching()) continue;
+        const wm = ce.contact.getWorldManifold(null); if (!wm || !wm.points.length) continue;
+        const q = wm.points[0], d = ce.other.getWorldCenter(), nx = d.x - q.x, ny = d.y - q.y, nl = Math.hypot(nx, ny) || 1, cv = ce.other.getLinearVelocity();
+        hits.push({ o: c, pt: { x: q.x, y: q.y }, n: { x: nx / nl, y: ny / nl }, closing: pass, share: 0.5, v: { x: cv.x, y: cv.y }, w: ce.other.getAngularVelocity(), vo: { x: inc.x * 0.6, y: inc.y * 0.6 } });
+      }
+      sayAt(bx * S, by * S - 20, pick(SAY.smash)); notice('smash');
+      remove(o);
+      const m = document.getElementById('projects'); m.classList.remove('shake'); void m.offsetWidth; m.classList.add('shake');
+      smashed++;
+      if (smashed === 1) toast('Smashed!');
+      else if (smashed === 10) toast('10 cards smashed. Feeling better?');
+    }
+
+    // ---- the katana: planted in the banner behind the fog. Wipe the fog off it and it pops up; pull it out and every swipe cuts cards in two ----
+    // slim curved blade, small round black guard on a gold collar, black wrapped grip with white diamonds (hilt up, tip down)
+    const katanaSvg = (id) => `<svg viewBox="0 0 40 300" width="40" height="300" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" x2="1"><stop offset="0" stop-color="#fbfcfd"/><stop offset=".5" stop-color="#d5dade"/><stop offset="1" stop-color="#9aa3ab"/></linearGradient></defs>
+      <path d="M16.5 97 L23.5 97 C24.5 165 28 240 36 298 C26 250 18.5 170 16.5 97Z" fill="url(#${id})" stroke="#7b858e" stroke-width=".6"/><path d="M18.3 100 C19.6 170 24 240 33 289" fill="none" stroke="#fff" stroke-width="1" opacity=".9"/>
+      <rect x="16" y="89" width="8" height="9" rx="1" fill="#e3c32f"/><ellipse cx="20" cy="86.5" rx="13" ry="4.2" fill="#121214"/>
+      <rect x="15" y="4" width="10" height="80" rx="2.5" fill="#17181c"/>${[9, 20, 31, 42, 53, 64, 75].map((y) => `<path d="M20 ${y} l2.6 3.4 l-2.6 3.4 l-2.6 -3.4z" fill="#f1f1ee"/>`).join('')}
+      <rect x="14.5" y="2" width="11" height="5" rx="2" fill="#0d0d0f"/><path d="M20 4 L20 97 C22 165 26 240 35 296" fill="none" stroke="transparent" stroke-width="16" stroke-linecap="round"/></svg>`;
+    const hero = document.getElementById('hero');
+    const kat = document.createElement('div'); kat.className = 'katana';
+    kat.innerHTML = `<span class="katana-in" role="img" aria-label="Katana">${katanaSvg('kat-a')}</span>`;
+    hero.querySelector('.scene').after(kat);   // before the fog canvas, so the fog covers it
+    const katIn = kat.firstChild;
+    const sheatheBtn = document.createElement('button'); sheatheBtn.type = 'button'; sheatheBtn.className = 'btn ghost sheathe'; sheatheBtn.hidden = true; sheatheBtn.textContent = 'Put the katana back';
+    const actions = document.createElement('div'); actions.className = 'phys-actions'; actions.appendChild(sheatheBtn); document.body.appendChild(actions);
+    let found = false, near = 0, lastWipe = null, katObj = null, tick = 0;
+    hero.addEventListener('pointermove', (e) => {   // the same strokes that wipe the fog uncover it
+      if (found || isCrazy()) return;
+      const r = kat.getBoundingClientRect();
+      if (Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.bottom - 50)) > 120) { lastWipe = null; return; }
+      if (lastWipe) near += Math.hypot(e.clientX - lastWipe.x, e.clientY - lastWipe.y);
+      lastWipe = { x: e.clientX, y: e.clientY };
+      if (near > 260) { found = true; kat.classList.add('found'); toast('A katana?! Pull it out of the ground.'); load().catch(() => {}); }
+    });
+    // planted, it is rooted like a card: grab the hilt and pull. Out of the ground it is a body you carry, swing and drop
+    const KAT_REST = 190;   // px the planted katana sits below its box: the blade is in the ground
+    katIn.addEventListener('pointerdown', (e) => {
+      if (!found || grab || press || e.button > 0 || isCrazy() || kat.classList.contains('away')) return;
+      e.preventDefault();
+      load().then(() => {
+        if (grab || (katObj && !katObj.root)) return;
+        init();
+        if (!katObj) plant();
+        hold(katObj, e.clientX + scrollX, e.clientY + scrollY, e);
+      }).catch(() => {});
+    });
+    function plant() {   // the body of the planted katana, rooted where it stands
+      katIn.classList.add('pulling'); katIn.style.transform = `translateY(${KAT_REST}px)`;
+      const r = katIn.getBoundingClientRect(), hx = r.left + r.width / 2 + scrollX, hy = r.top + r.height / 2 + scrollY;
+      katObj = addBody({ kind: 'katana', el: katIn, w: 40, h: 300, ex: hx, ey: hy - KAT_REST, grip: 1, root: { x: hx / S, y: hy / S } },
+        hx / S, hy / S, 0, new pl.Box(0.06, 0.48, { x: 0, y: -1.0 }, 0), { density: 2.6, filterCategoryBits: 4, filterMaskBits: 0 });   // the hilt carries most of the weight
+      // the solid parts follow the drawing: grip, round guard, and a thin blade that leans out to the curved tip
+      const part = { friction: 0.6, restitution: 0.1, filterCategoryBits: 4, filterMaskBits: 0 };
+      katObj.body.createFixture({ shape: new pl.Box(0.13, 0.045, { x: 0, y: -0.635 }, 0), density: 2.6, ...part });
+      katObj.body.createFixture({ shape: new pl.Polygon([{ x: -0.035, y: -0.55 }, { x: 0.035, y: -0.55 }, { x: 0.17, y: 1.46 }, { x: 0.12, y: 1.48 }]), density: 1.6, ...part });
+    }
+    function freeKatana(o) {   // the root tore: from the banner into the world
+      const el = document.createElement('div'); el.className = 'phys katana-body'; el.innerHTML = katanaSvg('kat-b'); el._o = o; layer.appendChild(el);
+      katIn.classList.remove('pulling'); katIn.style.transform = ''; kat.classList.add('away'); sheatheBtn.hidden = false;
+      o.el = el; o.ex = 20; o.ey = 150; o.root = null; o.tips = null;
+      o.body.setGravityScale(FALL);
+      for (let f = o.body.getFixtureList(); f; f = f.getNext()) f.setFilterData({ groupIndex: 0, categoryBits: 4, maskBits: 2 });   // it lands on the floor and walls but passes through cards: it cuts them instead
+      if (grab && grab.o === o) { grab.joint.setFrequency(HAND_HZ); grab.joint.setDampingRatio(1); carry(o); }
+      toast('The very tip of the blade cuts, however slowly. Double-click the katana to keep it in hand.'); say(o, 'khello', true); notice('katana');
+    }
+    // double-click: the katana jumps into the hand by its grip and stays there without holding the button. Double-click again or Esc lets go
+    const EQUIP_ANGLE = Math.PI + 0.5;
+    function equip(e) {
+      if (!pl || !found || isCrazy()) return;
+      init(); if (grab) { if (grab.o !== katObj) return; drop(); }
+      if (!katObj) plant();
+      if (katObj.root) freeKatana(katObj);
+      const o = katObj;
+      // in the hand it is held at one steady angle, blade up and leaning forward, and does not swing
+      o.body.setTransform(o.body.getPosition(), EQUIP_ANGLE); o.body.setFixedRotation(true); o.body.setAngularVelocity(0); o.pa = EQUIP_ANGLE; o.tips = null;
+      const g = o.body.getWorldPoint({ x: 0, y: -1.05 });
+      hold(o, g.x * S, g.y * S, { pointerId: -1, clientX: e.clientX, clientY: e.clientY });
+      grab.sticky = true; grab.moved = true; o.el.classList.add('equipped'); say(o, 'khello'); notice('katana');
+      grab.joint.setTarget({ x: (e.clientX + scrollX) / S, y: (e.clientY + scrollY) / S });
+    }
+    document.addEventListener('dblclick', (e) => {
+      const onKat = e.target.closest?.('.katana-body, .katana-in'); if (!onKat) return;
+      e.preventDefault();
+      if (grab && grab.sticky) drop(); else equip(e);
+    });
+    function putBack() { if (katObj) remove(katObj); katObj = null; kat.classList.remove('away'); sheatheBtn.hidden = true; }
+    sheatheBtn.addEventListener('click', putBack);
+    kat.addEventListener('click', (e) => { if (e.target === kat && kat.classList.contains('away')) putBack(); });
+    document.addEventListener('keydown', (e) => { if (e.key !== 'Escape' || !katObj || katObj.root) return; if (grab && grab.sticky) drop(); else putBack(); });
+    // once per frame: the katana has one cutting point, the very tip of the blade, and it cuts at any speed, in the hand or loose. The rest of the sword passes through cards.
+    // The tip's path is followed through each card: where it crosses the outline on the way in is the entry, where it crosses on the way out is the exit.
+    // Out through another side: the card is cut straight between the two points. Out through the side it came in: a stab, no cut, it bleeds for a while. Inside, the card screams
+    const TIP = [15, 146], TRAIL_SPEED = 700;   // the point of the blade, local px from the katana's centre; px/s above which the tip leaves a streak
+    const toLocal = (o, q) => { const p = o.body.getPosition(), a = o.body.getAngle(), c = Math.cos(a), s = Math.sin(a), dx = q[0] - p.x * S, dy = q[1] - p.y * S; return [dx * c + dy * s, -dx * s + dy * c]; };
+    const toPage = (o, q) => { const p = o.body.getPosition(), a = o.body.getAngle(), c = Math.cos(a), s = Math.sin(a); return [p.x * S + q[0] * c - q[1] * s, p.y * S + q[0] * s + q[1] * c]; };
+    function edgeOf(poly, q) {   // which side of the outline a point is nearest to
+      let best = 0, bd = Infinity;
+      for (let i = 0; i < poly.length; i++) {
+        const a = poly[i], b = poly[(i + 1) % poly.length], ex = b[0] - a[0], ey = b[1] - a[1], t = Math.max(0, Math.min(1, ((q[0] - a[0]) * ex + (q[1] - a[1]) * ey) / (ex * ex + ey * ey || 1)));
+        const d = Math.hypot(q[0] - a[0] - ex * t, q[1] - a[1] - ey * t); if (d < bd) { bd = d; best = i; }
+      }
+      return best;
+    }
+    let screamed = -1e9;
+    const wounds = [];
+    function bladeCuts(dt) {
+      bleed();
+      const o = katObj; if (o) o.tipWas = null; if (!o || o.root || dt <= 0) return;
+      const T = toPage(o, TIP), prev = o.tips; o.tips = T; o.tipWas = prev; o.tipDt = dt; if (!prev) { o.open = new Map(); return; }
+      const held = !!grab && grab.o === o, open = o.open, seen = new Set(), step = Math.hypot(T[0] - prev[0], T[1] - prev[1]);
+      if (step / dt >= TRAIL_SPEED) trail(prev, T);
+      if (!step && !open.size) return;
+      tick++;
+      for (const t of targets()) {
+        const here = (q) => t.o ? toLocal(t.o, q) : [q[0], q[1]];   // a loose card moves while it is being cut: remember the points on the card itself
+        const rec = open.get(t.key), xs = crossings(t.poly, prev, T), isIn = inside(t.poly, T[0], T[1]);
+        if (rec) {
+          seen.add(t.key); rec.t = t;
+          if (isIn) { const q = here(T), d = Math.hypot(q[0] - rec.a[0], q[1] - rec.a[1]); rec.z = q; if (d > rec.depth) { rec.depth = d; rec.w = q; } continue; }
+          if (xs.length) rec.z = here(xs[xs.length - 1]);   // the tip left: this is the way out
+          open.delete(t.key); endCut(o, rec, held); continue;
+        }
+        if (!xs.length) continue;   // the tip did not cross this outline
+        const a = here(xs[0]);
+        if (!isIn) { if (xs.length > 1) { const z = here(xs[xs.length - 1]); endCut(o, { t, a, z, w: z }, held); } continue; }   // in and out again within one frame
+        seen.add(t.key); open.set(t.key, { t, a, z: here(T), w: here(T), depth: 0 });
+        const tm = now(); if (tm - screamed > 700) { screamed = tm; if (t.o) say(t.o, 'cutting', true); else sayAt(T[0], Math.min(...t.poly.map((q) => q[1])) - 34, pick(SAY.cutting)); }
+      }
+      for (const key of [...open.keys()]) if (!seen.has(key)) open.delete(key);   // the card is gone
+    }
+    function endCut(k, rec, held) {
+      const t = rec.t, alive = t.o ? objs.has(t.o) : t.card.isConnected && !t.card.classList.contains('held'); if (!alive) return;
+      const outline = t.o ? (t.o.poly || rectPoly(t.o)).map(([x, y]) => [x - t.o.w / 2, y - t.o.h / 2]) : t.poly;
+      const through = edgeOf(outline, rec.a) !== edgeOf(outline, rec.z) && Math.hypot(rec.z[0] - rec.a[0], rec.z[1] - rec.a[1]) > 24;
+      if (through) {
+        const src = t.o || freeCard(t.card), A = toPage(src, t.o ? rec.a : toLocal(src, rec.a)), B = toPage(src, t.o ? rec.z : toLocal(src, rec.z));
+        if (slice(src, A, B, [B[0] - A[0], B[1] - A[1]])) { if (!held) say(k, 'kcut', true); else if (Math.random() < 0.4) say(k, 'kbrag'); notice('cut'); return; }
+        t.o = src; rec.w = t.card ? toLocal(src, rec.w) : rec.w;   // could not be split there after all: it is a wound
+      }
+      // stabbed: in and out through the same side. It keeps its shape, bleeds for a while and has something to say about it
+      notice('stab');
+      wounds.push({ o: t.o, card: t.o ? null : t.card, p: rec.w, until: now() + 2400 + Math.random() * 1200, next: 0 });
+      if (t.o) say(t.o, 'stab', true); else sayAt(rec.w[0], Math.min(...t.poly.map((q) => q[1])) - 34, pick(SAY.stab));
+      run();
+    }
+    function bleed() {
+      const tm = now();
+      for (let i = wounds.length - 1; i >= 0; i--) {
+        const w = wounds[i], ok = w.o ? objs.has(w.o) : w.card.isConnected && !w.card.classList.contains('held');
+        if (!ok || tm > w.until) { wounds.splice(i, 1); continue; }
+        if (tm < w.next) continue; w.next = tm + 70 + Math.random() * 90;
+        const q = w.o ? toPage(w.o, w.p) : w.p, el = document.createElement('i'), sz = 3 + Math.random() * 4; el.className = 'bit';
+        el.style.width = el.style.height = sz.toFixed(1) + 'px'; el.style.transform = `translate(${q[0].toFixed(1)}px, ${q[1].toFixed(1)}px)`; layer.appendChild(el);
+        bits.push({ el, x: q[0], y: q[1], vx: (Math.random() - 0.5) * 90, vy: -60 - Math.random() * 110, t: 0, life: 0.5 + Math.random() * 0.5 });
+      }
+    }
+
+    const polyArea = (ps) => Math.abs(ps.reduce((s, p, i) => { const q = ps[(i + 1) % ps.length]; return s + p[0] * q[1] - q[0] * p[1]; }, 0)) / 2;
+    const validPoly = (ps) => ps.length >= 3 && ps.length <= 10 && polyArea(ps) >= 150 && !ps.some((p, i) => { const q = ps[(i + 1) % ps.length]; return Math.hypot(p[0] - q[0], p[1] - q[1]) < 3; });
+    const rectPoly = (o) => [[0, 0], [o.w, 0], [o.w, o.h], [0, o.h]];
+    function worldPoly(o) {
+      const p = o.body.getPosition(), a = o.body.getAngle(), c = Math.cos(a), s = Math.sin(a);
+      return (o.poly || rectPoly(o)).map(([x, y]) => { const lx = x - o.w / 2, ly = y - o.h / 2; return [p.x * S + lx * c - ly * s, p.y * S + lx * s + ly * c]; });
+    }
+    function inside(poly, x, y) {
+      let sgn = 0;
+      for (let i = 0; i < poly.length; i++) { const p = poly[i], q = poly[(i + 1) % poly.length], cr = (q[0] - p[0]) * (y - p[1]) - (q[1] - p[1]) * (x - p[0]); if (cr) { if (sgn && Math.sign(cr) !== sgn) return false; sgn = Math.sign(cr); } }
+      return true;
+    }
+    function crossings(poly, a, b) {   // where the blade's path a -> b crosses the outline, in order
+      const out = [], rx = b[0] - a[0], ry = b[1] - a[1];
+      for (let i = 0; i < poly.length; i++) {
+        const p = poly[i], q = poly[(i + 1) % poly.length], sx = q[0] - p[0], sy = q[1] - p[1], den = rx * sy - ry * sx; if (!den) continue;
+        const t = ((p[0] - a[0]) * sy - (p[1] - a[1]) * sx) / den, u = ((p[0] - a[0]) * ry - (p[1] - a[1]) * rx) / den;
+        if (t >= 0 && t <= 1 && u >= 0 && u <= 1) out.push([a[0] + rx * t, a[1] + ry * t, t]);
+      }
+      return out.sort((m, n) => m[2] - n[2]);
+    }
+    function targets() {   // everything the blade can cut: loose cards and pieces, and the cards still in the grid
+      const out = [];
+      for (const o of objs) if ((o.kind === 'card' || o.kind === 'piece') && !o.root && o.born !== tick) out.push({ key: o, o, poly: worldPoly(o) });
+      for (const card of gridEl.querySelectorAll('.card:not(.held)')) {
+        if (rootOf.has(card)) continue;
+        const r = card.getBoundingClientRect(), x = r.left + scrollX, y = r.top + scrollY;
+        out.push({ key: card, card, poly: [[x, y], [x + r.width, y], [x + r.width, y + r.height], [x, y + r.height]] });
+      }
+      return out;
+    }
+    function freeCard(card) {   // a grid card that is cut never got pulled: it comes loose on the spot
+      card.classList.add('settled');
+      const r = card.getBoundingClientRect(), el = cloneCard(card);
+      el.style.width = r.width + 'px'; el.style.height = r.height + 'px'; layer.appendChild(el);
+      const o = addBody({ kind: 'card', el, w: r.width, h: r.height, ex: r.width / 2, ey: r.height / 2, key: card.dataset.key },
+        (r.left + r.width / 2 + scrollX) / S, (r.top + r.height / 2 + scrollY) / S, 0, new pl.Box(r.width / 2 / S, r.height / 2 / S));
+      el._o = o; card.classList.add('held'); ripped.add(o.key); showReset();
+      return o;
+    }
+    // a piece of a card: same origin and angle as the card it came from, its outline as the collision shape and as the clip-path
+    function fragment(src, poly, kind, opt, extra) {
+      const b = src.body, pos = b.getPosition(), W = src.w, H = src.h, el = cloneCard(src.el);
+      el.classList.add(kind); el.style.width = W + 'px'; el.style.height = H + 'px';
+      el.style.clipPath = `polygon(${poly.map(([x, y]) => `${x.toFixed(1)}px ${y.toFixed(1)}px`).join(',')})`;
+      layer.appendChild(el);
+      const s = addBody({ kind, el, w: W, h: H, ex: W / 2, ey: H / 2, poly, ...extra }, pos.x, pos.y, b.getAngle(), new pl.Polygon(poly.map(([x, y]) => ({ x: (x - W / 2) / S, y: (y - H / 2) / S }))), opt);
+      el._o = s; return s;
+    }
+    function slice(o, A, B, dir) {   // A, B: page points where the blade entered and left
+      if (!o || !objs.has(o)) return null;
+      const b = o.body, pos = b.getPosition(), ang = b.getAngle(), c = Math.cos(ang), s = Math.sin(ang), W = o.w, H = o.h;
+      const loc = (p) => { const dx = p[0] - pos.x * S, dy = p[1] - pos.y * S; return [dx * c + dy * s + W / 2, -dx * s + dy * c + H / 2]; };
+      const a = loc(A), z = loc(B), ux = z[0] - a[0], uy = z[1] - a[1], ul = Math.hypot(ux, uy); if (ul < 4) return null;
+      const side = (p) => ux * (p[1] - a[1]) - uy * (p[0] - a[0]), src = o.poly || rectPoly(o), L = [], R = [], cut = [];
+      for (let i = 0; i < src.length; i++) {
+        const p = src[i], q = src[(i + 1) % src.length], sp = side(p), sq = side(q);
+        (sp >= 0 ? L : R).push(p);
+        if ((sp > 0 && sq < 0) || (sp < 0 && sq > 0)) { const t = sp / (sp - sq), x = [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t]; L.push(x); R.push(x); cut.push(x); }
+      }
+      if (cut.length !== 2 || !validPoly(L) || !validPoly(R)) return null;
+      const v = b.getLinearVelocity(), vx = v.x, vy = v.y, w = b.getAngularVelocity();
+      const nx = (-uy * c - ux * s) / ul, ny = (-uy * s + ux * c) / ul;     // world normal of the cut, towards the L half
+      const dl = Math.hypot(dir[0], dir[1]) || 1, dx = dir[0] / dl, dy = dir[1] / dl;
+      const parts = [[L, 1], [R, -1]].map(([poly, sg]) => {
+        const p = fragment(o, poly, 'piece', {}, polyArea(poly) < 3000 ? { die: now() + 2500 + Math.random() * 1200 } : {});
+        p.born = tick;   // the stroke that made it cannot cut it again in the same move
+        p.body.setLinearVelocity({ x: vx + sg * nx * 2.4 + dx * 1.6, y: vy + sg * ny * 2.4 + dy * 1.6 });
+        p.body.setAngularVelocity(w + sg * (0.7 + Math.random()));
+        return p;
+      });
+      const toWorld = (p) => { const lx = p[0] - W / 2, ly = p[1] - H / 2; return [pos.x * S + lx * c - ly * s, pos.y * S + lx * s + ly * c]; };
+      const c0 = toWorld(cut[0]), c1 = toWorld(cut[1]), n = Math.max(4, Math.round(Math.hypot(c1[0] - c0[0], c1[1] - c0[1]) / 28));
+      for (let k = 0; k <= n; k++) spray(c0[0] + (c1[0] - c0[0]) * k / n, c0[1] + (c1[1] - c0[1]) * k / n, nx, ny);
+      say(parts[0], 'slice', true);
+      remove(o);
+      return parts;
+    }
+    // little drops and paper scraps that fly off a cut: plain points on the same clock as the physics, no bodies
+    const bits = [];
+    function spray(x, y, nx, ny) {
+      for (let k = 0; k < 4; k++) {
+        const el = document.createElement('i'), sz = 3 + Math.random() * 6; el.className = Math.random() < 0.72 ? 'bit' : 'bit paper';
+        el.style.width = el.style.height = sz.toFixed(1) + 'px'; el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`; layer.appendChild(el);
+        const sg = Math.random() < 0.5 ? -1 : 1, an = (Math.random() - 0.5) * 1.7, ca = Math.cos(an), sa = Math.sin(an), sp = 120 + Math.random() * 620;
+        bits.push({ el, x, y, vx: sg * (nx * ca - ny * sa) * sp, vy: sg * (nx * sa + ny * ca) * sp - 160, t: 0, life: 0.45 + Math.random() * 0.65 });
+      }
+      run();
+    }
+    function moveBits(dt) {
+      for (let i = bits.length - 1; i >= 0; i--) {
+        const p = bits[i]; p.t += dt;
+        if (p.t > p.life) { p.el.remove(); bits.splice(i, 1); continue; }
+        p.vy += 2600 * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+        p.el.style.transform = `translate(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px) scale(${(1 - 0.7 * p.t / p.life).toFixed(2)})`;
+      }
+    }
+    function trail(a, b) {
+      const el = document.createElement('i'); el.className = 'slash'; el.style.width = Math.hypot(b[0] - a[0], b[1] - a[1]).toFixed(1) + 'px';
+      el.style.transform = `translate(${a[0].toFixed(1)}px, ${a[1].toFixed(1)}px) rotate(${Math.atan2(b[1] - a[1], b[0] - a[0]).toFixed(3)}rad)`;
+      layer.appendChild(el); setTimeout(() => el.remove(), 280);
+    }
+    // ---- the claw: something lives past the right edge of the screen and it wants your cards.
+    // Carry a loose card to that edge and it takes one end. Pull the other end: the card stretches, then tears, and it keeps its half ----
+    const CLAW_SAY = {
+      eager: ['gimme', 'ooh. snack.', 'closer…', 'GIVE.', 'yes yes yes', 'do not test me', 'I will take it', 'дай!', 'ちょうだい'],
+      grab: ['mine.', 'GOT IT', 'thank you!', 'мое!', 'いただき!'],
+      tug: ['stretchy…', 'let gooo', 'pull harder', 'hnnngh', "it's MINE", 'разтяга се…', 'のびる…'],
+      rip: ['CHEESE PULL!!!!', 'CHEESE PULL!!!!', 'CHEESE PULL!!!!', 'RIIIP', 'half is fine!', 'again! again!', 'チーズ!!!', 'СИРЕНЕ!!!'],
+      eat: ['nom.', '*crunch*', 'papery.', 'needs salt', 'ごちそうさま', 'ммм.'],
+      keep: ['mine.', 'hehehe', 'no take-backs', 'finders keepers', 'хе-хе'],
+      toss: ['bored.', 'catch.', 'yeet', 'tastes like JavaScript', 'いらない'],
+      sulk: ['aww.', 'tease.', 'rude.', 'fine.', 'ケチ', 'пф.'],
+      // what it has to say about things it only watches
+      cut: ['ooh, sharp.', 'save me a slice', 'messy.', 'I could do that with my nails', 'thinner! thinner!', 'いい切れ味', 'режи, режи…'],
+      stab: ['finish it!', 'so close.', 'amateur.', 'I smell blood', 'again, deeper'],
+      smash: ['what a waste of a snack', 'boom.', 'I felt that', 'again!', 'бум!', 'もったいない'],
+      loose: ['fresh one!', 'bring it here', 'ooh, a loose one', 'that one looks tasty', 'дай го насам'],
+      throw: ['wheee', 'over here!', 'pass it!', 'nice arm'],
+      katana: ['show-off.', 'I prefer claws', 'pointy.', 'keep that away from me', 'かっこつけ'],
+      kdrop: ['butterfingers', 'clumsy.', 'ha.', 'and you call ME grabby'],
+      caught: ['nice throw', 'CAUGHT IT', 'thanks!', 'delivery!', 'for me? again?', 'хванах!', 'ナイスパス!'],
+      slip: ['slippery!', 'hey!!', 'no fair', 'my snack!'],
+      snatch: ['TOO SLOW', 'YOINK', 'MINE NOW', 'enough games', 'дай тука!', 'もらった!'],
+      savour: ['shhh.', 'slowly…', 'does it hurt?', 'look at me.', 'not yet.', 'one more squeeze', 'бавно…', 'まだだよ'],
+      shelf: ['ooh. left out for me?', 'a snack on a shelf', "don't mind if I do", 'nobody is looking…', 'unattended. mine.', 'какво имаме тук…', 'いただきます…'],
+      severed: ['MY HAND!!', 'I NEEDED THAT', 'AAAAAAAAA', 'you… you CUT it', 'that was my favourite one', 'РЪКАТА МИ!!', '手がぁぁ!!'],
+      regrow: ['grew a new one.', 'ta-da.', 'I have spares', 'that one was old anyway', 'good as new', 'нова-новеничка', '生えた。'],
+      crush: ['squish.', '*CRUNCH*', 'paper is weak', 'that is what teasing gets you', 'смачках го.', 'ぐしゃ'],
+      // "Surprise me": you said no, so it settles it with a coin
+      ask: ['go there?', 'well? go there?', 'this one. go?', 'I picked this for you. go?', 'shall we?', 'отиваме ли?', '行く?'],
+      heads: ['heads.', 'it is heads.', 'heads it is', 'ези.', '表。'],
+      tails: ['tails.', 'it is tails.', 'tails it is', 'тура.', '裏。'],
+      stay: ['you may stay. this time.', 'stay. for now.', 'you got lucky. stay.', 'остани. засега.', '今回だけだぞ。'],
+      hello: ['oh? a "no"?', 'hello there.', 'you said no. to ME?', 'hi. I live here.', 'picky, are we', 'здрасти.', 'やあ。'],
+      smashbtn: ['no "no".', 'WRONG BUTTONS.', 'not these.', 'I hate these two', 'my game. my buttons.', 'BAM.', 'не тези!', 'このボタン、きらい'],
+      better: ['much better.', 'much better now.', 'there. better.', 'now we play MY game', 'see? nicer.', 'така е по-добре.', 'これでよし。'],
+      flip: ['heads or tails?', 'call it.', 'let the coin decide', 'one flip. no take-backs.', 'ези или тура?', '表か裏か?'],
+      won: ['…fine.', 'lucky.', 'tch. stay then.', 'next time.', 'пф. късмет.', 'ちっ'],
+      lost: ['WRONG.', 'ha. wrong side.', 'the coin has spoken', 'loser walks', 'не позна!', 'ハズレ!'],
+      idgaf: ['you know what? idgaf.', 'actually, forget the coin', "you're going anyway", 'coin? what coin.', 'майната ѝ на монетата', 'どうでもいい。行け。'],
+      waiting: ['well?', 'tick tock', 'go on. press it.', 'or I press it for you', '3… 2…', 'хайде де', 'はやく'],
+      bye: ['BYE BYE', 'BYE BYEEE', 'HAHAHA BYE', 'see ya never', 'ЧАО-ЧАО!', 'バイバイ!'],
+      slap: ['no.', 'not yet!', '*slap*', 'hands off', 'I am not done', 'чакай!', 'だめ!'],
+      snap: ['ENOUGH.', 'FINE. FINE!', 'ugh. you are exhausting', 'stop poking things', 'стига вече!', 'もういい!'],
+      yourpick: ['go on then. pick.', 'pick. now.', 'your call. literally.', 'избирай.', '選べ。'],
+      secret: ['NOOOOOOO', 'NOOO! not the secret!', 'who told you about that?!', 'stop. right. there.', 'that is NOT for you', 'you were never supposed to find that', 'НЕЕЕЕЕ!', 'намери тайната!', 'не пипай това!', 'だめーーー!', 'ひみつが!', 'バレた!'],
+      escaped: ['...fine.', 'cheater.', 'I will remember this', 'nobody likes a sneak', 'ずるい', 'измамник.'],
+      callit: ['call it already', 'heads? tails? anything?', 'the coin is getting dizzy', 'I can do this all day', 'it is a coin, not a test', 'ези или тура? хайде!', 'はやく決めて'],
+      mypick: ["I'll do it myself", 'too slow. mine.', 'give me that', 'сам ще избера', '貸して'],
+      // it sent you away and you came back: it noticed, and wants a rematch
+      back: ["hmm. didn't like the repo?", 'back already?', 'oh. you again.', 'that bad, huh?', 'not your thing?', 'missed me?', 'you came back. cute.', 'върна се, а?', 'не ти хареса, а?', 'おかえり。', '気に入らなかった?'],
+      rematch: ['wanna play another coin toss?', 'another coin toss?', 'rematch. call it.', 'double or nothing?', 'same game. new coin.', 'heads or tails. again.', 'още едно хвърляне?', 'пак ли? ези или тура?', 'もう一回?', 'もう一度、表か裏か?'],
+    };
+    const NS = 'http://www.w3.org/2000/svg';
+    // hand space: wrist at 0,0, fingers along +x. Four fingers hook towards +y, the thumb comes up from below to meet them
+    const FING = [{ b: [58, -27], a: -0.36, l: [44, 33, 25], w: 12 }, { b: [66, -11], a: -0.13, l: [52, 38, 27], w: 13 }, { b: [64, 5], a: 0.09, l: [46, 34, 24], w: 12 }, { b: [56, 19], a: 0.32, l: [35, 26, 19], w: 10 }];
+    const THUMB = { b: [14, 22], a: 1.1, l: [36, 30, 23], w: 13 }, BEND = [0.3, 1.05, 0.85], ARCH = [-0.3, 0.2, 0.24], GRIP = [98, 20];
+    const PALM = [[-8, -15], [18, -25], [56, -33], [72, -12], [70, 14], [58, 27], [30, 30], [8, 27], [-8, 14]];
+    const POSES = {
+      lurk: { curl: 0.5, th: 0.4, spread: 0.75, eye: 0.3, pupil: 0.6, happy: 0, point: 0 },
+      eager: { curl: 0.12, th: 0.05, spread: 1.4, eye: 1.25, pupil: 1.25, happy: 0, point: 0 },
+      lunge: { curl: -0.12, th: -0.15, spread: 1.7, eye: 1.45, pupil: 0.6, happy: 0, point: 0 },
+      clamp: { curl: 0.82, th: 0.85, spread: 0.45, eye: 0.8, pupil: 0.8, happy: 0, point: 0 },
+      strain: { curl: 0.95, th: 1, spread: 0.3, eye: 0.3, pupil: 0.45, happy: 0, point: 0 },
+      joy: { curl: 0.82, th: 0.85, spread: 0.5, eye: 1, pupil: 1, happy: 1, point: 0 },
+      sulk: { curl: 0.95, th: 0.55, spread: 0.2, eye: 0.2, pupil: 0.5, happy: 0, point: 0 },
+  point: { curl: 0.95, th: 0.9, spread: 0.5, eye: 1.2, pupil: 0.7, happy: 0, point: 1 },   // one finger out, the rest in a fist: for pressing a button
+      pinch: { curl: 0.95, th: 0.62, spread: 0.5, eye: 0.55, pupil: 0.7, happy: 0, point: 0, pinch: 1 },   // thumb on the middle finger, about to snap
+      snapped: { curl: 0.95, th: 0.1, spread: 0.5, eye: 1.2, pupil: 0.9, happy: 0, point: 0, pinch: 0.45 },   // just snapped: the finger has hit the palm, the thumb has slid off
+    };
+    for (const k in POSES) POSES[k].pinch ??= 0;
+    let claw = null;
+    const clawBusy = () => sevBusy() || !!claw && ((!!shelf && shelf.want) || !!claw.react || !!claw.later || now() < (claw.flinch || 0) || claw.strands.length > 0 || !!claw.say || (claw.st !== 'off' && (claw.st !== 'lurk' || now() < claw.until)));
+    const clamp01 = (v) => Math.max(0, Math.min(1, v)), wrapA = (a) => a - 2 * Math.PI * Math.round(a / (2 * Math.PI));
+    // the drawing of one hand: two layers, the thumb under the cards and the rest over them, so a card really sits in its grip.
+    // The arm's hand has one, and so does every hand that has been cut off
+    function handParts(extra) {
+      const mk = (cls) => { const s = document.createElementNS(NS, 'svg'); s.setAttribute('class', 'claw ' + cls + (extra ? ' ' + extra : '')); s.setAttribute('aria-hidden', 'true'); document.body.appendChild(s); return s; };
+      const path = (svg, cls) => { const p = document.createElementNS(NS, 'path'); p.setAttribute('class', cls); svg.appendChild(p); return p; };
+      const under = mk('under'), over = mk('over');
+      return { under, over, thumb: path(under, 'flesh'), talonT: path(under, 'talon'), flesh: path(over, 'flesh'), talon: path(over, 'talon'), crease: path(over, 'crease'), vein: path(over, 'vein'), eye: path(over, 'eye'), pupil: path(over, 'pupil') };
+    }
+    function clawInit() {
+      claw = { st: 'off', t: 0, until: 0, cool: 0, x: html.clientWidth + 340, y: innerHeight * 0.55, ly: innerHeight * 0.55, hy: 0, a: Math.PI, sh: innerHeight * 0.55 + 70, pose: { ...POSES.lurk },
+        o: null, joint: null, snap: null, pre: null, gh: null, g: null, far: false, say: null, said: 0, strands: [], ...handParts() };
+    }
+    function clawSet(st) { if (st === 'show' || st === 'book') claw.stump = false;   // called in for a scene, it arrives with a hand
+      claw.st = st; claw.t = 0; claw.until = now() + 1500; run(); }
+    // The hand comments on most things it sees, but never at once: each remark waits a random while. When a lot happens together its
+    // agitation fills up and the wait gets shorter, and there are always at least 2 s of real time between two things it says
+    const REACT_GAP = TIMING.gap.hand;
+    function notice(kind) {
+      const c = claw; if (!c || c.st === 'off' || isCrazy()) return;
+      const t = now(), R = TIMING.react; c.agit = Math.min(6, (c.agit || 0) + 1);
+      const wait = (R.min + Math.random() * R.spread) * (1 - R.calm * clamp01((c.agit - 1) / 4));
+      if (!c.react) c.react = { kind, at: t + wait, born: t }; else { c.react.at = Math.min(c.react.at, t + wait); if (Math.random() < 0.5) c.react.kind = kind; }
+      run();
+    }
+    function clawSay(kind, force) {
+      const c = claw, t = now(); if (!force && (t - c.said < TIMING.gap.handIdle || t < (c.sayEnd || 0) + TIMING.gap.after)) return;
+      // never two lines within 2 s: what it does is not held up, but an important line waits its turn and an unimportant one is dropped
+      // a line that belongs to this moment cuts in on the last one, once that has been up long enough to be seen; a remark waits for it to end
+      if (t - c.said < TIMING.gap.show) { if (force) c.later = { kind, at: c.said + TIMING.gap.show }; return 0; }
+      c.later = null;
+      if (c.say) c.say.el.remove();
+      // the first rip it gets to shout about after every page load is always the cheese pull; after that the rip lines come at random again
+      const first = kind === 'rip' && !clawSay.cheesed; if (first) clawSay.cheesed = true;
+      const el = bubble(first ? CLAW_SAY.rip[0] : pick(CLAW_SAY[kind])), ms = TIMING.talk(el, TIMING.floor[kind]); el.classList.add('claw-say');
+      c.said = t; c.sayEnd = t + ms; c.say = { el, until: t + ms }; run(); return ms;
+    }
+    const gripPt = () => { const c = claw, ca = Math.cos(c.a), sa = Math.sin(c.a); return [c.x + GRIP[0] * ca + GRIP[1] * sa, c.y + GRIP[0] * sa - GRIP[1] * ca]; };
+    const wristFor = (H, a) => { const ca = Math.cos(a), sa = Math.sin(a); return [H[0] - GRIP[0] * ca - GRIP[1] * sa, H[1] - GRIP[0] * sa + GRIP[1] * ca]; };
+    // where the claw takes the card: on the far side of it from the pointer, seen from the hand
+    function clawPre(o, keep) {
+      const b = o.body, q = b.getLocalPoint(grab.joint.getAnchorB()), gp = [q.x * S, q.y * S];
+      let gh = keep;
+      if (!gh) {
+        // the end of the card opposite the one you hold; held by the middle, the side nearest the hand
+        const far = Math.hypot(gp[0], gp[1]) > 45, w = far ? { x: -gp[0], y: -gp[1] } : b.getLocalVector({ x: claw.x - grab.cx, y: claw.y - grab.cy }), wl = Math.hypot(w.x, w.y) || 1, ux = w.x / wl, uy = w.y / wl;
+        const ray = (x, y) => Math.min(ux > 1e-6 ? (o.w / 2 - x) / ux : ux < -1e-6 ? (-o.w / 2 - x) / ux : 1e9, uy > 1e-6 ? (o.h / 2 - y) / uy : uy < -1e-6 ? (-o.h / 2 - y) / uy : 1e9);
+        let d = ray(gp[0], gp[1]) - 24; const room = Math.max(90, 0.45 * (html.clientWidth - 110));   // on a narrow screen it takes the card nearer your hand, so there is room left to pull
+        if (d < 100) { d = ray(0, 0) - 24; gh = [ux * d, uy * d]; } else { d = Math.min(d, room); gh = [gp[0] + ux * d, gp[1] + uy * d]; }
+      }
+      const dx = gh[0] - gp[0], dy = gh[1] - gp[1], dn = Math.hypot(dx, dy) || 1;
+      return { gp, gh, dn, d0: Math.max(80, dn), phi: Math.atan2(dy, dx), ghm: { x: gh[0] / S, y: gh[1] / S }, gpm: { x: gp[0] / S, y: gp[1] / S } };
+    }
+    function clawTug(o) {
+      o.tug = { ...claw.pre, grip: 1, s: 1, e: 0, d: claw.pre.d0, psi: 0 }; claw.gh = claw.pre.gh;
+      o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 });   // nothing bumps into a card that is being fought over
+      claw.hy = Math.max(90, Math.min(innerHeight - 90, gripPt()[1]));
+      clawSet('tug'); clawSay('grab', true);
+    }
+    // the card between the pointer P and the claw H (page px): turned to lie along the pull, stretched to its length, thinner in the middle
+    function tugDraw(o, P, H) {
+      const g = o.tug, dx = H[0] - P[0], dy = H[1] - P[1], d = Math.hypot(dx, dy) || 1, psi = Math.atan2(dy, dx), s = Math.max(0.85, d / g.d0), tt = s > 1 ? Math.pow(s, -0.3) : 1;
+      const cf = Math.cos(g.phi), sf = Math.sin(g.phi), a = (g.gp[0] * cf + g.gp[1] * sf) * s, b = (-g.gp[0] * sf + g.gp[1] * cf) * tt, cp = Math.cos(psi), sp = Math.sin(psi);
+      const cx = P[0] - (a * cp - b * sp), cy = P[1] - (a * sp + b * cp);
+      o.body.setTransform({ x: cx / S, y: cy / S }, psi - g.phi); o.body.setLinearVelocity({ x: 0, y: 0 }); o.body.setAngularVelocity(0); o.body.setAwake(true);
+      // pain: 0 slack, 1 about to tear. Near the limit the whole card trembles (real time, not frames)
+      const pain = clamp01((d - g.d0) / (g.rip || 300)), tm = now(), shake = 2.6 * pain * pain * pain, jx = shake * Math.sin(tm * 0.083) * -sp + shake * 0.4 * Math.sin(tm * 0.131) * cp, jy = shake * Math.sin(tm * 0.083) * cp + shake * 0.4 * Math.sin(tm * 0.131) * sp;
+      o.el.style.transform = `translate(${(cx - o.ex + jx).toFixed(2)}px, ${(cy - o.ey + jy).toFixed(2)}px) rotate(${psi.toFixed(4)}rad) scale(${s.toFixed(4)}, ${tt.toFixed(4)}) rotate(${(-g.phi).toFixed(4)}rad)`;
+      const waist = Math.min(0.86, 0.5 * Math.pow(pain, 0.7) + 0.4 * pain * pain), crack = clamp01((pain - 0.45) / 0.55);
+      // the paper goes thin where it necks: you start to see through the middle, and it reddens under the strain
+      const nx = g.gp[0] + 0.5 * g.dn * cf + o.w / 2, ny = g.gp[1] + 0.5 * g.dn * sf + o.h / 2, thin = (1 - 0.6 * pain * pain).toFixed(3), r0 = 0.1 * g.dn, r1 = (0.2 + 0.25 * pain) * g.dn;
+      o.el.style.maskImage = o.el.style.webkitMaskImage = pain < 0.08 ? '' : `radial-gradient(circle at ${nx.toFixed(1)}px ${ny.toFixed(1)}px, rgba(0,0,0,${thin}) ${r0.toFixed(1)}px, #000 ${r1.toFixed(1)}px)`;
+      o.el.style.filter = pain < 0.3 ? '' : `saturate(${(1 + 0.8 * pain).toFixed(2)}) sepia(${(0.35 * (pain - 0.3)).toFixed(2)}) hue-rotate(-${(28 * (pain - 0.3)).toFixed(0)}deg)`;
+      if (waist < 0.02) o.el.style.clipPath = '';
+      else {
+        const W = o.w, Hh = o.h, pts = [], N = 26;
+        for (let k = 0; k < 4 * N; k++) {
+          const f = (k % N) / N, e = Math.floor(k / N), x = e === 0 ? f * W : e === 1 ? W : e === 2 ? W - f * W : 0, y = e === 0 ? 0 : e === 1 ? f * Hh : e === 2 ? Hh : Hh - f * Hh;
+          const rx = x - W / 2 - g.gp[0], ry = y - Hh / 2 - g.gp[1], al = rx * cf + ry * sf, bell = Math.exp(-Math.pow((al / g.dn - 0.5) / (0.3 - 0.1 * pain), 2));
+          // necking, and past the halfway point little tears open along the neck: every other point bites inwards by a fixed, uneven amount
+          const bite = crack * bell * (k % 2 ? 0.1 + 0.5 * (Math.sin(k * 12.9898) * 43758.5453 % 1 + 1) % 1 : 0), pe = (-rx * sf + ry * cf) * (1 - waist * bell) * (1 - bite);
+          pts.push(`${(g.gp[0] + al * cf - pe * sf + W / 2).toFixed(1)}px ${(g.gp[1] + al * sf + pe * cf + Hh / 2).toFixed(1)}px`);
+        }
+        o.el.style.clipPath = `polygon(${pts.join(',')})`;
+      }
+      g.s = s; g.d = d; g.psi = psi; g.e = d - g.d0;
+    }
+    function clawUntug(o, P, H) {   // back to an ordinary card, at its own size
+      const g = o.tug, dx = H[0] - P[0], dy = H[1] - P[1], d = Math.hypot(dx, dy) || 1;
+      tugDraw(o, P, [P[0] + dx / d * g.d0, P[1] + dy / d * g.d0]);
+      o.tug = null; o.el.style.clipPath = ''; o.el.style.maskImage = o.el.style.webkitMaskImage = ''; o.el.style.filter = '';
+      o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF });
+      const p = o.body.getPosition(); o.px = p.x; o.py = p.y; o.pa = o.body.getAngle();
+    }
+    function gore(x, y, nx, ny, n, pow) {
+      for (let k = 0; k < n; k++) {
+        const el = document.createElement('i'), r = Math.random(), sz = 3 + Math.random() * 9; el.className = r < 0.55 ? 'bit' : r < 0.8 ? 'bit ink' : 'bit paper';
+        el.style.width = el.style.height = sz.toFixed(1) + 'px'; el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`; layer.appendChild(el);
+        const an = (Math.random() - 0.5) * 2.4, ca = Math.cos(an), sa = Math.sin(an), sp = (120 + Math.random() * 720) * pow;
+        bits.push({ el, x, y, vx: (nx * ca - ny * sa) * sp, vy: (nx * sa + ny * ca) * sp - 180 * pow, t: 0, life: 0.5 + Math.random() * 0.8 });
+      }
+      run();
+    }
+    // the card screams, and the further it is stretched the louder, the bigger and the more often
+    const AGONY = [
+      ['uh oh', 'not again', 'too… long…', 'I bend, I do not br—', 'pick a side!', 'ъъъгх', 'のびてる!'],
+      ['IT HURTS', 'STOP PULLING', 'MY MIDDLE!!', 'I am not cheese!', 'LET GO LET GO', 'БОЛИИИ!', '痛い!!'],
+      ['AAAAAAAAAAAAAA', 'I CAN SEE MY INSIDES', 'I AM COMING APART', 'NOT LIKE THIS', 'МАМООООО', 'ぎゃああああ!!', 'AAAAAAA—'],
+    ];
+    // what the card on the shelf says while the hand is on its way, and what the cards near it say
+    const PANIC = [
+      ['uh. guys?', 'is that… coming here?', "it's not looking at me. right?", 'nobody move', 'I do not like this shelf', 'ъъъ… хора?', 'あれ、こっち来てる?'],
+      ['IT IS COMING HERE', 'somebody pick me up!', 'not me not me not me', 'I am just a card!', 'take another one!', 'ПОМОЩ!', 'こっち来ないで!'],
+      ['HELP HELP HELP', 'PICK ME UP PICK ME UP', 'I CAN SMELL IT', 'AAAAAAAAAA', 'DO SOMETHING', 'НЕ МЕ ЯЖ!!', '助けてぇぇ!!'],
+    ];
+    const NOTME = ['take that one!', 'not me. phew.', "don't look at me", 'I was never here', 'it wants the one on the shelf', 'вземи него!', 'あっちだよ!'];
+    // fear 0 to 1 as the hand closes in: the card shakes harder and harder, hops, shuffles away from the hand, and says so; loose cards nearby shiver and point at it
+    function panic(o, fear, dt, t) {
+      const c = claw, b = o.body, m = b.getMass(), away = Math.sign(b.getWorldCenter().x * S - scrollX - c.x) || -1;
+      if (fear > 0.05) cardSay(o, 0.1 + 0.9 * fear, PANIC);
+      if (t > (o.jit || 0)) {
+        o.jit = t + 150 - 90 * fear + Math.random() * 60;
+        b.applyLinearImpulse({ x: m * (away * (0.25 + 0.9 * fear) * Math.random() + (Math.random() - 0.5) * 0.5 * fear), y: -m * (0.35 + 2 * fear * Math.random()) }, b.getWorldCenter(), true);
+        b.applyAngularImpulse(b.getInertia() * (Math.random() - 0.5) * (1.2 + 5 * fear), true);
+      }
+      if (t > (c.crowd || 0)) {
+        c.crowd = t + 220; const w0 = b.getWorldCenter();
+        for (const q of objs) {
+          if (q === o || q.kind !== 'card' || q.root || q.tug || (grab && grab.o === q)) continue;
+          const w = q.body.getWorldCenter(); if (Math.hypot(w.x - w0.x, w.y - w0.y) > 6.5) continue;
+          q.body.applyLinearImpulse({ x: (Math.random() - 0.5) * q.body.getMass() * 0.5 * (0.3 + fear), y: -q.body.getMass() * 0.35 * (0.3 + fear) * Math.random() }, w, true);
+          q.body.applyAngularImpulse(q.body.getInertia() * (Math.random() - 0.5) * (0.3 + fear), true);
+          if (t - (c.notme || 0) > TIMING.gap.notme && Math.random() < 0.3 && !q.say) { c.notme = t; talkOn(q, pick(NOTME)); }
+        }
+      }
+    }
+    function cardSay(o, pain, LINES = AGONY) {
+      const t = now(), lvl = pain > 0.62 ? 2 : pain > 0.3 ? 1 : 0; if (o.said && t - o.said < 1500 - 950 * pain && lvl <= (o.lvl || 0)) return;
+      const el = talkOn(o, pick(LINES[lvl])); el.classList.add('agony'); el.style.setProperty('--pain', pain.toFixed(2)); if (lvl) el.dataset.lvl = lvl;
+      o.lvl = lvl;
+    }
+    function clawSlip(P, H) {   // a sharp yank right after it grabs and the claws slide off
+      const o = claw.o; clawUntug(o, P, H); claw.o = null; claw.cool = now() + 2500;
+      clawSet('sulk'); clawSay('slip', true);
+    }
+    function clawRip(P, H) {   // P, H: page px of the pointer and of the claw's grip
+      { const el = claw.o.el; el.style.maskImage = el.style.webkitMaskImage = ''; el.style.filter = ''; }   // the pieces are copies of this element: they must not inherit the stretch look
+      const c = claw, o = c.o, g = o.tug, W = o.w, Hh = o.h, cf = Math.cos(g.phi), sf = Math.sin(g.phi);
+      const mx = (g.gp[0] + g.gh[0]) / 2 + W / 2, my = (g.gp[1] + g.gh[1]) / 2 + Hh / 2, side = (p) => (p[0] - mx) * cf + (p[1] - my) * sf;
+      const src = rectPoly(o), hs = [], us = [], cut = [];
+      for (let i = 0; i < src.length; i++) {
+        const p = src[i], q = src[(i + 1) % src.length], sp = side(p), sq = side(q);
+        (sp >= 0 ? hs : us).push(p);
+        if ((sp > 0 && sq < 0) || (sp < 0 && sq > 0)) { const f = sp / (sp - sq), x = [p[0] + (q[0] - p[0]) * f, p[1] + (q[1] - p[1]) * f]; hs.push(x); us.push(x); cut.push(x); }
+      }
+      if (cut.length !== 2 || !validPoly(hs) || !validPoly(us)) return clawSlip(P, H);
+      // the tear is ragged: both halves get the same teeth along the cut, in the clip-path only. The bodies keep the straight edge
+      const n = Math.max(6, Math.round(Math.hypot(cut[1][0] - cut[0][0], cut[1][1] - cut[0][1]) / 15)), teeth = [];
+      for (let k = 1; k < n; k++) teeth.push([(k + (Math.random() - 0.5) * 0.5) / n, (k % 2 ? 1 : -1) * (4 + Math.random() * 9) * (Math.random() < 0.18 ? 2.2 : 1)]);
+      const jag = (poly) => {
+        const out = [];
+        poly.forEach((p, i) => {
+          out.push(p); const q = poly[(i + 1) % poly.length];
+          if (cut.includes(p) && cut.includes(q)) for (const [f, off] of (p === cut[0] ? teeth : [...teeth].reverse())) out.push([cut[0][0] + (cut[1][0] - cut[0][0]) * f + cf * off, cut[0][1] + (cut[1][1] - cut[0][1]) * f + sf * off]);
+        });
+        return `polygon(${out.map(([x, y]) => `${x.toFixed(1)}px ${y.toFixed(1)}px`).join(',')})`;
+      };
+      const ang = g.psi - g.phi, ca = Math.cos(ang), sa = Math.sin(ang), gr = grab;
+      const part = (poly, at, loc) => {
+        o.body.setTransform({ x: (at[0] - (loc[0] * ca - loc[1] * sa)) / S, y: (at[1] - (loc[0] * sa + loc[1] * ca)) / S }, ang);
+        const p = fragment(o, poly, 'piece', {}, polyArea(poly) < 3000 ? { die: now() + 2500 + Math.random() * 1200 } : {});
+        p.el.style.clipPath = jag(poly); return p;
+      };
+      const mine = part(us, P, g.gp), its = part(hs, H, g.gh);
+      world.destroyJoint(gr.joint); grab = null; o.tug = null; remove(o);
+      hold(mine, P[0], P[1], { pointerId: gr.id, clientX: gr.cx, clientY: gr.cy }); grab.moved = true; grab.h = gr.h; c.g = grab; c.far = false;
+      c.o = its; c.gh = g.gh; c.joint = world.createJoint(new pl.MouseJoint({ maxForce: 4000 * its.body.getMass(), frequencyHz: 30, dampingRatio: 1 }, ground, its.body, { x: H[0] / S, y: H[1] / S }));
+      its.body.setAngularDamping(HELD_SPIN);
+      // strings between the two torn edges, and a mess
+      const ux = Math.cos(g.psi), uy = Math.sin(g.psi), loc = (f) => ({ x: (cut[0][0] + (cut[1][0] - cut[0][0]) * f - W / 2) / S, y: (cut[0][1] + (cut[1][1] - cut[0][1]) * f - Hh / 2) / S });
+      for (let k = 0; k < 7; k++) {
+        const el = document.createElement('i'); el.className = 'strand'; layer.appendChild(el);
+        c.strands.push({ el, q: loc(0.08 + 0.84 * (k + Math.random() * 0.8) / 7), a: mine, b: its, t: 0, life: 0.35 + Math.random() * 1.1, max: 240 + Math.random() * 460, w: 3 + Math.random() * 4 });
+      }
+      for (let k = 0; k <= 8; k++) {
+        const q = loc(k / 8), A = mine.body.getWorldPoint(q), B = its.body.getWorldPoint(q);
+        gore(A.x * S, A.y * S, ux, uy, 5, 1); gore(B.x * S, B.y * S, -ux, -uy, 5, 1); gore((A.x + B.x) / 2 * S, (A.y + B.y) / 2 * S, -uy, ux, 3, 0.6);
+      }
+      say(mine, 'slice', true); clawSet('triumph'); clawSay('rip', true);
+      const m = document.getElementById('projects'); m.classList.remove('shake'); void m.offsetWidth; m.classList.add('shake');
+      if (!c.ripped) { c.ripped = true; toast('It keeps its half.'); }
+    }
+    function clawReset() {
+      const c = claw; if (!c) return;
+      for (const s of c.strands.splice(0)) s.el.remove();
+      if (c.say) { c.say.el.remove(); c.say = null; }
+      c.o = null; c.joint = null; c.snap = null; c.st = 'off'; c.stump = false; c.cool = 0; c.x = html.clientWidth + 340; c.pose = { ...POSES.lurk }; clawDraw(0, 0, 0);
+    }
+    // the crush takes its time: squeeze, stop and savour, squeeze, let it beg, squeeze, hold, and only then the crunch
+    const CRUSH_Q = [[0, 0], [0.8, 0.28], [1.7, 0.32], [2.5, 0.56], [3.7, 0.6], [4.3, 0.84], [5.0, 0.87], [5.18, 1]], CRUSH = 5.18;
+    const crushQ = (t) => { for (let i = 1; i < CRUSH_Q.length; i++) if (t < CRUSH_Q[i][0]) { const [t0, q0] = CRUSH_Q[i - 1], [t1, q1] = CRUSH_Q[i], f = (t - t0) / (t1 - t0); return q0 + (q1 - q0) * f * f * (3 - 2 * f); } return 1; };
+    const crushPause = (t) => (t > 0.8 && t < 1.7) || (t > 2.5 && t < 3.7) || (t > 4.3 && t < 5.0);
+    const BEG = ['please', 'I will be good', 'I have unmerged commits!', 'not the corners', 'we can talk about this', 'моля те…', 'やめて…', 'tell me what you want'];
+    function crushStart(o) {   // the card is in its fist from here on
+      o.hot = 0; o.body.setBullet(false); o.body.setGravityScale(0); o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 }); o.el.style.pointerEvents = 'none';
+      const N = 6, pts = [], ph = Math.random() * 6; for (let k = 0; k < 4 * N; k++) { const f = (k % N) / N, e = Math.floor(k / N); pts.push([e === 0 ? f * o.w : e === 1 ? o.w : e === 2 ? o.w - f * o.w : 0, e === 0 ? 0 : e === 1 ? f * o.h : e === 2 ? o.h : o.h - f * o.h, 0.45 + 0.22 * Math.sin(k * 1.9 + ph) + 0.18 * Math.random()]); }
+      o.tug = { crush: true, a: o.body.getAngle(), pts, spin: (Math.random() - 0.5) * 1.6 }; claw.hy = Math.max(110, Math.min(innerHeight - 110, claw.y));
+    }
+    function snatch(o) { claw.o = o; clawSet('snatch'); }
+    function clawTick(dt) {
+      if (!claw) { if (!ripped.size || isCrazy()) return; clawInit(); }
+      const c = claw; if (isCrazy() || c.st === 'book') return;
+      const vw = html.clientWidth, vh = innerHeight, t = now(); c.t += dt;
+      if (c.o && !objs.has(c.o)) { c.o = null; c.joint = null; c.snap = null; if (c.st !== 'off' && c.st !== 'lurk') { clawSet('sulk'); clawSay('sulk'); } }   // someone cut or smashed what it was holding
+      if (grab !== c.g) { c.g = grab; c.far = false; }
+      const P = grab ? [grab.cx, grab.cy] : null, held = grab && grab.o.kind === 'card' && !grab.o.root ? grab.o : null, o = c.o;
+      const NEAR = Math.min(230, vw * 0.34), FAR = Math.min(300, vw * 0.5), Z = zones(vw), HOLD = Math.min(110, vw * 0.2);
+      const ripE = Math.min(330, 0.3 * Math.min(vw, vh)), strainE = 0.4 * ripE;
+      if (P && P[0] < vw - FAR) c.far = true;   // a card has to be brought over, not just be there
+      let T = [vw + 150, c.ly], rate = 6, aim = Math.PI, pose = POSES.lurk, wig = 0.05, shake = 0, strain = 0;
+      if (!c.o && (c.st === 'lurk' || c.st === 'eager' || c.st === 'sulk' || c.st === 'gloat')) {   // a card thrown its way: it goes for the catch
+        for (const q of objs) {
+          if (q.kind !== 'card' || q.root || q.tug || (grab && grab.o === q)) continue;
+          const v = q.body.getLinearVelocity(), w = q.body.getWorldCenter(), sx = w.x * S - scrollX, sy = w.y * S - scrollY;
+          if (v.x > 5 && Math.hypot(v.x, v.y) > 8 && sx > Z.grab && sx < vw + 40 && sy > 20 && sy < vh - 20) { c.o = q; clawSet('catch'); break; }
+        }
+      }
+      if (c.st === 'off') { T[0] = vw + 340; if (ripped.size) clawSet('lurk'); }
+      else if (c.st === 'lurk') {
+        if (held) { c.ly += (Math.max(80, Math.min(vh - 80, P[1])) - c.ly) * (1 - Math.exp(-dt * 3)); if (t > c.cool && P[0] > Z.tease && !nearShelf(P)) { clawSet('eager'); clawSay('eager'); c.patience = TIMING.span(TIMING.wait.tease) / 1000; } }
+        else {   // nobody is holding anything: is there something lying on the shelf?
+          const q = shelfSnack(); if (shelf) shelf.want = !!q;
+          if (!q) c.eyed = null; else if (q !== c.eyed) { c.eyed = q; c.eyedAt = t; } else if (t > c.cool && t - c.eyedAt > 700) { c.o = q; c.eyed = null; clawSet('reach'); clawSay('shelf', true); }
+        }
+      } else if (c.st === 'reach') {   // it comes for what was left on the shelf: slowly, at a steady creep, the whole arm out across the screen, and the cards can see it coming
+        const o = c.o; pose = POSES.eager; wig = 0.22; rate = 0.9;
+        if (o && objs.has(o) && !onShelf(o)) c.off = (c.off || 0) + dt; else c.off = 0;   // it may hop about in its panic; only a card that has really left the shelf gets away
+        if (!o || (grab && grab.o === o) || c.off > 0.7) { c.o = null; c.off = 0; c.cool = t + 800; clawSet('sulk'); clawSay('sulk'); }
+        else {
+          const w = o.body.getWorldCenter(), Hc = [w.x * S - scrollX, w.y * S - scrollY], q = gripPt(), dist = Math.hypot(q[0] - Hc[0], q[1] - Hc[1]); c.ly = Math.max(80, Math.min(vh - 80, Hc[1]));
+          if (c.d0 == null || c.t < 0.1) c.d0 = Math.max(200, dist);
+          const fear = clamp01(1 - (dist - 60) / c.d0), W0 = wristFor(Hc, aim), dx = W0[0] - c.x, dy = W0[1] - c.y, dl = Math.hypot(dx, dy) || 1, lead = Math.min(dl, 230);
+          T = [c.x + dx / dl * lead, c.y + dy / dl * lead];   // never further ahead than this: a steady creep, easing in only at the very end
+          panic(o, fear, dt, t);
+          if (dist < 36 && c.t > 2.4) {   // it hovers over it for a moment, then: got it. A whole card may get crushed on the spot; otherwise it is dragged off and eaten
+            o.hot = 0; say(o, 'pull', true); c.cool = t + 1500; c.d0 = null;
+            if (o.kind === 'card' && Math.random() < 0.4) { crushStart(o); clawSet('crush'); clawSay('snatch', true); }
+            else {
+              o.body.setAngularDamping(HELD_SPIN); o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 }); o.el.style.pointerEvents = 'none';
+              c.joint = world.createJoint(new pl.MouseJoint({ maxForce: 4000 * o.body.getMass(), frequencyHz: 30, dampingRatio: 1 }, ground, o.body, { x: w.x, y: w.y }));
+              clawSet('eat'); clawSay('grab', true);
+            }
+          }
+        }
+      } else if (c.st === 'eager') {
+        pose = POSES.eager; wig = 0.34; rate = 9;
+        if (!held) clawSet('sulk');
+        else if (nearShelf(P)) clawSet('lurk');   // you are putting it on the shelf: it pulls back and waits for you to look away
+        else if (P[0] < Z.tease - 60) { if (Math.random() < 0.5) snatch(held); else { clawSet('sulk'); clawSay('sulk', true); } }   // teased: it sulks, or it loses its temper
+        else if (c.t > c.patience && P[0] < vw - NEAR) { if (Math.random() < 0.6) snatch(held); else { c.patience = c.t + TIMING.span(TIMING.wait.teaseAgain) / 1000; clawSay('eager', true); } }
+        else {
+          c.ly = Math.max(80, Math.min(vh - 80, P[1])); T = [vw - 10, P[1]]; aim = Math.atan2(P[1] - c.y, P[0] - c.x); if (Math.cos(aim) > -0.4) aim = Math.PI;
+          if (c.far && P[0] > vw - NEAR) { c.o = held; c.pre = clawPre(held); clawSet('lunge'); } else if (c.t > 2.6) clawSay('eager');
+        }
+      } else if (c.st === 'lunge') {
+        pose = POSES.lunge; rate = 38;
+        if (held !== o) { c.o = null; clawSet('sulk'); clawSay('sulk'); }
+        else {
+          const hw = o.body.getWorldPoint(c.pre.ghm), pw = o.body.getWorldPoint(c.pre.gpm), Hc = [hw.x * S - scrollX, hw.y * S - scrollY];
+          aim = Math.atan2(pw.y - hw.y, pw.x - hw.x); T = wristFor(Hc, aim);
+          const q = gripPt(), dist = Math.hypot(q[0] - Hc[0], q[1] - Hc[1]);
+          if (dist < 20 || c.t > 0.4) { if (dist < 90) clawTug(o); else { c.o = null; clawSet('sulk'); clawSay('sulk'); } }
+        }
+      } else if (c.st === 'snatch') {   // out of patience: the arm shoots all the way out to the card, wherever it is
+        pose = POSES.lunge; rate = 34;
+        if (held !== o) { c.o = null; clawSet('sulk'); clawSay('sulk'); }
+        else {
+          const w = o.body.getWorldCenter(), Hc = [w.x * S - scrollX, w.y * S - scrollY], q = gripPt();
+          aim = Math.atan2(Hc[1] - c.y, Hc[0] - c.x); if (Math.cos(aim) > -0.2) aim = Math.PI; T = wristFor(Hc, aim);
+          if (Math.hypot(q[0] - Hc[0], q[1] - Hc[1]) < 34) {   // got it: out of your hand and into its fist
+            drop(); crushStart(o);
+            clawSet('crush'); clawSay('snatch', true);
+          } else if (c.t > 0.9) { c.o = null; clawSet('sulk'); clawSay('sulk'); }
+        }
+      } else if (c.st === 'catch') {   // the arm shoots out to where the card is and plucks it out of the air
+        pose = POSES.lunge; rate = 44; const o = c.o;
+        if (!o || (grab && grab.o === o)) { c.o = null; clawSet('lurk'); }
+        else {
+          const w = o.body.getWorldCenter(), Hc = [w.x * S - scrollX, w.y * S - scrollY], q = gripPt(), dist = Math.hypot(q[0] - Hc[0], q[1] - Hc[1]);
+          aim = Math.atan2(Hc[1] - c.y, Hc[0] - c.x); if (Math.cos(aim) > -0.2) aim = Math.PI; T = wristFor(Hc, aim);
+          if (dist < 70) {
+            o.body.setLinearVelocity({ x: 0, y: 0 }); o.body.setAngularVelocity(o.body.getAngularVelocity() * 0.2); o.hot = 0; o.body.setBullet(false);
+            say(o, 'pull', true); clawSay('caught', true);
+            if (Math.random() < 0.3) { crushStart(o); clawSet('crush'); }   // sometimes it does not feel like sharing
+            else {
+              o.body.setAngularDamping(HELD_SPIN); c.gh = [0, 0]; c.pre = {}; c.snap = null; c.hy = Math.max(110, Math.min(vh - 110, Hc[1]));
+              c.joint = world.createJoint(new pl.MouseJoint({ maxForce: 4000 * o.body.getMass(), frequencyHz: 30, dampingRatio: 1 }, ground, o.body, { x: w.x, y: w.y }));
+              clawSet('has');
+            }
+          } else if (c.t > 0.6) { c.o = null; c.cool = t + 600; clawSet('sulk'); clawSay('sulk'); }
+        }
+      } else if (c.st === 'crush') {
+        const q = crushQ(c.t), rest = crushPause(c.t);   // the fingers close joint by joint with the squeeze; in the pauses it holds still, turns the card over and looks at it
+        pose = { curl: 0.5 + 0.62 * q, th: 0.45 + 0.6 * q, spread: 0.7 - 0.45 * q, eye: rest ? 1.3 : 0.5, pupil: rest ? 1.2 : 0.5, happy: rest && c.t > 2.5 ? 1 : 0 };
+        rate = 7; shake = rest ? 0.6 : 2 + 6 * q; aim = Math.PI + (rest ? Math.sin(c.t * 2.2) * 0.22 : Math.sin(c.t * 24) * 0.05); T = wristFor([vw - HOLD - 90, c.hy], aim);
+        if (rest && !c.sav) { c.sav = true; clawSay('savour', true); } else if (!rest) c.sav = false;
+      } else if (c.st === 'gloat') {
+        pose = POSES.joy; rate = 12; wig = 0.2; aim = Math.PI + Math.sin(c.t * 14) * 0.16; T = wristFor([vw - HOLD - 20, c.hy - 30 + Math.sin(c.t * 14) * 16], aim);
+        if (c.t > 1.3) { c.cool = t + 1200; clawSet('lurk'); }
+      } else if (c.st === 'tug') {
+        const g = o.tug;
+        if (!grab || grab.o !== o) {   // you let go: it has the whole card, which snaps back to its shape
+          c.snap = { t: 0, s0: g.s, psi: g.psi }; o.hot = 0; o.body.setBullet(false); o.body.setGravityScale(0);
+          clawSet('has'); clawSay('keep', true);
+        } else {
+          strain = clamp01((g.e - strainE) / (ripE - strainE)); pose = {}; for (const k in POSES.clamp) pose[k] = POSES.clamp[k] + (POSES.strain[k] - POSES.clamp[k]) * strain;
+          rate = 30; shake = strain * 4; wig = 0.02 + strain * 0.06;
+          const hh = [vw - HOLD, c.hy], give = Math.min(170, Math.max(0, g.e) * 0.35);   // the arm is dragged out a little as you pull
+          let dx = P[0] - hh[0], dy = P[1] - hh[1], dl = Math.hypot(dx, dy) || 1, Hd = [hh[0] + dx / dl * give, hh[1] + dy / dl * give];
+          dx = Hd[0] - P[0]; dy = Hd[1] - P[1]; dl = Math.hypot(dx, dy);
+          if (dl < g.d0) { if (dl < 1) { dx = 1; dy = 0; dl = 1; } Hd = [P[0] + dx / dl * g.d0, P[1] + dy / dl * g.d0]; }   // push the card at it and the hand backs off
+          aim = Math.atan2(P[1] - Hd[1], P[0] - Hd[0]); T = wristFor(Hd, aim);
+        }
+      } else if (c.st === 'has') {
+        pose = POSES.joy; rate = 12; aim = Math.PI + Math.sin(c.t * 3) * 0.08; T = wristFor([vw - HOLD, c.hy], aim);
+        if (grab && grab.o === o) {   // you took hold again
+          if (c.joint) { world.destroyJoint(c.joint); c.joint = null; }
+          if (!o.tug) o.tug = { ...c.pre };
+          c.snap = null; c.pre = clawPre(o, c.gh); clawTug(o);
+        } else if (!c.snap && c.t > 2) {   // bored of it: back it goes, sometimes hard
+          const hard = Math.random() < 0.3; world.destroyJoint(c.joint); c.joint = null; c.o = null;
+          o.body.setGravityScale(FALL); o.body.setAngularDamping(SPIN); o.body.setLinearVelocity(hard ? { x: -24, y: -8 } : { x: -9, y: -7 }); o.body.setAngularVelocity((Math.random() - 0.5) * 8);
+          if (hard) { o.hot = t + 1500; o.body.setBullet(true); say(o, 'throw', true); }
+          c.cool = t + 1200; clawSet('lurk'); clawSay('toss', true);
+        }
+      } else if (c.st === 'triumph') {
+        pose = POSES.joy; rate = 16; wig = 0.05; aim = Math.PI + Math.sin(c.t * 16) * 0.14; T = wristFor([vw - HOLD - 30, c.hy - 50 + Math.sin(c.t * 16) * 22], aim);
+        if (grab && grab.o === o) { world.destroyJoint(c.joint); c.joint = null; c.o = null; o.body.setAngularDamping(HELD_SPIN); c.cool = t + 1200; clawSet('sulk'); clawSay('slip', true); }
+        else if (c.t > 1.4 && o) { o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 }); o.el.style.pointerEvents = 'none'; clawSet('eat'); }
+        else if (!o) clawSet('lurk');
+      } else if (c.st === 'eat') {   // it drags its half off the screen
+        pose = POSES.joy; rate = c.x < vw - 380 ? 1.7 : 5; T = [c.x < vw - 380 ? c.x + 300 : vw + 420, c.y];   // from far away it drags its catch back across the screen at a walk
+        if (c.x > vw + 190 || !o) {
+          if (o) { remove(o); c.o = null; c.joint = null; gore(vw - 6 + scrollX, c.y + scrollY, -1, 0, 16, 0.8); clawSay('eat', true); }
+          c.cool = t + 1800; clawSet('lurk');
+        }
+      } else if (c.st === 'show') {   // driven by the page (Surprise me): it goes where it is told, in the pose it is told
+        const s = c.show; pose = POSES[s.pose] || POSES.eager; rate = s.rate || 8; wig = s.wig ?? 0.15; aim = (s.aim ?? Math.PI) + (s.bob ? Math.sin(c.t * 9) * 0.08 : 0);
+        T = s.tip && c.tip ? [c.x + s.x - c.tip[0], c.y + s.y - c.tip[1]] : wristFor([s.x, s.y + (s.bob ? Math.sin(c.t * 6) * 6 : 0)], aim);   // tip: put the pointing fingertip there
+      } else if (c.st === 'stump') {   // no hand: the arm whips back out of sight, spurting, and stays away until a new one has grown
+        rate = 7; T = [vw + 300, c.ly]; shake = c.t < 1.2 ? 6 : 0;
+        if (c.t < 1.6 && t > (c.drip || 0)) { c.drip = t + 60; gore(c.x + scrollX, c.y + scrollY, -Math.cos(c.a) * -1, -Math.sin(c.a) * -1, 3, 0.5); }
+        if (c.t > 8) { c.stump = false; c.pose = { ...POSES.sulk }; clawSet('regrow'); }
+      } else if (c.st === 'regrow') {   // back, with a new one, and it wants you to see it
+        pose = c.t < 1.6 ? POSES.eager : POSES.joy; rate = 5; wig = 0.45; aim = Math.PI + Math.sin(c.t * 5) * 0.3; T = [vw - 40, c.ly];
+        if (c.t > 0.7 && !c.shown) { c.shown = true; clawSay('regrow', true); }
+        if (c.t > 2.4) { c.shown = false; c.cool = t + 1500; clawSet('lurk'); }
+      } else if (c.st === 'sulk') {
+        pose = POSES.sulk; rate = 4; aim = Math.PI - 0.5; T = [vw + 120, c.ly + 30]; wig = 0.02;
+        if (c.t > 1.6) clawSet('lurk');
+      }
+      c.agit = Math.max(0, (c.agit || 0) - dt * 0.6);
+      if (c.later && t >= c.later.at) { const l = c.later; c.later = null; if (t - l.at < TIMING.gap.handLate) clawSay(l.kind, true); }
+      if (c.react) {
+        const idle = c.st === 'lurk' || c.st === 'sulk';
+        if (t - c.react.born > 6000) c.react = null;   // it was busy for too long: the moment has passed
+        else if (idle && t >= c.react.at && t - (c.said || 0) >= REACT_GAP && t >= (c.sayEnd || 0) + TIMING.gap.after) { clawSay(c.react.kind, true); c.flinch = t + TIMING.react.flinch; c.mood = c.react.kind; c.react = null; }
+      }
+      if (t < (c.flinch || 0) && (c.st === 'lurk' || c.st === 'sulk')) {   // it leans in to say it: fingers drumming, or a fist for the things it disapproves of
+        T = [vw + 36, c.ly]; rate = 10; wig = 0.3; aim = Math.PI + Math.sin(c.t * 9) * 0.06; pose = c.mood === 'katana' || c.mood === 'smash' ? POSES.sulk : c.mood === 'kdrop' || c.mood === 'stab' ? POSES.joy : POSES.eager;
+      }
+      const k = 1 - Math.exp(-dt * rate), ka = 1 - Math.exp(-dt * (rate > 20 ? 30 : 9)), kp = 1 - Math.exp(-dt * (c.st === 'lunge' ? 30 : 12));
+      c.x += (T[0] - c.x) * k; c.y += (T[1] - c.y) * k; c.a += wrapA(aim - c.a) * ka; c.sh += (c.y + 70 - c.sh) * (1 - Math.exp(-dt * 4));
+      for (const key in pose) c.pose[key] = (c.pose[key] || 0) + (pose[key] - (c.pose[key] || 0)) * kp;
+      const Hv = gripPt(), H = [Hv[0] + scrollX, Hv[1] + scrollY];
+      if (c.st === 'crush' && c.o) {   // the card crumples in the fist, screaming, and then there is no card
+        const ob = c.o, g = ob.tug, q = crushQ(c.t), rest = crushPause(c.t), a = g.a + g.spin * q + Math.sin(c.t * (rest ? 55 : 40)) * (rest ? 0.02 : 0.05 * q), sc = 1 - 0.6 * q;
+        ob.body.setTransform({ x: H[0] / S, y: H[1] / S }, a); ob.body.setLinearVelocity({ x: 0, y: 0 }); ob.body.setAngularVelocity(0);
+        ob.el.style.transform = `translate(${(H[0] - ob.ex).toFixed(2)}px, ${(H[1] - ob.ey).toFixed(2)}px) rotate(${a.toFixed(4)}rad) scale(${sc.toFixed(3)})`;
+        ob.el.style.clipPath = `polygon(${g.pts.map(([x, y, r]) => `${(x + (ob.w / 2 - x) * q * r).toFixed(1)}px ${(y + (ob.h / 2 - y) * q * r).toFixed(1)}px`).join(',')})`;
+        ob.el.style.filter = `saturate(${(1 + q).toFixed(2)}) sepia(${(0.4 * q).toFixed(2)}) hue-rotate(-${(30 * q).toFixed(0)}deg) brightness(${(1 - 0.25 * q).toFixed(2)})`;
+        if (rest && c.t > 2.5 && c.t < 3.7) {   // in the long pause it begs
+          if (!g.beg) { g.beg = true; talkOn(ob, pick(BEG)); }
+        } else if (!rest) cardSay(ob, 0.35 + 0.65 * q);
+        if (t > (g.drip || 0)) { g.drip = t + (rest ? 260 : 70); gore(H[0], H[1], 0, 1, 2 + Math.round(4 * q), 0.3 + 0.4 * q); }
+        if (q >= 1) {
+          gore(H[0], H[1], -1, 0, 54, 1.1); gore(H[0], H[1], 0, -1, 22, 0.8);
+          sayAt(H[0], H[1] - 70, pick(SAY.slice), 'scream');
+          ob.tug = null; remove(ob); c.o = null;
+          const m = document.getElementById('projects'); m.classList.remove('shake'); void m.offsetWidth; m.classList.add('shake');
+          clawSet('gloat'); clawSay('crush', true);
+        }
+      } else if (c.st === 'tug' && c.o && c.o.tug && grab && grab.o === c.o) {
+        const g = c.o.tug, Pp = [grab.cx + scrollX, grab.cy + scrollY];
+        g.rip = ripE; tugDraw(c.o, Pp, H);
+        if (g.e > 24) cardSay(c.o, clamp01(g.e / ripE));
+        const st = clamp01((g.e - strainE) / (ripE - strainE));
+        if (g.e > strainE) {
+          g.grip -= dt * (0.1 + 1.6 * st * st); clawSay('tug');
+          if (st > 0.4 && t > (g.drip || 0)) { g.drip = t + 120; gore((Pp[0] + H[0]) / 2, (Pp[1] + H[1]) / 2, 0, 1, 2, 0.35); }   // it starts to drip before it goes
+        } else g.grip = Math.min(1, g.grip + dt * 0.6);
+        const h = grab.h, n = h.length;
+        if (c.t < 0.45 && n > 1 && g.e > 30 && t - h[n - 1][2] < 60 && Math.hypot(h[n - 1][0] - h[n - 2][0], h[n - 1][1] - h[n - 2][1]) / Math.max(1, h[n - 1][2] - h[n - 2][2]) > 2) clawSlip(Pp, H);
+        else if (g.e > ripE || g.grip <= 0) clawRip(Pp, H);
+      } else if (c.st === 'has' && c.o) {
+        const sn = c.snap, ob = c.o;
+        if (sn) {   // the stretch rings out, then it is an ordinary card hanging from the claw
+          sn.t += dt;
+          const s = 1 + (sn.s0 - 1) * Math.exp(-sn.t * 14) * Math.cos(sn.t * 38), d = ob.tug.d0 * s, Pv = [H[0] - Math.cos(sn.psi) * d, H[1] - Math.sin(sn.psi) * d];
+          if (sn.t < 0.45) tugDraw(ob, Pv, H);
+          else {
+            clawUntug(ob, Pv, H); c.snap = null; ob.body.setGravityScale(FALL); ob.body.setAngularDamping(HELD_SPIN);
+            c.joint = world.createJoint(new pl.MouseJoint({ maxForce: 4000 * ob.body.getMass(), frequencyHz: 30, dampingRatio: 1 }, ground, ob.body, { x: H[0] / S, y: H[1] / S }));
+          }
+        } else if (c.joint) c.joint.setTarget({ x: H[0] / S, y: H[1] / S });
+      } else if (c.joint) c.joint.setTarget({ x: H[0] / S, y: H[1] / S });
+      for (let i = c.strands.length - 1; i >= 0; i--) {
+        const s = c.strands[i]; s.t += dt;
+        const gone = !objs.has(s.a) || !objs.has(s.b), A = gone ? null : s.a.body.getWorldPoint(s.q), B = gone ? null : s.b.body.getWorldPoint(s.q);
+        const len = gone ? 0 : Math.hypot(B.x - A.x, B.y - A.y) * S;
+        if (gone || s.t > s.life || len > s.max) { if (!gone) gore((A.x + B.x) / 2 * S, (A.y + B.y) / 2 * S, 0, 1, 2, 0.3); s.el.remove(); c.strands.splice(i, 1); continue; }
+        s.el.style.width = len.toFixed(1) + 'px';
+        s.el.style.transform = `translate(${(A.x * S).toFixed(1)}px, ${(A.y * S).toFixed(1)}px) rotate(${Math.atan2(B.y - A.y, B.x - A.x).toFixed(3)}rad) scaleY(${Math.max(0.2, s.w / 5 * (1 - 0.8 * len / s.max)).toFixed(2)})`;
+      }
+      if (c.say) {
+        if (t > c.say.until) { c.say.el.remove(); c.say = null; }
+        else { c.say.x = Math.min(c.x, Hv[0], vw - 80) - 30 + scrollX; c.say.y = Math.max(70, Math.min(c.y, Hv[1]) - 115) + scrollY; c.say.ax = c.x + scrollX; }   // put on the page in sayLayout()
+      }
+      clawDraw(wig, shake, strain);
+      // the katana's tip through the arm, anywhere along it: the hand comes off
+      const kt = katObj;
+      if (kt && !kt.root && kt.tips && c.arm2 && !c.stump && c.x < vw - 30 && c.st !== 'off' && c.st !== 'show' && c.st !== 'book' && c.st !== 'regrow') {
+        const a = kt.tipWas || kt.tips, b = kt.tips, n = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 8));
+        const near = (q, u, v) => { const ex = v[0] - u[0], ey = v[1] - u[1], f = clamp01(((q[0] - u[0]) * ex + (q[1] - u[1]) * ey) / (ex * ex + ey * ey || 1)); return Math.hypot(q[0] - u[0] - ex * f, q[1] - u[1] - ey * f); };
+        for (let i = 0; i <= n; i++) {
+          const q = [a[0] + (b[0] - a[0]) * i / n - scrollX, a[1] + (b[1] - a[1]) * i / n - scrollY];
+          if (q[0] < vw - 6 && (near(q, c.arm2[1], c.arm2[2]) < 13 || near(q, c.arm2[0], c.arm2[1]) < 16)) { sever(q, kt.tipDt > 0 ? [(b[0] - a[0]) / kt.tipDt, (b[1] - a[1]) / kt.tipDt] : [0, 0]); break; }
+        }
+      }
+    }
+    // whatever the arm's hand was holding is let go, whole, as it was
+    function clawLetGo() {
+      const c = claw, o = c.o; if (c.joint) { world.destroyJoint(c.joint); c.joint = null; }
+      if (o && objs.has(o)) {
+        const mineToo = grab && grab.o === o;
+        if (o.tug && o.tug.crush) { o.tug = null; o.el.style.clipPath = ''; o.el.style.filter = ''; say(o, 'stab', true); }
+        else if (o.tug) { const H = gripPt(), Hp = [H[0] + scrollX, H[1] + scrollY], g = o.tug; clawUntug(o, mineToo ? [grab.cx + scrollX, grab.cy + scrollY] : [Hp[0] - Math.cos(g.psi) * g.d0, Hp[1] - Math.sin(g.psi) * g.d0], Hp); }
+        o.el.style.pointerEvents = ''; o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF });
+        o.body.setGravityScale(mineToo ? 1 : FALL); o.body.setAngularDamping(mineToo ? HELD_SPIN : SPIN); o.body.setAwake(true);
+      }
+      c.o = null; c.snap = null;
+    }
+    function sever(q, v) {   // q: where the blade went through (viewport px), v: how fast the tip was going (px/s)
+      const c = claw, lim = (x) => Math.max(-7, Math.min(7, x / S * 0.3));
+      clawLetGo();
+      const ca = Math.cos(c.a), sa = Math.sin(c.a), o = sevSpawn(c.x + 35 * ca + scrollX, c.y + 35 * sa + scrollY, c.a, c.pose);
+      o.body.setLinearVelocity({ x: lim(v[0]) - 2.5, y: lim(v[1]) - 3 }); o.body.setAngularVelocity((Math.random() - 0.5) * 9);
+      gore(q[0] + scrollX, q[1] + scrollY, -1, 0, 34, 1); gore(q[0] + scrollX, q[1] + scrollY, 1, 0, 22, 0.8); gore(q[0] + scrollX, q[1] + scrollY, 0, -1, 14, 0.7);
+      c.stump = true; c.react = null; c.later = null; c.said = 0; clawSet('stump'); clawSay('severed', true);
+      if (k9()) say(katObj, 'kbrag', true);
+      const m = document.getElementById('projects'); m.classList.remove('shake'); void m.offsetWidth; m.classList.add('shake');
+      if (!c.cutOnce) { c.cutOnce = true; toast('You cut its hand off. It will grow another. The old one has plans of its own.'); }
+    }
+    const k9 = () => !!katObj && !katObj.root;
+
+    // ---- a hand that has been cut off is its own creature: a body like the cards, with a mind that is a table of behaviours.
+    // Each behaviour is an entry in SEV: pose (what the hand looks like), up (it stands on two fingers: the physics holds it upright and off the ground),
+    // enter(o, ai), tick(o, ai, dt, t) and leave(o, ai). sevSet(o, name) switches. To teach it something new, add an entry and a way into it.
+    // o.ai holds its state: st, t (seconds in it), dir (which way it faces and walks), vx (walking speed it wants, m/s), ph (step phase), hh (leg length, m) ----
+    const SEV_SAY = {
+      cut: ['…', '*twitch*', 'ow. wait.', 'where is my arm', 'ъъ?'],
+      rise: ['I can walk?!', 'freedom.', 'who needs an arm', 'look, no arm!', 'сам съм си шеф', '自由だ!'],
+      held: ['put me DOWN', 'unhand me. ha.', 'hands off the hand', 'I bite', 'I was walking here', 'пусни ме!', 'はなせ!'],
+      thrown: ['WHEEE—', 'not agaaain', 'I just got free!', 'ааааа!'],
+      hunt: ['snack.', 'there you are', 'mine mine mine', 'stay still', 'ела тук', 'みーつけた'],
+      squeeze: ['shhh.', 'no arm needed', 'I remember how', 'бавно…'],
+      crush: ['*crunch*', 'still got it', 'squish.', 'смачках го.', 'ぐしゃ'],
+      rest: ['zzz', 'five minutes…', 'tired fingers', 'ねむい…'],
+      drag: ['…ow', 'everything hurts', 'just… a bit… further', 'legs. I need legs.', 'ох, ох, ох'],
+      flee: ['NOT AGAIN', 'keep that thing away!', 'nope nope nope', 'I have seen what it does', 'не, не пак!', 'やだやだやだ!'],
+    };
+    // How it walks. Feet are planted on the ground and stay where they are while the body travels over them; a foot that has fallen too far
+    // behind its place under the body swings forward in an arc to a spot ahead of it, and never while the foot next to it is in the air.
+    // The body is held at hh above the ground and leans. flat: palm down, fingers forward, every finger and the thumb a leg (the classic crawling hand);
+    // otherwise upright on the first two fingers. home: where each foot belongs, px ahead of the body's middle (4 is the thumb).
+    const GAIT = {
+      tiptoe: { hh: 1.5, speed: 1.25, lean: 0.07, step: 62, lift: 24, swing: 0.2, bob: 0.05, home: { 0: 12, 1: -12 } },                       // strolling
+      sneak: { hh: 1.2, speed: 0.6, lean: 0.24, step: 44, lift: 46, swing: 0.4, bob: 0.02, home: { 0: 16, 1: -10 } },                        // stalking: low, slow, each foot lifted high and put down with care
+      scuttle: { flat: true, hh: 0.52, speed: 2.4, lean: 0.06, step: 50, lift: 13, swing: 0.11, bob: 0.03, home: { 0: 104, 1: 86, 2: 66, 3: 46, 4: 2 } },   // the spider walk
+      run: { flat: true, hh: 0.6, speed: 4.4, lean: -0.14, step: 74, lift: 20, swing: 0.07, bob: 0.07, home: { 0: 110, 1: 90, 2: 68, 3: 46, 4: -4 } },    // panic: nose up, legs a blur
+      crawl: { flat: true, drag: true, hh: 0.3, speed: 1.5, lean: 0, step: 64, lift: 9, swing: 0.3, bob: 0, home: { 0: 122, 1: 104 } },       // hurt: on its belly, two fingers reach out and pull the rest along
+    };
+    const TURN = 0.42;   // seconds a turn on the spot takes
+    const NEXT = { 0: [1, 4], 1: [0, 2], 2: [1, 3], 3: [2], 4: [0] };   // which feet are neighbours: two neighbours are never in the air together
+    function sevGround(x, y) {   // the ground under a page point, looking from a little above it down (page px)
+      let best = null; const p1 = { x: x / S, y: y / S - 0.5 }, p2 = { x: x / S, y: y / S + 2.6 };
+      world.rayCast(p1, p2, (f, pt, n, frac) => { const u = f.getBody().getUserData(); if ((u && u.kind === 'hand') || f.isSensor() || !(f.getFilterMaskBits() & 1)) return -1; best = pt.y * S; return frac; });
+      return best;
+    }
+    function sevFeet(o, a, dt) {
+      const g = GAIT[a.gait], b = o.body, p = b.getPosition(), bx = p.x * S, by = p.y * S, v = b.getLinearVelocity(), floor = by + a.hh * S;
+      if (!a.feet || a.feetGait !== a.gait) {   // a new way of walking: the feet it needs are set down where they belong, the others are lifted off
+        const old = a.feet || {}; a.feet = {}; a.feetGait = a.gait;
+        for (const k in g.home) { const hx = bx + a.fd * g.home[k]; a.feet[k] = old[k] || { x: hx, y: sevGround(hx, by) ?? floor, sw: 0 }; }
+      }
+      let air = 0; for (const k in a.feet) if (a.feet[k].sw) air++;
+      for (const k in a.feet) {
+        const f = a.feet[k], hx = bx + a.fd * g.home[k];
+        if (f.sw) {   // in the air: an arc from where it was to where it is going
+          f.u = Math.min(1, f.u + dt / g.swing); const e = f.u * f.u * (3 - 2 * f.u);
+          f.x = f.x0 + (f.x1 - f.x0) * e; f.y = f.y0 + (f.y1 - f.y0) * e - g.lift * Math.sin(Math.PI * f.u);
+          if (f.u >= 1) { f.sw = 0; f.x = f.x1; f.y = f.y1; }
+          continue;
+        }
+        const e = (f.x - hx) * a.fd, far = Math.hypot(f.x - bx, f.y - by) > 190;   // how far ahead of its place it is; negative is behind
+        if (far) { f.x = hx; f.y = sevGround(hx, by) ?? floor; continue; }   // the body was thrown or fell: the foot is simply back under it
+        if ((e < -g.step / 2 || e > g.step * 0.8) && !NEXT[k].some((n) => a.feet[n] && a.feet[n].sw) && air < 2) {
+          const lead = Math.min(g.step * 0.75, g.step / 2 + Math.abs(v.x) * S * g.swing * 0.9), x1 = hx + (Math.abs(v.x) > 0.2 ? a.fd * lead : 0);
+          f.sw = 1; f.u = 0; f.x0 = f.x; f.y0 = f.y; f.x1 = x1; f.y1 = sevGround(x1, by) ?? floor; air++;
+        }
+      }
+      a.air = air;
+      const out = [null, null, null, null, null]; for (const k in a.feet) out[k] = [a.feet[k].x - scrollX, a.feet[k].y - 22 - scrollY];   // the joint above the pointed tip
+      o.hand.feet = out;
+    }
+    const sevs = new Set(), SEV_POSE = {
+      limp: { curl: 0.55, th: 0.5, spread: 0.8, eye: 0.12, pupil: 0.4, happy: 0, point: 0, legs: 0 },
+      walk: { curl: 0.9, th: 0.95, spread: 0.5, eye: 1.15, pupil: 1, happy: 0, point: 0, legs: 1 },
+      sneak: { curl: 0.9, th: 0.95, spread: 0.5, eye: 1.45, pupil: 0.45, happy: 0, point: 0, legs: 1 },
+      run: { curl: 0.9, th: 0.95, spread: 0.5, eye: 1.5, pupil: 0.35, happy: 0, point: 0, legs: 1 },
+      crawl: { curl: 0.6, th: 0.5, spread: 0.7, eye: 0.3, pupil: 0.5, happy: 0, point: 0, legs: 0.45 },
+      held: { curl: 0.25, th: 0.2, spread: 1.3, eye: 1.4, pupil: 0.5, happy: 0, point: 0, legs: 0 },
+      grip: { curl: 0.7, th: 0.75, spread: 0.6, eye: 0.9, pupil: 0.8, happy: 0, point: 0, legs: 0 },
+      fist: { curl: 1.1, th: 1.05, spread: 0.3, eye: 0.35, pupil: 0.45, happy: 0, point: 0, legs: 0 },
+      joy: { curl: 0.9, th: 0.95, spread: 0.5, eye: 1, pupil: 1, happy: 1, point: 0, legs: 1 },
+      rest: { curl: 1, th: 1, spread: 0.3, eye: 0.06, pupil: 0.4, happy: 0, point: 0, legs: 0 },
+    };
+    const sevBusy = () => { for (const o of sevs) if (o.ai.st !== 'rest') return true; return false; };
+    function sevSay(o, kind, force) {
+      const t = now(); if (t - (o.said || -1e9) < (force ? TIMING.gap.sevForce : TIMING.gap.sev)) return;
+      talkOn(o, pick(SEV_SAY[kind])).classList.add('claw-say');
+    }
+    function sevSpawn(px, py, a, pose) {   // page px of the middle of the palm, and the way the fingers point
+      if (sevs.size >= 3) { const old = sevs.values().next().value, w = old.body.getPosition(); gore(w.x * S, w.y * S, 0, -1, 26, 0.9); remove(old); }   // three is a crowd
+      const el = document.createElement('div'); el.className = 'phys hand-hit'; layer.appendChild(el);
+      const o = addBody({ kind: 'hand', el, w: 104, h: 92, ex: 52, ey: 46 }, px / S, py / S, a, new pl.Box(0.4, 0.28), { density: 1.3, friction: 0.9, restitution: 0.05 });
+      el._o = o; o.body.setAngularDamping(2.5);
+      o.hand = { ...handParts('sev'), arm: false, m: 1, x: 0, y: 0, a, sh: 0, pose: { legs: 0, ...pose }, gait: 0, reach: 100 };
+      o.ai = { st: 'limp', t: 0, dir: Math.random() < 0.5 ? -1 : 1, vx: 0, hh: 0.4, gait: 'crawl', stroll: 'tiptoe', up: false, cool: 0, born: now(), hurt: now() + 7500, flee: 0 }; o.ai.face = o.ai.fd = o.ai.dir;
+      sevs.add(o); SEV.limp.enter(o, o.ai); run();
+      return o;
+    }
+    function sevGone(o) { sevs.delete(o); const a = o.ai; if (SEV[a.st].leave) SEV[a.st].leave(o, a); o.hand.under.remove(); o.hand.over.remove(); }
+    function sevSet(o, st) {
+      const a = o.ai; if (SEV[a.st].leave) SEV[a.st].leave(o, a);
+      a.st = st; a.t = 0; a.up = !!SEV[st].up; if (SEV[st].enter) SEV[st].enter(o, a);
+      o.body.setAwake(true); run();
+    }
+    const sevFood = (q) => (q.kind === 'card' || (q.kind === 'piece' && !q.die)) && !q.root && !q.tug && !q.sq && !(grab && grab.o === q) && !(claw && claw.o === q);
+    function sevUnsquash(q) {   // the card it was squeezing is let go, as it was
+      if (!q.sq) return; q.el.style.clipPath = q.sq.clip; q.el.style.filter = ''; q.el.style.pointerEvents = ''; q.sq = null;
+      if (objs.has(q)) { q.body.setGravityScale(FALL); q.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF }); q.body.setAwake(true); }
+    }
+    const SEV = {
+      // just cut off, or just dropped: it lies where it fell and twitches, and then it gets up
+      limp: {
+        pose: 'limp',
+        enter(o, a) { o.body.setAngularDamping(2.5); o.body.setGravityScale(grab && grab.o === o ? 1 : FALL); },
+        tick(o, a, dt, t) {
+          a.wig = a.t < 1.4 ? 0.5 * Math.exp(-a.t * 2) + (Math.sin(a.t * 31) > 0.93 ? 0.6 : 0) : 0.03;
+          if (t - a.born < 1600 && t > (a.drip || 0)) { a.drip = t + 90; const w = o.body.getWorldPoint({ x: -0.5, y: 0 }); gore(w.x * S, w.y * S, 0, -1, 2, 0.3); }
+          if (a.t > 0.9 && t - a.born < 2500) sevSay(o, 'cut');
+          if (a.t > (t - a.born < 4000 ? 2.6 : 0.9) && o.body.getLinearVelocity().length() < 1.2) sevSet(o, 'rise');
+        },
+      },
+      // getting up: on its belly first if it is hurt, otherwise straight onto its fingers
+      rise: {
+        pose: 'walk', up: true,
+        enter(o, a) { a.vx = 0; a.hh = Math.min(a.hh, 0.42); a.gait = now() < a.hurt ? 'crawl' : a.stroll; o.body.setAngularDamping(0.5); },
+        tick(o, a, dt, t) { if (a.t > 0.5 && !a.said1 && a.gait !== 'crawl') { a.said1 = true; sevSay(o, 'rise', true); } if (a.t > 0.8) sevSet(o, 'walk'); },
+      },
+      // walking. How depends on what is going on: dragging itself along while it is hurt, strolling on tiptoe or scuttling like a spider with nothing to do,
+      // stalking a card it has seen and scuttling the last stretch, and running for it when the katana comes near
+      walk: {
+        pose: 'walk', up: true,
+        enter(o, a) { a.turn = now() + 2500 + Math.random() * 4000; a.tired = now() + 14000 + Math.random() * 9000; a.stuck = 0; },
+        tick(o, a, dt, t) {
+          const b = o.body, p = b.getPosition(), v = b.getLinearVelocity();
+          if (t > (a.look || 0)) {   // look around a few times a second
+            a.look = t + 250; a.food = null; let best = 520;
+            if (t > a.cool) for (const q of objs) { if (!sevFood(q)) continue; const w = q.body.getWorldCenter(), dx = (w.x - p.x) * S, dy = (w.y - p.y) * S; if (dy > -90 && dy < 240 && Math.abs(dx) < best && q.body.getLinearVelocity().length() < 2.5) { best = Math.abs(dx); a.food = q; } }
+            if (a.food && !a.hunting) sevSay(o, 'hunt'); a.hunting = !!a.food;
+            const k = katObj && !katObj.root && katObj.tips ? katObj.tips : null;   // the blade that cut it off
+            if (k && Math.hypot(k[0] - p.x * S, k[1] - p.y * S) < 280) { if (t > a.flee) sevSay(o, 'flee', true); a.flee = t + 2200; a.fd = k[0] < p.x * S ? 1 : -1; }
+          }
+          const f = a.food && sevFood(a.food) && objs.has(a.food) ? a.food : null, was = a.gait;
+          a.stuck = Math.abs(v.x) < 0.25 ? a.stuck + dt : 0;
+          if (t < a.flee) { a.gait = 'run'; if (p.x * S < 70) a.fd = 1; else if (p.x * S > size.W - 70) a.fd = -1; }
+          else if (t < a.hurt) { a.gait = 'crawl'; sevSay(o, 'drag'); if (p.x * S < 90) a.fd = 1; else if (p.x * S > size.W - 90) a.fd = -1; }
+          else if (f) {
+            const w = f.body.getWorldCenter(), dx = (w.x - p.x) * S; a.fd = dx < 0 ? -1 : 1; a.gait = Math.abs(dx) > f.w / 2 + 150 ? 'sneak' : 'scuttle';
+            if ((Math.abs(dx) < 46 || (a.stuck > 0.2 && Math.abs(dx) < f.w / 2 + 110)) && Math.abs(w.y - p.y) * S < 260) { a.prey = f; return sevSet(o, 'crush'); }   // over it, or up against its side: it climbs on
+          } else {
+            a.gait = a.stroll;
+            if (p.x * S < 70) a.fd = 1; else if (p.x * S > size.W - 70) a.fd = -1; else if (t > a.turn) { a.fd = -a.fd; a.turn = t + 2500 + Math.random() * 5000; a.stroll = Math.random() < 0.6 ? 'tiptoe' : 'scuttle'; }
+            if (t > a.tired) return sevSet(o, 'rest');
+          }
+          if (a.stuck > 0.7) { a.stuck = 0; if (f) { a.cool = t + 2500; a.food = null; } a.fd = -a.fd; a.turn = t + 2000 + Math.random() * 3000; }
+          const g = GAIT[a.gait]; a.vx = a.fd * g.speed * (g.drag ? (a.air ? 0.12 : 1) : 1);   // dragging: it only moves while both fingers have hold of the ground
+          a.wig = 0.03; a.look2 = a.gait === 'sneak' ? 'sneak' : a.gait === 'run' ? 'run' : a.gait === 'crawl' ? 'crawl' : 'walk';
+        },
+      },
+      // in your hand: it does not like it
+      held: {
+        pose: 'held',
+        enter(o, a) { sevSay(o, 'held', true); },
+        tick(o, a, dt, t) { a.wig = 0.55; if (!grab || grab.o !== o) { a.born = t - 4000; sevSet(o, 'limp'); } else if (a.t > 2.5) sevSay(o, 'held'); },
+      },
+      // it has got hold of a card: it climbs on, closes around it, slowly, and squeezes until there is no card
+      crush: {
+        pose: 'grip',
+        enter(o, a) {
+          const q = a.prey, n = q.poly || rectPoly(q), cx = n.reduce((m, r) => m + r[0], 0) / n.length, cy = n.reduce((m, r) => m + r[1], 0) / n.length, pts = [];
+          for (let i = 0; i < n.length; i++) for (let k = 0; k < 4; k++) { const r = n[(i + 1) % n.length]; pts.push([n[i][0] + (r[0] - n[i][0]) * k / 4, n[i][1] + (r[1] - n[i][1]) * k / 4, 0.4 + 0.25 * Math.sin((i * 4 + k) * 1.9) + 0.2 * Math.random()]); }
+          q.sq = { clip: q.el.style.clipPath, pts, cx, cy }; q.hot = 0; q.body.setGravityScale(0); q.body.setLinearVelocity({ x: 0, y: 0 }); q.body.setAngularVelocity(0);
+          q.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 }); q.el.style.pointerEvents = 'none';
+          o.body.setGravityScale(0); a.from = { x: o.body.getPosition().x, y: o.body.getPosition().y, a: o.body.getAngle() }; say(q, 'pull', true);
+        },
+        tick(o, a, dt, t) {
+          const q = a.prey; if (!q || !objs.has(q) || !q.sq) { a.cool = t + 1500; return sevSet(o, 'limp'); }
+          if (grab && grab.o === o) return sevSet(o, 'held');
+          const T = 3.2, u = clamp01(a.t / T), sq = u < 0.35 ? u / 0.35 * 0.4 : u < 0.6 ? 0.4 + (u - 0.35) * 0.2 : 0.45 + (u - 0.6) / 0.4 * 0.55, pause = u >= 0.35 && u < 0.6;
+          const w = q.body.getWorldPoint({ x: (q.sq.cx - q.w / 2) / S, y: (q.sq.cy - q.h / 2) / S }), k = clamp01(a.t / 0.55), e = k * k * (3 - 2 * k), b = o.body;
+          b.setTransform({ x: a.from.x + (w.x - a.from.x) * e, y: a.from.y + (w.y - 0.42 - a.from.y) * e }, a.from.a + wrapA(Math.PI / 2 - a.from.a) * e + Math.sin(a.t * 30) * 0.03 * sq); b.setLinearVelocity({ x: 0, y: 0 }); b.setAngularVelocity(0);
+          q.body.setLinearVelocity({ x: 0, y: 0 }); q.body.setAngularVelocity(0);
+          const hp = o.hand.pose, g = SEV_POSE.grip, fz = SEV_POSE.fist; for (const key in g) hp[key] = g[key] + (fz[key] - g[key]) * sq; hp.eye = pause ? 1.3 : 0.5; hp.happy = pause ? 1 : 0; a.poseSet = true; a.wig = pause ? 0.02 : 0.05;
+          q.el.style.clipPath = `polygon(${q.sq.pts.map(([x, y, r]) => `${(x + (q.sq.cx - x) * sq * (0.55 + r)).toFixed(1)}px ${(y + (q.sq.cy - y) * sq * (0.55 + r)).toFixed(1)}px`).join(',')})`;
+          q.el.style.filter = `saturate(${(1 + sq).toFixed(2)}) sepia(${(0.4 * sq).toFixed(2)}) hue-rotate(-${(30 * sq).toFixed(0)}deg) brightness(${(1 - 0.25 * sq).toFixed(2)})`;
+          if (pause) sevSay(o, 'squeeze'); else cardSay(q, 0.35 + 0.65 * sq);
+          if (t > (a.drip || 0)) { a.drip = t + (pause ? 240 : 80); gore(w.x * S, w.y * S, 0, 1, 2 + Math.round(3 * sq), 0.3 + 0.4 * sq); }
+          if (u >= 1) {
+            gore(w.x * S, w.y * S, -1, 0, 30, 1); gore(w.x * S, w.y * S, 1, 0, 30, 1); gore(w.x * S, w.y * S, 0, -1, 20, 0.8);
+            sayAt(w.x * S, w.y * S - 110, pick(SAY.slice), 'scream');
+            q.sq = null; remove(q); a.prey = null; a.cool = t + 5000; sevSay(o, 'crush', true); sevSet(o, 'gloat');
+          }
+        },
+        leave(o, a) { if (a.prey) sevUnsquash(a.prey); a.prey = null; a.poseSet = false; if (objs.has(o)) o.body.setGravityScale(grab && grab.o === o ? 1 : FALL); },
+      },
+      // a little dance on the spot
+      gloat: { pose: 'joy', up: true, enter(o, a) { a.vx = 0; a.gait = 'tiptoe'; }, tick(o, a, dt, t) { a.hop = 0.16 * Math.abs(Math.sin(a.t * 9)); if (a.t > 1.5) { a.hop = 0; sevSet(o, 'walk'); } } },
+      // sitting down with its eye shut. Anything that touches it, or a while of real time, and it is up again
+      rest: {
+        pose: 'rest',
+        enter(o, a) { sevSay(o, 'rest', true); o.body.setAngularDamping(2.5); a.wake = now() + 7000 + Math.random() * 7000; setTimeout(() => { if (objs.has(o) && a.st === 'rest') sevSet(o, 'rise'); }, TIMING.wait.sevRest); },
+        tick(o, a, dt, t) { a.wig = 0; if (t > a.wake || o.body.getLinearVelocity().length() > 1.5) sevSet(o, 'rise'); },
+      },
+    };
+    // inside the physics step: a walking hand is held up by its legs (a spring to the ground under it), turned to the angle its gait wants, and pushed along
+    function sevStep(o) {
+      const a = o.ai; if (!a.up || (grab && grab.o === o)) return;
+      const g = GAIT[a.gait], b = o.body, p = b.getPosition(), v = b.getLinearVelocity(), m = b.getMass(), L = a.hh + 0.5; let fr = 1;
+      world.rayCast(p, { x: p.x, y: p.y + L }, (f, pt, n, frac) => { if (f.getBody() === b || f.isSensor() || !(f.getFilterMaskBits() & 1)) return -1; fr = frac; return frac; });
+      const h = fr * L, on = fr < 1 && h < a.hh + 0.14; let fx = 0, fy = 0;
+      if (!g.drag && fr < 1 && h < a.hh + 0.3) fy = -m * Math.max(0, Math.min(170, GRAVITY * FALL + 520 * (a.hh - h) + 42 * v.y));
+      if (on) fx = m * (a.vx - v.x) * (g.drag ? 30 : 14);
+      b.applyForceToCenter({ x: fx, y: fy }, true);
+      const want = g.flat ? (a.fd > 0 ? 0 : Math.PI) - a.fd * g.lean : Math.PI / 2 + a.fd * g.lean * Math.min(1, Math.abs(v.x) + 0.4);
+      b.applyTorque(b.getInertia() * (900 * wrapA(want - b.getAngle()) - 54 * b.getAngularVelocity()), true);
+    }
+    // once per frame: every cut-off hand thinks, and is drawn where its body is
+    function sevTick(dt) {
+      if (!sevs.size) return;
+      const t = now();
+      for (const o of [...sevs]) {
+        const a = o.ai, h = o.hand; a.t += dt;
+        if (grab && grab.o === o && a.st !== 'held') sevSet(o, 'held');
+        SEV[a.st].tick(o, a, dt, t);
+        if (!objs.has(o)) continue;
+        const b = o.body, p = b.getPosition(), ang = b.getAngle(), pose = SEV_POSE[SEV[a.st].pose], kp = 1 - Math.exp(-dt * 10);
+        const look = a.st === 'walk' && a.look2 ? SEV_POSE[a.look2] : pose;
+        if (!a.poseSet) for (const key in look) h.pose[key] = (h.pose[key] || 0) + (look[key] - (h.pose[key] || 0)) * kp;
+        if (a.up) {   // the palm faces back, the knuckles lead; height follows the gait, with a dip each time a foot is in the air
+          // Turning round: it slows to a stop, turns on the spot (seen from the side that is the whole hand narrowing to edge-on and opening out again
+          // the other way round), ducking a little, and sets off again. At the edge-on moment body and feet are swapped left for right
+          if (a.face !== a.dir) {
+            const was = a.face; a.face = a.dir > a.face ? Math.min(a.dir, a.face + dt / TURN * 2) : Math.max(a.dir, a.face - dt / TURN * 2);
+            if (was * a.face <= 0 && a.fd !== a.dir) {
+              a.fd = a.dir; b.setTransform(p, Math.PI - ang); b.setAngularVelocity(-b.getAngularVelocity()); o.pa = Math.PI - ang;
+              if (a.feet) for (const k in a.feet) { const f = a.feet[k]; f.x = 2 * p.x * S - f.x; if (f.sw) { f.x0 = 2 * p.x * S - f.x0; f.x1 = 2 * p.x * S - f.x1; } }
+            }
+          }
+          const open = Math.abs(a.face), g = GAIT[a.gait]; a.vx = a.fd === a.dir ? a.vx * open * open : 0;
+          h.m = -a.fd; h.sx = Math.max(0.07, Math.sin(open * Math.PI / 2)); h.cx = p.x * S - scrollX;
+          a.hh += (g.hh * (1 - 0.1 * (1 - open)) - (a.air ? g.bob : 0) - (a.hop || 0) - a.hh) * (1 - Math.exp(-dt * 9));
+          sevFeet(o, a, dt);
+        } else { h.feet = null; a.feet = null; h.sx = 1; a.face = a.fd = a.dir; }
+        const ang2 = b.getAngle();
+        h.a = ang2; h.x = p.x * S - scrollX - 35 * Math.cos(ang2); h.y = p.y * S - scrollY - 35 * Math.sin(ang2);
+        handDraw(h, a.wig || 0, 0, 0);
+      }
+    }
+    window.__sev = { list: sevs, SEV, POSES: SEV_POSE, set: sevSet, spawn: sevSpawn, say: sevSay, cut: () => claw && sever([claw.x, claw.y], [0, 0]) };   // for tests, and for whoever teaches it more
+
+    // the arm and hand, rebuilt each frame from the pose: bones as tapered limbs with knobbly joints, a talon on every finger.
+    // c is the arm's own hand (claw) or a cut-off one: arm false draws no arm, stump draws the arm with nothing on the end, m -1 mirrors it,
+    // and pose.legs stands it on its first two fingers, stepping with c.gait
+    function clawDraw(wig, shake, strain) { handDraw(claw, wig, shake, strain); }
+    function handDraw(c, wig, shake, strain) {
+      const p = c.pose, ca = Math.cos(c.a), sa = Math.sin(c.a), tm = now() / 1000, vw = html.clientWidth, mr = c.m || 1;
+      const ox = c.x + (Math.random() - 0.5) * shake, oy = c.y + (Math.random() - 0.5) * shake, f1 = (v) => v.toFixed(1);
+      const sx = c.sx ?? 1, cx = c.cx ?? 0;   // sx under 1 narrows the whole drawing towards the upright line through cx: the hand turning round, seen from the side
+      const tf = (x, y) => { const X = ox + x * ca + mr * y * sa; return [sx === 1 ? X : cx + (X - cx) * sx, oy + x * sa - mr * y * ca]; };
+      const limb = (pts, ws) => {
+        let d = '';
+        for (let i = 0; i < pts.length; i++) {
+          const [x, y] = pts[i], r = ws[i] / 2 * (i && i < pts.length - 1 ? 1.34 : i ? 1.05 : 1);
+          d += `M${f1(x - r)} ${f1(y)}a${f1(r)} ${f1(r)} 0 1 0 ${f1(2 * r)} 0a${f1(r)} ${f1(r)} 0 1 0 ${f1(-2 * r)} 0Z`;
+          if (i + 1 < pts.length) {
+            const [X, Y] = pts[i + 1], dx = X - x, dy = Y - y, l = Math.hypot(dx, dy) || 1, nx = -dy / l, ny = dx / l, a = ws[i] / 2, b = ws[i + 1] / 2;
+            d += `M${f1(x + nx * a)} ${f1(y + ny * a)}L${f1(X + nx * b)} ${f1(Y + ny * b)}L${f1(X - nx * b)} ${f1(Y - ny * b)}L${f1(x - nx * a)} ${f1(y - ny * a)}Z`;
+          }
+        }
+        return d;
+      };
+      // a finger is three bones on three joints. It arches back at the first knuckle and hooks at the other two, so even an open hand is a claw;
+      // curling adds to every joint. Knuckles are knobs wider than the bones, each with two crease lines, and the talon is a long curved hook
+      // With a foot (hand space) the finger is a leg: its tip is put exactly there and the joints are solved backwards from it, knee towards the back of the hand
+      const finger = (f, curl, sgn, spread, foot) => {
+        let a = f.a * spread, x = f.b[0], y = f.b[1]; const loc = [[x, y]], dirs = [];
+        if (foot) {
+          const L1 = f.l[0] * 1.1, L2 = f.l[1] * 1.1, L3 = f.l[2] * 1.1, B = L2 + L3 * 0.94, d = Math.max(Math.abs(L1 - B) + 2, Math.min((L1 + B) * 0.995, Math.hypot(foot[0] - x, foot[1] - y))), ang = Math.atan2(foot[1] - y, foot[0] - x);
+          const a1 = ang - Math.acos(Math.max(-1, Math.min(1, (L1 * L1 + d * d - B * B) / (2 * L1 * d)))), kx = x + L1 * Math.cos(a1), ky = y + L1 * Math.sin(a1), fx = x + d * Math.cos(ang), fy = y + d * Math.sin(ang);
+          const a2 = Math.atan2(fy - ky, fx - kx) - 0.16, jx = kx + L2 * Math.cos(a2), jy = ky + L2 * Math.sin(a2), a3 = Math.atan2(fy - jy, fx - jx);
+          dirs.push(a1, a2, a3); loc.push([kx, ky], [jx, jy], [fx, fy]); a = a3; x = fx; y = fy; sgn = 1;
+        } else for (let j = 0; j < 3; j++) { a += sgn * (curl * BEND[j] + ARCH[j]); dirs.push(a); x += Math.cos(a) * f.l[j] * 1.1; y += Math.sin(a) * f.l[j] * 1.1; loc.push([x, y]); }
+        const pts = loc.map(([lx, ly]) => tf(lx, ly)), w = f.w * 0.86, L = pts[3], tl = w * 2.4, hook = sgn * (0.55 + curl * 0.35);
+        const P = (r, da, side) => tf(x + Math.cos(a + da) * r - Math.sin(a) * side, y + Math.sin(a + da) * r + Math.cos(a) * side), tip = P(tl, hook, 0);
+        const c1 = P(tl * 0.55, hook * 0.25, -sgn * w * 0.42), c2 = P(tl * 0.5, hook * 0.75, sgn * w * 0.3), b1 = P(-w * 0.15, 0, -sgn * w * 0.3), b2 = P(-w * 0.15, 0, sgn * w * 0.3);
+        const talon = `M${f1(b1[0])} ${f1(b1[1])}Q${f1(c1[0])} ${f1(c1[1])} ${f1(tip[0])} ${f1(tip[1])}Q${f1(c2[0])} ${f1(c2[1])} ${f1(b2[0])} ${f1(b2[1])}Z`;
+        let crease = '';
+        for (let j = 1; j < 3; j++) for (const off of [-0.16, 0.16]) {   // across the knuckle, on the outside of the bend
+          const ang = (dirs[j - 1] + dirs[j]) / 2, r = w * (j === 1 ? 0.5 : 0.42), cx = loc[j][0] + Math.cos(ang) * off * w, cy = loc[j][1] + Math.sin(ang) * off * w;
+          const q0 = tf(cx - Math.sin(ang) * r * -sgn * 0.1, cy + Math.cos(ang) * r * -sgn * 0.1), q1 = tf(cx + Math.sin(ang) * r * sgn * -1, cy - Math.cos(ang) * r * sgn * -1);
+          crease += `M${f1(q0[0])} ${f1(q0[1])}L${f1(q1[0])} ${f1(q1[1])}`;
+        }
+        return { pts, talon, crease, tip, d: limb(pts, [w, w * 0.9, w * 0.78, w * 0.56]) };
+      };
+      // feet: where each finger's tip stands (viewport px; 0 to 3 the fingers, 4 the thumb). A finger with no foot curls by the pose; pose.legs makes a fist of those
+      const pt = p.point || 0, lg = p.legs || 0, ft = c.feet, toL = (q) => { const dx = (sx === 1 ? q[0] : cx + (q[0] - cx) / sx) - ox, dy = q[1] - oy; return [dx * ca + dy * sa, mr * (dx * sa - dy * ca)]; }, fs = FING.map((f, i) => {
+        let cu = (p.curl + wig * Math.sin(tm * 12 + i * 1.4)) * (1 - pt) + (i ? 1.1 : -0.22) * pt;   // point: the first finger straightens, the others close
+        if (lg) cu = cu * (1 - lg) + lg * 1.15;
+        return finger(f, cu, 1, p.spread * (1 - lg) + 0.3 * lg, ft && ft[i] ? toL(ft[i]) : null);
+      });
+      c.tip = fs[0].tip;
+      const th = finger(THUMB, p.th + wig * Math.sin(tm * 12 + 5), -1, 1, ft && ft[4] ? toL(ft[4]) : null);
+      // arm: in from past the edge, a bony elbow, a bend that straightens under strain
+      const A = [vw + 90, c.sh], Wp = [ox, oy], ax = Wp[0] - A[0], ay = Wp[1] - A[1], al = Math.hypot(ax, ay) || 1, bend = (10 + 44 * (1 - strain));
+      let ex = (A[0] + Wp[0]) / 2 + ay / al * bend, ey = (A[1] + Wp[1]) / 2 - ax / al * bend; if (ax > 0) { ex = (A[0] + Wp[0]) / 2; ey = (A[1] + Wp[1]) / 2; }
+      const arm = [A, [ex, ey], Wp], noArm = c.arm === false, armD = noArm ? limb([tf(-17, 1), tf(8, 0)], [18, 22]) : limb(arm, [44, 30, 21]);
+      if (!noArm) c.arm2 = arm;
+      if (c.stump && c.st === 'stump') {   // the hand is gone: the arm ends in a raw ring
+        c.flesh.setAttribute('d', armD); for (const key of ['thumb', 'talonT', 'talon', 'crease', 'eye', 'pupil']) c[key].setAttribute('d', '');
+        c.vein.setAttribute('d', `M${f1(ox - 8)} ${f1(oy)}a8 8 0 1 0 16 0a8 8 0 1 0 -16 0M${f1(ox - 3)} ${f1(oy)}a3 3 0 1 0 6 0a3 3 0 1 0 -6 0`); return;
+      }
+      let palm = PALM.map(([x, y]) => tf(x, y)), ar = 0; palm.forEach((q, i) => { const r = palm[(i + 1) % palm.length]; ar += q[0] * r[1] - r[0] * q[1]; }); if (ar > 0) palm.reverse();   // same winding as the limbs, or the overlaps would cut holes
+      const mid = (q, r) => [(q[0] + r[0]) / 2, (q[1] + r[1]) / 2], m0 = mid(palm[palm.length - 1], palm[0]);
+      let pd = `M${f1(m0[0])} ${f1(m0[1])}`; palm.forEach((q, i) => { const m = mid(q, palm[(i + 1) % palm.length]); pd += `Q${f1(q[0])} ${f1(q[1])} ${f1(m[0])} ${f1(m[1])}`; }); pd += 'Z';
+      c.flesh.setAttribute('d', armD + pd + fs.map((f) => f.d).join(''));
+      c.thumb.setAttribute('d', th.d); c.talonT.setAttribute('d', th.talon);
+      c.talon.setAttribute('d', fs.map((f) => f.talon).join('')); c.crease.setAttribute('d', fs.map((f) => f.crease).join(''));
+      const line = (pts) => 'M' + pts.map((q) => `${f1(q[0])} ${f1(q[1])}`).join('L');
+      c.vein.setAttribute('d', fs.map((f, i) => line([tf(FING[i].b[0] - 30, FING[i].b[1] * 0.45), ...f.pts.slice(0, 3)])).join('') + (noArm ? '' : line([tf(18, 6), Wp, [ex + 3, ey + 4], [A[0], A[1] + 6]]) + line([tf(-2, -6), [ex - 2, ey - 6]])));
+      // one eye on the back of the hand
+      const E = [36, -2], hh = 8.5 * Math.max(0.08, p.eye), happy = p.happy > 0.5, q = (x, y) => { const v = tf(E[0] + x, E[1] + y); return `${f1(v[0])} ${f1(v[1])}`; };
+      c.eye.setAttribute('class', happy ? 'eye happy' : 'eye');
+      c.eye.setAttribute('d', happy ? `M${q(-12, 4)}Q${q(0, -13)} ${q(12, 4)}` : `M${q(-14, 0)}Q${q(0, -2 * hh)} ${q(14, 0)}Q${q(0, 2 * hh)} ${q(-14, 0)}Z`);
+      const pw = 2.2 + 2.6 * p.pupil, ph = hh * 0.82;
+      c.pupil.setAttribute('d', happy ? '' : `M${q(3, -ph)}Q${q(3 + pw, 0)} ${q(3, ph)}Q${q(3 - pw, 0)} ${q(3, -ph)}Z`);
+    }
+    // ---- 棚 the shelf: a secret. The code is written in the top right corner of the banner, under the fog. Type it (tana, or рафт) and a shelf
+    // comes out of the left edge, where you are looking; type it again and it goes. It is part of the ground, like the floor. A card left lying on it
+    // is a card nobody is holding: the hand comes for it, slowly, with its whole arm out across the screen ----
+    let shelf = null;
+    function shelfOn(at) {
+      const W = size.W, w = Math.min(260, W * 0.42), x0 = 0, x1 = w;   // on the very left: the hand has to come all the way across the screen for it
+      const clear = hero.getBoundingClientRect().bottom + scrollY + 250;   // low enough that a card lying on it does not cover the katana in the banner
+      const y = Math.round(Math.max(140, Math.min(size.H - 160, at ?? Math.min(Math.max(scrollY + innerHeight * 0.56, clear), scrollY + innerHeight - 70))));
+      const fx = ground.createFixture({ shape: new pl.Box(w / 2 / S, 0.07, { x: (x0 + w / 2) / S, y: (y + 7) / S }, 0), friction: 0.9, filterCategoryBits: 3 });
+      const el = document.createElement('div'); el.className = 'shelf'; el.style.left = x0 + 'px'; el.style.top = y + 'px'; el.style.width = w + 'px'; layer.prepend(el);
+      shelf = { fx, el, x0, x1, y, w, want: false };
+      for (const o of objs) o.body.setAwake(true);
+      run();
+    }
+    function shelfOff() { ground.destroyFixture(shelf.fx); shelf.el.remove(); shelf = null; for (const o of objs) o.body.setAwake(true); run(); }
+    const onShelf = (o) => { if (!shelf || !objs.has(o)) return false; for (let ce = o.body.getContactList(); ce; ce = ce.next) { const k = ce.contact; if ((k.getFixtureA() === shelf.fx || k.getFixtureB() === shelf.fx) && k.isTouching()) return true; } return false; };
+    const nearShelf = (P) => !!shelf && P[0] + scrollX > shelf.x0 - 120 && P[0] + scrollX < shelf.x1 + 60 && P[1] + scrollY > shelf.y - 380 && P[1] + scrollY < shelf.y + 80;
+    function shelfSnack() {   // a card or a big piece lying still on the shelf, on screen, in nobody's hand
+      if (!shelf) return null;
+      for (const o of objs) {
+        if ((o.kind !== 'card' && (o.kind !== 'piece' || o.die)) || o.root || o.tug || o.sq || (grab && grab.o === o) || !onShelf(o)) continue;
+        const w = o.body.getWorldCenter(), sy = w.y * S - scrollY; if (sy < 60 || sy > innerHeight - 40 || o.body.getLinearVelocity().length() > 0.6) continue;
+        return o;
+      }
+      return null;
+    }
+    window.__shelf = () => {
+      if (isCrazy()) return;
+      load().then(() => {
+        init();
+        if (shelf) { shelfOff(); toast('The shelf is gone.'); } else { shelfOn(); toast(ripped.size ? '棚 · A shelf. Leave a card on it and look away.' : '棚 · A shelf. Pull a card out and leave it there.'); }
+      }).catch(() => {});
+    };
+    // ---- put everything back ----
+    function showReset() {
+      if (resetBtn) { resetBtn.hidden = false; return; }
+      resetBtn = document.createElement('button'); resetBtn.type = 'button'; resetBtn.className = 'btn ghost reset-cards'; resetBtn.textContent = 'Put the cards back';
+      resetBtn.addEventListener('click', resetAll); actions.appendChild(resetBtn);
+    }
+    function resetAll() {
+      clawReset();
+      for (const o of [...objs]) remove(o);
+      for (const p of bits.splice(0)) p.el.remove();
+      wounds.length = 0;
+      kat.classList.remove('away'); sheatheBtn.hidden = true;
+      hits.length = 0; blasts.length = 0; ripped.clear(); resetBtn.hidden = true;
+      document.querySelectorAll('#grid .card.held').forEach((c) => { c.classList.remove('held'); c.classList.add('regrow'); setTimeout(() => c.classList.replace('regrow', 'settled'), 700); });
+    }
+    // the grid re-renders on search or theme changes: keep torn-out cards out of it
+    document.addEventListener('cards-rendered', () => {
+      for (const o of [...objs]) if (o.root && o.kind === 'card') remove(o);
+      document.querySelectorAll('#grid .card').forEach((c) => { if (ripped.has(c.dataset.key)) c.classList.add('held'); });
+    });
+    window.__cards = { objs, S, bits, state: () => ({ grab, press, loopOn, size, found, katana: katObj, claw, shelf }) };   // for browser tests
+    window.__lines = { SAY, CLAW_SAY, AGONY, BEG, PANIC, NOTME, SEV_SAY };   // every line anything here can say: the phrasebook (scripts/phrasebook.js) prints them from these lists
+    // the phrasebook borrows the hand: while its state is 'book' the tick below leaves it alone and the book poses and draws it itself.
+    // Surprise me calls it in for a scene: come() brings its grip to a point (viewport px), to() moves or re-poses it, say() and leave()
+    window.__hand = { get: () => { if (!claw) clawInit(); return claw; }, draw: clawDraw, set: clawSet, POSES, katanaSvg,
+      async come(x, y, pose) {
+        await load(); init(); if (!claw) clawInit();
+        claw.show = { x, y, pose: pose || 'eager', rate: 6, bob: true }; claw.y = y; claw.ly = y; claw.sh = y + 70; clawSet('show');
+      },
+      to(o) { if (claw && claw.st === 'show') { Object.assign(claw.show, o); claw.t = 0; run(); } },
+      say(kind) { return claw ? clawSay(kind, true) || 0 : 0; },   // how long the line will be up (0: it was held back a moment)
+      grip() { return claw ? gripPt() : null; },
+      leave() { if (claw && claw.st === 'show') { claw.show = null; clawSet('sulk'); } },
+    };
+  })();
+
+  // ---- greeting typewriter: Bulgarian, Japanese, English ----
+  const hellos = ['Hi there.', 'Здравей.', 'こんにちは。', 'Welcome.', 'Добре дошли.', 'ようこそ。']; // always English, then Bulgarian, then Japanese
+  const helloEl = document.getElementById('hello');
+  if (reduced) helloEl.textContent = hellos[0];
+  else (async function type() {
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    for (let k = 0; ; k = (k + 1) % hellos.length) {
+      const word = [...hellos[k]];
+      for (let j = 1; j <= word.length; j++) { helloEl.textContent = word.slice(0, j).join(''); await wait(85); }
+      await wait(2200);
+      for (let j = word.length - 1; j >= 0; j--) { helloEl.textContent = word.slice(0, j).join(''); await wait(40); }
+      await wait(260);
+    }
+  })();
+
+  // ---- surprise me: slot-machine through project names, then draw an omikuji fortune ----
+  const surprise = document.getElementById('surprise'), label = document.getElementById('surprise-label');
+  surprise.addEventListener('click', async () => {
+    if (!data || !data.projects.length || surprise.classList.contains('rolling')) return;
+    const list = data.projects.filter((p) => !/^https:\/\/github\.com\//.test(p.url));
+    const pick = list[Math.floor(Math.random() * list.length)] || data.projects[0];
+    surprise.classList.add('rolling');
+    const steps = reduced ? 1 : 14;
+    for (let s = 0; s < steps; s++) {
+      label.textContent = list[Math.floor(Math.random() * list.length)].name;
+      await new Promise((r) => setTimeout(r, 40 + s * s * 1.6));
+    }
+    label.textContent = 'Surprise me';
+    surprise.classList.remove('rolling');
+    drawFortune(list, pick);
+  });
+
+  // the surprise is an omikuji: a fortune slip with a project picked for you
+  const FORTUNES = [
+    ['大吉', 'Great blessing · Голям късмет', 'The fog parts just for you today.', 3],
+    ['中吉', 'Middle blessing · Среден късмет', 'Something you build today will compile on the first try.', 3],
+    ['小吉', 'Small blessing · Малък късмет', 'A small bug will flee before you.', 3],
+    ['吉', 'Blessing · Късмет', 'The katana is on your side. Mostly.', 3],
+    ['末吉', 'Future blessing · Бъдещ късмет', [   // a random line, original, in Japanese (the English is the tooltip)
+      ['霧の中で、自分の形を忘れていく', 'In the fog I am forgetting my own shape'],
+      ['割れた鏡の向こうで、知らない顔が笑う', 'Beyond the broken mirror, a face I do not know is smiling'],
+      ['崩れていく僕を、誰か見つけて', 'Someone, find me while I crumble'],
+      ['止まった時計の中で、まだ息をしている', 'Inside a stopped clock, I am still breathing'],
+      ['霧が晴れたら、僕はまだここにいるかな', 'When the fog lifts, will I still be here?'],
+      ['色のない世界で、赤だけが痛い', 'In a world without colour, only the red hurts'],
+      ['名前を呼ばれても、返事ができない', 'They call my name and I cannot answer'],
+    ], 2],
+    ['凶', 'Curse · Лош късмет', 'Tie this slip to a tree and draw again.', 1],
+  ];
+  const omi = document.getElementById('omikuji'), slip = document.getElementById('slip');
+  const $ = (id) => document.getElementById(id), goBtn = $('omi-go'), noBtn = $('omi-no'), qEl = $('omi-q'), actEl = $('omi-actions');
+  let scene = null;   // the hand's coin-flip scene while it runs
+  function drawFortune(list, pick) {
+    const total = FORTUNES.reduce((a, f) => a + f[3], 0);
+    let r = Math.random() * total, f = FORTUNES[0];
+    for (const x of FORTUNES) { if ((r -= x[3]) < 0) { f = x; break; } }
+    $('omi-kanji').textContent = f[0]; $('omi-name').textContent = f[1]; { const t = Array.isArray(f[2]) ? f[2][Math.floor(Math.random() * f[2].length)] : [f[2], '']; $('omi-text').textContent = t[0]; $('omi-text').title = t[1]; $('omi-text').lang = Array.isArray(f[2]) ? 'ja' : ''; }
+    $('omi-proj').textContent = pick.name; $('omi-desc').textContent = pick.description || '';
+    goBtn.href = pick.url; qEl.textContent = window.__hand && !isCrazy() ? '' : 'Go there?';
+    { const b = band(pick.name, 0); slip.style.setProperty('--c1', b.c1); slip.style.setProperty('--tile', b.style.slice(b.style.indexOf(':') + 1).replaceAll('&quot;', '"')); }   // the project's own embroidery
+    actEl.innerHTML = ''; actEl.append(goBtn, noBtn); goBtn.classList.remove('pressed'); noBtn.disabled = false;
+    slip.classList.toggle('curse', f[0] === '凶');
+    omi.hidden = false; fitOmi(); secret.classList.remove('near'); found = false;
+    slip.style.animation = 'none'; void slip.offsetWidth; slip.style.animation = '';
+    const seal = slip.querySelector('.omi-seal'); seal.style.animation = 'none'; void seal.offsetWidth; seal.style.animation = '';
+    goBtn.focus({ preventScroll: true });
+    setTimeout(askHand, 700);
+  }
+  function closeFortune() { if (scene) return; omi.hidden = true; unpeek(); surprise.focus({ preventScroll: true }); }
+  // keep the slip on screen when the page is pinch-zoomed: fixed boxes follow the layout viewport, so sit on the visible one instead
+  function fitOmi() {
+    const v = window.visualViewport; if (!v || omi.hidden) return;
+    Object.assign(omi.style, v.scale > 1.01 ? { inset: 'auto', left: v.offsetLeft + 'px', top: v.offsetTop + 'px', width: v.width + 'px', height: v.height + 'px' } : { inset: '', left: '', top: '', width: '', height: '' });
+  }
+  if (window.visualViewport) { visualViewport.addEventListener('resize', fitOmi); visualViewport.addEventListener('scroll', fitOmi); }
+  // the secret ×: it rises when the pointer comes within ~90px of the screen's bottom-left corner, and the hand panics.
+  // Clicking it closes the slip there and then, coin game or not
+  const secret = $('omi-secret'); let found = false, peek = false;
+  document.addEventListener('pointermove', (e) => {
+    if (omi.hidden) return;
+    const o = omi.getBoundingClientRect(), r = slip.getBoundingClientRect(), near = Math.hypot(e.clientX - (o.left + 29), e.clientY - (o.bottom - 29)) < 90;
+    if (near === secret.classList.contains('near')) return;
+    secret.classList.toggle('near', near);
+    if (!near || found) return;
+    found = true;
+    const H = window.__hand; if (!H || isCrazy()) return;
+    if (scene) { H.say('secret'); return; }
+    // the hand was not out: it bursts in to protest
+    peek = true; clearTimeout(showOff); root.classList.add('hand-show');
+    const vw = document.documentElement.clientWidth;
+    H.come(Math.min(vw - 70, r.right + 70), r.top + r.height * 0.6, 'clamp').then(() => { if (peek) setTimeout(() => peek && H.say('secret'), TIMING.wait.secret); });
+  });
+  // nothing on the slip talks: the hand leans in beside it and asks the question itself
+  function askHand() {
+    const H = window.__hand; if (!H || isCrazy() || scene || peek || omi.hidden) return;
+    peek = true; clearTimeout(showOff); root.classList.add('hand-show');
+    const r = slip.getBoundingClientRect(), vw = document.documentElement.clientWidth;
+    const asking = () => peek && !scene && !omi.hidden;
+    // it asks, and if you do nothing for a while it asks once more
+    H.come(Math.min(vw - 70, r.right + 70), r.top + r.height * 0.35, 'eager').then(() => setTimeout(() => { if (!asking()) return; H.say('ask'); clearTimeout(askAgain); askAgain = setTimeout(() => asking() && H.say('ask'), TIMING.wait.ask); }, 600));
+  }
+  let askAgain = 0;
+  function unpeek() { clearTimeout(askAgain); if (!peek) return; peek = false; const H = window.__hand; if (H) H.leave(); showOff = setTimeout(() => root.classList.remove('hand-show'), 2000); }
+  secret.addEventListener('click', () => {
+    const H = window.__hand, out = peek || scene;
+    if (scene) scene.kill();   // stop the coin game wherever it is
+    omi.hidden = true;
+    if (out && H) { H.say('escaped'); if (scene === null) unpeek(); }
+    surprise.focus({ preventScroll: true });
+  });
+  $('omi-x').addEventListener('click', () => { if (!scene) handScene(); });
+  omi.addEventListener('click', (e) => { if (e.target === omi) closeFortune(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !omi.hidden) closeFortune(); });
+
+  // "No": the hand comes out, flips a coin and makes you call it. Call it right and you stay. Call it wrong
+  // (or 1 time in 10 it just can't be bothered) and it presses Yes for you, laughing
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  let swatsLeft = 1;   // the first time you go for heads or tails (once per visit) it knocks the buttons away, then snaps
+  // No and the × do the same thing: the hand comes out
+  noBtn.addEventListener('click', () => (scene && scene.pick ? scene.pick('no') : handScene()));
+  goBtn.addEventListener('click', () => { if (scene && scene.pick) scene.kill(); });   // your own Yes: the link takes you there, and the scene is over
+  let showOff = 0; const GONE = new Error('slip closed');
+  async function handScene(back) {   // back: you returned after it sent you away, so it greets you differently
+    if (scene) return;
+    clearTimeout(showOff);
+    const H = window.__hand; if (!H || isCrazy()) { closeFortune(); return; }
+    peek = false;   // if it had burst in over the secret ×, the scene takes it over
+    // a scene can be killed by the secret ×: every wait below then throws, and the finally tidies up
+    const my = scene = { dead: false, fails: [] };
+    my.kill = () => { my.dead = true; my.fails.forEach((f) => f()); };
+    const sleep = (ms) => new Promise((r, j) => { my.fails.push(() => j(GONE)); setTimeout(() => (my.dead ? j(GONE) : r()), ms); });
+    noBtn.disabled = true; root.classList.add('hand-show');
+    const sr = slip.getBoundingClientRect(), vw = document.documentElement.clientWidth;
+    const hx = Math.min(vw - 70, sr.right + 70), hy = sr.top + sr.height * 0.35;
+    try {
+      await H.come(hx, hy, 'eager');
+      await sleep(700);
+      await sleep(Math.max(back ? TIMING.wait.back : TIMING.wait.hello, H.say(back ? 'back' : 'hello')));   // long enough to read it
+      let heads, tails, go;
+      const makeBtns = () => {
+        heads = document.createElement('button'); tails = document.createElement('button');
+        heads.className = tails.className = 'btn ghost'; heads.type = tails.type = 'button'; heads.textContent = 'Heads'; tails.textContent = 'Tails';
+        const tap = (side, el) => go && go(side, el).catch((e) => { if (e !== GONE) throw e; });
+        heads.onclick = () => tap('heads', heads); tails.onclick = () => tap('tails', tails);
+        actEl.innerHTML = ''; actEl.append(heads, tails);
+      };
+      // it has no use for Yes and No: it slams itself down on them, they fly off the page in pieces, and it snaps its fingers for a pair of its own
+      {
+        const gb = goBtn.getBoundingClientRect(), nb = noBtn.getBoundingClientRect();
+        const mx = (Math.min(gb.left, nb.left) + Math.max(gb.right, nb.right)) / 2, by = (Math.min(gb.top, nb.top) + Math.max(gb.bottom, nb.bottom)) / 2;
+        actEl.style.minHeight = actEl.offsetHeight + 'px';
+        H.to({ x: mx + 20, y: by - 150, pose: 'eager', tip: false, aim: Math.PI, rate: 12, bob: false }); await sleep(600);   // it rises over them
+        H.to({ x: mx + 20, y: by + 4, pose: 'lunge', rate: 60 }); await sleep(100); H.say('smashbtn');   // and comes down flat
+        slip.animate([{ translate: '0 0' }, { translate: '0 9px' }, { translate: '0 -4px' }, { translate: '0 2px' }, { translate: '0 0' }], { duration: 300, easing: 'ease-out' });
+        [goBtn, noBtn].forEach((el, i) => {
+          const r = el.getBoundingClientRect(), d = i ? 1 : -1, cs = getComputedStyle(el), cl = el.cloneNode(true);
+          cl.removeAttribute('id'); cl.removeAttribute('href'); cl.classList.add('omi-flung'); cl.setAttribute('aria-hidden', 'true');
+          Object.assign(cl.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' }); omi.appendChild(cl);
+          // the button itself is flattened, then shot out past the edge of the screen
+          cl.animate([{ transform: 'none' }, { transform: 'translateY(5px) scale(1.25, .3)', offset: .14 },
+            { transform: `translate(${d * (vw * 0.6 + 260)}px, ${-140 - Math.random() * 220}px) rotate(${d * (700 + Math.random() * 500)}deg) scale(.8)` }], { duration: 560, easing: 'cubic-bezier(.3,.6,.6,1)', fill: 'forwards' }).onfinish = () => cl.remove();
+          // and bits of it break off
+          const cols = [cs.backgroundColor, cs.borderTopColor, cs.color].filter((c) => c && !/, 0\)$|transparent/.test(c));
+          for (let k = 0; k < 9; k++) {
+            const bit = document.createElement('i'), sz = 4 + Math.random() * 7, a = -Math.PI * (0.08 + 0.84 * Math.random()), sp = 90 + Math.random() * 230, dx = Math.cos(a) * sp + d * 40, dy = Math.sin(a) * sp;
+            bit.className = 'omi-bit'; Object.assign(bit.style, { width: sz + 'px', height: sz * (0.5 + Math.random() * 0.6) + 'px', background: cols[k % cols.length] });
+            const x0 = r.left + r.width * Math.random(), y0 = r.top + r.height * Math.random(); omi.appendChild(bit);
+            bit.animate([{ transform: `translate(${x0}px, ${y0}px)`, opacity: 1 }, { transform: `translate(${x0 + dx * 0.6}px, ${y0 + dy * 0.75}px) rotate(${dx * 2}deg)`, opacity: 1, offset: .45 },
+              { transform: `translate(${x0 + dx}px, ${y0 + dy * 0.5 + 240}px) rotate(${dx * 5}deg)`, opacity: 0 }], { duration: 650 + Math.random() * 350, easing: 'linear', fill: 'forwards' }).onfinish = () => bit.remove();
+          }
+        });
+        actEl.innerHTML = ''; qEl.textContent = '';   // gone at once. The hand asks the questions from here on, not the slip
+        await sleep(700);
+        // back up, thumb on its middle finger; a snap; and its own two buttons poof in
+        H.to({ x: hx, y: hy, pose: 'pinch', tip: false, aim: Math.PI, rate: 9, bob: false }); await sleep(950);
+        H.to({ pose: 'snapped', rate: 60 });
+        { const q = H.get().tip2 || [hx, hy], sn = document.createElement('div'); sn.className = 'omi-snap'; sn.style.translate = `${q[0].toFixed(0)}px ${q[1].toFixed(0)}px`;
+          for (let k = 0; k < 7; k++) { const ray = document.createElement('i'); ray.style.rotate = (k * 360 / 7) + 'deg'; sn.appendChild(ray); }
+          document.body.appendChild(sn); setTimeout(() => sn.remove(), 420); }
+        await sleep(160);
+        makeBtns(); heads.disabled = tails.disabled = true; actEl.style.minHeight = '';
+        for (const el of [heads, tails]) { el.classList.add('poof'); const puff = document.createElement('i'); puff.className = 'omi-puff'; el.appendChild(puff); setTimeout(() => puff.remove(), 520); }
+        await sleep(900); const ms = H.say('better'); H.to({ pose: 'joy', rate: 10, bob: true });
+        await sleep(Math.max(TIMING.wait.better, ms));
+      }
+      // the toss: the coin leaves the hand and spins in the air above it until you call it
+      H.to({ pose: 'joy', bob: false }); H.say(back ? 'rematch' : 'flip');
+      const g = H.grip() || [hx, hy], coin = document.createElement('div'); coin.className = 'coin'; coin.innerHTML = '<i class="rim"></i><b class="face"></b>'; document.body.appendChild(coin);
+      my.coin = coin; my.coinEl = coin; H.get().dodge = coin.querySelector('.face');
+      const D = 54, THICK = 10, face = coin.querySelector('.face'), rim = coin.querySelector('.rim');
+      // th = how far it is turned (0 = face to you). The face shrinks with cos, the rim (its thickness, seen edge-on) grows with sin
+      const turn = (th, label) => {
+        const c = Math.abs(Math.cos(th)), h = Math.max(1.5, D * c), e = THICK * Math.abs(Math.sin(th)) + 2;
+        face.style.height = h.toFixed(1) + 'px'; face.style.top = (-(h + e) / 2).toFixed(1) + 'px'; face.style.fontSize = (1.3 * c).toFixed(2) + 'rem'; face.textContent = c > 0.3 ? label : '';
+        rim.style.height = h.toFixed(1) + 'px'; rim.style.top = (-(h + e) / 2 + e).toFixed(1) + 'px';
+        rim.style.boxShadow = `0 ${(-e / 2).toFixed(1)}px 0 #b98325`;
+      };
+      scene.turn = turn;
+      const t0 = performance.now(), cx = Math.min(vw - 40, g[0]), top = Math.max(60, g[1] - 140);
+      const fly = () => { if (!my.coin) return; const tn = performance.now(), s = Math.min(1, (tn - t0) / 450), y = g[1] + (top - g[1]) * (1 - (1 - s) * (1 - s)) + (s >= 1 ? Math.sin(tn / 160) * 6 : 0);
+        coin.style.translate = `${cx.toFixed(0)}px ${y.toFixed(0)}px`; turn((tn - t0) / 1000 * Math.PI * 5, '?'); requestAnimationFrame(fly); };   // 2.5 turns a second, real time
+      requestAnimationFrame(fly);
+      heads.disabled = tails.disabled = false; heads.focus({ preventScroll: true });
+      const hover = () => H.to({ x: hx, y: hy, pose: 'joy', tip: false, aim: Math.PI, rate: 10, bob: true });
+      // one finger, on a button
+      const poke = async (btn) => {
+        const b = btn.getBoundingClientRect(), bx = b.left + b.width * 0.6, by = b.top + b.height * 0.5;
+        H.to({ x: bx + 10, y: by - 34, pose: 'point', tip: true, aim: Math.PI - 0.5, rate: 12, bob: false }); await sleep(700);
+        H.to({ x: bx, y: by, rate: 22 }); await sleep(120); btn.classList.add('pressed'); await sleep(260);
+        H.to({ x: bx + 6, y: by - 26, rate: 10 }); await sleep(300);
+      };
+      // you have TIMING.wait.call to call it, with a nag halfway. Then it calls it itself and presses the button for you. The clock starts over
+      // whenever the buttons are yours again
+      let nagT = 0, outT = 0;
+      const stopClock = () => { clearTimeout(nagT); clearTimeout(outT); };
+      const call = await new Promise((res, rej) => {
+        my.fails.push(() => { stopClock(); rej(GONE); });
+        let busy = false;
+        const clock = () => {
+          stopClock();
+          nagT = setTimeout(() => !busy && !my.dead && H.say('callit'), TIMING.wait.callNag);
+          outT = setTimeout(() => go && go(null).catch((e) => { if (e !== GONE) throw e; }), TIMING.wait.call);
+        };
+        const myPick = async () => {   // it picks for you: one finger on Heads or Tails
+          heads.disabled = tails.disabled = true;
+          const mine = Math.random() < 0.5 ? 'heads' : 'tails'; H.say('mypick');
+          await poke(mine === 'heads' ? heads : tails); hover(); res(mine);
+        };
+        go = async (side, btn) => {
+          if (busy) return;
+          stopClock();
+          if (side === null) { busy = true; await myPick(); return; }   // you took too long
+          if (swatsLeft <= 0) { res(side); return; }
+          busy = true; swatsLeft--;
+          // it knocks both buttons off the slip, one of three ways: a slap (sweep left), a backhand (sweep right) or a slam (straight down)
+          heads.disabled = tails.disabled = true;
+          const hb = heads.getBoundingClientRect(), tb = tails.getBoundingClientRect(), my = (hb.top + hb.bottom) / 2, L = hb.left, R = tb.right, mx = (L + R) / 2;
+          const kind = ['slap', 'backhand', 'slam'][Math.floor(Math.random() * 3)];
+          const fling = (el, kf, delay) => el.animate(kf, { duration: 650, delay, easing: 'cubic-bezier(.2,.7,.4,1)', fill: 'forwards' });
+          if (kind === 'slam') {
+            H.to({ x: mx, y: my - 110, pose: 'clamp', tip: false, aim: Math.PI, rate: 30, bob: false }); await sleep(260);
+            H.to({ x: mx, y: my - 4, rate: 50 }); await sleep(110); H.say('slap');
+            for (const [el, d] of [[heads, -1], [tails, 1]]) fling(el, [{ transform: 'none' }, { transform: 'translateY(4px) scale(1.3, .3)', offset: .2 },
+              { transform: `translate(${d * 60}px, 70px) rotate(${d * 40}deg) scale(1.4, .1)`, opacity: 0 }], 0);
+          } else {
+            const d = kind === 'slap' ? -1 : 1, from = d < 0 ? R + 30 : L - 30, to = d < 0 ? L - 60 : R + 60;
+            H.to({ x: from, y: my, pose: kind === 'slap' ? 'clamp' : 'joy', tip: false, aim: Math.PI, rate: 40, bob: false }); await sleep(220);
+            H.to({ x: to, y: my - 10, rate: 45 }); await sleep(80); H.say('slap');
+            const first = d < 0 ? tails : heads, second = d < 0 ? heads : tails;
+            [first, second].forEach((el, i) => fling(el, [{ transform: 'none' }, { transform: `translate(${d * 30}px, -12px) rotate(${d * 25}deg)`, offset: .15 },
+              { transform: `translate(${d * (320 + i * 60)}px, ${kind === 'slap' ? 140 : -180}px) rotate(${d * (280 + i * 120)}deg)`, opacity: 0 }], i * 70));
+          }
+          await sleep(450); hover();
+          // then it snaps, and a fresh pair poofs in, chattering
+          await sleep(900); H.to({ pose: 'sulk', rate: 14 }); H.say('snap');
+          await sleep(1000);
+          makeBtns(); heads.disabled = tails.disabled = true;
+          const hi = window.__lines.SAY.btnhi, a = Math.floor(Math.random() * hi.length), b2 = (a + 1 + Math.floor(Math.random() * (hi.length - 1))) % hi.length;
+          [heads, tails].forEach((el, i) => {
+            el.classList.add('poof'); const puff = document.createElement('i'); puff.className = 'omi-puff'; el.appendChild(puff); setTimeout(() => puff.remove(), 520);
+            setTimeout(() => { const t = document.createElement('span'); t.className = 'btn-say'; t.textContent = hi[i ? b2 : a]; el.appendChild(t); setTimeout(() => t.remove(), TIMING.talk(t, TIMING.floor.btn) + 100); }, 250 + i * 450);
+          });
+          await sleep(2600);
+          if (Math.random() < 0.5) { H.say('yourpick'); hover(); heads.disabled = tails.disabled = false; busy = false; clock(); return; }
+          await myPick();
+        };
+        clock();
+      }).finally(stopClock);
+      heads.disabled = tails.disabled = true;
+      const r = Math.random(), side = r < 0.45 ? 'heads' : r < 0.9 ? 'tails' : null;
+      await sleep(500);
+      if (!side) { my.coin = null; coin.remove(); H.to({ pose: 'clamp' }); H.say('idgaf'); }
+      else {
+        my.coin = null; turn(0.55, side === 'heads' ? 'H' : 'T'); coin.style.translate = `${cx.toFixed(0)}px ${(g[1] - 40).toFixed(0)}px`;
+        H.say(side); await sleep(TIMING.wait.result);
+        if (side === call) {   // spared
+          await sleep(300); H.to({ pose: 'sulk', bob: false }); const ms = H.say('won');
+          await sleep(Math.max(TIMING.wait.verdict, ms)); coin.remove(); H.say('stay');
+          await sleep(1500); await poke($('omi-x'));   // it closes the slip for you, then goes back where it came from
+          omi.hidden = true; H.leave();
+          qEl.textContent = 'Go there?'; actEl.innerHTML = ''; actEl.append(goBtn, noBtn); goBtn.classList.remove('pressed');
+          return;
+        }
+        await sleep(300); H.to({ pose: 'joy', bob: true }); H.say('lost');
+        setTimeout(() => coin.remove(), 1500);
+      }
+      // it reaches over and presses Yes for you
+      await sleep(TIMING.wait.verdict);
+      actEl.innerHTML = ''; actEl.append(goBtn, noBtn); noBtn.disabled = false;
+      const b = goBtn.getBoundingClientRect(), bx = b.left + b.width * 0.62, by = b.top + b.height * 0.5;
+      // Yes and No are yours again for 5 seconds, and it keeps its hand off them. Only if you press neither does it press Yes itself
+      H.to({ x: hx, y: hy, pose: 'point', tip: false, aim: Math.PI, rate: 10, bob: true });
+      const nag = setTimeout(() => my.pick && H.say('waiting'), TIMING.wait.yesNag);
+      const own = await new Promise((res, rej) => { my.fails.push(() => rej(GONE)); const t = setTimeout(() => res(null), TIMING.wait.yes); my.pick = (c) => { clearTimeout(t); res(c); }; }).finally(() => { my.pick = null; clearTimeout(nag); });
+      if (own === 'no') {   // you said no again, and this time it lets you
+        noBtn.disabled = true; H.to({ x: hx, y: hy, pose: 'sulk', tip: false, aim: Math.PI, rate: 10, bob: false }); H.say('escaped');
+        await sleep(TIMING.wait.escaped); omi.hidden = true; H.leave(); qEl.textContent = 'Go there?'; return;
+      }
+      noBtn.disabled = true;
+      H.to({ x: bx + 10, y: by - 34, pose: 'point', tip: true, aim: Math.PI - 0.5, rate: 12, bob: false });   // one finger out, hovering over Yes
+      await sleep(700);
+      H.to({ x: bx, y: by, rate: 22 }); await sleep(120); goBtn.classList.add('pressed'); H.say('bye');   // poke
+      await sleep(260); H.to({ x: bx + 6, y: by - 26, rate: 10 });
+      await sleep(300); H.to({ pose: 'joy', tip: false, aim: Math.PI, bob: true, rate: 10 });
+      await sleep(1100);
+      try { sessionStorage.setItem(SENT, goBtn.href); } catch (e) {}
+      location.href = goBtn.href;
+    } catch (e) {
+      if (e !== GONE) throw e;
+    } finally {
+      my.coin = null; if (my.coinEl) my.coinEl.remove(); actEl.style.minHeight = '';
+      if (my.dead) { const H2 = window.__hand; if (H2) H2.leave(); qEl.textContent = 'Go there?'; actEl.innerHTML = ''; actEl.append(goBtn, noBtn); goBtn.classList.remove('pressed'); }
+      if (scene === my) scene = null;
+      noBtn.disabled = false;
+      showOff = setTimeout(() => root.classList.remove('hand-show'), 2000);
+    }
+  }
+  // Back on the page after the hand sent you away (Back button, a page restored from the back/forward cache, or a later
+  // visit in the same tab): it draws you another project and wants a rematch. A normal visit has no mark and gets nothing
+  const SENT = 'kiripad-sent';
+  function welcomeBack() {
+    let sent = null; try { sent = sessionStorage.getItem(SENT); } catch (e) {}
+    if (!sent || scene || !data || !data.projects.length || !window.__hand || isCrazy()) return;
+    try { sessionStorage.removeItem(SENT); } catch (e) {}
+    const list = data.projects.filter((p) => !/^https:\/\/github\.com\//.test(p.url)), fresh = list.filter((p) => p.url !== sent);
+    const from = fresh.length ? fresh : list.length ? list : data.projects;
+    swatsLeft = 0;   // it already slapped you once today
+    drawFortune(list, from[Math.floor(Math.random() * from.length)]);
+    handScene(true);
+  }
+  window.addEventListener('pageshow', (e) => { if (e.persisted) setTimeout(welcomeBack, 600); });
+
+  // ---- wipeable fog over the hero ----
+  const hero = document.getElementById('hero'), cv = document.getElementById('fog'), ctx = cv.getContext('2d');
+  const mask = document.createElement('canvas'), mctx = mask.getContext('2d');
+  const hint = document.getElementById('hint');
+  let W = 0, H = 0, dpr = 1, last = null, running = false, wiped = 0;
+  // Regrow: add whole alpha steps with 'lighter' (additive), paced by real elapsed time.
+  // A faint source-over fade used to round to nothing on an 8-bit canvas and stalled at ~2/3 fog.
+  const REGROW_S = 12, heroGrow = { t: null, acc: 0 };
+  function regrowMask(c, el, t, st) {
+    if (st.t != null) st.acc += Math.max(0, t - st.t) / 1000 * 255 / REGROW_S;
+    st.t = t;
+    const lv = Math.floor(st.acc);
+    if (lv < 1) return;
+    st.acc -= lv;
+    c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.globalCompositeOperation = 'lighter';
+    c.fillStyle = `rgba(0,0,0,${Math.min(255, lv) / 255})`; c.fillRect(0, 0, el.width, el.height); c.restore();
+  }
+  const blobs = Array.from({ length: 14 }, (_, i) => ({ x: Math.random(), y: Math.random(), r: 0.18 + Math.random() * 0.25, s: (0.3 + Math.random()) * (i % 2 ? 1 : -1) }));
+  function fogRGB() { return getComputedStyle(root).getPropertyValue('--fog').trim(); }
+  let rgb = fogRGB();
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    W = hero.clientWidth; H = hero.clientHeight;
+    for (const c of [cv, mask]) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }
+    mctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    mctx.fillStyle = '#000'; mctx.fillRect(0, 0, W, H);
+  }
+  function wipe(x, y) {
+    mctx.globalCompositeOperation = 'destination-out';
+    const from = last || { x, y }, dist = Math.hypot(x - from.x, y - from.y), n = Math.max(1, Math.ceil(dist / 10)), R = Math.max(46, Math.min(W, H) * 0.14);
+    for (let k = 1; k <= n; k++) {
+      const px = from.x + (x - from.x) * k / n, py = from.y + (y - from.y) * k / n;
+      const g = mctx.createRadialGradient(px, py, 0, px, py, R);
+      g.addColorStop(0, 'rgba(0,0,0,.55)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+      mctx.fillStyle = g; mctx.beginPath(); mctx.arc(px, py, R, 0, Math.PI * 2); mctx.fill();
+    }
+    mctx.globalCompositeOperation = 'source-over';
+    last = { x, y };
+    wiped += dist; if (wiped > 400) hint.classList.add('gone');
+  }
+  function frame(t) {
+    if (!running) return;
+    if (!mask.width || !mask.height) { requestAnimationFrame(frame); return; }
+    regrowMask(mctx, mask, t, heroGrow); // fog rolls back in, all the way
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = `rgba(${rgb}, .8)`; ctx.fillRect(0, 0, W, H);
+    const time = reduced ? 0 : t / 1000;
+    for (const b of blobs) {
+      const x = ((b.x + time * 0.012 * b.s) % 1 + 1) % 1 * (W + 400) - 200, y = b.y * H, r = b.r * Math.max(W, 500);
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, `rgba(${rgb}, .55)`); g.addColorStop(1, `rgba(${rgb}, 0)`);
+      ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r * 2, r * 2);
+    }
+    ctx.globalCompositeOperation = 'destination-in';
+    ctx.drawImage(mask, 0, 0, W, H);
+    requestAnimationFrame(frame);
+  }
+  function setRunning(on) { if (on && !running) { running = true; requestAnimationFrame(frame); } else if (!on) running = false; }
+  hero.addEventListener('pointermove', (e) => { const r = hero.getBoundingClientRect(); wipe(e.clientX - r.left, e.clientY - r.top); });
+  hero.addEventListener('pointerleave', () => { last = null; });
+  new ResizeObserver(resize).observe(hero);
+  new IntersectionObserver(([en]) => setRunning(en.isIntersecting && !isCrazy())).observe(hero);
+  document.addEventListener('visibilitychange', () => setRunning(!document.hidden && !isCrazy()));
+  function refog(msg) { mctx.fillStyle = '#000'; mctx.fillRect(0, 0, W, H); hint.classList.remove('gone'); wiped = 0; if (msg) toast(msg); }
+
+
+  // ---- 霧 kiri flood: a wall of fog rolls down over the whole page and everything on it ----
+  const kv = document.getElementById('kiri'), kctx = kv.getContext('2d');
+  const km = document.createElement('canvas'), kmctx = km.getContext('2d');
+  const FLOOD_IN_S = 2.4, FLOOD_HOLD_S = 14, FLOOD_OUT_S = 4;
+  let flood = null, kW = 0, kH = 0, kdpr = 1, kS = 0.5, kLast = null;
+  const kGrow = { t: null, acc: 0 };
+  const kBlobs = Array.from({ length: 16 }, (_, i) => ({ x: Math.random(), y: Math.random(), r: 0.2 + Math.random() * 0.25, s: (0.3 + Math.random()) * (i % 2 ? 1 : -1) }));
+  const ease = (p) => p <= 0 ? 0 : p >= 1 ? 1 : 1 - Math.pow(1 - p, 3);
+  function pageH() { return Math.max(document.documentElement.scrollHeight, innerHeight); }
+  function kSize() {
+    kdpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    kW = document.documentElement.clientWidth; kH = innerHeight;
+    kv.width = Math.round(kW * kdpr); kv.height = Math.round(kH * kdpr);
+    kctx.setTransform(kdpr, 0, 0, kdpr, 0, 0);
+  }
+  function kMaskSize() { // page-sized mask at reduced resolution, keeps what was there
+    const ph = pageH(); kS = Math.min(0.5, 4096 / ph);
+    const w = Math.ceil(kW * kS), h = Math.ceil(ph * kS);
+    if (km.width === w && km.height === h) return;
+    const old = km.width ? (() => { const c = document.createElement('canvas'); c.width = km.width; c.height = km.height; c.getContext('2d').drawImage(km, 0, 0); return c; })() : null;
+    km.width = w; km.height = h;
+    kmctx.fillStyle = '#000'; kmctx.fillRect(0, 0, w, h);
+    if (old) kmctx.drawImage(old, 0, 0, w, h);
+  }
+  function kWipe(x, y) { // page coordinates
+    const from = kLast || { x, y }, dist = Math.hypot(x - from.x, y - from.y), n = Math.max(1, Math.ceil(dist / 10)), R = Math.max(50, Math.min(kW, kH) * 0.12);
+    kmctx.globalCompositeOperation = 'destination-out';
+    for (let k = 1; k <= n; k++) {
+      const px = (from.x + (x - from.x) * k / n) * kS, py = (from.y + (y - from.y) * k / n) * kS, r = R * kS;
+      const g = kmctx.createRadialGradient(px, py, 0, px, py, r);
+      g.addColorStop(0, 'rgba(0,0,0,.55)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+      kmctx.fillStyle = g; kmctx.beginPath(); kmctx.arc(px, py, r, 0, Math.PI * 2); kmctx.fill();
+    }
+    kmctx.globalCompositeOperation = 'source-over';
+    kLast = { x, y };
+  }
+  function kFrame(t) {
+    if (!flood) return;
+    requestAnimationFrame(kFrame);
+    const s = (t - flood.t0) / 1000;
+    const liftAt = flood.lift ?? (FLOOD_IN_S + FLOOD_HOLD_S);
+    const alpha = 1 - Math.min(1, Math.max(0, (s - liftAt) / FLOOD_OUT_S));
+    if (alpha <= 0) { flood = null; kv.classList.remove('on'); return; }
+    kMaskSize();
+    regrowMask(kmctx, km, t, kGrow);
+    const front = flood.from + (flood.to - flood.from) * ease(s / FLOOD_IN_S);
+    if (front > flood.filled) { kmctx.fillStyle = '#000'; kmctx.fillRect(0, flood.filled * kS, km.width, (front - flood.filled) * kS); flood.filled = front; }
+    const sy = scrollY, fv = front - sy, edge = 180, a = alpha;
+    kctx.globalCompositeOperation = 'source-over';
+    kctx.clearRect(0, 0, kW, kH);
+    if (fv <= 0) return;
+    const bottom = Math.min(kH, fv);
+    kctx.fillStyle = `rgba(${rgb}, ${a})`; kctx.fillRect(0, 0, kW, Math.max(0, Math.min(kH, fv - edge)));
+    if (fv - edge < kH) {
+      const g = kctx.createLinearGradient(0, fv - edge, 0, fv);
+      g.addColorStop(0, `rgba(${rgb}, ${a})`); g.addColorStop(1, `rgba(${rgb}, 0)`);
+      kctx.fillStyle = g; kctx.fillRect(0, Math.max(0, fv - edge), kW, bottom - Math.max(0, fv - edge));
+    }
+    const time = reduced ? 0 : t / 1000;
+    for (const b of kBlobs) {
+      const x = ((b.x + time * 0.015 * b.s) % 1 + 1) % 1 * (kW + 400) - 200, y = b.y * kH, r = b.r * Math.max(kW, 500);
+      if (y - r > bottom) continue;
+      const g = kctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, `rgba(${rgb}, ${0.6 * alpha})`); g.addColorStop(1, `rgba(${rgb}, 0)`);
+      kctx.fillStyle = g; kctx.fillRect(x - r, y - r, r * 2, Math.min(r * 2, bottom - (y - r)));
+    }
+    kctx.globalCompositeOperation = 'destination-in';
+    kctx.drawImage(km, 0, sy * kS, km.width, kH * kS, 0, 0, kW, kH);
+  }
+  function floodPage() {
+    if (flood && flood.lift == null) return; // already flooded
+    kSize(); kMaskSize();
+    const from = Math.max(0, scrollY - 40);
+    kmctx.fillStyle = '#000'; kmctx.fillRect(0, 0, km.width, from * kS); // everything above the screen is already gone
+    flood = { t0: performance.now(), from, to: pageH() + 200, filled: from, lift: null };
+    kGrow.t = null; kLast = null;
+    kv.classList.add('on');
+    requestAnimationFrame(kFrame);
+  }
+  function liftFlood() { if (flood && flood.lift == null) flood.lift = Math.max(FLOOD_IN_S, (performance.now() - flood.t0) / 1000); }
+  document.addEventListener('pointermove', (e) => { if (flood) kWipe(e.clientX + scrollX, e.clientY + scrollY); }, { passive: true });
+  addEventListener('scroll', () => { kLast = null; }, { passive: true });
+  addEventListener('resize', () => { if (flood) kSize(); });
+
+  // ---- theme toggle (light / dark), remembered ----
+  const themeBtn = document.getElementById('theme');
+  const darkNow = () => root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  function syncTheme() { themeBtn.textContent = darkNow() ? '☀' : '☾'; rgb = fogRGB(); }
+  themeBtn.addEventListener('click', () => {
+    root.dataset.theme = darkNow() ? 'light' : 'dark';
+    try { localStorage.setItem('kiripad-theme', root.dataset.theme); } catch (e) {}
+    syncTheme(); refog();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncTheme);
+  syncTheme();
+
+  // ---- keys: "/" focuses search, typing "kiri" or "мъгла" buries the whole page in fog (Esc lifts it) ----
+  let typed = '';
+  document.addEventListener('keydown', (e) => {
+    if (e.target.matches('input, textarea') || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key === '/' && !isCrazy()) { e.preventDefault(); q.focus(); return; }
+    if (e.key === 'Escape') liftFlood();
+    if (e.key.length !== 1) return;
+    typed = (typed + e.key.toLowerCase()).slice(-8);
+    if (typed.endsWith('kiri') || typed.endsWith('мъгла')) {
+      if (!isCrazy()) { refog(); floodPage(); toast('霧が出た · Мъгла падна · The fog rolls in'); }
+    }
+    // 棚 the secret written under the fog in the top right corner of the banner
+    if (typed.endsWith('tana') || typed.endsWith('рафт') || typed.endsWith('たな')) { typed = ''; window.__shelf?.(); }
+  });
+  // no keyboard: wipe the fog off the writing and tap it
+  hero.addEventListener('click', (e) => {
+    const r = document.getElementById('secret').getBoundingClientRect(), h = hero.getBoundingClientRect();
+    if (e.clientX < r.left - 8 || e.clientX > r.right + 8 || e.clientY < r.top - 8 || e.clientY > r.bottom + 8) return;
+    const a = mctx.getImageData(Math.round((r.left + r.width / 2 - h.left) * dpr), Math.round((r.top + r.height / 2 - h.top) * dpr), 1, 1).data[3];
+    if (a < 150) window.__shelf?.();
+  });
+
+  // ---- tab title: static in normal mode, scrolling in crazy mode ----
+  const calmTitle = 'kiripad.dev · Projects';
+  let slopTitle = '✨🚀 KIRIPAD.DEV 🚀 Revolutionizing The Future With AI-Powered Synergy 🤖 100% CERTIFIED SLOP 🥣 ';
+  let titleTimer = null;
+  function applyMode() {
+    const crazy = isCrazy();
+    document.getElementById('toggle').textContent = crazy ? '😴 back to boring mode' : 'Crazy mode';
+    clearInterval(titleTimer);
+    if (crazy) titleTimer = setInterval(() => { slopTitle = slopTitle.slice(1) + slopTitle[0]; document.title = slopTitle; }, 180);
+    else document.title = calmTitle;
+    setRunning(!crazy && !document.hidden);
+    render();
+  }
+  const warn = document.getElementById('warn');
+  function setCrazy(on) {
+    root.classList.toggle('crazy', on);
+    try { localStorage.setItem('kiripad-mode', on ? 'crazy' : 'normal'); } catch (e) {}
+    applyMode();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function askCrazy() { warn.hidden = false; document.getElementById('warn-yes').focus(); }
+  document.getElementById('toggle').addEventListener('click', () => { if (isCrazy()) setCrazy(false); else askCrazy(); });
+  document.getElementById('warn-yes').addEventListener('click', () => { warn.hidden = true; setCrazy(true); });
+  document.getElementById('warn-no').addEventListener('click', () => { warn.hidden = true; setCrazy(false); });
+  warn.addEventListener('keydown', (e) => { if (e.key === 'Escape') document.getElementById('warn-no').click(); });
+  applyMode();
+  if (root.dataset.wantCrazy) askCrazy();

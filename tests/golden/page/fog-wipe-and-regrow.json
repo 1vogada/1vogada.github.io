@@ -1,0 +1,18 @@
+{
+ "scenario": "page / fog wipe and regrow",
+ "seed": 1,
+ "bubbles": [],
+ "states": [
+  {
+   "doc": 1,
+   "t": 50,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  }
+ ]
+}

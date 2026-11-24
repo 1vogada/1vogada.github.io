@@ -1,0 +1,145 @@
+{
+ "scenario": "scenes / button slam and snap",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 5170,
+   "ms": 950,
+   "who": "hand",
+   "key": "CLAW_SAY.ask",
+   "text": "отиваме ли?"
+  },
+  {
+   "doc": 1,
+   "t": 6120,
+   "ms": 1304,
+   "who": "hand",
+   "key": "CLAW_SAY.hello",
+   "text": "здрасти."
+  },
+  {
+   "doc": 1,
+   "t": 9020,
+   "ms": 1300,
+   "who": "hand",
+   "key": "CLAW_SAY.smashbtn",
+   "text": "не тези!"
+  },
+  {
+   "doc": 1,
+   "t": 11730,
+   "ms": 1646,
+   "who": "hand",
+   "key": "CLAW_SAY.better",
+   "text": "така е по-добре."
+  },
+  {
+   "doc": 1,
+   "t": 13830,
+   "ms": 602,
+   "who": "hand",
+   "key": "CLAW_SAY.flip",
+   "text": "ези или тура?"
+  },
+  {
+   "doc": 1,
+   "t": 14432,
+   "ms": 1128,
+   "who": "hand",
+   "key": "CLAW_SAY.slap",
+   "text": "чакай!"
+  },
+  {
+   "doc": 1,
+   "t": 15560,
+   "ms": 1320,
+   "who": "hand",
+   "key": "CLAW_SAY.snap",
+   "text": "стига вече!"
+  },
+  {
+   "doc": 1,
+   "t": 16810,
+   "ms": 2700,
+   "who": "btn",
+   "key": "SAY.btnhi",
+   "text": "こんにちは"
+  },
+  {
+   "doc": 1,
+   "t": 17260,
+   "ms": 2700,
+   "who": "btn",
+   "key": "SAY.btnhi",
+   "text": "ей!"
+  },
+  {
+   "doc": 1,
+   "t": 19160,
+   "ms": 1304,
+   "who": "hand",
+   "key": "CLAW_SAY.mypick",
+   "text": "貸して"
+  },
+  {
+   "doc": 1,
+   "t": 21040,
+   "ms": 1312,
+   "who": "hand",
+   "key": "CLAW_SAY.tails",
+   "text": "裏。"
+  },
+  {
+   "doc": 1,
+   "t": 23140,
+   "ms": 1324,
+   "who": "hand",
+   "key": "CLAW_SAY.won",
+   "text": "пф. късмет."
+  },
+  {
+   "doc": 1,
+   "t": 25240,
+   "ms": 1992,
+   "who": "hand",
+   "key": "CLAW_SAY.stay",
+   "text": "今回だけだぞ。"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 100,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 4620,
+   "claw": "show",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 28130,
+   "claw": "sulk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  }
+ ]
+}

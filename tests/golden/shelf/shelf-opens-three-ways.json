@@ -1,0 +1,95 @@
+{
+ "scenario": "shelf / shelf opens three ways",
+ "seed": 1,
+ "bubbles": [],
+ "states": [
+  {
+   "doc": 1,
+   "t": 20,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 80,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 260,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 440,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 620,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 840,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 1060,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 1842,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": null,
+   "objs": {}
+  }
+ ]
+}

@@ -1,0 +1,295 @@
+{
+ "scenario": "arm / sever with the katana tip, stump, regrow",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 3816,
+   "ms": 792,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 4608,
+   "ms": 1392,
+   "who": "card",
+   "key": "SAY.rip",
+   "text": "I was comfy!"
+  },
+  {
+   "doc": 1,
+   "t": 7744,
+   "ms": 1968,
+   "who": "hand",
+   "key": "CLAW_SAY.shelf",
+   "text": "ooh. left out for me?"
+  },
+  {
+   "doc": 1,
+   "t": 7760,
+   "ms": 1024,
+   "who": "card",
+   "key": "PANIC.0",
+   "text": "I do not like this shelf"
+  },
+  {
+   "doc": 1,
+   "t": 8784,
+   "ms": 1072,
+   "who": "card",
+   "key": "PANIC.1",
+   "text": "take another one!",
+   "lvl": "1"
+  },
+  {
+   "doc": 1,
+   "t": 9272,
+   "ms": 2952,
+   "who": "card",
+   "key": "SAY.khello",
+   "text": "hello! I'm the sharpest katana ever!"
+  },
+  {
+   "doc": 1,
+   "t": 9856,
+   "ms": 1312,
+   "who": "card",
+   "key": "PANIC.1",
+   "text": "ПОМОЩ!",
+   "lvl": "1"
+  },
+  {
+   "doc": 1,
+   "t": 10624,
+   "ms": 2240,
+   "who": "hand",
+   "key": "CLAW_SAY.severed",
+   "text": "that was my favourite one"
+  },
+  {
+   "doc": 1,
+   "t": 11520,
+   "ms": 1312,
+   "who": "hand",
+   "key": "SEV_SAY.cut",
+   "text": "…"
+  },
+  {
+   "doc": 1,
+   "t": 14032,
+   "ms": 1904,
+   "who": "hand",
+   "key": "SEV_SAY.drag",
+   "text": "just… a bit… further"
+  },
+  {
+   "doc": 1,
+   "t": 16240,
+   "ms": 1312,
+   "who": "hand",
+   "key": "SEV_SAY.drag",
+   "text": "ох, ох, ох"
+  },
+  {
+   "doc": 1,
+   "t": 19328,
+   "ms": 1328,
+   "who": "hand",
+   "key": "CLAW_SAY.regrow",
+   "text": "good as new"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 100,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 3240,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "found",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 3464,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "found",
+   "shelf": true,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 3832,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "found",
+   "shelf": true,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4616,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "found",
+   "shelf": true,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6372,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "found",
+   "shelf": true,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 7772,
+   "claw": "reach",
+   "sev": "",
+   "pb": "closed",
+   "kat": "found",
+   "shelf": true,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 9322,
+   "claw": "reach",
+   "sev": "",
+   "pb": "closed",
+   "kat": "equipped",
+   "shelf": true,
+   "grab": "katana",
+   "objs": {
+    "card": 1,
+    "katana": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 10636,
+   "claw": "stump/stump",
+   "sev": "limp",
+   "pb": "closed",
+   "kat": "equipped",
+   "shelf": true,
+   "grab": "katana",
+   "objs": {
+    "card": 1,
+    "katana": 1,
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 10848,
+   "claw": "stump/stump",
+   "sev": "limp",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": true,
+   "grab": null,
+   "objs": {
+    "card": 1,
+    "katana": 1,
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 13248,
+   "claw": "stump/stump",
+   "sev": "rise",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": true,
+   "grab": null,
+   "objs": {
+    "card": 1,
+    "katana": 1,
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 14048,
+   "claw": "stump/stump",
+   "sev": "walk",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": true,
+   "grab": null,
+   "objs": {
+    "card": 1,
+    "katana": 1,
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 18648,
+   "claw": "regrow",
+   "sev": "walk",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": true,
+   "grab": null,
+   "objs": {
+    "card": 1,
+    "katana": 1,
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 21048,
+   "claw": "lurk",
+   "sev": "walk",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": true,
+   "grab": null,
+   "objs": {
+    "card": 1,
+    "katana": 1,
+    "hand": 1
+   }
+  }
+ ]
+}
