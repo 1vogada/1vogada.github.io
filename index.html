@@ -285,6 +285,15 @@
               animation: stamp .35s .75s cubic-bezier(.3,1.6,.5,1) forwards; pointer-events: none; }
   @keyframes stamp { to { opacity: .8; transform: rotate(-12deg) scale(1); } }
   .slip.curse .omi-kanji { color: #3d4d6a; }
+  html.hand-show .claw.over { z-index: 58; } html.hand-show .claw.under { z-index: 57; } html.hand-show #phys { z-index: 58; }
+  .omi-actions .btn.pressed { transform: scale(.9); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 35%, transparent); }
+  .omi-actions .btn[disabled] { opacity: .5; cursor: default; }
+  .coin { position: fixed; left: 0; top: 0; z-index: 59; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; pointer-events: none;
+          background: radial-gradient(circle at 35% 30%, #fff3c4, #e2b23c 55%, #9c7116); border: 2px solid #7a5a12; color: #5a3f08;
+          display: grid; place-items: center; font: 800 .8rem/1 system-ui, sans-serif; box-shadow: 0 6px 14px rgba(0,0,0,.25); }
+  .coin.spin { animation: coinspin .24s linear infinite; }
+  @keyframes coinspin { 0% { transform: scaleY(1); } 50% { transform: scaleY(.08); } 100% { transform: scaleY(1); } }
+  .omi-call { margin: 12px 0 0; font-weight: 700; }
   @media (prefers-reduced-motion: reduce) { .slip, .omi-seal { animation: none; } .omi-seal { opacity: .8; transform: rotate(-12deg); } }
   /* flashing-lights warning before crazy mode */
   .warn { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px;
@@ -449,7 +458,8 @@
       <p class="omi-name" id="omi-name"></p>
       <p class="omi-text" id="omi-text"></p>
       <div class="omi-pick"><small>your project today</small><b id="omi-proj"></b><span id="omi-desc"></span></div>
-      <div class="omi-actions"><a class="btn primary" id="omi-go" href="#">Take me there →</a><button class="btn ghost" id="omi-again" type="button">Draw again</button></div>
+      <p class="omi-call" id="omi-q">Go there?</p>
+      <div class="omi-actions" id="omi-actions"><a class="btn primary" id="omi-go" href="#">Yes, take me →</a><button class="btn ghost" id="omi-no" type="button">No</button></div>
       <span class="omi-seal" aria-hidden="true">霧</span>
     </div>
   </div>
@@ -1322,6 +1332,13 @@
       snatch: ['TOO SLOW', 'YOINK', 'MINE NOW', 'enough games', 'дай тука!', 'もらった!'],
       savour: ['shhh.', 'slowly…', 'does it hurt?', 'look at me.', 'not yet.', 'one more squeeze', 'бавно…', 'まだだよ'],
       crush: ['squish.', '*CRUNCH*', 'paper is weak', 'that is what teasing gets you', 'смачках го.', 'ぐしゃ'],
+      // "Surprise me": you said no, so it settles it with a coin
+      hello: ['oh? a "no"?', 'hello there.', 'you said no. to ME?', 'hi. I live here.', 'picky, are we', 'здрасти.', 'やあ。'],
+      flip: ['heads or tails?', 'call it.', 'let the coin decide', 'one flip. no take-backs.', 'ези или тура?', '表か裏か?'],
+      won: ['…fine.', 'lucky.', 'tch. stay then.', 'next time.', 'пф. късмет.', 'ちっ'],
+      lost: ['WRONG.', 'ha. wrong side.', 'the coin has spoken', 'loser walks', 'не позна!', 'ハズレ!'],
+      idgaf: ['you know what? idgaf.', 'actually, forget the coin', "you're going anyway", 'coin? what coin.', 'майната ѝ на монетата', 'どうでもいい。行け。'],
+      bye: ['BYE BYE', 'BYE BYEEE', 'HAHAHA BYE', 'see ya never', 'ЧАО-ЧАО!', 'バイバイ!'],
     };
     const NS = 'http://www.w3.org/2000/svg';
     // hand space: wrist at 0,0, fingers along +x. Four fingers hook towards +y, the thumb comes up from below to meet them
@@ -1626,6 +1643,9 @@
           if (o) { remove(o); c.o = null; c.joint = null; gore(vw - 6 + scrollX, c.y + scrollY, -1, 0, 16, 0.8); clawSay('eat', true); }
           c.cool = t + 1800; clawSet('lurk');
         }
+      } else if (c.st === 'show') {   // driven by the page (Surprise me): it goes where it is told, in the pose it is told
+        const s = c.show; pose = POSES[s.pose] || POSES.eager; rate = s.rate || 8; wig = s.wig ?? 0.15; aim = (s.aim ?? Math.PI) + (s.bob ? Math.sin(c.t * 9) * 0.08 : 0);
+        T = wristFor([s.x, s.y + (s.bob ? Math.sin(c.t * 6) * 6 : 0)], aim);
       } else if (c.st === 'sulk') {
         pose = POSES.sulk; rate = 4; aim = Math.PI - 0.5; T = [vw + 120, c.ly + 30]; wig = 0.02;
         if (c.t > 1.6) clawSet('lurk');
@@ -1776,8 +1796,18 @@
     });
     window.__cards = { objs, S, bits, state: () => ({ grab, press, loopOn, size, found, katana: katObj, claw }) };   // for browser tests
     window.__lines = { SAY, CLAW_SAY, AGONY, BEG };   // every line anything here can say: the phrasebook (scripts/phrasebook.js) prints them from these lists
-    // the phrasebook borrows the hand: while its state is 'book' the tick below leaves it alone and the book poses and draws it itself
-    window.__hand = { get: () => { if (!claw) clawInit(); return claw; }, draw: clawDraw, set: clawSet, POSES, katanaSvg };
+    // the phrasebook borrows the hand: while its state is 'book' the tick below leaves it alone and the book poses and draws it itself.
+    // Surprise me calls it in for a scene: come() brings its grip to a point (viewport px), to() moves or re-poses it, say() and leave()
+    window.__hand = { get: () => { if (!claw) clawInit(); return claw; }, draw: clawDraw, set: clawSet, POSES, katanaSvg,
+      async come(x, y, pose) {
+        await load(); init(); if (!claw) clawInit();
+        claw.show = { x, y, pose: pose || 'eager', rate: 6, bob: true }; claw.y = y; claw.ly = y; claw.sh = y + 70; clawSet('show');
+      },
+      to(o) { if (claw && claw.st === 'show') { Object.assign(claw.show, o); claw.t = 0; run(); } },
+      say(kind) { if (claw) clawSay(kind, true); },
+      grip() { return claw ? gripPt() : null; },
+      leave() { if (claw && claw.st === 'show') { claw.show = null; clawSet('sulk'); } },
+    };
   })();
 
   // ---- greeting typewriter: Bulgarian, Japanese, English ----
@@ -1822,31 +1852,84 @@
     ['凶', 'Curse · Лош късмет', 'Tie this slip to a tree and draw again.', 1],
   ];
   const omi = document.getElementById('omikuji'), slip = document.getElementById('slip');
+  const $ = (id) => document.getElementById(id), goBtn = $('omi-go'), noBtn = $('omi-no'), qEl = $('omi-q'), actEl = $('omi-actions');
+  let scene = null;   // the hand's coin-flip scene while it runs
   function drawFortune(list, pick) {
     const total = FORTUNES.reduce((a, f) => a + f[3], 0);
     let r = Math.random() * total, f = FORTUNES[0];
     for (const x of FORTUNES) { if ((r -= x[3]) < 0) { f = x; break; } }
-    document.getElementById('omi-kanji').textContent = f[0];
-    document.getElementById('omi-name').textContent = f[1];
-    document.getElementById('omi-text').textContent = f[2];
-    document.getElementById('omi-proj').textContent = pick.name;
-    document.getElementById('omi-desc').textContent = pick.description || '';
-    document.getElementById('omi-go').href = pick.url;
-    document.getElementById('omi-again').textContent = f[0] === '凶' ? 'Tie it to a tree, draw again' : 'Draw again';
+    $('omi-kanji').textContent = f[0]; $('omi-name').textContent = f[1]; $('omi-text').textContent = f[2];
+    $('omi-proj').textContent = pick.name; $('omi-desc').textContent = pick.description || '';
+    goBtn.href = pick.url; qEl.textContent = 'Go there?';
+    actEl.innerHTML = ''; actEl.append(goBtn, noBtn); goBtn.classList.remove('pressed'); noBtn.disabled = false;
     slip.classList.toggle('curse', f[0] === '凶');
     omi.hidden = false;
     slip.style.animation = 'none'; void slip.offsetWidth; slip.style.animation = '';
     const seal = slip.querySelector('.omi-seal'); seal.style.animation = 'none'; void seal.offsetWidth; seal.style.animation = '';
-    omi._list = list;
-    document.getElementById('omi-go').focus({ preventScroll: true });
+    goBtn.focus({ preventScroll: true });
   }
-  function closeFortune() { omi.hidden = true; surprise.focus({ preventScroll: true }); }
-  document.getElementById('omi-x').addEventListener('click', closeFortune);
+  function closeFortune() { if (scene) return; omi.hidden = true; surprise.focus({ preventScroll: true }); }
+  $('omi-x').addEventListener('click', closeFortune);
   omi.addEventListener('click', (e) => { if (e.target === omi) closeFortune(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !omi.hidden) closeFortune(); });
-  document.getElementById('omi-again').addEventListener('click', () => {
-    const list = omi._list || [];
-    if (list.length) drawFortune(list, list[Math.floor(Math.random() * list.length)]);
+
+  // "No": the hand comes out, flips a coin and makes you call it. Call it right and you stay. Call it wrong
+  // (or 1 time in 10 it just can't be bothered) and it presses Yes for you, laughing
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  noBtn.addEventListener('click', async () => {
+    const H = window.__hand; if (!H || scene || isCrazy()) { closeFortune(); return; }
+    scene = {}; noBtn.disabled = true; root.classList.add('hand-show');
+    const sr = slip.getBoundingClientRect(), vw = document.documentElement.clientWidth;
+    const hx = Math.min(vw - 70, sr.right + 70), hy = sr.top + sr.height * 0.35;
+    try {
+      await H.come(hx, hy, 'eager');
+      await sleep(700); H.say('hello');
+      await sleep(2200);
+      // the toss: the coin leaves the hand and spins in the air above it until you call it
+      H.to({ pose: 'joy', bob: false }); H.say('flip');
+      const g = H.grip() || [hx, hy], coin = document.createElement('div'); coin.className = 'coin spin'; coin.textContent = '?'; document.body.appendChild(coin);
+      scene.coin = coin;
+      const t0 = performance.now(), cx = Math.min(vw - 40, g[0]), top = Math.max(60, g[1] - 140);
+      const fly = () => { if (!scene.coin) return; const s = Math.min(1, (performance.now() - t0) / 450), y = g[1] + (top - g[1]) * (1 - (1 - s) * (1 - s)) + (s >= 1 ? Math.sin(performance.now() / 160) * 6 : 0);
+        coin.style.translate = `${cx.toFixed(0)}px ${y.toFixed(0)}px`; requestAnimationFrame(fly); };
+      requestAnimationFrame(fly);
+      qEl.textContent = 'Call it:';
+      const heads = document.createElement('button'), tails = document.createElement('button');
+      heads.className = tails.className = 'btn ghost'; heads.type = tails.type = 'button'; heads.textContent = 'Heads'; tails.textContent = 'Tails';
+      actEl.innerHTML = ''; actEl.append(heads, tails); heads.focus({ preventScroll: true });
+      const call = await new Promise((res) => { heads.onclick = () => res('heads'); tails.onclick = () => res('tails'); });
+      heads.disabled = tails.disabled = true;
+      const r = Math.random(), side = r < 0.45 ? 'heads' : r < 0.9 ? 'tails' : null;
+      await sleep(500);
+      coin.classList.remove('spin');
+      if (!side) { scene.coin = null; coin.remove(); H.to({ pose: 'clamp' }); H.say('idgaf'); qEl.textContent = 'The hand pocketed the coin.'; }
+      else {
+        scene.coin = null; coin.textContent = side === 'heads' ? 'H' : 'T'; coin.style.translate = `${cx.toFixed(0)}px ${(g[1] - 40).toFixed(0)}px`;
+        qEl.textContent = `${side === 'heads' ? 'Heads' : 'Tails'}. You called ${call}.`;
+        if (side === call) {   // spared
+          await sleep(300); H.to({ pose: 'sulk', bob: false }); H.say('won');
+          await sleep(1800); coin.remove(); H.leave();
+          qEl.textContent = 'You may stay. This time.'; actEl.innerHTML = ''; actEl.append(goBtn, noBtn); goBtn.classList.remove('pressed');
+          return;
+        }
+        await sleep(300); H.to({ pose: 'joy', bob: true }); H.say('lost');
+        setTimeout(() => coin.remove(), 1500);
+      }
+      // it reaches over and presses Yes for you
+      await sleep(2100);
+      actEl.innerHTML = ''; actEl.append(goBtn, noBtn); noBtn.disabled = true;
+      const b = goBtn.getBoundingClientRect(), bx = b.left + b.width * 0.62, by = b.top + b.height * 0.5;
+      H.to({ x: bx + 26, y: by - 20, pose: 'lunge', rate: 14, bob: false });
+      await sleep(550);
+      H.to({ x: bx, y: by, pose: 'clamp', rate: 18 }); goBtn.classList.add('pressed'); H.say('bye');
+      await sleep(250); H.to({ pose: 'joy', bob: true, rate: 10 });
+      await sleep(1100);
+      location.href = goBtn.href;
+    } finally {
+      if (scene && scene.coin) scene.coin.remove();
+      scene = null; noBtn.disabled = false;
+      setTimeout(() => root.classList.remove('hand-show'), 2000);
+    }
   });
 
   // ---- wipeable fog over the hero ----
