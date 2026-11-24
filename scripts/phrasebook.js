@@ -270,7 +270,7 @@
   // leaves it alone and this file poses it. The thrown cards are real bodies in a small planck world the size of the window. ----
   const LINGER = 30000, S = 100, DT = 1 / 240, GRAV = 85, FALL = 0.25, SMASH = 13, GRIP = [98, 20];
   let raid = null, armT = 0, armed = 0;
-  const pick = (a) => a[Math.floor(Math.random() * a.length)], clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const pick = (a) => window.__pick ? window.__pick(a) : a[Math.floor(Math.random() * a.length)], clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   function raidArm() {   // counts only the time the menu is really in front of someone
     clearInterval(armT); armed = 0; if (!window.__hand) return;
     armT = setInterval(() => { if (!isOpen) return clearInterval(armT); if (!document.hidden) armed += 250; if (armed >= LINGER) { clearInterval(armT); raidStart(); } }, 250);
