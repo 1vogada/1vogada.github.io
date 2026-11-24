@@ -857,7 +857,7 @@
         world.destroyJoint(g.joint); html.classList.remove('throwing');
         if (!o.root) {
           o.el.classList.remove('grabbed', 'equipped'); b.setAngularDamping(SPIN); b.setGravityScale(FALL); if (b.isFixedRotation()) b.setFixedRotation(false);
-          if (o.kind === 'katana') say(o, 'kdrop', true);
+          if (o.kind === 'katana') { say(o, 'kdrop', true); notice('kdrop'); }
           // a hand slows down in the last few ms before it lets go: throw with the speed it had over the last 80 ms if that was faster
           const t = now(), h = g.h.filter((q) => t - q[2] < 80), a = h[0], z = h[h.length - 1];
           let v = b.getLinearVelocity(), sp = v.length();
@@ -868,7 +868,7 @@
           if (sp > 60) { v = { x: v.x * 60 / sp, y: v.y * 60 / sp }; sp = 60; }
           b.setLinearVelocity(v);
           if (DBG) console.log('release speed', sp.toFixed(1));
-          if (sp > HOT) { o.hot = now() + 1500; say(o, 'throw', true); } else b.setBullet(false);
+          if (sp > HOT) { o.hot = now() + 1500; say(o, 'throw', true); if (o.kind !== 'katana') notice('throw'); } else b.setBullet(false);
         } else if (g.moved) say(o, 'back', true);
         if (g.moved) { suppress = true; setTimeout(() => { suppress = false; }, 0); }
         return;
@@ -907,7 +907,7 @@
       o.body.setGravityScale(FALL);
       o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF });
       if (grab && grab.o === o) { grab.joint.setFrequency(HAND_HZ); grab.joint.setDampingRatio(1); carry(o); }
-      showReset(); say(o, 'rip', true);
+      showReset(); say(o, 'rip', true); notice('rip');
       if (ripped.size === 1) toast('Ripped it out! Stack them, or throw one hard to smash it.');
     }
     function onMove(e) {
@@ -1002,7 +1002,7 @@
         const q = wm.points[0], d = ce.other.getWorldCenter(), nx = d.x - q.x, ny = d.y - q.y, nl = Math.hypot(nx, ny) || 1, cv = ce.other.getLinearVelocity();
         hits.push({ o: c, pt: { x: q.x, y: q.y }, n: { x: nx / nl, y: ny / nl }, closing: pass, share: 0.5, v: { x: cv.x, y: cv.y }, w: ce.other.getAngularVelocity(), vo: { x: inc.x * 0.6, y: inc.y * 0.6 } });
       }
-      sayAt(bx * S, by * S - 20, pick(SAY.smash));
+      sayAt(bx * S, by * S - 20, pick(SAY.smash)); notice('smash');
       remove(o);
       const m = document.getElementById('projects'); m.classList.remove('shake'); void m.offsetWidth; m.classList.add('shake');
       smashed++;
@@ -1062,7 +1062,7 @@
       o.body.setGravityScale(FALL);
       for (let f = o.body.getFixtureList(); f; f = f.getNext()) f.setFilterData({ groupIndex: 0, categoryBits: 4, maskBits: 2 });   // it lands on the floor and walls but passes through cards: it cuts them instead
       if (grab && grab.o === o) { grab.joint.setFrequency(HAND_HZ); grab.joint.setDampingRatio(1); carry(o); }
-      toast('The very tip of the blade cuts, however slowly. Double-click the katana to keep it in hand.'); say(o, 'khello', true);
+      toast('The very tip of the blade cuts, however slowly. Double-click the katana to keep it in hand.'); say(o, 'khello', true); notice('katana');
     }
     // double-click: the katana jumps into the hand by its grip and stays there without holding the button. Double-click again or Esc lets go
     const EQUIP_ANGLE = Math.PI + 0.5;
@@ -1076,7 +1076,7 @@
       o.body.setTransform(o.body.getPosition(), EQUIP_ANGLE); o.body.setFixedRotation(true); o.body.setAngularVelocity(0); o.pa = EQUIP_ANGLE; o.tips = null;
       const g = o.body.getWorldPoint({ x: 0, y: -1.05 });
       hold(o, g.x * S, g.y * S, { pointerId: -1, clientX: e.clientX, clientY: e.clientY });
-      grab.sticky = true; grab.moved = true; o.el.classList.add('equipped'); say(o, 'khello');
+      grab.sticky = true; grab.moved = true; o.el.classList.add('equipped'); say(o, 'khello'); notice('katana');
       grab.joint.setTarget({ x: (e.clientX + scrollX) / S, y: (e.clientY + scrollY) / S });
     }
     document.addEventListener('dblclick', (e) => {
@@ -1135,10 +1135,11 @@
       const through = edgeOf(outline, rec.a) !== edgeOf(outline, rec.z) && Math.hypot(rec.z[0] - rec.a[0], rec.z[1] - rec.a[1]) > 24;
       if (through) {
         const src = t.o || freeCard(t.card), A = toPage(src, t.o ? rec.a : toLocal(src, rec.a)), B = toPage(src, t.o ? rec.z : toLocal(src, rec.z));
-        if (slice(src, A, B, [B[0] - A[0], B[1] - A[1]])) { if (!held) say(k, 'kcut', true); else if (Math.random() < 0.4) say(k, 'kbrag'); return; }
+        if (slice(src, A, B, [B[0] - A[0], B[1] - A[1]])) { if (!held) say(k, 'kcut', true); else if (Math.random() < 0.4) say(k, 'kbrag'); notice('cut'); return; }
         t.o = src; rec.w = t.card ? toLocal(src, rec.w) : rec.w;   // could not be split there after all: it is a wound
       }
       // stabbed: in and out through the same side. It keeps its shape, bleeds for a while and has something to say about it
+      notice('stab');
       wounds.push({ o: t.o, card: t.o ? null : t.card, p: rec.w, until: now() + 2400 + Math.random() * 1200, next: 0 });
       if (t.o) say(t.o, 'stab', true); else sayAt(rec.w[0], Math.min(...t.poly.map((q) => q[1])) - 34, pick(SAY.stab));
       run();
@@ -1268,6 +1269,14 @@
       keep: ['mine.', 'hehehe', 'no take-backs', 'finders keepers', 'хе-хе'],
       toss: ['bored.', 'catch.', 'yeet', 'tastes like JavaScript', 'いらない'],
       sulk: ['aww.', 'tease.', 'rude.', 'fine.', 'ケチ', 'пф.'],
+      // what it has to say about things it only watches
+      cut: ['ooh, sharp.', 'save me a slice', 'messy.', 'I could do that with my nails', 'thinner! thinner!', 'いい切れ味', 'режи, режи…'],
+      stab: ['finish it!', 'so close.', 'amateur.', 'I smell blood', 'again, deeper'],
+      smash: ['what a waste of a snack', 'boom.', 'I felt that', 'again!', 'бум!', 'もったいない'],
+      rip: ['fresh one!', 'bring it here', 'ooh, a loose one', 'that one looks tasty', 'дай го насам'],
+      throw: ['wheee', 'over here!', 'pass it!', 'nice arm'],
+      katana: ['show-off.', 'I prefer claws', 'pointy.', 'keep that away from me', 'かっこつけ'],
+      kdrop: ['butterfingers', 'clumsy.', 'ha.', 'and you call ME grabby'],
       caught: ['nice throw', 'CAUGHT IT', 'thanks!', 'delivery!', 'for me? again?', 'хванах!', 'ナイスパス!'],
       slip: ['slippery!', 'hey!!', 'no fair', 'my snack!'],
       snatch: ['TOO SLOW', 'YOINK', 'MINE NOW', 'enough games', 'дай тука!', 'もらった!'],
@@ -1288,7 +1297,7 @@
       sulk: { curl: 0.95, th: 0.55, spread: 0.2, eye: 0.2, pupil: 0.5, happy: 0 },
     };
     let claw = null;
-    const clawBusy = () => !!claw && (claw.strands.length > 0 || !!claw.say || (claw.st !== 'off' && (claw.st !== 'lurk' || now() < claw.until)));
+    const clawBusy = () => !!claw && (!!claw.react || now() < (claw.flinch || 0) || claw.strands.length > 0 || !!claw.say || (claw.st !== 'off' && (claw.st !== 'lurk' || now() < claw.until)));
     const clamp01 = (v) => Math.max(0, Math.min(1, v)), wrapA = (a) => a - 2 * Math.PI * Math.round(a / (2 * Math.PI));
     function clawInit() {
       const mk = (cls) => { const s = document.createElementNS(NS, 'svg'); s.setAttribute('class', 'claw ' + cls); s.setAttribute('aria-hidden', 'true'); document.body.appendChild(s); return s; };
@@ -1299,6 +1308,16 @@
         thumb: path(under, 'flesh'), flesh: path(over, 'flesh'), vein: path(over, 'vein'), eye: path(over, 'eye'), pupil: path(over, 'pupil') };
     }
     function clawSet(st) { claw.st = st; claw.t = 0; claw.until = now() + 1500; run(); }
+    // The hand comments on most things it sees, but never at once: each remark waits a random while. When a lot happens together its
+    // agitation fills up and the wait gets shorter, and there are always at least 2 s of real time between two things it says
+    const REACT_GAP = 2000;
+    function notice(kind) {
+      const c = claw; if (!c || c.st === 'off' || isCrazy()) return;
+      const t = now(); c.agit = Math.min(6, (c.agit || 0) + 1);
+      const wait = (700 + Math.random() * 2100) * (1 - 0.65 * clamp01((c.agit - 1) / 4));
+      if (!c.react) c.react = { kind, at: t + wait, born: t }; else { c.react.at = Math.min(c.react.at, t + wait); if (Math.random() < 0.5) c.react.kind = kind; }
+      run();
+    }
     function clawSay(kind, force) {
       const c = claw, t = now(); if (!force && t - c.said < 2400) return;
       if (c.say) c.say.el.remove();
@@ -1559,6 +1578,15 @@
       } else if (c.st === 'sulk') {
         pose = POSES.sulk; rate = 4; aim = Math.PI - 0.5; T = [vw + 120, c.ly + 30]; wig = 0.02;
         if (c.t > 1.6) clawSet('lurk');
+      }
+      c.agit = Math.max(0, (c.agit || 0) - dt * 0.6);
+      if (c.react) {
+        const idle = c.st === 'lurk' || c.st === 'sulk';
+        if (t - c.react.born > 6000) c.react = null;   // it was busy for too long: the moment has passed
+        else if (idle && t >= c.react.at && t - (c.said || 0) >= REACT_GAP) { clawSay(c.react.kind, true); c.flinch = t + 1500; c.mood = c.react.kind; c.react = null; }
+      }
+      if (t < (c.flinch || 0) && (c.st === 'lurk' || c.st === 'sulk')) {   // it leans in to say it: fingers drumming, or a fist for the things it disapproves of
+        T = [vw + 36, c.ly]; rate = 10; wig = 0.3; aim = Math.PI + Math.sin(c.t * 9) * 0.06; pose = c.mood === 'katana' || c.mood === 'smash' ? POSES.sulk : c.mood === 'kdrop' || c.mood === 'stab' ? POSES.joy : POSES.eager;
       }
       const k = 1 - Math.exp(-dt * rate), ka = 1 - Math.exp(-dt * (rate > 20 ? 30 : 9)), kp = 1 - Math.exp(-dt * (c.st === 'lunge' ? 30 : 12));
       c.x += (T[0] - c.x) * k; c.y += (T[1] - c.y) * k; c.a += wrapA(aim - c.a) * ka; c.sh += (c.y + 70 - c.sh) * (1 - Math.exp(-dt * 4));
