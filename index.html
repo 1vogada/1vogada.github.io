@@ -321,6 +321,11 @@
              box-shadow: var(--shadow); animation: btnsay 2.6s ease forwards; }
   .btn-say::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -5px; border: 5px solid transparent; border-top-color: var(--border); }
   @keyframes btnsay { 0% { opacity: 0; transform: translateY(6px) scale(.8); } 10%, 85% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-4px); } }
+  .omi-flung { position: fixed; margin: 0; z-index: 4; pointer-events: none; }
+  .omi-bit { position: fixed; left: 0; top: 0; z-index: 4; pointer-events: none; border-radius: 3px; }
+  .omi-snap { position: fixed; left: 0; top: 0; z-index: 60; width: 0; height: 0; pointer-events: none; }
+  .omi-snap i { position: absolute; left: -1.5px; top: -24px; width: 3px; height: 14px; border-radius: 2px; background: var(--accent); transform-origin: 1.5px 24px; animation: snapray .38s ease-out forwards; }
+  @keyframes snapray { from { translate: 0 6px; opacity: 1; scale: 1 .4; } to { translate: 0 -8px; opacity: 0; scale: 1 1.2; } }
   .omi-call:empty { display: none; }
   /* the coin: a thick gold disc. JS turns it about its horizontal axis: the face squashes and the rim shows below it */
   .coin { position: fixed; left: 0; top: 0; z-index: 59; width: 0; height: 0; pointer-events: none; }
@@ -1421,6 +1426,8 @@
       crush: ['squish.', '*CRUNCH*', 'paper is weak', 'that is what teasing gets you', 'смачках го.', 'ぐしゃ'],
       // "Surprise me": you said no, so it settles it with a coin
       hello: ['oh? a "no"?', 'hello there.', 'you said no. to ME?', 'hi. I live here.', 'picky, are we', 'здрасти.', 'やあ。'],
+      smashbtn: ['no "no".', 'WRONG BUTTONS.', 'not these.', 'I hate these two', 'my game. my buttons.', 'BAM.', 'не тези!', 'このボタン、きらい'],
+      better: ['much better.', 'much better now.', 'there. better.', 'now we play MY game', 'see? nicer.', 'така е по-добре.', 'これでよし。'],
       flip: ['heads or tails?', 'call it.', 'let the coin decide', 'one flip. no take-backs.', 'ези или тура?', '表か裏か?'],
       won: ['…fine.', 'lucky.', 'tch. stay then.', 'next time.', 'пф. късмет.', 'ちっ'],
       lost: ['WRONG.', 'ha. wrong side.', 'the coin has spoken', 'loser walks', 'не позна!', 'ハズレ!'],
@@ -1450,7 +1457,10 @@
       joy: { curl: 0.82, th: 0.85, spread: 0.5, eye: 1, pupil: 1, happy: 1, point: 0 },
       sulk: { curl: 0.95, th: 0.55, spread: 0.2, eye: 0.2, pupil: 0.5, happy: 0, point: 0 },
   point: { curl: 0.95, th: 0.9, spread: 0.5, eye: 1.2, pupil: 0.7, happy: 0, point: 1 },   // one finger out, the rest in a fist: for pressing a button
+      pinch: { curl: 0.95, th: 0.62, spread: 0.5, eye: 0.55, pupil: 0.7, happy: 0, point: 0, pinch: 1 },   // thumb on the middle finger, about to snap
+      snapped: { curl: 0.95, th: 0.1, spread: 0.5, eye: 1.2, pupil: 0.9, happy: 0, point: 0, pinch: 0.45 },   // just snapped: the finger has hit the palm, the thumb has slid off
     };
+    for (const k in POSES) POSES[k].pinch ??= 0;
     let claw = null;
     const clawBusy = () => sevBusy() || !!claw && ((!!shelf && shelf.want) || !!claw.react || !!claw.later || now() < (claw.flinch || 0) || claw.strands.length > 0 || !!claw.say || (claw.st !== 'off' && (claw.st !== 'lurk' || now() < claw.until)));
     const clamp01 = (v) => Math.max(0, Math.min(1, v)), wrapA = (a) => a - 2 * Math.PI * Math.round(a / (2 * Math.PI));
@@ -2124,10 +2134,11 @@
       // legs: the first two fingers are legs. Each in turn lifts (bends) and swings forward, then plants and pushes back; the other two stay in a fist
       const pt = p.point || 0, lg = p.legs || 0, gp = c.gait || 0, fs = FING.map((f, i) => {
         let cu = (p.curl + wig * Math.sin(tm * 12 + i * 1.4)) * (1 - pt) + (i ? 1.1 : -0.22) * pt;   // point: the first finger straightens, the others close
+        if (p.pinch) cu = cu * (1 - p.pinch) + p.pinch * (i === 1 ? 0.5 : i ? 1.1 : 0.05);   // pinch: the middle finger comes down to the thumb, the first stays out
         if (lg) cu = cu * (1 - lg) + lg * (i < 2 ? 0.06 + 0.4 * Math.max(0, Math.sin(gp + i * Math.PI)) : 1.15);
         return finger(f, cu, 1, p.spread * (1 - lg) + 0.3 * lg, i < 2 ? -0.32 * lg * Math.cos(gp + i * Math.PI) : 0);
       });
-      c.tip = fs[0].tip;
+      c.tip = fs[0].tip; c.tip2 = fs[1].tip;
       if (lg) c.reach = Math.max((fs[0].tip[0] - ox) * ca + (fs[0].tip[1] - oy) * sa, (fs[1].tip[0] - ox) * ca + (fs[1].tip[1] - oy) * sa) - 35;   // how far below the palm the lower foot is
       const th = finger(THUMB, p.th + wig * Math.sin(tm * 12 + 5), -1, 1);
       // arm: in from past the edge, a bony elbow, a bend that straightens under strain
@@ -2349,6 +2360,53 @@
       await H.come(hx, hy, 'eager');
       await sleep(700); H.say(back ? 'back' : 'hello');
       await sleep(back ? 2500 : 2200);
+      let heads, tails, go;
+      const makeBtns = () => {
+        heads = document.createElement('button'); tails = document.createElement('button');
+        heads.className = tails.className = 'btn ghost'; heads.type = tails.type = 'button'; heads.textContent = 'Heads'; tails.textContent = 'Tails';
+        const tap = (side, el) => go && go(side, el).catch((e) => { if (e !== GONE) throw e; });
+        heads.onclick = () => tap('heads', heads); tails.onclick = () => tap('tails', tails);
+        actEl.innerHTML = ''; actEl.append(heads, tails);
+      };
+      // it has no use for Yes and No: it slams itself down on them, they fly off the page in pieces, and it snaps its fingers for a pair of its own
+      {
+        const gb = goBtn.getBoundingClientRect(), nb = noBtn.getBoundingClientRect();
+        const mx = (Math.min(gb.left, nb.left) + Math.max(gb.right, nb.right)) / 2, by = (Math.min(gb.top, nb.top) + Math.max(gb.bottom, nb.bottom)) / 2;
+        actEl.style.minHeight = actEl.offsetHeight + 'px';
+        H.to({ x: mx + 20, y: by - 150, pose: 'eager', tip: false, aim: Math.PI, rate: 12, bob: false }); await sleep(600);   // it rises over them
+        H.to({ x: mx + 20, y: by + 4, pose: 'lunge', rate: 60 }); await sleep(100); H.say('smashbtn');   // and comes down flat
+        slip.animate([{ translate: '0 0' }, { translate: '0 9px' }, { translate: '0 -4px' }, { translate: '0 2px' }, { translate: '0 0' }], { duration: 300, easing: 'ease-out' });
+        [goBtn, noBtn].forEach((el, i) => {
+          const r = el.getBoundingClientRect(), d = i ? 1 : -1, cs = getComputedStyle(el), cl = el.cloneNode(true);
+          cl.removeAttribute('id'); cl.removeAttribute('href'); cl.classList.add('omi-flung'); cl.setAttribute('aria-hidden', 'true');
+          Object.assign(cl.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' }); omi.appendChild(cl);
+          // the button itself is flattened, then shot out past the edge of the screen
+          cl.animate([{ transform: 'none' }, { transform: 'translateY(5px) scale(1.25, .3)', offset: .14 },
+            { transform: `translate(${d * (vw * 0.6 + 260)}px, ${-140 - Math.random() * 220}px) rotate(${d * (700 + Math.random() * 500)}deg) scale(.8)` }], { duration: 560, easing: 'cubic-bezier(.3,.6,.6,1)', fill: 'forwards' }).onfinish = () => cl.remove();
+          // and bits of it break off
+          const cols = [cs.backgroundColor, cs.borderTopColor, cs.color].filter((c) => c && !/, 0\)$|transparent/.test(c));
+          for (let k = 0; k < 9; k++) {
+            const bit = document.createElement('i'), sz = 4 + Math.random() * 7, a = -Math.PI * (0.08 + 0.84 * Math.random()), sp = 90 + Math.random() * 230, dx = Math.cos(a) * sp + d * 40, dy = Math.sin(a) * sp;
+            bit.className = 'omi-bit'; Object.assign(bit.style, { width: sz + 'px', height: sz * (0.5 + Math.random() * 0.6) + 'px', background: cols[k % cols.length] });
+            const x0 = r.left + r.width * Math.random(), y0 = r.top + r.height * Math.random(); omi.appendChild(bit);
+            bit.animate([{ transform: `translate(${x0}px, ${y0}px)`, opacity: 1 }, { transform: `translate(${x0 + dx * 0.6}px, ${y0 + dy * 0.75}px) rotate(${dx * 2}deg)`, opacity: 1, offset: .45 },
+              { transform: `translate(${x0 + dx}px, ${y0 + dy * 0.5 + 240}px) rotate(${dx * 5}deg)`, opacity: 0 }], { duration: 650 + Math.random() * 350, easing: 'linear', fill: 'forwards' }).onfinish = () => bit.remove();
+          }
+        });
+        actEl.innerHTML = ''; qEl.textContent = '';   // gone at once. The hand asks the questions from here on, not the slip
+        await sleep(700);
+        // back up, thumb on its middle finger; a snap; and its own two buttons poof in
+        H.to({ x: hx, y: hy, pose: 'pinch', tip: false, aim: Math.PI, rate: 9, bob: false }); await sleep(950);
+        H.to({ pose: 'snapped', rate: 60 });
+        { const q = H.get().tip2 || [hx, hy], sn = document.createElement('div'); sn.className = 'omi-snap'; sn.style.translate = `${q[0].toFixed(0)}px ${q[1].toFixed(0)}px`;
+          for (let k = 0; k < 7; k++) { const ray = document.createElement('i'); ray.style.rotate = (k * 360 / 7) + 'deg'; sn.appendChild(ray); }
+          document.body.appendChild(sn); setTimeout(() => sn.remove(), 420); }
+        await sleep(160);
+        makeBtns(); heads.disabled = tails.disabled = true; actEl.style.minHeight = '';
+        for (const el of [heads, tails]) { el.classList.add('poof'); const puff = document.createElement('i'); puff.className = 'omi-puff'; el.appendChild(puff); setTimeout(() => puff.remove(), 520); }
+        await sleep(900); H.say('better'); H.to({ pose: 'joy', rate: 10, bob: true });
+        await sleep(2100);
+      }
       // the toss: the coin leaves the hand and spins in the air above it until you call it
       H.to({ pose: 'joy', bob: false }); H.say(back ? 'rematch' : 'flip');
       const g = H.grip() || [hx, hy], coin = document.createElement('div'); coin.className = 'coin'; coin.innerHTML = '<i class="rim"></i><b class="face"></b>'; document.body.appendChild(coin);
@@ -2366,16 +2424,7 @@
       const fly = () => { if (!my.coin) return; const tn = performance.now(), s = Math.min(1, (tn - t0) / 450), y = g[1] + (top - g[1]) * (1 - (1 - s) * (1 - s)) + (s >= 1 ? Math.sin(tn / 160) * 6 : 0);
         coin.style.translate = `${cx.toFixed(0)}px ${y.toFixed(0)}px`; turn((tn - t0) / 1000 * Math.PI * 5, '?'); requestAnimationFrame(fly); };   // 2.5 turns a second, real time
       requestAnimationFrame(fly);
-      qEl.textContent = '';   // the hand asks the question, not the slip
-      let heads, tails, go;
-      const makeBtns = () => {
-        heads = document.createElement('button'); tails = document.createElement('button');
-        heads.className = tails.className = 'btn ghost'; heads.type = tails.type = 'button'; heads.textContent = 'Heads'; tails.textContent = 'Tails';
-        const tap = (side, el) => go && go(side, el).catch((e) => { if (e !== GONE) throw e; });
-        heads.onclick = () => tap('heads', heads); tails.onclick = () => tap('tails', tails);
-        actEl.innerHTML = ''; actEl.append(heads, tails);
-      };
-      makeBtns(); heads.focus({ preventScroll: true });
+      heads.disabled = tails.disabled = false; heads.focus({ preventScroll: true });
       const hover = () => H.to({ x: hx, y: hy, pose: 'joy', tip: false, aim: Math.PI, rate: 10, bob: true });
       // one finger, on a button
       const poke = async (btn) => {
@@ -2458,7 +2507,7 @@
     } catch (e) {
       if (e !== GONE) throw e;
     } finally {
-      my.coin = null; if (my.coinEl) my.coinEl.remove();
+      my.coin = null; if (my.coinEl) my.coinEl.remove(); actEl.style.minHeight = '';
       if (my.dead) { const H2 = window.__hand; if (H2) H2.leave(); qEl.textContent = 'Go there?'; actEl.innerHTML = ''; actEl.append(goBtn, noBtn); goBtn.classList.remove('pressed'); }
       if (scene === my) scene = null;
       noBtn.disabled = false;
