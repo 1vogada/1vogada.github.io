@@ -87,6 +87,8 @@
         { src: 'ANGRY', key: null, title: 'Back, and angry', when: 'The other half of the time it returns furious: it reaches fast, throws three cards in a row, and may take hold of the scroll.' },
         { src: 'SCROLL', key: null, title: 'Shaking the scroll', when: 'In a temper it grabs the right edge of the menu and yanks the page up and down so you lose your place.' },
         { src: 'CLAW_SAY', key: 'hello', title: 'Answering a no', when: 'Surprise me offers you a project and you say No. The Hand comes out to see about that.' },
+        { src: 'CLAW_SAY', key: 'smashbtn', title: 'Smashing Yes and No', when: 'A few moments after it greets you, it slams itself down on the Yes and No buttons. They fly off the page in pieces.' },
+        { src: 'CLAW_SAY', key: 'better', title: 'Its own buttons', when: 'It snaps two fingers, and Heads and Tails poof in where Yes and No were.' },
         { src: 'CLAW_SAY', key: 'flip', title: 'The toss', when: 'It throws a coin and makes you call it, heads or tails.' },
         { src: 'CLAW_SAY', key: 'won', title: 'Beaten by a coin', when: 'You called it right. You may stay on the page.' },
         { src: 'CLAW_SAY', key: 'lost', title: 'The taunt', when: 'You called it wrong. It reaches over and presses Yes for you.' },
