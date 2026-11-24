@@ -7,7 +7,7 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   // Bump VER, and the ?v= on this file's script tag in index.html, whenever this file or the stylesheet changes. GitHub Pages caches each
   // file for ten minutes on its own, and a new script with an old stylesheet looks broken; the version makes them arrive as a pair
-  const VER = 3;
+  const VER = 4;
   const here = (document.currentScript && document.currentScript.src) || '/scripts/phrasebook.js';
 
   // ---- what this file knows: which occasion each list belongs to. src = which list on window.__lines, key = which entry of it ----
@@ -66,6 +66,7 @@
         { src: 'CLAW_SAY', key: 'throw', title: 'Watching a throw', when: 'It saw you throw a card.' },
         { src: 'CLAW_SAY', key: 'katana', title: 'On the katana', when: 'It saw you draw the katana, or take it in hand.' },
         { src: 'CLAW_SAY', key: 'kdrop', title: 'On the katana, dropped', when: 'It saw you drop the katana.' },
+        { src: 'BOOK', key: null, title: 'Bored of your reading', when: 'You keep this menu open for 30 seconds. It starts pulling the cards out of it and throwing them at the left edge of the screen, where they break.' },
         { src: 'CLAW_SAY', key: 'hello', title: 'Answering a no', when: 'Surprise me offers you a project and you say No. The Hand comes out to see about that.' },
         { src: 'CLAW_SAY', key: 'flip', title: 'The toss', when: 'It throws a coin and makes you call it, heads or tails.' },
         { src: 'CLAW_SAY', key: 'won', title: 'Beaten by a coin', when: 'You called it right. You may stay on the page.' },
@@ -74,6 +75,8 @@
         { src: 'CLAW_SAY', key: 'bye', title: 'Seeing you off', when: 'Its finger is on the Yes button. You are leaving.' },
       ] },
   ];
+  // the only lines that live in this file: what the hand says while it empties this menu
+  const RAID_SAY = ['boring.', 'too many words', 'less reading, more snacks', 'you read too slow', 'I am in this one!', 'spoilers.', 'YEET', 'next!', 'this one too', 'скука.', 'つまらない', 'ポイ'];
   // what the Bulgarian and Japanese lines mean. A line that is missing here is simply printed without a gloss
   const GLOSS = {
     'здрасти.': 'hi.', 'やあ。': 'hey.', 'ези или тура?': 'heads or tails?', '表か裏か?': 'heads or tails?', 'пф. късмет.': 'pff. luck.', 'ちっ': 'tch',
@@ -86,7 +89,7 @@
     'моля те…': 'please…', 'やめて…': 'stop…', 'дай!': 'give!', 'ちょうだい': 'give it to me', 'мое!': 'mine!', 'いただき!': 'got it!', 'разтяга се…': 'it stretches…', 'のびる…': 'it stretches…',
     'チーズ!!!': 'CHEESE!!!', 'СИРЕНЕ!!!': 'CHEESE!!!', 'ごちそうさま': 'thank you for the meal', 'ммм.': 'mmm.', 'хе-хе': 'heh-heh', 'いらない': 'do not want it', 'ケチ': 'stingy', 'пф.': 'pff.',
     'いい切れ味': 'a fine edge', 'режи, режи…': 'cut, cut…', 'бум!': 'boom!', 'もったいない': 'what a waste', 'дай го насам': 'hand it over here', 'かっこつけ': 'show-off',
-    'хванах!': 'caught it!', 'ナイスパス!': 'nice pass!', 'дай тука!': 'give it here!', 'もらった!': 'mine now!', 'бавно…': 'slowly…', 'まだだよ': 'not yet', 'смачках го.': 'I crushed it.', 'ぐしゃ': 'the sound of crumpling',
+    'хванах!': 'caught it!', 'ナイスパス!': 'nice pass!', 'дай тука!': 'give it here!', 'もらった!': 'mine now!', 'бавно…': 'slowly…', 'まだだよ': 'not yet', 'смачках го.': 'I crushed it.', 'скука.': 'boring.', 'つまらない': 'boring', 'ポイ': 'the sound of tossing something away',
   };
   const langOf = (s) => /[぀-ヿ一-鿿]/.test(s) ? 'JP' : /[Ѐ-ӿ]/.test(s) ? 'BG' : '';
 
@@ -160,7 +163,7 @@
     }).join('');
   }
   function build() {
-    const L = window.__lines; figN_plate = 0;
+    const L = window.__lines && { ...window.__lines, BOOK: RAID_SAY }; figN_plate = 0;
     if (!L) return { head: 'Nothing to list', nav: '', body: '<p class="pb-intro">Nothing on this site moves or speaks while your system asks for reduced motion, so there are no lines to show. Switch that setting off and open this again.</p>' };
     const chapters = CHAPTERS.map((c) => ({ ...c, entries: c.entries.map((e) => e.fig ? e : ({ ...e, lines: listOf(L, e) })).filter((e) => e.fig || (e.lines && e.lines.length)) }));
     // lists the page has that this file has not been told about yet: they are still shown, in the section they belong to
@@ -213,14 +216,189 @@
     el.hidden = false; document.documentElement.classList.add('pb-lock'); scroller.scrollTop = 0; scroller.dispatchEvent(new Event('scroll'));
     requestAnimationFrame(() => el.classList.add('in'));
     scroller.focus({ preventScroll: true });   // so the arrow keys, space and page keys scroll it straight away
+    raidArm();
     el.dispatchEvent(new CustomEvent('pb-open'));
   }
   function close() {
     if (!isOpen) return;
-    isOpen = false; el.classList.remove('in'); document.documentElement.classList.remove('pb-lock');
+    isOpen = false; el.classList.remove('in'); document.documentElement.classList.remove('pb-lock'); raidStop();
     el.dispatchEvent(new CustomEvent('pb-close'));
     setTimeout(() => { if (!isOpen) el.hidden = true; }, 240);
     if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+  }
+
+  // ---- stay too long and the hand gets bored: after 30 s in the menu it reaches in, pulls the cards out one by one and throws them
+  // at the left edge of the screen, where they break. The hand is the page's own (window.__hand): while its state is 'book' the page
+  // leaves it alone and this file poses it. The thrown cards are real bodies in a small planck world the size of the window. ----
+  const LINGER = 30000, S = 100, DT = 1 / 240, GRAV = 85, FALL = 0.25, SMASH = 13, GRIP = [98, 20];
+  let raid = null, armT = 0, armed = 0;
+  const pick = (a) => a[Math.floor(Math.random() * a.length)], clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  function raidArm() {   // counts only the time the menu is really in front of someone
+    clearInterval(armT); armed = 0; if (!window.__hand) return;
+    armT = setInterval(() => { if (!isOpen) return clearInterval(armT); if (!document.hidden) armed += 250; if (armed >= LINGER) { clearInterval(armT); raidStart(); } }, 250);
+  }
+  function loadPlanck() { return window.planck ? Promise.resolve() : new Promise((res, rej) => { const s = document.createElement('script'); s.src = new URL('../vendor/planck-1.4.2.min.js', here).href; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
+  async function raidStart() {
+    const H = window.__hand; if (!H || !isOpen || raid) return;
+    clearInterval(armT);
+    const r = raid = { st: 'wait', t: 0, now: 0, objs: new Set(), bits: [], hits: [], thrown: 0, broken: 0, last: 0, acc: 0, target: null, held: null, say: null, said: -1e9 };
+    try { await loadPlanck(); } catch (e) { raid = null; return; }
+    if (raid !== r || !isOpen) return;
+    const pl = window.planck;
+    r.layer = document.createElement('div'); r.layer.className = 'pb-fly'; document.body.appendChild(r.layer);
+    r.world = new pl.World({ gravity: { x: 0, y: GRAV } }); r.ground = r.world.createBody(); r.walls = [];
+    r.world.on('begin-contact', (c) => {   // the world is locked in here: the hit is only noted, and the card is broken after the step
+      const fa = c.getFixtureA(), fb = c.getFixtureB(), wall = fa.getBody() === r.ground ? fa : fb.getBody() === r.ground ? fb : null; if (!wall) return;
+      const o = (wall === fa ? fb : fa).getBody().getUserData(); if (!o || o.kind !== 'card' || o.hit) return;
+      const n = wall.getUserData(), v = o.body.getLinearVelocity(), closing = -(v.x * n[0] + v.y * n[1]); if (closing < SMASH) return;
+      const wm = c.getWorldManifold(null), pt = wm && wm.points && wm.points[0], p = o.body.getPosition();
+      o.hit = true; r.hits.push({ o, n, x: pt ? pt.x : p.x, y: pt ? pt.y : p.y, vx: v.x, vy: v.y, w: o.body.getAngularVelocity() });
+    });
+    raidWalls(); addEventListener('resize', raidWalls);
+    requestAnimationFrame(raidFrame);
+  }
+  function raidWalls() {
+    const r = raid; if (!r || !r.world) return; const pl = window.planck, w = document.documentElement.clientWidth / S, h = innerHeight / S, T = 5;
+    for (const f of r.walls) r.ground.destroyFixture(f);
+    const box = (cx, cy, hw, hh, n) => { const f = r.ground.createFixture({ shape: new pl.Box(hw, hh, { x: cx, y: cy }, 0), friction: 0.8 }); f.setUserData(n); return f; };
+    r.walls = [box(-T, h / 2, T, h * 3, [1, 0]), box(w + T, h / 2, T, h * 3, [-1, 0]), box(w / 2, h + T, w, T, [0, -1])];
+    for (const o of r.objs) o.body.setAwake(true);
+  }
+  function raidStop() {
+    clearInterval(armT); const r = raid; if (!r) return; raid = null;
+    removeEventListener('resize', raidWalls);
+    if (r.layer) r.layer.remove();
+    if (r.c) {   // the hand goes back to whatever it was doing on the page
+      const c = r.c, H = window.__hand; c.under.classList.remove('pb-raid'); c.over.classList.remove('pb-raid');
+      c.x = document.documentElement.clientWidth + 340; c.pose = { ...H.POSES.lurk }; c.a = Math.PI; H.draw(0, 0, 0); c.st = 'off'; if (r.prev !== 'off') H.set('lurk');
+    }
+  }
+  function raidSay(text, o) {
+    const r = raid, b = document.createElement('div'); b.className = 'pb-say' + (o ? '' : ' hand'); b.textContent = text; r.layer.appendChild(b);
+    if (o) { if (o.say) o.say.el.remove(); o.say = { el: b, until: r.now + 1300 }; }
+    else { if (r.say) r.say.el.remove(); r.say = { el: b, until: r.now + 1500 }; r.said = r.now; }
+  }
+  const intact = () => [...scroller.querySelectorAll('.pb-entry:not(.pb-gone), .pb-fig:not(.pb-gone)')];
+  function inView(e) { const a = e.getBoundingClientRect(), b = scroller.getBoundingClientRect(), mid = (a.top + a.bottom) / 2; return mid > b.top + 30 && mid < b.bottom - 30; }
+  function raidBody(o, x, y, a, shape, opt) {
+    const r = raid; o.body = r.world.createBody({ type: 'dynamic', position: { x, y }, angle: a, linearDamping: 0.05, angularDamping: 0.5, bullet: true });
+    o.body.createFixture({ shape, density: 1, friction: 0.7, restitution: 0.1, ...opt }); o.body.setGravityScale(FALL); o.body.setUserData(o);
+    o.px = x; o.py = y; o.pa = a; r.objs.add(o); return o;
+  }
+  // the card breaks from the point where it struck: a web of cracks fanned out from there, every piece a body of its own
+  function raidShatter(h) {
+    const r = raid, o = h.o, pl = window.planck, b = o.body, pos = b.getPosition(), ang = b.getAngle(), hw = o.w / 2, hh = o.h / 2;
+    const lp = b.getLocalPoint({ x: h.x, y: h.y }), P = [clamp(lp.x * S, -hw + 4, hw - 4), clamp(lp.y * S, -hh + 4, hh - 4)];
+    const rim = [], edge = (x0, y0, x1, y1) => { const n = 1 + Math.round(Math.hypot(x1 - x0, y1 - y0) / 110); rim.push([x0, y0]); for (let i = 0; i < n; i++) { const f = (i + 0.25 + Math.random() * 0.5) / n; rim.push([x0 + (x1 - x0) * f, y0 + (y1 - y0) * f]); } };
+    edge(-hw, -hh, hw, -hh); edge(hw, -hh, hw, hh); edge(hw, hh, -hw, hh); edge(-hw, hh, -hw, -hh);
+    const ring = rim.map((q) => { const f = 0.3 + Math.random() * 0.3; return [P[0] + (q[0] - P[0]) * f, P[1] + (q[1] - P[1]) * f]; });
+    const polys = []; for (let i = 0; i < rim.length; i++) { const j = (i + 1) % rim.length; polys.push([P, ring[i], ring[j]], [ring[i], rim[i], rim[j], ring[j]]); }
+    const area = (p) => { let a = 0; p.forEach((q, i) => { const n = p[(i + 1) % p.length]; a += q[0] * n[1] - n[0] * q[1]; }); return a / 2; };
+    const vn = h.vx * h.n[0] + h.vy * h.n[1], bx = h.vx - 1.3 * vn * h.n[0], by = h.vy - 1.3 * vn * h.n[1], ca = Math.cos(ang), sa = Math.sin(ang);
+    if (o.say) o.say.el.remove();
+    r.world.destroyBody(b); r.objs.delete(o); r.broken++;
+    for (let p of polys) {
+      const A = area(p); if (Math.abs(A) < 90) continue; if (A < 0) p = [...p].reverse();
+      let ok = true; p.forEach((q, i) => { const n = p[(i + 1) % p.length]; if (Math.hypot(q[0] - n[0], q[1] - n[1]) < 3) ok = false; }); if (!ok) continue;
+      const shape = new pl.Polygon(p.map((q) => ({ x: q[0] / S, y: q[1] / S }))); if (shape.m_count !== p.length) continue;   // planck quietly makes a box out of a bad outline
+      const elp = o.el.cloneNode(true); elp.style.clipPath = `polygon(${p.map((q) => `${(q[0] + hw).toFixed(1)}px ${(q[1] + hh).toFixed(1)}px`).join(',')})`; elp.style.boxShadow = 'none'; r.layer.appendChild(elp);
+      const cx = p.reduce((s2, q) => s2 + q[0], 0) / p.length - P[0], cy = p.reduce((s2, q) => s2 + q[1], 0) / p.length - P[1], cl = Math.hypot(cx, cy) || 1, push = (3 + Math.random() * 7) * Math.max(0.3, 1 - cl / 400);
+      const ox = (cx * ca - cy * sa) / cl, oy = (cx * sa + cy * ca) / cl;
+      const piece = raidBody({ kind: 'piece', el: elp, w: o.w, h: o.h, die: r.now + 3200 + Math.random() * 2600 }, pos.x, pos.y, ang, shape, { filterGroupIndex: -1 });
+      piece.body.setLinearVelocity({ x: bx * (0.25 + Math.random() * 0.5) + ox * push, y: by * (0.25 + Math.random() * 0.5) + oy * push - 2 }); piece.body.setAngularVelocity(h.w * 0.4 + (Math.random() - 0.5) * 14);
+    }
+    o.el.remove();
+    const vw = document.documentElement.clientWidth, X = clamp(h.x * S, 0, vw), Y = clamp(h.y * S, 0, innerHeight);
+    for (let i = 0; i < 16; i++) { const e = document.createElement('div'); e.className = 'pb-bit'; const sz = 3 + Math.random() * 5; e.style.width = e.style.height = sz + 'px'; r.layer.appendChild(e); const a = Math.random() * Math.PI * 2, sp = 200 + Math.random() * 700; r.bits.push({ el: e, x: X, y: Y, vx: h.n[0] * (200 + Math.random() * 500) + Math.cos(a) * sp * 0.6, vy: h.n[1] * 300 + Math.sin(a) * sp * 0.6 - 200, life: 0.6 + Math.random() * 0.6, t: 0 }); }
+    const L = window.__lines, sm = L && L.SAY && L.SAY.smash; if (sm) { const s = document.createElement('div'); s.className = 'pb-say scream'; s.textContent = pick(sm); s.style.translate = `calc(${clamp(X, 90, vw - 90).toFixed(0)}px - 50%) ${clamp(Y - 60, 12, innerHeight - 50).toFixed(0)}px`; r.layer.appendChild(s); setTimeout(() => s.remove(), 1300); }
+    const card = q('.pb-card'); card.classList.remove('pb-jolt'); void card.offsetWidth; card.classList.add('pb-jolt');
+  }
+  function raidFrame(t) {
+    const r = raid; if (!r) return;
+    const ms = Math.min(250, t - (r.last || t)); r.last = t; const dt = ms / 1000;
+    if (!document.hidden) {
+      r.now += ms; r.acc += dt;
+      while (r.acc >= DT) { for (const o of r.objs) { const p = o.body.getPosition(); o.px = p.x; o.py = p.y; o.pa = o.body.getAngle(); } r.world.step(DT, 10, 6); r.acc -= DT; for (const h of r.hits.splice(0)) if (r.objs.has(h.o)) raidShatter(h); }
+      raidHand(dt);
+      const k = r.acc / DT;
+      for (const o of r.objs) {
+        const p = o.body.getPosition(), x = (o.px + (p.x - o.px) * k) * S, y = (o.py + (p.y - o.py) * k) * S, a = o.pa + (o.body.getAngle() - o.pa) * k;
+        o.el.style.transform = `translate(${(x - o.w / 2).toFixed(2)}px, ${(y - o.h / 2).toFixed(2)}px) rotate(${a.toFixed(4)}rad)`;
+        if (o.say) { if (r.now > o.say.until) { o.say.el.remove(); o.say = null; } else o.say.el.style.translate = `calc(${clamp(x, 70, innerWidth - 70).toFixed(0)}px - 50%) ${clamp(y - o.h / 2 - 36, 8, innerHeight - 40).toFixed(0)}px`; }
+        if (o.die && r.now > o.die) { o.el.style.opacity = Math.max(0, 1 - (r.now - o.die) / 500).toFixed(2); if (r.now > o.die + 500) { if (o.say) o.say.el.remove(); o.el.remove(); r.world.destroyBody(o.body); r.objs.delete(o); } }
+        else if (o.kind === 'card' && !o.hit && !o.die && r.now > o.born + 6000) o.die = r.now;   // one that somehow never broke does not lie around for ever
+      }
+      for (let i = r.bits.length - 1; i >= 0; i--) { const b = r.bits[i]; b.t += dt; b.vy += 2100 * dt; b.x += b.vx * dt; b.y += b.vy * dt; if (b.t > b.life) { b.el.remove(); r.bits.splice(i, 1); } else b.el.style.transform = `translate(${b.x.toFixed(1)}px, ${b.y.toFixed(1)}px) rotate(${(b.t * 9).toFixed(2)}rad)`; }
+    }
+    requestAnimationFrame(raidFrame);
+  }
+  // the hand's own little state machine while it is in the menu
+  function raidHand(dt) {
+    const r = raid, H = window.__hand, vw = document.documentElement.clientWidth, vh = innerHeight, G = GRIP, P = H.POSES;
+    if (!r.c) {   // it finishes whatever it was doing on the page first
+      const c = H.get(); if ((c.st !== 'off' && c.st !== 'lurk' && c.st !== 'sulk' && c.st !== 'gloat') || c.o || c.joint) return;
+      r.c = c; r.prev = c.st; c.st = 'book'; c.under.classList.add('pb-raid'); c.over.classList.add('pb-raid');
+      c.x = vw + 340; c.y = c.ly = vh * 0.5; c.sh = c.y + 70; c.a = Math.PI; c.pose = { ...P.lurk }; r.st = 'enter'; r.t = 0;
+    }
+    const c = r.c; c.st = 'book'; r.t += dt;
+    const set = (st) => { r.st = st; r.t = 0; }, wristFor = (Hc, a) => { const ca = Math.cos(a), sa = Math.sin(a); return [Hc[0] - G[0] * ca - G[1] * sa, Hc[1] - G[0] * sa + G[1] * ca]; };
+    const grip = () => { const ca = Math.cos(c.a), sa = Math.sin(c.a); return [c.x + G[0] * ca + G[1] * sa, c.y + G[0] * sa - G[1] * ca]; };
+    let T = [vw + 30, c.ly], aim = Math.PI, pose = P.eager, rate = 7, wig = 0.12, shake = 0, strain = 0;
+    const tr = r.target && r.target.isConnected ? r.target.getBoundingClientRect() : null;
+    const hold = tr ? [Math.min(tr.right - 30, vw - 60), clamp((tr.top + tr.bottom) / 2, 70, vh - 70)] : null;
+    if (r.st === 'enter') { wig = 0.34; T = [vw + 10, vh * 0.5]; if (r.t > 0.5 && r.said < 0) raidSay(pick(RAID_SAY)); if (r.t > 1.7) set('pick'); }
+    else if (r.st === 'pick') {
+      const all = intact(), seen = all.filter(inView);
+      if (!all.length) { set('done'); raidSay('all gone.'); }
+      else if (seen.length) { r.target = pick(seen); r.scrolling = false; set('reach'); }
+      else if (r.t > 0.4 && !r.scrolling) { const e = all[0], sr = scroller.getBoundingClientRect(), er = e.getBoundingClientRect(); scroller.scrollTo({ top: Math.max(0, scroller.scrollTop + er.top - sr.top - 60), behavior: 'smooth' }); r.scrolling = true; }   // nothing left on screen: it turns the page for you
+      else if (r.t > 1.6) { r.scrolling = false; r.t = 0; }
+    } else if (r.st === 'reach') {
+      if (!tr || !inView(r.target)) set('pick');
+      else { pose = P.lunge; rate = 16; T = wristFor(hold, aim); c.ly = hold[1]; const g = grip(); if (Math.hypot(g[0] - hold[0], g[1] - hold[1]) < 16) { r.target.classList.add('pb-tug'); set('grip'); } else if (r.t > 1.5) set('pick'); }
+    } else if (r.st === 'grip') {   // it has it by the edge and the card does not want to come out
+      if (!tr) set('pick');
+      else {
+        strain = clamp(r.t / 0.5, 0, 1); pose = {}; for (const k in P.clamp) pose[k] = P.clamp[k] + (P.strain[k] - P.clamp[k]) * strain;
+        rate = 30; shake = 1 + 3 * strain; T = wristFor([hold[0] + 26 * strain, hold[1]], aim);
+        if (r.t > 0.55) {
+          const e = r.target, el2 = e.cloneNode(true); el2.classList.remove('pb-tug'); if (e.closest('.pb-sec-hand')) el2.classList.add('pb-sec-hand');
+          el2.style.width = tr.width + 'px'; el2.style.height = tr.height + 'px'; r.layer.appendChild(el2);
+          e.classList.remove('pb-tug'); e.classList.add('pb-gone');
+          const g = grip(), cx = tr.left + tr.width / 2, cy = tr.top + tr.height / 2;
+          r.held = { kind: 'card', el: el2, w: tr.width, h: tr.height, off: [g[0] - cx, g[1] - cy], x: cx, y: cy, a: 0, vx: 0, vy: 0 };
+          r.y0 = hold[1]; const L = window.__lines; if (L && L.SAY && L.SAY.rip) raidSay(pick(L.SAY.rip), r.held);
+          set('wind');
+        }
+      }
+    } else if (r.st === 'wind') {   // back it goes, cocked over its shoulder
+      pose = P.clamp; rate = 9; aim = Math.PI + 0.95; T = wristFor([vw - 90, clamp(r.y0 - 60, 110, vh - 110)], aim);
+      if (r.t > 0.2 && r.now - r.said > 2600) raidSay(pick(RAID_SAY));
+      if (r.t > 0.62) set('throw');
+    } else if (r.st === 'throw') {   // and the whip forward: the card leaves the fingers with the speed they had
+      rate = 34; aim = Math.PI - 0.3; T = wristFor([vw - 420, clamp(r.y0 + 10, 110, vh - 110)], aim); pose = r.held ? P.clamp : P.lunge;
+      if (r.held && r.t > 0.085) {
+        const o = r.held, pl = window.planck; r.held = null;
+        let vx = o.vx / S, vy = o.vy / S, sp = Math.hypot(vx, vy); if (vx > -0.8 * sp || sp < 1) { vx = -0.98; vy = -0.2; sp = 1; }
+        const v = clamp(sp, 34, 52); vx = vx / sp * v; vy = Math.min(vy / sp * v, -2);
+        raidBody(o, o.x / S, o.y / S, o.a, new pl.Box(o.w / 2 / S, o.h / 2 / S));
+        o.body.setLinearVelocity({ x: vx, y: vy }); o.body.setAngularVelocity((Math.random() - 0.5) * 9); o.born = r.now; r.thrown++;
+        const L = window.__lines; if (L && L.SAY && L.SAY.throw) raidSay(pick(L.SAY.throw), o);
+      }
+      if (r.t > 0.5) { r.rest = 0.5 + Math.random() * 0.9; set('rest'); }
+    } else if (r.st === 'rest') { pose = P.joy; wig = 0.2; T = [vw + 20, c.ly]; if (r.t > r.rest) set('pick'); }
+    else if (r.st === 'done') { pose = P.sulk; rate = 3; T = [vw + (r.t > 1.6 ? 340 : 60), vh * 0.5]; wig = 0.02; }
+    const k = 1 - Math.exp(-dt * rate), ka = 1 - Math.exp(-dt * (rate > 20 ? 30 : 9)), kp = 1 - Math.exp(-dt * (r.st === 'reach' || r.st === 'throw' ? 30 : 12));
+    c.x += (T[0] - c.x) * k; c.y += (T[1] - c.y) * k; c.a += (aim - c.a) * ka; c.sh += (c.y + 70 - c.sh) * (1 - Math.exp(-dt * 4));
+    for (const key in pose) c.pose[key] += (pose[key] - c.pose[key]) * kp;
+    if (r.held) {   // the card is pinned in the fingers: it goes where the grip goes and turns with the wrist
+      const o = r.held, g = grip(), th = c.a - Math.PI, ca = Math.cos(th), sa = Math.sin(th), x = g[0] - (o.off[0] * ca - o.off[1] * sa), y = g[1] - (o.off[0] * sa + o.off[1] * ca);
+      if (dt > 0) { o.vx = (x - o.x) / dt; o.vy = (y - o.y) / dt; } o.x = x; o.y = y; o.a = th;
+      o.el.style.transform = `translate(${(x - o.w / 2).toFixed(2)}px, ${(y - o.h / 2).toFixed(2)}px) rotate(${th.toFixed(4)}rad)`;
+      if (o.say) { if (r.now > o.say.until) { o.say.el.remove(); o.say = null; } else o.say.el.style.translate = `calc(${clamp(x, 70, vw - 70).toFixed(0)}px - 50%) ${clamp(y - o.h / 2 - 36, 8, vh - 40).toFixed(0)}px`; }
+    }
+    if (r.say) { if (r.now > r.say.until) { r.say.el.remove(); r.say = null; } else { const g = grip(); r.say.el.style.translate = `calc(${clamp(Math.min(c.x, g[0]) - 30, 80, vw - 90).toFixed(0)}px - 50%) ${clamp(Math.min(c.y, g[1]) - 115, 10, vh - 50).toFixed(0)}px`; } }
+    H.draw(wig, shake, strain);
   }
 
   // ---- the button: a translate sign, next to the theme switch ----
@@ -229,5 +407,5 @@
   btn.innerHTML = '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path fill="currentColor" d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>';
   btn.addEventListener('click', open);
   nav.insertBefore(btn, document.getElementById('theme'));
-  window.__phrasebook = { open, close, state: () => ({ isOpen }), get el() { return el; } };
+  window.__phrasebook = { open, close, raid: raidStart, state: () => ({ isOpen, raid: raid && { st: raid.st, objs: raid.objs.size, thrown: raid.thrown, broken: raid.broken, gone: scroller.querySelectorAll('.pb-gone').length } }), get el() { return el; } };
 })();
