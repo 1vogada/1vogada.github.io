@@ -7,7 +7,7 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   // Bump VER, and the ?v= on this file's script tag in index.html, whenever this file or the stylesheet changes. GitHub Pages caches each
   // file for ten minutes on its own, and a new script with an old stylesheet looks broken; the version makes them arrive as a pair
-  const VER = 5;
+  const VER = 6;
   const here = (document.currentScript && document.currentScript.src) || '/scripts/phrasebook.js';
 
   // ---- what this file knows: which occasion each list belongs to. src = which list on window.__lines, key = which entry of it ----
@@ -82,6 +82,8 @@
         { src: 'SAY', key: 'btnhi', title: 'The new buttons', when: 'After it snaps, a fresh Heads and Tails poof in and each says hello.' },
         { src: 'CLAW_SAY', key: 'yourpick', title: 'Letting you pick', when: 'Half the time after it snaps, it lets you call it after all.' },
         { src: 'CLAW_SAY', key: 'mypick', title: 'Picking for you', when: 'The other half, it pokes Heads or Tails itself.' },
+        { src: 'CLAW_SAY', key: 'back', title: 'You came back', when: 'It pressed Yes for you, and now you are on this page again. It noticed.' },
+        { src: 'CLAW_SAY', key: 'rematch', title: 'The rematch', when: 'It draws you another project and tosses the coin again.' },
       ] },
   ];
   // the only lines that live in this file: what the hand says while it empties this menu
@@ -92,6 +94,8 @@
   const SCROLL_SAY = ['lost your place?', 'where were we?', 'up! down! up!', 'wheeee', 'нагоре-надолу!', 'ぐるぐる〜'];
   // what the Bulgarian and Japanese lines mean. A line that is missing here is simply printed without a gloss
   const GLOSS = {
+    'върна се, а?': 'you came back, huh?', 'не ти хареса, а?': 'did not like it, huh?', 'おかえり。': 'welcome back.', '気に入らなかった?': 'did you not like it?',
+    'още едно хвърляне?': 'one more toss?', 'пак ли? ези или тура?': 'again? heads or tails?', 'もう一回?': 'one more time?', 'もう一度、表か裏か?': 'once more: heads or tails?',
     'чакай!': 'wait!', 'だめ!': 'no!', 'стига вече!': 'enough already!', 'もういい!': 'that is enough!', 'избирай.': 'pick.', '選べ。': 'pick.', 'сам ще избера': 'I will pick myself', '貸して': 'give it here', 'здрасти!': 'hi!', 'ей!': 'hey!', 'ето ни пак': 'here we are again', 'やあ!': 'hey!', 'こんにちは': 'hello', 'ただいま': 'we are home', 'おっす': 'yo',
     'здрасти.': 'hi.', 'やあ。': 'hey.', 'ези или тура?': 'heads or tails?', '表か裏か?': 'heads or tails?', 'пф. късмет.': 'pff. luck.', 'ちっ': 'tch',
     'не позна!': 'wrong guess!', 'ハズレ!': 'miss!', 'майната ѝ на монетата': 'to hell with the coin', 'どうでもいい。行け。': 'whatever. go.', 'ЧАО-ЧАО!': 'BYE-BYE!', 'バイバイ!': 'bye-bye!',
