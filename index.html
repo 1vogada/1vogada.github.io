@@ -145,17 +145,24 @@
   .toggle { font: inherit; font-size: .85rem; color: var(--muted); background: transparent; border: 1px solid var(--border);
             border-radius: 999px; padding: 6px 14px; cursor: pointer; }
   .toggle:hover { color: var(--text); border-color: var(--muted); }
-  /* thrown cards */
+  /* card physics */
   .card.held { visibility: hidden; }
   .card.grab-ready { transform: scale(1.03); border-color: var(--accent); }
+  .card.pulling { transition: none; z-index: 5; box-shadow: 0 14px 30px rgba(0,0,0,.18); }
+  .card.springback { transition: transform .45s cubic-bezier(.3,1.6,.5,1); }
   .card.settled { animation: none; opacity: 1; }
   .card.regrow { animation: regrow .6s cubic-bezier(.3,1.5,.5,1) both; }
   @keyframes regrow { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: none; } }
-  .flying, .shard { position: fixed; z-index: 70; margin: 0; pointer-events: none; animation: none !important; opacity: 1; will-change: transform; transition: none !important; translate: none; }
-  .flying { box-shadow: 0 18px 40px rgba(0,0,0,.25); cursor: grabbing; transform-origin: 50% 50%; }
-  .shard { box-shadow: none; background: color-mix(in srgb, var(--surface) 93%, var(--text)); }
+  #phys { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 35; overflow: hidden; }
+  #phys .phys { position: absolute; left: 0; top: 0; margin: 0; pointer-events: auto; animation: none !important; opacity: 1; transition: none !important;
+                transform-origin: 50% 50%; will-change: transform; cursor: grab; touch-action: none; translate: none; }
+  #phys .phys.grabbed { box-shadow: 0 18px 40px rgba(0,0,0,.25); }
+  #phys .shard { pointer-events: none; box-shadow: none; background: color-mix(in srgb, var(--surface) 93%, var(--text)); }
   html.throwing, html.throwing * { cursor: grabbing !important; user-select: none; }
   .grid .card { cursor: grab; }
+  .reset-cards { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: 16px; z-index: 45; box-shadow: var(--shadow); }
+  .reset-cards[hidden] { display: none; }
+  html.crazy #phys, html.crazy .reset-cards { display: none; }
   main.shake { animation: shake .28s; }
   @keyframes shake { 20% { translate: -5px 2px; } 40% { translate: 4px -3px; } 60% { translate: -3px 2px; } 80% { translate: 2px -1px; } }
   .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 30px); opacity: 0; background: var(--text); color: var(--bg);
@@ -428,7 +435,7 @@
     const pill = post ? `<span class="pill postpill">post${p.date ? ' · ' + esc(fmtDate(p.date)) : ''}</span>`
                       : /^https:\/\/github\.com\//.test(p.url) ? '<span class="pill">code only</span>' : '';
     return `
-      <div class="card${post ? ' post' : ''}" style="--i:${i};--c1:${b.c1}">
+      <div class="card${post ? ' post' : ''}" style="--i:${i};--c1:${b.c1}" data-key="${esc(p.key)}">
         ${p.pinned && query ? '<span class="pin">Pinned</span>' : ''}
         <span class="band">${b.svg}</span>
         <div class="body">
@@ -465,6 +472,7 @@
     let i = 0;
     grid.innerHTML = sections(list).map((sec) =>
       (sec.title ? `<h3 class="sec">${esc(sec.title)}</h3>` : '') + sec.list.map((p) => calmCard(p, i++)).join('')).join('');
+    document.dispatchEvent(new Event('cards-rendered'));
   }
 
   // ---- blog post reader (#post-<id>) with a tiny, safe markdown renderer ----
@@ -541,181 +549,264 @@
     });
   }
 
-  // ---- throw cards: grab a card anywhere, fling it at a screen edge and it shatters from the impact corner ----
-  (function throwable() {
+  // ---- card physics: cards are rooted in the grid; pull hard to rip one out, then it is a real rigid body ----
+  // Ripped cards fall to the bottom of the page, collide and stack. Thrown hard into a wall or another card, they shatter.
+  (function cardPhysics() {
     if (reduced) return;
     const gridEl = document.getElementById('grid');
-    let press = null, drag = null, smashed = 0, suppressClick = false;
+    const RIP = 160;            // px of pull needed to rip a card out
+    const SMASH = 13;           // impact speed (px per step) needed to shatter
+    let M = null, loading = null, engine = null, layer = null, walls = [], loopOn = false, last = 0, acc = 0;
+    const bodies = new Map();   // body.id -> { body, el, w, h, key, kind }
+    const ripped = new Set();   // card keys ripped out of the grid
+    let press = null, grab = null, smashed = 0, resetBtn = null;
     const now = () => performance.now();
-    const rotV = (x, y, a) => [x * Math.cos(a) - y * Math.sin(a), x * Math.sin(a) + y * Math.cos(a)];
 
-    // card state: centre (cx, cy), angle a (rad), velocity (vx, vy) px/ms, spin w rad/ms
-    function begin(e) {
-      const card = press.card, r = card.getBoundingClientRect();
-      const ghost = card.cloneNode(true);
-      const uid = 'g' + Math.random().toString(36).slice(2, 8);
-      ghost.querySelectorAll('pattern[id]').forEach((pt) => { const old = pt.id; pt.id = old + uid; ghost.querySelectorAll('rect[fill]').forEach((x) => { if (x.getAttribute('fill') === `url(#${old})`) x.setAttribute('fill', `url(#${old + uid})`); }); });
-      ghost.classList.add('flying'); ghost.removeAttribute('style');
-      ghost.style.cssText = `--c1:${card.style.getPropertyValue('--c1')};left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;`;
-      document.body.appendChild(ghost);
-      card.classList.add('held');
-      drag = { card, ghost, w: r.width, h: r.height, left: r.left, top: r.top,
-               cx: r.left + r.width / 2, cy: r.top + r.height / 2, a: 0, vx: 0, vy: 0, w0: 0, spin: 0,
-               gx: press.x - (r.left + r.width / 2), gy: press.y - (r.top + r.height / 2), // grab point relative to centre (card space)
-               px: e.clientX, py: e.clientY, hist: [{ x: press.x, y: press.y, t: press.t }] };
-      document.documentElement.classList.add('throwing');
+    function loadMatter() {
+      if (window.Matter) return Promise.resolve(M = window.Matter);
+      return loading || (loading = new Promise((res, rej) => {
+        const s = document.createElement('script'); s.src = '/vendor/matter-0.19.0.min.js';
+        s.onload = () => res(M = window.Matter); s.onerror = rej; document.head.appendChild(s);
+      }));
     }
-    function place(d) {
-      d.ghost.style.transform = `translate(${d.cx - d.w / 2 - d.left}px, ${d.cy - d.h / 2 - d.top}px) rotate(${d.a}rad)`;
+    const docW = () => document.documentElement.clientWidth;
+    const docH = () => Math.max(document.documentElement.scrollHeight, innerHeight);
+
+    function world() {
+      if (engine) return;
+      engine = M.Engine.create({ enableSleeping: true });
+      engine.gravity.y = 1.1;
+      layer = document.createElement('div'); layer.id = 'phys'; document.body.appendChild(layer);
+      buildWalls();
+      M.Events.on(engine, 'collisionStart', onHit);
+      addEventListener('resize', () => { if (engine) buildWalls(); });
     }
-    // while held: the grab point sticks to the pointer, the card swings around it like paper pulled by a corner
-    function follow(x, y, t) {
-      const d = drag, h = d.hist;
-      h.push({ x, y, t }); while (h.length > 2 && t - h[0].t > 60) h.shift();
-      const a = h[0], b = h[h.length - 1], dt = Math.max(8, b.t - a.t);
-      d.vx = (b.x - a.x) / dt; d.vy = (b.y - a.y) / dt;
-      const [rx, ry] = rotV(d.gx, d.gy, d.a), rr = rx * rx + ry * ry;
-      const step = t - (d.lastT || t); d.lastT = t;
-      if (rr > 400 && step > 0) { // centre trails behind the motion: torque from grab offset x pointer velocity
-        d.spin = Math.max(-0.02, Math.min(0.02, ((rx * d.vy - ry * d.vx) / rr) * 0.9));
-        d.a += d.spin * step;
+    function buildWalls() {
+      const W = docW(), H = docH(), T = 200;
+      layer.style.width = W + 'px'; layer.style.height = H + 'px';
+      if (walls.length) M.Composite.remove(engine.world, walls);
+      walls = [
+        M.Bodies.rectangle(-T / 2, H / 2 - H, T, H * 4, { isStatic: true, label: 'wall' }),
+        M.Bodies.rectangle(W + T / 2, H / 2 - H, T, H * 4, { isStatic: true, label: 'wall' }),
+        M.Bodies.rectangle(W / 2, H + T / 2, W + 2 * T, T, { isStatic: true, label: 'wall', friction: 0.9 }),
+      ];
+      M.Composite.add(engine.world, walls);
+    }
+
+    function cloneCard(card) {
+      const el = card.cloneNode(true);
+      const uid = 'p' + Math.random().toString(36).slice(2, 8);
+      el.querySelectorAll('pattern[id]').forEach((pt) => { const old = pt.id; pt.id = old + uid; el.querySelectorAll('rect[fill]').forEach((x) => { if (x.getAttribute('fill') === `url(#${old})`) x.setAttribute('fill', `url(#${old + uid})`); }); });
+      el.removeAttribute('style'); el.style.setProperty('--c1', card.style.getPropertyValue('--c1'));
+      el.classList.remove('held', 'pulling', 'regrow', 'settled'); el.classList.add('phys');
+      return el;
+    }
+    function sync() {
+      for (const o of bodies.values()) {
+        const b = o.body;
+        o.el.style.transform = `translate(${b.position.x - o.ox}px, ${b.position.y - o.oy}px) rotate(${b.angle + o.a0}rad)`;
+        if (o.die) { const left = o.die - now(); if (left < 900) o.el.style.opacity = Math.max(0, left / 900); if (left <= 0) removeBody(o); }
       }
-      const [rx2, ry2] = rotV(d.gx, d.gy, d.a);
-      d.cx = x - rx2; d.cy = y - ry2; place(d);
     }
+    function removeBody(o) { M.Composite.remove(engine.world, o.body); o.el.remove(); bodies.delete(o.body.id); }
+    function loop(t) {
+      if (!bodies.size) { loopOn = false; return; }
+      acc += Math.min(100, t - (last || t)); last = t;
+      let n = 0; while (acc >= 16.667 && n++ < 4) { M.Engine.update(engine, 16.667); acc -= 16.667; flushSmash(); }
+      sync(); requestAnimationFrame(loop);
+    }
+    function run() { if (!loopOn) { loopOn = true; last = 0; acc = 0; requestAnimationFrame(loop); } }
 
+    // ---- rooted pull ----
+    function pullView(card, dx, dy, gx, gy, w, h) {
+      const d = Math.hypot(dx, dy), k = 110 / (110 + d);          // rubber band: gives less the further you pull
+      const ox = dx * k, oy = dy * k;
+      const tilt = Math.max(-0.22, Math.min(0.22, ((gx - w / 2) * oy - (gy - h / 2) * ox) / (w * h) * 2.2));
+      card.style.transform = `translate(${ox}px, ${oy}px) rotate(${tilt}rad)`;
+      card.style.transformOrigin = `${gx}px ${gy}px`;
+      return { ox, oy, tilt };
+    }
     gridEl.addEventListener('pointerdown', (e) => {
       const card = e.target.closest('.card');
-      if (!card || isCrazy() || e.button > 0 || drag) return;
-      press = { card, x: e.clientX, y: e.clientY, t: now(), id: e.pointerId, armed: e.pointerType === 'mouse' };
+      if (!card || isCrazy() || e.button > 0 || press || grab) return;
+      const r = card.getBoundingClientRect();
+      press = { card, x: e.clientX, y: e.clientY, id: e.pointerId, gx: e.clientX - r.left, gy: e.clientY - r.top, w: r.width, h: r.height,
+                armed: e.pointerType === 'mouse', hist: [], moved: false };
+      loadMatter().catch(() => {});
       if (e.pointerType === 'mouse') e.preventDefault();
       else press.timer = setTimeout(() => { if (press) { press.armed = true; card.classList.add('grab-ready'); navigator.vibrate?.(12); } }, 200);
     });
-    window.addEventListener('pointermove', (e) => {
-      if (!press || e.pointerId !== press.id) return;
-      if (!drag) {
-        const dist = Math.hypot(e.clientX - press.x, e.clientY - press.y);
-        if (!press.armed) { if (dist > 10) { clearTimeout(press.timer); press = null; } return; }
-        if (dist < 3) return;
-        begin(e);
+    function onMove(e) {
+      if (grab && e.pointerId === grab.id) {
+        const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : []; const ev = evs.length ? evs[evs.length - 1] : e;
+        grab.c.pointA = { x: ev.clientX + scrollX, y: ev.clientY + scrollY };
+        if (Math.hypot(ev.clientX - grab.sx, ev.clientY - grab.sy) > 4) grab.moved = true;
+        M.Sleeping.set(grab.o.body, false);
+        return;
       }
-      const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
-      for (const c of (evs.length ? evs : [e])) follow(c.clientX, c.clientY, c.timeStamp || now());
-    });
-    window.addEventListener('touchmove', (e) => { if (drag || press?.armed) e.preventDefault(); }, { passive: false });
-    function release(e) {
-      if (!press || (e && e.pointerId !== press.id)) return;
-      clearTimeout(press.timer); press.card.classList.remove('grab-ready');
-      const d = drag; press = null; drag = null;
-      if (!d) return;
-      suppressClick = true; setTimeout(() => { suppressClick = false; }, 0);
-      if (now() - d.hist[d.hist.length - 1].t > 80) { d.vx = 0; d.vy = 0; } // held still before letting go
-      // velocity of the centre = grab point velocity minus the swing
-      const [rx, ry] = rotV(d.gx, d.gy, d.a);
-      d.vx += d.spin * ry; d.vy -= d.spin * rx;
-      fly(d);
+      if (!press || e.pointerId !== press.id) return;
+      const dx = e.clientX - press.x, dy = e.clientY - press.y, d = Math.hypot(dx, dy);
+      if (!press.armed) { if (d > 10) { clearTimeout(press.timer); press = null; } return; }
+      if (d > 3) press.moved = true;
+      press.hist.push({ x: e.clientX, y: e.clientY, t: now() }); while (press.hist.length > 2 && now() - press.hist[0].t > 60) press.hist.shift();
+      press.card.classList.add('pulling');
+      press.view = pullView(press.card, dx, dy, press.gx, press.gy, press.w, press.h);
+      if (d > RIP && M) rip(e);
     }
-    window.addEventListener('pointerup', release);
-    window.addEventListener('pointercancel', release);
-    gridEl.addEventListener('click', (e) => { if (suppressClick) { e.preventDefault(); e.stopPropagation(); } }, true);
+    addEventListener('pointermove', onMove);
+    addEventListener('touchmove', (e) => { if (grab || press?.armed) e.preventDefault(); }, { passive: false });
+
+    function rip(e) {
+      const p = press; press = null; world();
+      const card = p.card, r = card.getBoundingClientRect(); // rect of the stretched, tilted card is close enough for position
+      const el = cloneCard(card); layer.appendChild(el);
+      const cx = r.left + r.width / 2 + scrollX, cy = r.top + r.height / 2 + scrollY;
+      const body = M.Bodies.rectangle(cx, cy, p.w, p.h, { chamfer: { radius: 12 }, friction: 0.7, frictionStatic: 1, restitution: 0.12, frictionAir: 0.012, density: 0.0016, label: 'card' });
+      M.Body.setAngle(body, p.view ? p.view.tilt : 0);
+      const o = { body, el, w: p.w, h: p.h, ox: p.w / 2, oy: p.h / 2, a0: 0, key: card.dataset.key, kind: 'card' };
+      el.style.width = p.w + 'px'; el.style.height = p.h + 'px';
+      bodies.set(body.id, o); M.Composite.add(engine.world, body);
+      ripped.add(card.dataset.key);
+      card.classList.remove('pulling', 'grab-ready'); card.style.transform = ''; card.classList.add('held');
+      // snap: the card jumps a little toward the hand when it tears free
+      const h = p.hist, a = h[0], b = h[h.length - 1], dt = Math.max(8, (b?.t || 1) - (a?.t || 0));
+      if (a && b) M.Body.setVelocity(body, { x: (b.x - a.x) / dt * 16.7 * 0.6, y: (b.y - a.y) / dt * 16.7 * 0.6 });
+      startGrab(o, e, e.clientX + scrollX, e.clientY + scrollY);
+      sync(); run(); showReset();
+      if (ripped.size === 1) toast('Ripped it out! Throw it hard at a wall to smash it.');
+    }
+    function startGrab(o, e, px, py) {
+      const b = o.body;
+      const c = M.Constraint.create({ pointA: { x: px, y: py }, bodyB: b, pointB: { x: px - b.position.x, y: py - b.position.y }, stiffness: 0.5, damping: 0.12, length: 0 });
+      M.Composite.add(engine.world, c); M.Sleeping.set(b, false);
+      grab = { c, o, id: e.pointerId, sx: e.clientX, sy: e.clientY, moved: false };
+      o.el.classList.add('grabbed'); document.documentElement.classList.add('throwing');
+      b.plugin.thrownAt = 0;
+    }
+    function release(e) {
+      if (grab && (!e || e.pointerId === grab.id)) {
+        const g = grab; grab = null; M.Composite.remove(engine.world, g.c);
+        g.o.el.classList.remove('grabbed'); document.documentElement.classList.remove('throwing');
+        const v = g.o.body.velocity; if (Math.hypot(v.x, v.y) > 6) g.o.body.plugin.thrownAt = now();
+        if (g.moved) { g.o.el.dataset.noclick = '1'; setTimeout(() => delete g.o.el.dataset.noclick, 0); }
+        return;
+      }
+      if (!press || (e && e.pointerId !== press.id)) return;
+      clearTimeout(press.timer);
+      const card = press.card, moved = press.moved; press = null;
+      card.classList.remove('grab-ready');
+      if (card.classList.contains('pulling')) { // let go before it tore: spring back into its slot
+        card.classList.remove('pulling'); card.classList.add('springback'); card.style.transform = '';
+        setTimeout(() => { card.classList.remove('springback'); card.style.transformOrigin = ''; }, 500);
+      }
+      if (moved) { suppress = true; setTimeout(() => { suppress = false; }, 0); }
+    }
+    let suppress = false;
+    addEventListener('pointerup', release); addEventListener('pointercancel', release);
+    gridEl.addEventListener('click', (e) => { if (suppress) { e.preventDefault(); e.stopPropagation(); } }, true);
     gridEl.addEventListener('dragstart', (e) => e.preventDefault());
 
-    function corners(d) {
-      return [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([sx, sy]) => { const [x, y] = rotV(sx * d.w / 2, sy * d.h / 2, d.a); return [d.cx + x, d.cy + y]; });
-    }
-    function fly(d) {
-      if (Math.hypot(d.vx, d.vy) < 0.25) return home(d);
-      let last = now();
-      (function step() {
-        const t = now(), dt = Math.min(24, t - last); last = t;
-        d.cx += d.vx * dt; d.cy += d.vy * dt; d.a += d.spin * dt;
-        const f = Math.pow(0.9982, dt); d.vx *= f; d.vy *= f; d.spin *= Math.pow(0.997, dt);
-        // deepest corner past a screen edge = the impact point
-        const W = innerWidth, H = innerHeight; let hit = null, depth = 0;
-        for (const [x, y] of corners(d)) {
-          for (const [pen, nx, ny] of [[-x, 1, 0], [x - W, -1, 0], [-y, 0, 1], [y - H, 0, -1]])
-            if (pen > depth) { depth = pen; hit = { x: Math.max(0, Math.min(W, x)), y: Math.max(0, Math.min(H, y)), nx, ny }; }
-        }
-        if (hit) {
-          const vn = -(d.vx * hit.nx + d.vy * hit.ny); // speed into the wall
-          if (vn > 0.45) { place(d); return shatter(d, hit, vn); }
-          if (vn > 0) { // bounce: reflect the normal part, the off-centre hit adds spin
-            d.vx += hit.nx * vn * 1.45; d.vy += hit.ny * vn * 1.45;
-            const rx = hit.x - d.cx, ry = hit.y - d.cy;
-            d.spin += (rx * hit.ny - ry * hit.nx) * vn * 0.00004;
-          }
-          d.cx += hit.nx * depth; d.cy += hit.ny * depth;
-        }
-        place(d);
-        if (Math.hypot(d.vx, d.vy) < 0.04) return home(d);
-        requestAnimationFrame(step);
-      })();
-    }
-    function home(d) {
-      const r = d.card.getBoundingClientRect();
-      const to = `translate(${r.left - d.left}px, ${r.top - d.top}px) rotate(0rad)`;
-      d.ghost.animate([{ transform: d.ghost.style.transform || 'none' }, { transform: to }], { duration: 400, easing: 'cubic-bezier(.3,1.35,.5,1)', fill: 'forwards' });
-      setTimeout(() => { d.ghost.remove(); d.card.classList.remove('held'); done(); }, 420);
-    }
-    function done() { if (!document.querySelector('.flying, .shard')) document.documentElement.classList.remove('throwing'); }
+    // grabbing cards that are already loose
+    document.addEventListener('pointerdown', (e) => {
+      const el = e.target.closest('.phys'); if (!el || grab || e.button > 0) return;
+      const o = [...bodies.values()].find((x) => x.el === el && x.kind === 'card'); if (!o) return;
+      e.preventDefault(); startGrab(o, e, e.clientX + scrollX, e.clientY + scrollY); run();
+    });
+    document.addEventListener('click', (e) => { const el = e.target.closest('.phys'); if (el && (el.dataset.noclick || el.classList.contains('shard'))) { e.preventDefault(); e.stopPropagation(); } }, true);
+    document.addEventListener('dragstart', (e) => { if (e.target.closest?.('.phys')) e.preventDefault(); });
 
-    function shatter(d, hit, vn) {
-      // local impact point (card space, origin top-left) so cracks start where it hit
-      const [lx, ly] = rotV(hit.x - d.cx, hit.y - d.cy, -d.a), ix = lx + d.w / 2, iy = ly + d.h / 2;
-      // radial crack pattern: rays from the impact point to the outline, split into rings
-      const outline = [];
-      const per = 2 * (d.w + d.h), N = 22;
-      for (let k = 0; k < N; k++) {
-        let s = ((k + Math.random() * 0.6) / N) * per, x, y;
-        if (s < d.w) { x = s; y = 0; } else if ((s -= d.w) < d.h) { x = d.w; y = s; } else if ((s -= d.h) < d.w) { x = d.w - s; y = d.h; } else { s -= d.w; x = 0; y = d.h - s; }
-        outline.push([x, y]);
+    // ---- impacts ----
+    const pending = new Map();
+    function onHit(ev) {
+      const t = now();
+      for (const pair of ev.pairs) {
+        const a = pair.bodyA, b = pair.bodyB;
+        if (a.label !== 'card' && b.label !== 'card') continue;
+        const n = pair.collision.normal;
+        const impact = Math.abs((a.velocity.x - b.velocity.x) * n.x + (a.velocity.y - b.velocity.y) * n.y);
+        if (impact < SMASH) continue;
+        const thrown = (x) => x.label === 'card' && x.plugin.thrownAt && t - x.plugin.thrownAt < 1500;
+        const held = (x) => grab && grab.o.body === x;
+        if (!(thrown(a) || thrown(b) || held(a) || held(b))) continue; // dropped cards land, only throws smash
+        const pt = pair.collision.supports[0] || a.position;
+        for (const x of [a, b]) if (x.label === 'card' && !pending.has(x.id)) pending.set(x.id, { pt: { x: pt.x, y: pt.y }, impact });
       }
-      const rings = [0, 0.22, 0.5, 1], pieces = [];
-      const at = (p, f) => [ix + (p[0] - ix) * f, iy + (p[1] - iy) * f];
-      for (let k = 0; k < N; k++) {
-        const p = outline[k], q = outline[(k + 1) % N];
-        for (let r = 0; r < rings.length - 1; r++) {
-          const f0 = rings[r] * (r ? 0.85 + Math.random() * 0.3 : 1), f1 = rings[r + 1] * (r + 1 < rings.length - 1 ? 0.85 + Math.random() * 0.3 : 1);
-          pieces.push(r === 0 ? [at(p, 0), at(p, f1), at(q, f1)] : [at(p, f0), at(p, f1), at(q, f1), at(q, f0)]);
-        }
-      }
-      // corners of the card between two outline points
-      const [vx, vy] = [d.vx, d.vy], cosA = Math.cos(d.a), sinA = Math.sin(d.a);
-      const shards = pieces.map((poly) => {
-        const s = d.ghost.cloneNode(true); s.classList.replace('flying', 'shard');
-        s.style.clipPath = `polygon(${poly.map(([x, y]) => `${x.toFixed(1)}px ${y.toFixed(1)}px`).join(',')})`;
-        const c = poly.reduce((m, p) => [m[0] + p[0] / poly.length, m[1] + p[1] / poly.length], [0, 0]);
-        s.style.transformOrigin = `${c[0]}px ${c[1]}px`;
-        document.body.appendChild(s);
-        const ox = c[0] - d.w / 2, oy = c[1] - d.h / 2;
-        const wx = d.cx + ox * cosA - oy * sinA, wy = d.cy + ox * sinA + oy * cosA; // world centroid
-        // velocity: card motion + spin at that point, the part into the wall reflected, plus a burst away from impact
-        let svx = vx - d.spin * (wy - d.cy), svy = vy + d.spin * (wx - d.cx);
-        const into = -(svx * hit.nx + svy * hit.ny);
-        if (into > 0) { const e = 0.25 + Math.random() * 0.25; svx += hit.nx * into * (1 + e); svy += hit.ny * into * (1 + e); }
-        const ax = wx - hit.x, ay = wy - hit.y, dist = Math.max(12, Math.hypot(ax, ay));
-        const burst = vn * (0.35 + Math.random() * 0.35) * Math.min(1, 140 / dist);
-        svx += (ax / dist) * burst + (Math.random() - 0.5) * 0.12; svy += (ay / dist) * burst + (Math.random() - 0.5) * 0.12;
-        return { el: s, c, wx, wy, vx: svx, vy: svy, a: d.a, w: d.spin + (Math.random() - 0.5) * 0.02 * (1 + burst * 3) };
-      });
-      d.ghost.remove();
-      const m = document.getElementById('projects'); m.classList.remove('shake'); void m.offsetWidth; m.classList.add('shake');
-      let last = now(); const t0 = last;
-      (function step() {
-        const t = now(), dt = Math.min(24, t - last); last = t; const age = t - t0;
-        for (const s of shards) {
-          s.vy += 0.0016 * dt; s.wx += s.vx * dt; s.wy += s.vy * dt; s.a += s.w * dt;
-          s.el.style.transform = `translate(${s.wx - d.left - s.c[0]}px, ${s.wy - d.top - s.c[1]}px) rotate(${s.a}rad)`;
-          s.el.style.opacity = Math.max(0, 1 - Math.max(0, age - 600) / 800);
-        }
-        if (age < 1400) requestAnimationFrame(step);
-        else { shards.forEach((s) => s.el.remove()); done(); }
-      })();
-      smashed++;
-      if (smashed === 1) toast('Smashed! It grows back.');
-      else if (smashed === 10) toast('10 cards smashed. Feeling better?');
-      setTimeout(() => { d.card.classList.remove('held'); d.card.classList.add('regrow'); setTimeout(() => d.card.classList.replace('regrow', 'settled'), 700); }, 1100);
     }
+    function flushSmash() {
+      if (!pending.size) return;
+      for (const [id, h] of pending) { const o = bodies.get(id); if (o) shatter(o, h.pt, h.impact); }
+      pending.clear();
+    }
+    function shatter(o, pt, impact) {
+      const b = o.body, W = o.w, H = o.h, ca = Math.cos(b.angle), sa = Math.sin(b.angle);
+      if (grab && grab.o === o) release({ pointerId: grab.id });
+      // impact point in card space (origin top-left)
+      const rx = pt.x - b.position.x, ry = pt.y - b.position.y;
+      const ix = Math.max(0, Math.min(W, rx * ca + ry * sa + W / 2)), iy = Math.max(0, Math.min(H, -rx * sa + ry * ca + H / 2));
+      const N = 14, per = 2 * (W + H), out = [];
+      for (let k = 0; k < N; k++) {
+        let s = ((k + 0.2 + Math.random() * 0.6) / N) * per, x, y;
+        if (s < W) { x = s; y = 0; } else if ((s -= W) < H) { x = W; y = s; } else if ((s -= H) < W) { x = W - s; y = H; } else { s -= W; x = 0; y = H - s; }
+        out.push([x, y]);
+      }
+      // corners must stay in the outline so no piece of the card goes missing
+      const cornersL = [[0, 0], [W, 0], [W, H], [0, H]];
+      const perim = (p) => p[1] === 0 ? p[0] : p[0] === W ? W + p[1] : p[1] === H ? W + H + (W - p[0]) : 2 * W + H + (H - p[1]);
+      const ring = [...out, ...cornersL].sort((p, q) => perim(p) - perim(q));
+      const rings = [0, 0.3, 0.65, 1], polys = [];
+      const at = (p, f) => [ix + (p[0] - ix) * f, iy + (p[1] - iy) * f];
+      for (let k = 0; k < ring.length; k++) {
+        const p = ring[k], q = ring[(k + 1) % ring.length];
+        for (let r = 0; r < 3; r++) polys.push(r === 0 ? [[ix, iy], at(p, rings[1]), at(q, rings[1])] : [at(p, rings[r]), at(p, rings[r + 1]), at(q, rings[r + 1]), at(q, rings[r])]);
+      }
+      const toWorld = ([x, y]) => ({ x: b.position.x + (x - W / 2) * ca - (y - H / 2) * sa, y: b.position.y + (x - W / 2) * sa + (y - H / 2) * ca });
+      const area = (ps) => Math.abs(ps.reduce((s, p, i) => { const q = ps[(i + 1) % ps.length]; return s + p[0] * q[1] - q[0] * p[1]; }, 0)) / 2;
+      const v = b.velocity, w = b.angularVelocity;
+      removeBody(o);
+      for (const poly of polys) {
+        if (area(poly) < 40) continue;
+        const wv = poly.map(toWorld);
+        const cx = wv.reduce((s, p) => s + p.x, 0) / wv.length, cy = wv.reduce((s, p) => s + p.y, 0) / wv.length;
+        let sb; try { sb = M.Bodies.fromVertices(cx, cy, [wv], { friction: 0.5, restitution: 0.25, frictionAir: 0.01, density: 0.0016, label: 'shard' }); } catch (_) { continue; }
+        if (!sb) continue;
+        // card-space point that the body's centre sits on
+        const dx = sb.position.x - b.position.x, dy = sb.position.y - b.position.y;
+        const lx = dx * ca + dy * sa + W / 2, ly = -dx * sa + dy * ca + H / 2;
+        const el = cloneCard(o.el); el.classList.add('shard');
+        el.style.width = W + 'px'; el.style.height = H + 'px';
+        el.style.clipPath = `polygon(${poly.map(([x, y]) => `${x.toFixed(1)}px ${y.toFixed(1)}px`).join(',')})`;
+        el.style.transformOrigin = `${lx}px ${ly}px`;
+        layer.appendChild(el);
+        // inherit the card's motion (incl. spin at that point) plus a burst away from the impact
+        const ax = sb.position.x - pt.x, ay = sb.position.y - pt.y, dist = Math.max(10, Math.hypot(ax, ay));
+        const burst = impact * (0.18 + Math.random() * 0.2) * Math.min(1, 120 / dist);
+        M.Body.setVelocity(sb, { x: v.x * 0.7 - w * dy + (ax / dist) * burst, y: v.y * 0.7 + w * dx + (ay / dist) * burst });
+        M.Body.setAngularVelocity(sb, w + (Math.random() - 0.5) * 0.25);
+        M.Composite.add(engine.world, sb);
+        bodies.set(sb.id, { body: sb, el, w: W, h: H, ox: lx, oy: ly, a0: b.angle, kind: 'shard', die: now() + 4500 + Math.random() * 1500 });
+      }
+      const m = document.getElementById('projects'); m.classList.remove('shake'); void m.offsetWidth; m.classList.add('shake');
+      smashed++;
+      if (smashed === 1) toast('Smashed!');
+      else if (smashed === 10) toast('10 cards smashed. Feeling better?');
+      run();
+    }
+
+    // ---- put everything back ----
+    function showReset() {
+      if (resetBtn) { resetBtn.hidden = false; return; }
+      resetBtn = document.createElement('button'); resetBtn.type = 'button'; resetBtn.className = 'btn ghost reset-cards'; resetBtn.textContent = 'Put the cards back';
+      resetBtn.addEventListener('click', resetAll); document.body.appendChild(resetBtn);
+    }
+    function resetAll() {
+      for (const o of [...bodies.values()]) removeBody(o);
+      ripped.clear(); resetBtn.hidden = true;
+      document.querySelectorAll('#grid .card.held').forEach((c) => { c.classList.remove('held'); c.classList.add('regrow'); setTimeout(() => c.classList.replace('regrow', 'settled'), 700); });
+    }
+    // the grid re-renders on search or theme changes: keep ripped cards out of it
+    document.addEventListener('cards-rendered', () => {
+      document.querySelectorAll('#grid .card').forEach((c) => { if (ripped.has(c.dataset.key)) c.classList.add('held'); });
+    });
   })();
 
   // ---- greeting typewriter: Bulgarian, Japanese, English ----
