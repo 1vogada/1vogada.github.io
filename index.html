@@ -383,7 +383,9 @@
     const out = [], seen = new Set(), cats = new Set((site.categories || []).map((c) => c.id));
     for (const it of site.items || []) {
       const s = src.get(it.key); if (!s || seen.has(it.key)) continue;
-      seen.add(it.key); out.push({ ...s, key: it.key, category: cats.has(it.category) ? it.category : '', pinned: !!it.pinned });
+      seen.add(it.key);
+      const page = s.kind === 'project' && it.page && /^[a-z0-9-]+$/.test(it.page.slug || '') ? '/p/' + it.page.slug + '/' : null;
+      out.push({ ...s, key: it.key, category: cats.has(it.category) ? it.category : '', pinned: !!it.pinned, page });
     }
     for (const [key, s] of src) if (!seen.has(key)) out.push({ ...s, key, category: '', pinned: false });
     return out;
@@ -417,10 +419,10 @@
         ${p.pinned && query ? '<span class="pin">Pinned</span>' : ''}
         <span class="band">${b.svg}</span>
         <div class="body">
-          <h3><a href="${esc(p.url)}">${esc(p.name)}</a>${pill}</h3>
+          <h3><a href="${esc(p.page || p.url)}">${esc(p.name)}</a>${pill}</h3>
           <p${p.description ? '' : ' class="none"'}>${esc(p.description || 'No description yet.')}</p>
           <div class="links">
-            ${post ? `<a href="${esc(p.url)}">Read</a>` : `<a href="${esc(p.url)}">${esc(host(p.url))}</a>`}
+            ${post ? `<a href="${esc(p.url)}">Read</a>` : `${p.page ? `<a href="${esc(p.page)}">About</a>` : ''}<a href="${esc(p.url)}">${esc(host(p.url))}</a>`}
             ${p.code && p.code !== p.url ? `<a href="${esc(p.code)}">Source</a>` : ''}
           </div>
         </div>
@@ -440,7 +442,7 @@
     if (crazy) {
       grid.innerHTML = list.map((p, i) => `
       <div class="card">
-        <h2><a href="${esc(p.url)}">${p.kind === 'post' ? '📰' : '🚀'} ${esc(p.name)}</a> <span class="badge">${hype[i % hype.length]}</span></h2>
+        <h2><a href="${esc(p.page || p.url)}">${p.kind === 'post' ? '📰' : '🚀'} ${esc(p.name)}</a> <span class="badge">${hype[i % hype.length]}</span></h2>
         <p>${esc(p.description || '')} ${blurbs[i % blurbs.length]}</p>
         ${p.kind === 'post' ? '' : `<a class="u" href="${esc(p.url)}">${esc(host(p.url))}</a>`}
         ${p.code && p.code !== p.url ? `<a class="src" href="${esc(p.code)}">📦 source code (open source!!)</a>` : ''}
