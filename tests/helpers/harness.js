@@ -269,8 +269,13 @@ class Session {
     for (let i = 0; i < 200; i++) { if (await this.page.evaluate(() => !!window.planck)) return; await real(20); }
     throw new Error('planck did not load');
   }
-  async press(sel, i = 0) {   // click a button by selector at its centre, then let one frame pass
-    const b = await this.box(sel, i);
+  async press(sel, i = 0) {   // click a button by selector at its centre, then let one frame pass. Off screen, it is scrolled into view first
+    let b = await this.box(sel, i);
+    if (b.y < 0 || b.y + b.h > (this.opts.viewport || VIEW).height) {
+      await this.page.evaluate(([sel, i]) => document.querySelectorAll(sel)[i].scrollIntoView({ block: 'center', behavior: 'instant' }), [sel, i]);
+      await this.run(20, 20);
+      b = await this.box(sel, i);
+    }
     await this.page.mouse.click(b.x + b.w / 2, b.y + b.h / 2);
     await this.run(20, 20);
   }

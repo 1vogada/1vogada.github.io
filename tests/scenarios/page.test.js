@@ -130,12 +130,12 @@ scenario(G, 'kiri flood and Esc lift', async (s) => {
   assert.equal((await s.eval(k)).on, true, 'still lifting');
   await s.run(1200, 100);
   assert.equal((await s.eval(k)).on, false, 'gone');
-  // left alone it holds for 14 s before it lifts by itself
+  // left alone it rolls in (2.4 s), holds for 14 s, then thins out over 4 s: gone 20.4 s after it was called
   await s.type('kiri');
   await s.run(15000, 200);
   assert.equal((await s.eval(k)).on, true, 'held');
   await s.run(2000, 200);
-  assert.equal((await s.eval(k)).on, true);
-  await s.run(2000, 200);
+  assert.equal((await s.eval(k)).on, true, 'lifting by itself');
+  await s.run(3600, 200);
   assert.equal((await s.eval(k)).on, false, 'lifted on its own');
 });

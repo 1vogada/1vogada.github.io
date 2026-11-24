@@ -1,0 +1,18 @@
+{
+ "scenario": "page / kiri flood and Esc lift",
+ "seed": 1,
+ "bubbles": [],
+ "states": [
+  {
+   "doc": 1,
+   "t": 20,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  }
+ ]
+}
