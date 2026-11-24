@@ -263,28 +263,31 @@
   .omikuji { position: fixed; inset: 0; z-index: 55; display: grid; place-items: center; padding: 16px;
              background: color-mix(in srgb, var(--bg) 55%, transparent); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
   .omikuji[hidden] { display: none; }
-  .slip { position: relative; width: min(340px, 100%); background: #fbf6ea; color: #2a2522; border-radius: 4px; padding: 26px 26px 22px; text-align: center;
-          box-shadow: 0 24px 60px rgba(0,0,0,.28); border-top: 10px solid var(--accent); border-bottom: 10px solid var(--accent);
-          transform-origin: 50% 0; animation: unroll .7s cubic-bezier(.2,1.2,.4,1) both; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  .slip::before { content: ""; position: absolute; inset: 6px; border: 1px solid rgba(200,55,45,.35); pointer-events: none; }
-  @keyframes unroll { from { transform: scaleY(.04) rotate(-4deg); opacity: 0; } 60% { opacity: 1; } to { transform: none; } }
-  .omi-x { position: absolute; top: 6px; right: 10px; border: 0; background: none; font-size: 1.4rem; color: #8a7f76; cursor: pointer; z-index: 1; }
-  .omi-kanji { font-size: 4.2rem; line-height: 1; margin: 6px 0 4px; font-weight: 800; color: var(--accent); letter-spacing: .05em;
+  /* the slip is a card like the project cards: surface, border, shadow, and an embroidery strip top and bottom */
+  .slip { position: relative; width: min(360px, 100%); background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 14px;
+          overflow: hidden; text-align: center; box-shadow: var(--shadow), 0 24px 60px rgba(0,0,0,.18);
+          transform-origin: 50% 0; animation: unroll .6s cubic-bezier(.2,1.2,.4,1) both; }
+  .slip .band.bottom { border-bottom: 0; border-top: 1px solid var(--border); }
+  .slip .band.bottom::before { transform: scaleY(-1); }
+  .slip-body { position: relative; padding: 20px 24px 20px; }
+  @keyframes unroll { from { transform: scaleY(.04); opacity: 0; } 60% { opacity: 1; } to { transform: none; } }
+  .omi-x { position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; border-radius: 8px; border: 0; background: none; font-size: 1.3rem; color: var(--muted); cursor: pointer; z-index: 1; }
+  .omi-x:hover { color: var(--text); background: var(--accent-soft); }
+  .omi-kanji { font-size: 3.8rem; line-height: 1; margin: 4px 0 6px; font-weight: 800; color: var(--accent); letter-spacing: .05em;
                font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif; }
-  .omi-name { margin: 0; font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; color: #8a7f76; }
-  .omi-text { margin: 12px 0 16px; font-size: 1.02rem; }
-  .omi-pick { border-top: 1px dashed rgba(42,37,34,.25); border-bottom: 1px dashed rgba(42,37,34,.25); padding: 12px 4px; display: grid; gap: 2px; }
-  .omi-pick small { color: #8a7f76; font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; }
-  .omi-pick b { font-size: 1.3rem; }
-  .omi-pick span { color: #6b625b; font-size: .9rem; }
-  .omi-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+  .omi-name { margin: 0; font-size: .78rem; font-weight: 650; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .omi-text { margin: 10px 0 16px; font-size: 1rem; }
+  .omi-pick { background: color-mix(in srgb, var(--c1, var(--accent)) 6%, var(--surface)); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; display: grid; gap: 2px; }
+  .omi-pick small { color: var(--muted); font-size: .72rem; font-weight: 650; text-transform: uppercase; letter-spacing: .08em; }
+  .omi-pick b { font-size: 1.2rem; font-weight: 650; }
+  .omi-pick span { color: var(--muted); font-size: .9rem; }
+  .omi-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
   .omi-actions .btn.primary { min-width: 0; }
-  .omi-actions .btn.ghost { background: transparent; color: #2a2522; border-color: rgba(42,37,34,.25); }
-  .omi-seal { position: absolute; left: 18px; top: 20px; width: 46px; height: 46px; border: 3px solid var(--accent); border-radius: 6px; color: var(--accent);
-              display: grid; place-items: center; font-size: 1.5rem; font-weight: 800; opacity: 0; transform: rotate(-12deg) scale(2.2);
-              animation: stamp .35s .75s cubic-bezier(.3,1.6,.5,1) forwards; pointer-events: none; }
-  @keyframes stamp { to { opacity: .8; transform: rotate(-12deg) scale(1); } }
-  .slip.curse .omi-kanji { color: #3d4d6a; }
+  .omi-seal { position: absolute; left: 16px; top: 14px; width: 40px; height: 40px; border-radius: 8px; background: var(--accent); color: #fff;
+              display: grid; place-items: center; font-size: 1.25rem; font-weight: 800; opacity: 0; transform: rotate(-8deg) scale(2.2);
+              box-shadow: inset 0 0 0 2px rgba(255,255,255,.25); animation: stamp .35s .6s cubic-bezier(.3,1.6,.5,1) forwards; pointer-events: none; }
+  @keyframes stamp { to { opacity: 1; transform: rotate(-8deg) scale(1); } }
+  .slip.curse .omi-kanji { color: var(--ink); }
   html.hand-show .claw.over { z-index: 58; } html.hand-show .claw.under { z-index: 57; } html.hand-show #phys { z-index: 58; }
   .omi-actions .btn.pressed { transform: scale(.9); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 35%, transparent); }
   .omi-actions .btn[disabled] { opacity: .5; cursor: default; }
@@ -294,7 +297,7 @@
   .coin.spin { animation: coinspin .24s linear infinite; }
   @keyframes coinspin { 0% { transform: scaleY(1); } 50% { transform: scaleY(.08); } 100% { transform: scaleY(1); } }
   .omi-call { margin: 12px 0 0; font-weight: 700; }
-  @media (prefers-reduced-motion: reduce) { .slip, .omi-seal { animation: none; } .omi-seal { opacity: .8; transform: rotate(-12deg); } }
+  @media (prefers-reduced-motion: reduce) { .slip, .omi-seal { animation: none; } .omi-seal { opacity: 1; transform: rotate(-8deg); } }
   /* flashing-lights warning before crazy mode */
   .warn { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px;
           background: color-mix(in srgb, #000 55%, transparent); }
@@ -453,14 +456,18 @@
   <div class="reader" id="reader" hidden></div>
   <div class="omikuji" id="omikuji" hidden role="dialog" aria-modal="true" aria-labelledby="omi-kanji">
     <div class="slip" id="slip">
-      <button class="omi-x" id="omi-x" type="button" aria-label="Close">×</button>
-      <p class="omi-kanji" id="omi-kanji"></p>
-      <p class="omi-name" id="omi-name"></p>
-      <p class="omi-text" id="omi-text"></p>
-      <div class="omi-pick"><small>your project today</small><b id="omi-proj"></b><span id="omi-desc"></span></div>
-      <p class="omi-call" id="omi-q">Go there?</p>
-      <div class="omi-actions" id="omi-actions"><a class="btn primary" id="omi-go" href="#">Yes, take me →</a><button class="btn ghost" id="omi-no" type="button">No</button></div>
-      <span class="omi-seal" aria-hidden="true">霧</span>
+      <span class="band" aria-hidden="true"></span>
+      <div class="slip-body">
+        <button class="omi-x" id="omi-x" type="button" aria-label="Close">×</button>
+        <span class="omi-seal" aria-hidden="true">霧</span>
+        <p class="omi-kanji" id="omi-kanji"></p>
+        <p class="omi-name" id="omi-name"></p>
+        <p class="omi-text" id="omi-text"></p>
+        <div class="omi-pick"><small>your project today</small><b id="omi-proj"></b><span id="omi-desc"></span></div>
+        <p class="omi-call" id="omi-q">Go there?</p>
+        <div class="omi-actions" id="omi-actions"><a class="btn primary" id="omi-go" href="#">Yes, take me →</a><button class="btn ghost" id="omi-no" type="button">No</button></div>
+      </div>
+      <span class="band bottom" aria-hidden="true"></span>
     </div>
   </div>
 
@@ -1861,6 +1868,7 @@
     $('omi-kanji').textContent = f[0]; $('omi-name').textContent = f[1]; $('omi-text').textContent = f[2];
     $('omi-proj').textContent = pick.name; $('omi-desc').textContent = pick.description || '';
     goBtn.href = pick.url; qEl.textContent = 'Go there?';
+    { const b = band(pick.name, 0); slip.style.setProperty('--c1', b.c1); slip.style.setProperty('--tile', b.style.slice(b.style.indexOf(':') + 1).replaceAll('&quot;', '"')); }   // the project's own embroidery
     actEl.innerHTML = ''; actEl.append(goBtn, noBtn); goBtn.classList.remove('pressed'); noBtn.disabled = false;
     slip.classList.toggle('curse', f[0] === '凶');
     omi.hidden = false;
