@@ -7,7 +7,7 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   // Bump VER, and the ?v= on this file's script tag in index.html, whenever this file or the stylesheet changes. GitHub Pages caches each
   // file for ten minutes on its own, and a new script with an old stylesheet looks broken; the version makes them arrive as a pair
-  const VER = 4;
+  const VER = 5;
   const here = (document.currentScript && document.currentScript.src) || '/scripts/phrasebook.js';
 
   // ---- what this file knows: which occasion each list belongs to. src = which list on window.__lines, key = which entry of it ----
@@ -67,6 +67,10 @@
         { src: 'CLAW_SAY', key: 'katana', title: 'On the katana', when: 'It saw you draw the katana, or take it in hand.' },
         { src: 'CLAW_SAY', key: 'kdrop', title: 'On the katana, dropped', when: 'It saw you drop the katana.' },
         { src: 'BOOK', key: null, title: 'Bored of your reading', when: 'You keep this menu open for 30 seconds. It starts pulling the cards out of it and throwing them at the left edge of the screen, where they break.' },
+        { src: 'SWAT', key: null, title: 'Swatted', when: 'You click the Hand while it is in this menu. It drops what it holds and stays away for at least five seconds.' },
+        { src: 'GRUDGE', key: null, title: 'Back, and careful', when: 'About half the time it returns from a swat wary, and creeps towards the next card slowly.' },
+        { src: 'ANGRY', key: null, title: 'Back, and angry', when: 'The other half of the time it returns furious: it reaches fast, throws three cards in a row, and may take hold of the scroll.' },
+        { src: 'SCROLL', key: null, title: 'Shaking the scroll', when: 'In a temper it grabs the right edge of the menu and yanks the page up and down so you lose your place.' },
         { src: 'CLAW_SAY', key: 'hello', title: 'Answering a no', when: 'Surprise me offers you a project and you say No. The Hand comes out to see about that.' },
         { src: 'CLAW_SAY', key: 'flip', title: 'The toss', when: 'It throws a coin and makes you call it, heads or tails.' },
         { src: 'CLAW_SAY', key: 'won', title: 'Beaten by a coin', when: 'You called it right. You may stay on the page.' },
@@ -77,6 +81,10 @@
   ];
   // the only lines that live in this file: what the hand says while it empties this menu
   const RAID_SAY = ['boring.', 'too many words', 'less reading, more snacks', 'you read too slow', 'I am in this one!', 'spoilers.', 'YEET', 'next!', 'this one too', 'скука.', 'つまらない', 'ポイ'];
+  const SWAT_SAY = ['OW!', 'hey!!', 'rude.', 'my knuckles!', 'I was reading that', 'what was that for', 'you hit me?!', 'ау!', 'боли!', '痛っ!', 'ひどい!'];
+  const GRUDGE_SAY = ['fine. slowly.', 'gently, then', 'do not hit me', 'tiptoe…', 'I am being nice now', 'полека…', 'そーっと…'];
+  const ANGRY_SAY = ['THAT IS IT', 'you asked for it', 'no more mister nice hand', 'NOW I am angry', 'сега ще видиш!', 'もう怒った!'];
+  const SCROLL_SAY = ['lost your place?', 'where were we?', 'up! down! up!', 'wheeee', 'нагоре-надолу!', 'ぐるぐる〜'];
   // what the Bulgarian and Japanese lines mean. A line that is missing here is simply printed without a gloss
   const GLOSS = {
     'здрасти.': 'hi.', 'やあ。': 'hey.', 'ези или тура?': 'heads or tails?', '表か裏か?': 'heads or tails?', 'пф. късмет.': 'pff. luck.', 'ちっ': 'tch',
@@ -89,7 +97,7 @@
     'моля те…': 'please…', 'やめて…': 'stop…', 'дай!': 'give!', 'ちょうだい': 'give it to me', 'мое!': 'mine!', 'いただき!': 'got it!', 'разтяга се…': 'it stretches…', 'のびる…': 'it stretches…',
     'チーズ!!!': 'CHEESE!!!', 'СИРЕНЕ!!!': 'CHEESE!!!', 'ごちそうさま': 'thank you for the meal', 'ммм.': 'mmm.', 'хе-хе': 'heh-heh', 'いらない': 'do not want it', 'ケチ': 'stingy', 'пф.': 'pff.',
     'いい切れ味': 'a fine edge', 'режи, режи…': 'cut, cut…', 'бум!': 'boom!', 'もったいない': 'what a waste', 'дай го насам': 'hand it over here', 'かっこつけ': 'show-off',
-    'хванах!': 'caught it!', 'ナイスパス!': 'nice pass!', 'дай тука!': 'give it here!', 'もらった!': 'mine now!', 'бавно…': 'slowly…', 'まだだよ': 'not yet', 'смачках го.': 'I crushed it.', 'скука.': 'boring.', 'つまらない': 'boring', 'ポイ': 'the sound of tossing something away',
+    'хванах!': 'caught it!', 'ナイスパス!': 'nice pass!', 'дай тука!': 'give it here!', 'もらった!': 'mine now!', 'бавно…': 'slowly…', 'まだだよ': 'not yet', 'смачках го.': 'I crushed it.', 'скука.': 'boring.', 'ау!': 'ow!', 'боли!': 'it hurts!', '痛っ!': 'ouch!', 'ひどい!': 'how mean!', 'полека…': 'easy does it…', 'そーっと…': 'ever so quietly…', 'сега ще видиш!': 'now you will see!', 'もう怒った!': 'now I am angry!', 'нагоре-надолу!': 'up and down!', 'ぐるぐる〜': 'round and round', 'つまらない': 'boring', 'ポイ': 'the sound of tossing something away',
   };
   const langOf = (s) => /[぀-ヿ一-鿿]/.test(s) ? 'JP' : /[Ѐ-ӿ]/.test(s) ? 'BG' : '';
 
@@ -163,7 +171,7 @@
     }).join('');
   }
   function build() {
-    const L = window.__lines && { ...window.__lines, BOOK: RAID_SAY }; figN_plate = 0;
+    const L = window.__lines && { ...window.__lines, BOOK: RAID_SAY, SWAT: SWAT_SAY, GRUDGE: GRUDGE_SAY, ANGRY: ANGRY_SAY, SCROLL: SCROLL_SAY }; figN_plate = 0;
     if (!L) return { head: 'Nothing to list', nav: '', body: '<p class="pb-intro">Nothing on this site moves or speaks while your system asks for reduced motion, so there are no lines to show. Switch that setting off and open this again.</p>' };
     const chapters = CHAPTERS.map((c) => ({ ...c, entries: c.entries.map((e) => e.fig ? e : ({ ...e, lines: listOf(L, e) })).filter((e) => e.fig || (e.lines && e.lines.length)) }));
     // lists the page has that this file has not been told about yet: they are still shown, in the section they belong to
@@ -241,11 +249,14 @@
   async function raidStart() {
     const H = window.__hand; if (!H || !isOpen || raid) return;
     clearInterval(armT);
-    const r = raid = { st: 'wait', t: 0, now: 0, objs: new Set(), bits: [], hits: [], thrown: 0, broken: 0, last: 0, acc: 0, target: null, held: null, say: null, said: -1e9 };
+    const r = raid = { st: 'wait', t: 0, now: 0, objs: new Set(), bits: [], hits: [], thrown: 0, broken: 0, last: 0, acc: 0, target: null, held: null, say: null, said: -1e9, mood: 'slow', fury: 0, swats: 0 };
     try { await loadPlanck(); } catch (e) { raid = null; return; }
     if (raid !== r || !isOpen) return;
     const pl = window.planck;
     r.layer = document.createElement('div'); r.layer.className = 'pb-fly'; document.body.appendChild(r.layer);
+    // the drawn hand takes no clicks (it is one big SVG over the window), so a patch that follows it does: click it and the hand is swatted
+    r.swat = document.createElement('button'); r.swat.type = 'button'; r.swat.className = 'pb-swat'; r.swat.tabIndex = -1; r.swat.setAttribute('aria-label', 'Swat the hand away'); r.layer.appendChild(r.swat);
+    r.swat.addEventListener('pointerdown', (e) => { e.preventDefault(); raidSwat(e.clientX, e.clientY); });
     r.world = new pl.World({ gravity: { x: 0, y: GRAV } }); r.ground = r.world.createBody(); r.walls = [];
     r.world.on('begin-contact', (c) => {   // the world is locked in here: the hit is only noted, and the card is broken after the step
       const fa = c.getFixtureA(), fb = c.getFixtureB(), wall = fa.getBody() === r.ground ? fa : fb.getBody() === r.ground ? fb : null; if (!wall) return;
@@ -277,6 +288,17 @@
     const r = raid, b = document.createElement('div'); b.className = 'pb-say' + (o ? '' : ' hand'); b.textContent = text; r.layer.appendChild(b);
     if (o) { if (o.say) o.say.el.remove(); o.say = { el: b, until: r.now + 1300 }; }
     else { if (r.say) r.say.el.remove(); r.say = { el: b, until: r.now + 1500 }; r.said = r.now; }
+  }
+  function raidSwat(x, y) {
+    const r = raid; if (!r || !r.c || r.st === 'swat' || r.st === 'done') return;
+    if (r.target) r.target.classList.remove('pb-tug');
+    if (r.held) {   // what it was holding just drops
+      const o = r.held, pl = window.planck; r.held = null; raidBody(o, o.x / S, o.y / S, o.a, new pl.Box(o.w / 2 / S, o.h / 2 / S));
+      o.body.setLinearVelocity({ x: -2 - Math.random() * 3, y: -3 }); o.body.setAngularVelocity((Math.random() - 0.5) * 5); o.born = r.now;
+      const L = window.__lines; if (L && L.SAY && L.SAY.land) raidSay(pick(L.SAY.land), o);
+    }
+    const ring = document.createElement('div'); ring.className = 'pb-slap'; ring.style.left = x + 'px'; ring.style.top = y + 'px'; r.layer.appendChild(ring); setTimeout(() => ring.remove(), 400);
+    r.swats++; r.away = 5 + Math.random() * 2.5; r.st = 'swat'; r.t = 0; raidSay(pick(SWAT_SAY));
   }
   const intact = () => [...scroller.querySelectorAll('.pb-entry:not(.pb-gone), .pb-fig:not(.pb-gone)')];
   function inView(e) { const a = e.getBoundingClientRect(), b = scroller.getBoundingClientRect(), mid = (a.top + a.bottom) / 2; return mid > b.top + 30 && mid < b.bottom - 30; }
@@ -343,7 +365,8 @@
     const c = r.c; c.st = 'book'; r.t += dt;
     const set = (st) => { r.st = st; r.t = 0; }, wristFor = (Hc, a) => { const ca = Math.cos(a), sa = Math.sin(a); return [Hc[0] - G[0] * ca - G[1] * sa, Hc[1] - G[0] * sa + G[1] * ca]; };
     const grip = () => { const ca = Math.cos(c.a), sa = Math.sin(c.a); return [c.x + G[0] * ca + G[1] * sa, c.y + G[0] * sa - G[1] * ca]; };
-    let T = [vw + 30, c.ly], aim = Math.PI, pose = P.eager, rate = 7, wig = 0.12, shake = 0, strain = 0;
+    let T = [vw + 30, c.ly], aim = Math.PI, pose = P.eager, rate = 7, wig = 0.12, shake = 0, strain = 0, vmax = 1e9;
+    const angry = r.mood === 'angry', slow = r.mood === 'slow';
     const tr = r.target && r.target.isConnected ? r.target.getBoundingClientRect() : null;
     const hold = tr ? [Math.min(tr.right - 30, vw - 60), clamp((tr.top + tr.bottom) / 2, 70, vh - 70)] : null;
     if (r.st === 'enter') { wig = 0.34; T = [vw + 10, vh * 0.5]; if (r.t > 0.5 && r.said < 0) raidSay(pick(RAID_SAY)); if (r.t > 1.7) set('pick'); }
@@ -355,13 +378,17 @@
       else if (r.t > 1.6) { r.scrolling = false; r.t = 0; }
     } else if (r.st === 'reach') {
       if (!tr || !inView(r.target)) set('pick');
-      else { pose = P.lunge; rate = 16; T = wristFor(hold, aim); c.ly = hold[1]; const g = grip(); if (Math.hypot(g[0] - hold[0], g[1] - hold[1]) < 16) { r.target.classList.add('pb-tug'); set('grip'); } else if (r.t > 1.5) set('pick'); }
+      else {   // the first time, and when it comes back wary, it creeps: fingers out, a little at a time. Otherwise it just goes for it
+        pose = slow ? P.eager : P.lunge; rate = angry ? 28 : 16; if (slow) { vmax = 150; wig = 0.3; aim = Math.PI + Math.sin(r.t * 2.6) * 0.07; }
+        T = wristFor(hold, Math.PI); c.ly = hold[1]; const g = grip();
+        if (Math.hypot(g[0] - hold[0], g[1] - hold[1]) < 18) { r.target.classList.add('pb-tug'); set('grip'); } else if (r.t > (slow ? 12 : 1.5)) set('pick');
+      }
     } else if (r.st === 'grip') {   // it has it by the edge and the card does not want to come out
       if (!tr) set('pick');
       else {
-        strain = clamp(r.t / 0.5, 0, 1); pose = {}; for (const k in P.clamp) pose[k] = P.clamp[k] + (P.strain[k] - P.clamp[k]) * strain;
+        const gt = angry ? 0.25 : slow ? 0.9 : 0.55; strain = clamp(r.t / (gt - 0.05), 0, 1); pose = {}; for (const k in P.clamp) pose[k] = P.clamp[k] + (P.strain[k] - P.clamp[k]) * strain;
         rate = 30; shake = 1 + 3 * strain; T = wristFor([hold[0] + 26 * strain, hold[1]], aim);
-        if (r.t > 0.55) {
+        if (r.t > gt) {
           const e = r.target, el2 = e.cloneNode(true); el2.classList.remove('pb-tug'); if (e.closest('.pb-sec-hand')) el2.classList.add('pb-sec-hand');
           el2.style.width = tr.width + 'px'; el2.style.height = tr.height + 'px'; r.layer.appendChild(el2);
           e.classList.remove('pb-tug'); e.classList.add('pb-gone');
@@ -374,7 +401,7 @@
     } else if (r.st === 'wind') {   // back it goes, cocked over its shoulder
       pose = P.clamp; rate = 9; aim = Math.PI + 0.95; T = wristFor([vw - 90, clamp(r.y0 - 60, 110, vh - 110)], aim);
       if (r.t > 0.2 && r.now - r.said > 2600) raidSay(pick(RAID_SAY));
-      if (r.t > 0.62) set('throw');
+      if (r.t > (angry ? 0.4 : 0.62)) set('throw');
     } else if (r.st === 'throw') {   // and the whip forward: the card leaves the fingers with the speed they had
       rate = 34; aim = Math.PI - 0.3; T = wristFor([vw - 420, clamp(r.y0 + 10, 110, vh - 110)], aim); pose = r.held ? P.clamp : P.lunge;
       if (r.held && r.t > 0.085) {
@@ -385,11 +412,34 @@
         o.body.setLinearVelocity({ x: vx, y: vy }); o.body.setAngularVelocity((Math.random() - 0.5) * 9); o.born = r.now; r.thrown++;
         const L = window.__lines; if (L && L.SAY && L.SAY.throw) raidSay(pick(L.SAY.throw), o);
       }
-      if (r.t > 0.5) { r.rest = 0.5 + Math.random() * 0.9; set('rest'); }
+      if (r.t > 0.5) {
+        if (slow) r.mood = 'normal';   // it got one: no more creeping
+        if (angry && --r.fury <= 0) r.mood = 'normal';
+        if (angry && r.fury > 0 && Math.random() < 0.3) set('scroll'); else { r.rest = angry ? 0.12 : 0.5 + Math.random() * 0.9; set('rest'); }
+      }
     } else if (r.st === 'rest') { pose = P.joy; wig = 0.2; T = [vw + 20, c.ly]; if (r.t > r.rest) set('pick'); }
+    else if (r.st === 'swat') {   // swatted: it snatches itself back out of the window and nurses its knuckles for at least five seconds
+      pose = P.sulk; rate = 13; shake = r.t < 0.35 ? 7 : 0; aim = Math.PI - 0.5; T = [vw + 400, clamp(c.ly - 30, 80, vh - 80)]; wig = 0.02;
+      if (r.t > r.away) {
+        if (Math.random() < 0.5) { r.mood = 'slow'; raidSay(pick(GRUDGE_SAY)); set('pick'); }
+        else { r.mood = 'angry'; r.fury = 3; raidSay(pick(ANGRY_SAY)); set(Math.random() < 0.65 ? 'scroll' : 'pick'); }
+      }
+    } else if (r.st === 'scroll') {   // in a temper: it takes the right edge of the menu like a scrollbar and yanks the page about
+      const sr = scroller.getBoundingClientRect(), max = scroller.scrollHeight - scroller.clientHeight, top = sr.top + 40, span = Math.max(1, sr.height - 80);
+      if (max < 40) set('pick');
+      else if (!r.grabbed) {
+        pose = P.lunge; rate = 20; const hp = [Math.min(sr.right - 6, vw - 20), top + span * scroller.scrollTop / max]; T = wristFor(hp, aim); c.ly = hp[1];
+        const g = grip(); if (Math.hypot(g[0] - hp[0], g[1] - hp[1]) < 22 || r.t > 0.9) { r.grabbed = true; r.t = 0; r.s0 = scroller.scrollTop / max; r.ph = Math.random() * 6; raidSay(pick(SCROLL_SAY)); }
+      } else {
+        const f = clamp(r.s0 + 0.42 * Math.sin(r.t * 8 + r.ph) * Math.min(1, r.t * 3) + 0.12 * Math.sin(r.t * 23), 0, 1);
+        pose = P.clamp; rate = 40; shake = 2; T = wristFor([Math.min(sr.right - 6, vw - 20), top + span * f], aim); scroller.scrollTop = f * max;
+        if (r.t > 1.7) { r.grabbed = false; r.rest = 0.2; set('rest'); }
+      }
+    }
     else if (r.st === 'done') { pose = P.sulk; rate = 3; T = [vw + (r.t > 1.6 ? 340 : 60), vh * 0.5]; wig = 0.02; }
     const k = 1 - Math.exp(-dt * rate), ka = 1 - Math.exp(-dt * (rate > 20 ? 30 : 9)), kp = 1 - Math.exp(-dt * (r.st === 'reach' || r.st === 'throw' ? 30 : 12));
-    c.x += (T[0] - c.x) * k; c.y += (T[1] - c.y) * k; c.a += (aim - c.a) * ka; c.sh += (c.y + 70 - c.sh) * (1 - Math.exp(-dt * 4));
+    let mx = (T[0] - c.x) * k, my = (T[1] - c.y) * k; const ml = Math.hypot(mx, my), cap = vmax * dt; if (ml > cap) { mx *= cap / ml; my *= cap / ml; }
+    c.x += mx; c.y += my; c.a += (aim - c.a) * ka; c.sh += (c.y + 70 - c.sh) * (1 - Math.exp(-dt * 4));
     for (const key in pose) c.pose[key] += (pose[key] - c.pose[key]) * kp;
     if (r.held) {   // the card is pinned in the fingers: it goes where the grip goes and turns with the wrist
       const o = r.held, g = grip(), th = c.a - Math.PI, ca = Math.cos(th), sa = Math.sin(th), x = g[0] - (o.off[0] * ca - o.off[1] * sa), y = g[1] - (o.off[0] * sa + o.off[1] * ca);
@@ -398,6 +448,10 @@
       if (o.say) { if (r.now > o.say.until) { o.say.el.remove(); o.say = null; } else o.say.el.style.translate = `calc(${clamp(x, 70, vw - 70).toFixed(0)}px - 50%) ${clamp(y - o.h / 2 - 36, 8, vh - 40).toFixed(0)}px`; }
     }
     if (r.say) { if (r.now > r.say.until) { r.say.el.remove(); r.say = null; } else { const g = grip(); r.say.el.style.translate = `calc(${clamp(Math.min(c.x, g[0]) - 30, 80, vw - 90).toFixed(0)}px - 50%) ${clamp(Math.min(c.y, g[1]) - 115, 10, vh - 50).toFixed(0)}px`; } }
+    {   // the patch that takes the swatting click sits over the palm and fingers, wherever they are
+      const g = grip(), hx = (c.x + g[0]) / 2, hy = (c.y + g[1]) / 2, on = r.st !== 'swat' && r.st !== 'done' && hx < vw + 40;
+      r.swat.style.display = on ? '' : 'none'; if (on) r.swat.style.transform = `translate(${(hx - 95).toFixed(0)}px, ${(hy - 80).toFixed(0)}px)`;
+    }
     H.draw(wig, shake, strain);
   }
 
@@ -407,5 +461,5 @@
   btn.innerHTML = '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path fill="currentColor" d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>';
   btn.addEventListener('click', open);
   nav.insertBefore(btn, document.getElementById('theme'));
-  window.__phrasebook = { open, close, raid: raidStart, state: () => ({ isOpen, raid: raid && { st: raid.st, objs: raid.objs.size, thrown: raid.thrown, broken: raid.broken, gone: scroller.querySelectorAll('.pb-gone').length } }), get el() { return el; } };
+  window.__phrasebook = { open, close, raid: raidStart, state: () => ({ isOpen, raid: raid && { st: raid.st, mood: raid.mood, swats: raid.swats, hand: raid.c && [raid.c.x, raid.c.y], objs: raid.objs.size, thrown: raid.thrown, broken: raid.broken, gone: scroller.querySelectorAll('.pb-gone').length } }), get el() { return el; } };
 })();
