@@ -75,3 +75,21 @@ html.pb-lock { overflow: hidden; }
 .pb-fig { overflow: hidden; }
 .pb-fig svg.pb-hand { overflow: hidden; border-radius: 8px; }
 .pb-lines { align-items: center; }
+
+/* ---- the hand in the menu: after 30 s it pulls the cards out and throws them at the left edge of the screen ---- */
+.claw.pb-raid.under { z-index: 47; } .claw.pb-raid.over { z-index: 49; }
+.pb-fly { position: fixed; inset: 0; z-index: 48; pointer-events: none; overflow: hidden; --paper: var(--surface); --rubric: var(--accent); --ink: var(--text); }
+.pb-fly .pb-entry, .pb-fly .pb-fig { position: absolute; left: 0; top: 0; box-sizing: border-box; transform-origin: 50% 50%; will-change: transform; box-shadow: 0 14px 30px rgba(0, 0, 0, .28); }
+.pb-entry.pb-gone, .pb-fig.pb-gone { background: transparent; border-style: dashed; }
+.pb-gone > * { visibility: hidden; }
+.pb-tug { animation: pb-tug .09s linear infinite; }
+@keyframes pb-tug { 0% { translate: 0 0; } 25% { translate: 2px -1px; } 75% { translate: 3px 1px; } }
+.pb-say { position: absolute; left: 0; top: 0; white-space: nowrap; background: var(--text); color: var(--bg); font-size: .82rem; font-weight: 650; padding: 4px 11px; border-radius: 12px;
+          box-shadow: 0 6px 16px rgba(0, 0, 0, .2); animation: pb-say 1.3s both; z-index: 3; }
+.pb-say::after { content: ""; position: absolute; left: 50%; bottom: -5px; width: 10px; height: 10px; background: inherit; transform: translateX(-50%) rotate(45deg); border-radius: 2px; }
+.pb-say.hand { background: var(--accent); color: #fff; font-weight: 800; letter-spacing: .02em; rotate: -4deg; animation-duration: 1.5s; }
+.pb-say.scream { background: var(--accent); color: #fff; font-size: 1.15rem; letter-spacing: .04em; }
+@keyframes pb-say { 0% { opacity: 0; scale: .6; } 12% { opacity: 1; scale: 1.08; } 20% { scale: 1; } 82% { opacity: 1; } 100% { opacity: 0; } }
+.pb-bit { position: absolute; left: 0; top: 0; border-radius: 1px; background: var(--surface); border: 1px solid var(--border); }
+.pb-card.pb-jolt { animation: pb-jolt .28s; }
+@keyframes pb-jolt { 20% { translate: -6px 2px; } 40% { translate: 4px -3px; } 60% { translate: -3px 2px; } 80% { translate: 2px -1px; } }
