@@ -7,7 +7,7 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   // Bump VER, and the ?v= on this file's script tag in index.html, whenever this file or the stylesheet changes. GitHub Pages caches each
   // file for ten minutes on its own, and a new script with an old stylesheet looks broken; the version makes them arrive as a pair
-  const VER = 13;
+  const VER = 14;
   const here = (document.currentScript && document.currentScript.src) || '/scripts/phrasebook.js';
 
   // ---- what this file knows: which occasion each list belongs to. src = which list on window.__lines, key = which entry of it ----
@@ -17,33 +17,44 @@
       entries: [
         { src: 'SAY', key: 'pull', title: 'On being taken hold of', when: 'You begin to drag a card that still sits in its place in the grid. A card the Hand plucks out of the air says the same.' },
         { src: 'SAY', key: 'strain', title: 'Under strain', when: 'You have pulled some 160 px from where you took hold, and the root begins to lose its grip.' },
+        { fig: 'strain' },
         { src: 'SAY', key: 'back', title: 'Let go in time', when: 'You release the card before it tears. It springs home, and gloats.' },
+        { fig: 'back' },
         { src: 'SAY', key: 'rip', title: 'Torn out', when: 'You pull past 350 px, or hold the strain until the root gives up. The card comes loose in your hand.' },
         { fig: 'pull' },
         { src: 'SAY', key: 'throw', title: 'Thrown', when: 'A loose card is let go at more than 900 px a second.' },
+        { fig: 'fly' },
         { src: 'SAY', key: 'land', title: 'A hard landing', when: 'The card strikes something at more than 500 px a second, and survives it.' },
+        { fig: 'land' },
         { src: 'SAY', key: 'smash', title: 'Shattered', when: 'A thrown card meets a wall, the floor or another card at more than 1300 px a second. Only a thrown card breaks; one that is dropped or carried never does.' },
         { fig: 'smash' },
+        { fig: 'stack' },
         { src: 'SAY', key: 'cutting', title: 'With the blade inside', when: 'The very tip of the katana has entered the card and has not yet come out.' },
         { src: 'SAY', key: 'stab', title: 'Stabbed, not cut', when: 'The tip leaves by the same side it came in through. The card is not divided, but it bleeds for a while.' },
         { src: 'SAY', key: 'slice', title: 'Cut in two', when: 'The tip goes in by one side and out by another. These are also the last words of a card torn in half between you and the Hand.' },
         { fig: 'cut' },
         { src: 'AGONY', key: 0, title: 'Stretched: the first degree', when: 'You and the Hand each hold an end of the same card, and it has begun to grow longer.' },
         { src: 'AGONY', key: 1, title: 'Stretched: the second degree', when: 'The card is pulled past a third of what it can bear. Also said in the Hand’s fist, while it is being crushed.' },
+        { fig: 'stretch' },
         { src: 'AGONY', key: 2, title: 'Stretched: the third degree', when: 'The card is close to tearing, or close to being a ball of paper. The letters grow, redden and shake.' },
         { src: 'PANIC', key: 0, title: 'On the shelf: it has noticed', when: 'A card lies on the secret shelf and the Hand has started across the screen for it.' },
         { src: 'PANIC', key: 1, title: 'On the shelf: it is coming', when: 'The Hand is a third of the way there. The card shakes and hops and shuffles away from it.' },
+        { fig: 'shelf' },
         { src: 'PANIC', key: 2, title: 'On the shelf: it is here', when: 'The Hand is nearly on it. Pick the card up and it is saved.' },
         { src: 'NOTME', key: null, title: 'Not me', when: 'Said by a loose card lying near the shelf while the Hand is coming for another.' },
         { src: 'BEG', key: null, title: 'Begging', when: 'In the Hand’s closed fist, in the quiet pause after the second squeeze.' },
+        { fig: 'crush' },
       ] },
     { id: 'katana', num: 'II', title: 'The Katana', head: 'Of the Katana',
       intro: 'Hidden in the mist of the banner stands a katana, and it has a very high opinion of itself. It is drawn like a card, by pulling, and a double click keeps it in the hand. Only its very tip cuts, at any speed whatever. It speaks once and is then quiet for two seconds, however much it has done in the meantime.',
       entries: [
         { fig: 'katana' },
         { src: 'SAY', key: 'khello', title: 'Introducing itself', when: 'You tear it out of the banner, or double-click to take it in hand.' },
+        { fig: 'mist' },
         { src: 'SAY', key: 'kbrag', title: 'Boasting', when: 'It has just cut a card in two while you were holding it. It boasts about two times in five.' },
+        { fig: 'equip' },
         { src: 'SAY', key: 'kcut', title: 'Cutting by accident', when: 'It cuts a card with nobody holding it, on its way down the page.' },
+        { fig: 'kfall' },
         { src: 'SAY', key: 'kdrop', title: 'Dropped', when: 'You let go of it.' },
       ] },
     { id: 'hand', num: 'III', title: 'The Hand', head: 'Of the Hand',
@@ -58,12 +69,14 @@
         { src: 'CLAW_SAY', key: 'keep', title: 'Winning the whole card', when: 'You let go during the tug of war.' },
         { src: 'CLAW_SAY', key: 'toss', title: 'Bored of it', when: 'It has held a card for two seconds. The card comes back, and about one time in three it comes back hard.' },
         { src: 'CLAW_SAY', key: 'sulk', title: 'Sulking', when: 'You tempt it and take the card away, or the thing it was holding is cut or smashed.' },
+        { fig: 'sulking' },
         { src: 'CLAW_SAY', key: 'snatch', title: 'Out of patience', when: 'You have teased it for too long with a card just out of reach. The arm shoots out as far as it must.' },
         { src: 'CLAW_SAY', key: 'savour', title: 'Savouring', when: 'In the pauses of the crushing, while it turns the card over and looks at it.' },
         { src: 'CLAW_SAY', key: 'crush', title: 'The crunch', when: 'The card it snatched is finally crushed.' },
         { fig: 'fist' },
         { src: 'CLAW_SAY', key: 'shelf', title: 'The shelf', when: 'There is a secret written under the fog in the top right corner of the banner. With the shelf out, you leave a card lying on it and let go: it reaches for it, slowly.' },
         { src: 'CLAW_SAY', key: 'severed', title: 'Its hand cut off', when: 'The very tip of the katana passes through its arm while the arm is out on the screen. The hand drops, and the arm whips back out of sight.' },
+        { fig: 'severed' },
         { src: 'CLAW_SAY', key: 'regrow', title: 'A new hand', when: 'Some eight seconds after losing one. It comes back to show it off.' },
         { src: 'SEV_SAY', key: 'cut', title: 'The cut-off hand: just fallen', when: 'Said by the hand that was cut off, lying where it fell and twitching.' },
         { src: 'SEV_SAY', key: 'rise', title: 'The cut-off hand: up on two fingers', when: 'After a couple of seconds it stands up on its first two fingers and walks off on tiptoe.' },
@@ -76,6 +89,7 @@
         { src: 'SEV_SAY', key: 'flee', title: 'The cut-off hand: running for it', when: 'The tip of the katana comes within about 280 px of it. It runs the other way on all five.' },
         { src: 'SEV_SAY', key: 'rest', title: 'The cut-off hand: sitting down', when: 'After a while of walking with nothing to catch. It gets up again by itself, or when something bumps it.' },
         { src: 'CLAW_SAY', key: 'caught', title: 'A catch', when: 'You throw a card towards the right edge, and it plucks it out of the air.' },
+        { fig: 'catch' },
         { src: 'CLAW_SAY', key: 'slip', title: 'Losing its grip', when: 'You yank the card away the moment it grabs, or take back the card it was celebrating with.' },
         { src: 'CLAW_SAY', key: 'cut', title: 'Watching a cut', when: 'It saw the katana divide a card.' },
         { src: 'CLAW_SAY', key: 'stab', title: 'Watching a stab', when: 'It saw the katana go in and come out the same way.' },
@@ -85,14 +99,17 @@
         { src: 'CLAW_SAY', key: 'kdrop', title: 'On the katana, dropped', when: 'It saw you drop the katana.' },
         { src: 'BOOK', key: null, title: 'Bored of your reading', when: 'You keep this menu open for 30 seconds. It starts pulling the cards out of it and throwing them at the left edge of the screen, where they break.' },
         { src: 'SWAT', key: null, title: 'Swatted', when: 'You click the Hand while it is in this menu. It drops what it holds and stays away for at least five seconds.' },
+        { fig: 'swat' },
         { src: 'GRUDGE', key: null, title: 'Back, and careful', when: 'About half the time it returns from a swat wary, and creeps towards the next card slowly.' },
         { src: 'ANGRY', key: null, title: 'Back, and angry', when: 'The other half of the time it returns furious: it reaches fast, throws three cards in a row, and may take hold of the scroll.' },
         { src: 'SCROLL', key: null, title: 'Shaking the scroll', when: 'In a temper it grabs the right edge of the menu and yanks the page up and down so you lose your place.' },
+        { fig: 'scroll' },
         { src: 'CLAW_SAY', key: 'ask', title: 'The question', when: 'Surprise me draws you a fortune and a project. It leans in beside the slip and asks.' },
         { src: 'CLAW_SAY', key: 'hello', title: 'Answering a no', when: 'Surprise me offers you a project and you say No. The Hand comes out to see about that.' },
         { src: 'CLAW_SAY', key: 'smashbtn', title: 'Smashing Yes and No', when: 'A few moments after it greets you, it slams itself down on the Yes and No buttons. They fly off the page in pieces.' },
         { src: 'CLAW_SAY', key: 'better', title: 'Its own buttons', when: 'It snaps two fingers, and Heads and Tails poof in where Yes and No were.' },
         { src: 'CLAW_SAY', key: 'flip', title: 'The toss', when: 'It throws a coin and makes you call it, heads or tails.' },
+        { fig: 'coin' },
         { src: 'CLAW_SAY', key: 'heads', title: 'Heads', when: 'The coin lands heads up, and it reads it out.' },
         { src: 'CLAW_SAY', key: 'tails', title: 'Tails', when: 'The coin lands tails up, and it reads it out.' },
         { src: 'CLAW_SAY', key: 'won', title: 'Beaten by a coin', when: 'You called it right. You may stay on the page.' },
@@ -101,6 +118,7 @@
         { src: 'CLAW_SAY', key: 'idgaf', title: 'Not bothering with the coin', when: 'One toss in ten it pockets the coin and decides for you anyway.' },
         { src: 'CLAW_SAY', key: 'waiting', title: 'Waiting on you', when: 'You lost the toss. Yes and No are back, and you have five seconds before it presses Yes for you.' },
         { src: 'CLAW_SAY', key: 'bye', title: 'Seeing you off', when: 'You pressed neither button for five seconds, so its finger is on Yes. You are leaving.' },
+        { fig: 'press' },
         { src: 'CLAW_SAY', key: 'slap', title: 'Knocking the buttons away', when: 'The first time you reach for Heads or Tails on a visit, it slaps, backhands or slams both buttons off the slip.' },
         { src: 'CLAW_SAY', key: 'snap', title: 'Snapping', when: 'Right after the buttons go flying. It has had enough of you.' },
         { src: 'CLAW_SAY', key: 'secret', title: 'The secret is out', when: 'You bring the pointer near the bottom-right corner of the fortune slip and the hidden × rises out of it. If it was not already out, it bursts in to protest.' },
@@ -153,17 +171,22 @@
   const cursor = (x, y) => `<path transform="translate(${x} ${y})" d="M0 0v17l4.6-4.2 3 7 2.9-1.3-3-6.8h6.2z" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.2" stroke-linejoin="round"/>`;
   const hatch = (id) => `<defs><pattern id="${id}" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0v6" stroke="var(--ink)" stroke-width="1"/></pattern></defs>`;
   const first = (L, src, key, fallback) => { const a = L && L[src] && L[src][key]; return (Array.isArray(a) && a.find((s) => !langOf(s) && s.length < 14)) || fallback; };
-  function handPrint(pose, a) {   // the page's hand, held in a pose for a moment and copied as paths
-    const H = window.__hand; if (!H) return '';
+  // the page's hand, held in a pose for a moment and copied as paths. x, y: where the wrist goes in the figure. It comes back in two layers,
+  // thumb (under) and the rest (over), so a card can be drawn between them and sit in its grip
+  function handParts(pose, a, x, y, sh = 70) {
+    const H = window.__hand; if (!H) return null;
     try {
       const c = H.get(), parts = ['thumb', 'talonT', 'flesh', 'talon', 'crease', 'vein', 'eye', 'pupil'], vw = document.documentElement.clientWidth;
       const keep = { x: c.x, y: c.y, a: c.a, sh: c.sh, pose: c.pose, d: parts.map((k) => c[k].getAttribute('d')), eye: c.eye.getAttribute('class') };
-      Object.assign(c, { x: vw - 250, y: 400, a: a, sh: 520, pose: { ...H.POSES[pose] } }); H.draw(0, 0, 0);
-      const out = parts.map((k) => `<path class="${k === 'thumb' ? 'flesh' : k === 'talonT' ? 'talon' : c[k].getAttribute('class')}" d="${c[k].getAttribute('d')}"/>`).join('');
+      Object.assign(c, { x: vw - 250, y: 400, a, sh: 400 + sh, pose: typeof pose === 'string' ? { ...H.POSES[pose] } : { ...H.POSES.lurk, ...pose } }); H.draw(0, 0, 0);
+      const g = (ks) => `<g class="pb-hand" transform="translate(${x - (vw - 250)} ${y - 400})">${ks.map((k) => `<path class="${k === 'thumb' ? 'flesh' : k === 'talonT' ? 'talon' : c[k].getAttribute('class')}" d="${c[k].getAttribute('d') || ''}"/>`).join('')}</g>`;
+      const out = { under: g(parts.slice(0, 2)), over: g(parts.slice(2)) }; out.all = out.under + out.over;
       Object.assign(c, { x: keep.x, y: keep.y, a: keep.a, sh: keep.sh, pose: keep.pose }); parts.forEach((k, i) => { if (keep.d[i] == null) c[k].removeAttribute('d'); else c[k].setAttribute('d', keep.d[i]); }); c.eye.setAttribute('class', keep.eye || 'eye');
-      return `<svg class="pb-hand" viewBox="${vw - 440} 270 400 250" aria-hidden="true">${out}</svg>`;
-    } catch (e) { return ''; }
+      return out;
+    } catch (e) { return null; }
   }
+  function handPrint(pose, a) { const h = handParts(pose, a, 190, 130, 120); return h ? `<svg class="pb-clip" viewBox="0 0 400 250" aria-hidden="true">${h.all}</svg>` : ''; }
+  const kat = (tf) => { const H = window.__hand; return H ? `<g class="pb-kat" transform="${tf}">${H.katanaSvg('pb-kat' + (++figN)).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '')}</g>` : ''; };
   const FIGS = {
     pull: (L) => [`<svg viewBox="0 0 340 150" aria-hidden="true">
         ${cardG('translate(4 62)')}${cardG('translate(224 62)')}
@@ -195,6 +218,127 @@
       'The katana. <b>a.</b> The tip, which cuts whatever it touches. <b>b.</b> The rest of the blade, which passes through everything and only looks sharp.']; },
     hand: () => { const s = handPrint('eager', Math.PI); return s && [s, 'The Hand, wanting. The eye opens wide and the fingers spread when a loose card comes near.']; },
     fist: () => { const s = handPrint('joy', Math.PI + 0.12); return s && [s, 'The Hand, pleased with itself. When it is happy the eye closes to a curve.']; },
+    // ---- more figures. The ones with the hand in them use the page's own drawing of it (handParts), placed among the other shapes ----
+    strain: (L) => [`<svg viewBox="0 0 340 160" aria-hidden="true">
+        ${cardG('translate(4 78)')}${cardG('translate(224 78)')}
+        <rect x="114" y="78" width="112" height="72" rx="6" ${INK} stroke-width="1.1" stroke-dasharray="4 4" opacity=".7"/>
+        <path d="M132 80C140 66 150 70 162 58M158 80C164 68 176 74 184 62M186 80C190 70 202 76 208 66M210 80C214 72 222 76 228 70" ${INK} stroke="var(--rubric)" stroke-width="1.5"/>
+        ${cardG('translate(150 6) rotate(-9 56 36)')}
+        <path d="M138 30l-8-4M136 44l-9 1M272 14l8-5M276 30l9-1" ${INK} stroke-width="1.1"/>
+        ${bubble(96, 34, first(L, 'SAY', 'strain', 'nnngh!'))}${cursor(232, 30)}</svg>`,
+      'Under strain. Past 160 px of pull the root starts to let go, strand by strand, and the card shakes.'],
+    back: (L) => [`<svg viewBox="0 0 340 150" aria-hidden="true">
+        ${cardG('translate(4 62)')}${cardG('translate(224 62)')}
+        <rect x="114" y="62" width="112" height="72" rx="6" ${INK} stroke-width="1.1" stroke-dasharray="4 4" opacity=".7"/>
+        ${cardG('translate(118 56) rotate(3 56 36)')}
+        <path d="M300 18C270 14 244 24 226 44" ${INK} stroke-width="1" stroke-dasharray="2 5"/><path d="M226 44l10-3M226 44l3-10" ${INK} stroke-width="1"/>
+        <path d="M108 52c-6 6-8 14-6 22M236 50c6 6 8 14 6 22M100 44c-9 9-12 20-9 32" ${INK} stroke-width="1" opacity=".6"/>
+        ${bubble(170, 16, first(L, 'SAY', 'back', 'ha!'))}${cursor(304, 14)}</svg>`,
+      'Let go in time. The root pulls the card straight home, where it wobbles once and gloats.'],
+    fly: (L) => [`<svg viewBox="0 0 340 150" aria-hidden="true">
+        <path d="M20 132C70 60 150 30 250 38" ${INK} stroke-width="1" stroke-dasharray="2 5"/>
+        <path d="M150 66h-46M146 82h-58M150 98h-40" ${INK} stroke-width="1.4"/><path d="M96 74h-22M82 90h-18" ${INK} stroke-width="1" opacity=".6"/>
+        ${cardG('translate(166 34) rotate(14 56 36)')}${cursor(22, 118)}
+        <path d="M36 112l8-9M44 122l11-4" ${INK} stroke-width="1"/>
+        ${bubble(228, 4, first(L, 'SAY', 'throw', 'wheee'))}</svg>`,
+      'Thrown. Let go at more than 900 px a second and the card keeps the speed of the hand that threw it.'],
+    land: (L) => [`<svg viewBox="0 0 340 150" aria-hidden="true">${hatch('pb-h2')}
+        <rect x="0" y="128" width="340" height="22" fill="url(#pb-h2)" opacity=".7"/><path d="M0 128h340" ${INK} stroke-width="1.6"/>
+        <path d="M250 6C236 30 220 46 204 60" ${INK} stroke-width="1" stroke-dasharray="2 5"/>
+        ${cardG('translate(108 51) rotate(-7 56 36)')}
+        <path d="M104 126l-14-8M100 118l-10-12M232 124l14-10M236 114l8-12" ${INK} stroke-width="1.2"/>
+        <path d="M70 124a7 5 0 1 1 12 0M254 124a8 5 0 1 1 14 0M44 125a5 4 0 1 1 9 0" ${INK} stroke-width="1" opacity=".7"/>
+        ${bubble(126, 14, first(L, 'SAY', 'land', 'oof'))}</svg>`,
+      'A hard landing. Faster than 500 px a second it hurts; only a thrown card going faster than 1300 breaks.'],
+    stack: () => [`<svg viewBox="0 -24 340 194" aria-hidden="true">${hatch('pb-h3')}
+        <rect x="0" y="150" width="340" height="20" fill="url(#pb-h3)" opacity=".7"/><path d="M0 150h340" ${INK} stroke-width="1.6"/>
+        ${cardG('translate(110 108) scale(1 .56)')}${cardG('translate(122 67) scale(1 .56)')}${cardG('translate(104 26) scale(1 .56)')}${cardG('translate(118 -15) scale(1 .56)')}
+        <path d="M262 -14v40M262 26l-5-8M262 26l5-8" ${INK} stroke-width="1" stroke-dasharray="2 4"/><path d="M84 148l-10-6M256 148l10-6" ${INK} stroke-width="1.1"/></svg>`,
+      'Loose cards are ordinary objects. They fall, lie on each other and stack; a tower of five stands.'],
+    stretch: (L) => { const h = handParts('strain', Math.PI, 392, 82); if (!h) return null; const a = L && L.AGONY && L.AGONY[1];
+      return [`<svg class="pb-clip" viewBox="0 0 460 190" aria-hidden="true">${h.under}
+        <path d="M40 56h74c40 2 62 30 86 30s48-22 96-18v72c-48 4-72-20-96-20s-46 28-86 30H40a6 6 0 0 1-6-6V62a6 6 0 0 1 6-6z" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M34 70h82c34 2 58 24 84 24" ${INK} stroke-width=".8"/><path d="M46 84h44M46 98h70c30 0 50 4 84 4M46 110h60M46 122h40" stroke="var(--ink)" stroke-width="1" opacity=".5" stroke-linecap="round" fill="none"/>
+        <path d="M188 80l5 8M200 78l1 9M212 80l-4 8M190 116l4-7M204 118l0-8" ${INK} stroke="var(--rubric)" stroke-width="1.4"/>
+        <circle cx="198" cy="132" r="2.6" fill="var(--rubric)"/><circle cx="206" cy="146" r="2" fill="var(--rubric)"/><circle cx="194" cy="158" r="1.5" fill="var(--rubric)"/>
+        ${h.over}${cursor(52, 96)}${bubble(196, 30, (a && a.find((s) => !langOf(s) && s.length < 14)) || 'IT HURTS', true)}</svg>`,
+      'The tug of war. You hold one end and the Hand the other; the card grows a waist, drips, and at last tears in two.']; },
+    crush: (L) => { const h = handParts({ ...window.__hand.POSES.clamp, curl: 0.7, th: 0.7, eye: 1.3, pupil: 1.2 }, Math.PI, 300, 100); if (!h) return null;
+      return [`<svg class="pb-clip" viewBox="0 0 400 200" aria-hidden="true">${h.under}
+        <path d="M168 96l14-22 20 8 16-14 14 20 22 2-6 22 14 16-20 10-2 22-22-8-16 14-12-20-22-2 8-20-14-16z" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.4" stroke-linejoin="round"/>
+        <path d="M182 74l18 34 18-40M200 108l32-20M200 108l-24 22M200 108l24 28M200 108l40 10" ${INK} stroke-width=".9" opacity=".7"/>
+        ${h.over}<path d="M150 70l-10-8M146 96l-13-1M152 122l-11 7" ${INK} stroke-width="1.2"/>
+        ${bubble(128, 28, (L && L.BEG && L.BEG.find((s) => !langOf(s) && s.length < 14)) || 'please')}</svg>`,
+      'In the fist. It squeezes in three goes and looks the card over between them. In the second pause the card begs.']; },
+    shelf: (L) => { const h = handParts('eager', Math.PI, 400, 96); if (!h) return null; const p = L && L.PANIC && L.PANIC[1];
+      return [`<svg class="pb-clip" viewBox="0 0 440 190" aria-hidden="true">
+        <path d="M14 132h196" ${INK} stroke-width="3"/><path d="M40 132v22l18-22M184 132v22l-18-22" ${INK} stroke-width="1.6"/>
+        ${cardG('translate(52 59) rotate(-3 56 36)')}
+        <path d="M44 70l-9-5M42 92l-10 1M174 62l9-6M176 88l10-1M58 52l-4-9M150 50l4-9" ${INK} stroke-width="1.1"/>
+        <path d="M218 96h-22M210 110h-16" ${INK} stroke-width="1" stroke-dasharray="2 4"/>
+        ${h.all}${bubble(108, 14, (p && p.find((s) => !langOf(s) && s.length < 16)) || 'it is coming', true)}</svg>`,
+      'The secret shelf. A card left on it shakes and hops as the Hand comes over. Pick the card up and it is saved.']; },
+    mist: () => { const k = kat('translate(150 6) scale(.52)'); if (!k) return null; const cloud = (x, y, s, o) => `<path transform="translate(${x} ${y}) scale(${s})" d="M0 30c-14 0-20-18-6-24 2-16 26-20 34-6 12-10 32-2 30 14 16 2 16 22-2 22z" fill="var(--paper)" stroke="var(--ink)" stroke-width="${1.1 / s}" opacity="${o}"/>`;
+      return [`<svg viewBox="0 0 340 170" aria-hidden="true"><path d="M0 162h340" ${INK} stroke-width="1.4"/>
+        ${cloud(40, 96, 1.5, 0.8)}${k}${cloud(96, 112, 1.6, 1)}${cloud(176, 104, 1.3, 1)}${cloud(232, 118, 1.2, 0.85)}${cloud(10, 126, 1, 1)}
+        <path d="M196 30c16-12 34-10 44 2M204 44c12-8 24-6 32 2" ${INK} stroke-width="1" stroke-dasharray="2 4"/>${cursor(246, 26)}</svg>`,
+      'The katana stands planted in the mist of the banner. Move the pointer about near it for a while and it shows itself.']; },
+    kfall: (L) => { const k = kat('translate(150 -30) scale(.46)'); if (!k) return null;
+      return [`<svg class="pb-clip" viewBox="0 0 340 180" aria-hidden="true">
+        <g transform="translate(96 100)"><path d="M0 6a6 6 0 0 1 6-6h58l-6 72H6a6 6 0 0 1-6-6z" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.4"/><path d="M84 0h58a6 6 0 0 1 6 6v60a6 6 0 0 1-6 6H78z" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.4" transform="translate(6 3) rotate(3 110 36)"/>
+          <path d="M10 22h34M10 34h40M10 44h28" stroke="var(--ink)" stroke-width="1" opacity=".5" stroke-linecap="round"/></g>
+        ${k}<path d="M140 2v22M190 0v26" ${INK} stroke-width="1" opacity=".6"/>
+        ${bubble(262, 50, first(L, 'SAY', 'kcut', 'whoops'))}</svg>`,
+      'Dropped, it still cuts. The tip divides whatever it meets on the way down the page, and the katana says sorry.']; },
+    equip: () => { const k = kat('translate(120 -40) rotate(38 20 150) scale(.6)'); if (!k) return null;
+      return [`<svg class="pb-clip" viewBox="0 0 340 170" aria-hidden="true">${k}
+        <circle cx="218" cy="42" r="15" ${INK} stroke="var(--rubric)" stroke-width="1.4"/><circle cx="218" cy="42" r="24" ${INK} stroke="var(--rubric)" stroke-width="1.1" stroke-dasharray="3 4"/>
+        ${cursor(214, 38)}<text x="262" y="34" font-size="12" font-weight="700" fill="var(--ink)">× 2</text>
+        <path d="M66 150c10 6 24 8 36 4M52 136c14 12 36 16 56 10" ${INK} stroke-width="1" stroke-dasharray="2 4"/></svg>`,
+      'Double-click and the katana stays in the hand at one steady angle. Double-click again, or press Esc, to let it go.']; },
+    catch: (L) => { const h = handParts('lunge', Math.PI + 0.08, 410, 104); if (!h) return null;
+      return [`<svg class="pb-clip" viewBox="0 0 460 190" aria-hidden="true">
+        <path d="M10 150C60 96 110 78 160 76" ${INK} stroke-width="1" stroke-dasharray="2 5"/>
+        <path d="M118 62h-46M112 80h-60M118 98h-38" ${INK} stroke-width="1.4"/>
+        ${h.under}${cardG('translate(134 44) rotate(-10 56 36)')}${h.over}
+        ${bubble(330, 16, first(L, 'CLAW_SAY', 'caught', 'CAUGHT IT'), true)}</svg>`,
+      'A catch. Throw a card towards the right edge and the arm shoots out to pluck it from the air.']; },
+    press: (L) => { const h = handParts('point', Math.PI - 0.95, 286, 60); if (!h) return null;
+      return [`<svg class="pb-clip" viewBox="0 0 440 180" aria-hidden="true">
+        <rect x="34" y="62" width="150" height="96" rx="12" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.4"/><path d="M52 84h76M52 98h110" stroke="var(--ink)" stroke-width="1" opacity=".5" stroke-linecap="round"/>
+        <rect x="52" y="116" width="52" height="26" rx="13" ${INK} stroke-width="1.3"/><text x="78" y="133.500" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">No</text>
+        <rect x="114" y="116" width="54" height="26" rx="13" fill="var(--rubric)"/><text x="141" y="133.500" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--paper)">Yes</text>
+        ${h.all}${bubble(110, 22, first(L, 'CLAW_SAY', 'bye', 'BYE BYE'), true)}</svg>`,
+      'Surprise me. Lose the toss, press neither button for five seconds, and one pointing finger presses Yes for you.']; },
+    coin: (L) => { const h = handParts('snapped', Math.PI + 0.5, 360, 150); if (!h) return null;
+      return [`<svg class="pb-clip" viewBox="0 0 440 200" aria-hidden="true">
+        <path d="M236 96C212 60 196 44 172 40" ${INK} stroke-width="1" stroke-dasharray="2 5"/>
+        <ellipse cx="150" cy="40" rx="20" ry="14" fill="#e3c32f" stroke="var(--ink)" stroke-width="1.4"/><ellipse cx="150" cy="40" rx="13" ry="8.500" ${INK} stroke-width="1"/>
+        <path d="M118 30c-6 6-6 14 0 20M182 30c6 6 6 14 0 20M110 24c-9 10-9 22 0 32M190 24c9 10 9 22 0 32" ${INK} stroke-width="1"/>
+        ${h.all}${bubble(110, 84, first(L, 'CLAW_SAY', 'flip', 'call it.'), true)}</svg>`,
+      'The toss. It will not take your No for an answer: it flips a coin and makes you call heads or tails.']; },
+    severed: (L) => { const h = handParts('lunge', Math.PI, 250, 96); if (!h) return null; const id = 'pb-sv' + (++figN);
+      return [`<svg class="pb-clip" viewBox="0 0 440 190" aria-hidden="true"><defs><clipPath id="${id}a"><path d="M0-40h292l-26 280H0z"/></clipPath><clipPath id="${id}b"><path d="M292-40h200v280H266z"/></clipPath></defs>
+        <g transform="translate(-16 14) rotate(-7 250 96)"><g clip-path="url(#${id}a)">${h.all}</g></g><g transform="translate(12 -2)"><g clip-path="url(#${id}b)">${h.all}</g></g>
+        <path d="M306-6L262 196" ${INK} stroke="var(--rubric)" stroke-width="1.4" stroke-dasharray="6 5"/>
+        <circle cx="282" cy="150" r="3" fill="var(--rubric)"/><circle cx="290" cy="166" r="2.200" fill="var(--rubric)"/><circle cx="274" cy="172" r="1.600" fill="var(--rubric)"/><circle cx="296" cy="140" r="1.800" fill="var(--rubric)"/>
+        ${bubble(370, 20, first(L, 'CLAW_SAY', 'severed', 'MY HAND!!'), true)}</svg>`,
+      'Pass the tip of the katana through the arm and the hand comes off. It lives on by itself; the arm grows a new one.']; },
+    swat: () => { const h = handParts('sulk', Math.PI - 0.45, 372, 84); if (!h) return null;
+      return [`<svg class="pb-clip" viewBox="0 0 440 190" aria-hidden="true">
+        <circle cx="150" cy="104" r="20" ${INK} stroke="var(--rubric)" stroke-width="2"/><circle cx="150" cy="104" r="32" ${INK} stroke="var(--rubric)" stroke-width="1.2" stroke-dasharray="3 5"/>
+        <path d="M150 62v-12M150 146v12M108 104h-12M192 104h12M120 74l-9-9M180 74l9-9M120 134l-9 9M180 134l9 9" ${INK} stroke="var(--rubric)" stroke-width="1.4"/>
+        ${cursor(146, 100)}<path d="M214 70h26M208 92h34M216 114h24" ${INK} stroke-width="1.3"/>
+        ${h.all}${bubble(300, 16, SWAT_SAY[0], true)}</svg>`,
+      'Click the Hand while it is in this menu and it is swatted. It drops what it holds and sulks for five seconds or more.']; },
+    scroll: () => { const h = handParts('clamp', Math.PI, 382, 78); if (!h) return null; let rows = ''; for (let i = 0; i < 3; i++) for (let j = 0; j < 2; j++) rows += `<rect x="${40 + j * 106}" y="${34 + i * 48}" width="96" height="38" rx="6" ${INK} stroke-width="1" opacity=".6"/><path d="M${48 + j * 106} ${46 + i * 48}h40M${48 + j * 106} ${58 + i * 48}h70" stroke="var(--ink)" stroke-width="1" opacity=".4" stroke-linecap="round"/>`;
+      return [`<svg class="pb-clip" viewBox="0 0 440 190" aria-hidden="true">
+        <rect x="28" y="20" width="250" height="160" rx="12" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.4"/>${rows}
+        <path d="M266 30v140" ${INK} stroke-width="1" opacity=".5"/><rect x="262" y="80" width="8" height="38" rx="4" fill="var(--rubric)"/>
+        <path d="M296 34v-18M296 16l-6 8M296 16l6 8M296 150v20M296 170l-6-8M296 170l6-8" ${INK} stroke="var(--rubric)" stroke-width="1.5"/>
+        ${h.all}${bubble(366, 150, SCROLL_SAY[0], true)}</svg>`,
+      'In a temper it takes hold of the edge of this menu and yanks the page up and down until you have lost your place.']; },
+    sulking: () => { const s = handPrint('sulk', Math.PI - 0.4); return s && [s, 'The Hand, sulking: a fist turned half away and the eye nearly shut. It does not last.']; },
   };
   function figure(name, L) {
     let f = null; try { f = FIGS[name](L); } catch (e) { f = null; }

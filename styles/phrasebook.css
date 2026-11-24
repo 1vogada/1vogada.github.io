@@ -98,3 +98,7 @@ html.pb-lock { overflow: hidden; }
 .pb-slap { position: absolute; width: 0; height: 0; z-index: 6; }
 .pb-slap::before { content: ""; position: absolute; left: -34px; top: -34px; width: 68px; height: 68px; border-radius: 50%; border: 5px solid #fff; box-shadow: 0 0 0 2px var(--accent), inset 0 0 0 2px var(--accent); animation: pb-slap .36s ease-out forwards; }
 @keyframes pb-slap { from { scale: .2; opacity: 1; } to { scale: 1.5; opacity: 0; } }
+/* figures with the hand among other shapes: wider, and the arm is cut off at the frame */
+.pb-fig svg.pb-clip { overflow: hidden; border-radius: 8px; max-width: 360px; }
+.pb-fig g.pb-kat { filter: none; }
+.pb-fig g.pb-kat > path:first-of-type { stroke: var(--ink); stroke-width: 1.3; }
