@@ -1297,7 +1297,7 @@
       sulk: { curl: 0.95, th: 0.55, spread: 0.2, eye: 0.2, pupil: 0.5, happy: 0 },
     };
     let claw = null;
-    const clawBusy = () => !!claw && (!!claw.react || now() < (claw.flinch || 0) || claw.strands.length > 0 || !!claw.say || (claw.st !== 'off' && (claw.st !== 'lurk' || now() < claw.until)));
+    const clawBusy = () => !!claw && (!!claw.react || !!claw.later || now() < (claw.flinch || 0) || claw.strands.length > 0 || !!claw.say || (claw.st !== 'off' && (claw.st !== 'lurk' || now() < claw.until)));
     const clamp01 = (v) => Math.max(0, Math.min(1, v)), wrapA = (a) => a - 2 * Math.PI * Math.round(a / (2 * Math.PI));
     function clawInit() {
       const mk = (cls) => { const s = document.createElementNS(NS, 'svg'); s.setAttribute('class', 'claw ' + cls); s.setAttribute('aria-hidden', 'true'); document.body.appendChild(s); return s; };
@@ -1320,6 +1320,9 @@
     }
     function clawSay(kind, force) {
       const c = claw, t = now(); if (!force && t - c.said < 2400) return;
+      // never two lines within 2 s: what it does is not held up, but an important line waits its turn and an unimportant one is dropped
+      if (t - c.said < REACT_GAP) { if (force) c.later = { kind, at: c.said + REACT_GAP }; return; }
+      c.later = null;
       if (c.say) c.say.el.remove();
       const el = bubble(pick(CLAW_SAY[kind])), ms = kind === 'rip' ? 1900 : 1300; el.classList.add('claw-say'); el.style.animationDuration = ms + 'ms';
       c.said = t; c.say = { el, until: t + ms }; run();
@@ -1580,6 +1583,7 @@
         if (c.t > 1.6) clawSet('lurk');
       }
       c.agit = Math.max(0, (c.agit || 0) - dt * 0.6);
+      if (c.later && t >= c.later.at) { const l = c.later; c.later = null; if (t - l.at < 1200) clawSay(l.kind, true); }
       if (c.react) {
         const idle = c.st === 'lurk' || c.st === 'sulk';
         if (t - c.react.born > 6000) c.react = null;   // it was busy for too long: the moment has passed
