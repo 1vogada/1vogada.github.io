@@ -291,8 +291,17 @@
   html.hand-show .claw.over { z-index: 58; } html.hand-show .claw.under { z-index: 57; } html.hand-show #phys { z-index: 58; }
   .omi-actions .btn.pressed { transform: scale(.9); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 35%, transparent); }
   .omi-actions .btn[disabled] { opacity: .5; cursor: default; }
-  .omi-actions .btn.swatted { animation: swatted .45s cubic-bezier(.3,1.4,.5,1); }
-  @keyframes swatted { 25% { transform: translate(-30px, 10px) rotate(-16deg); } 100% { transform: none; } }
+  .omi-actions .btn { position: relative; }
+  .omi-actions .btn.poof { animation: poof .45s cubic-bezier(.3,1.6,.5,1) both; }
+  @keyframes poof { 0% { transform: scale(.2); opacity: 0; filter: blur(4px); } 60% { transform: scale(1.15); opacity: 1; filter: none; } 100% { transform: none; } }
+  .omi-puff { position: absolute; left: 50%; top: 50%; width: 90px; height: 90px; margin: -45px 0 0 -45px; border-radius: 50%; pointer-events: none;
+              background: radial-gradient(circle, color-mix(in srgb, var(--muted) 45%, transparent) 0 30%, transparent 62%); animation: puff .5s ease-out forwards; }
+  @keyframes puff { from { transform: scale(.3); opacity: 1; } to { transform: scale(1.5); opacity: 0; } }
+  .btn-say { position: absolute; bottom: calc(100% + 9px); left: 50%; translate: -50% 0; white-space: nowrap; pointer-events: none; z-index: 2;
+             background: var(--surface); color: var(--ink); border: 1px solid var(--border); border-radius: 10px; padding: 3px 9px; font-size: .78rem; font-weight: 650;
+             box-shadow: var(--shadow); animation: btnsay 2.6s ease forwards; }
+  .btn-say::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -5px; border: 5px solid transparent; border-top-color: var(--border); }
+  @keyframes btnsay { 0% { opacity: 0; transform: translateY(6px) scale(.8); } 10%, 85% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-4px); } }
   .omi-call:empty { display: none; }
   /* the coin: a thick gold disc. JS turns it about its horizontal axis: the face squashes and the rim shows below it */
   .coin { position: fixed; left: 0; top: 0; z-index: 59; width: 0; height: 0; pointer-events: none; }
@@ -800,6 +809,7 @@
       throw: ['wheee', 'NOOO', 'not the wall!', 'I can fly?!', 'aaaaaa'],
       land: ['oof', 'ow', 'ugh', "I'm fine", 'ох…', 'my corner!'],
       kdrop: ['oops.', 'I meant to do that', 'gravity wins again', 'catch me?!', 'timber!', 'butterfingers', 'おっと', 'опа!'],
+      btnhi: ['hi!', 'hello again', 'we are back', 'miss us?', 'pick me!', 'no, me!', 'hey there', 'ta-da', 'здрасти!', 'ей!', 'ето ни пак', 'やあ!', 'こんにちは', 'ただいま', 'おっす'],   // the new Heads/Tails buttons, as they poof in
       khello: ["hello! I'm the sharpest katana ever!", 'careful: I cut things just by touching them', 'sharpest blade in the world, hi!', "don't touch anything you like with me", '世界一切れる刀です', 'най-острата катана на света, здрасти!'],
       kbrag: ['told you. sharpest ever.', "I didn't even try", 'one touch is all it takes', 'I barely touched it!', 'too sharp, sorry', 'スパッ', 'като масло'],
       cutting: ['AAAAAAAAA', 'IT IS IN ME', 'STOP STOP STOP', 'NOT THE MIDDLE', 'I CAN FEEL IT', '痛い痛い痛い!!', 'ААААААА!', 'боли боли боли'],
@@ -1902,7 +1912,7 @@
   // "No": the hand comes out, flips a coin and makes you call it. Call it right and you stay. Call it wrong
   // (or 1 time in 10 it just can't be bothered) and it presses Yes for you, laughing
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-  let swatsLeft = 2;   // the first time you go for heads or tails (once per visit) it slaps your hand away twice, then snaps
+  let swatsLeft = 1;   // the first time you go for heads or tails (once per visit) it knocks the buttons away, then snaps
   // No and the × do the same thing: the hand comes out
   noBtn.addEventListener('click', () => handScene());
   async function handScene() {
@@ -1933,9 +1943,14 @@
         coin.style.translate = `${cx.toFixed(0)}px ${y.toFixed(0)}px`; turn((tn - t0) / 1000 * Math.PI * 5, '?'); requestAnimationFrame(fly); };   // 2.5 turns a second, real time
       requestAnimationFrame(fly);
       qEl.textContent = '';   // the hand asks the question, not the slip
-      const heads = document.createElement('button'), tails = document.createElement('button');
-      heads.className = tails.className = 'btn ghost'; heads.type = tails.type = 'button'; heads.textContent = 'Heads'; tails.textContent = 'Tails';
-      actEl.innerHTML = ''; actEl.append(heads, tails); heads.focus({ preventScroll: true });
+      let heads, tails, go;
+      const makeBtns = () => {
+        heads = document.createElement('button'); tails = document.createElement('button');
+        heads.className = tails.className = 'btn ghost'; heads.type = tails.type = 'button'; heads.textContent = 'Heads'; tails.textContent = 'Tails';
+        heads.onclick = () => go && go('heads', heads); tails.onclick = () => go && go('tails', tails);
+        actEl.innerHTML = ''; actEl.append(heads, tails);
+      };
+      makeBtns(); heads.focus({ preventScroll: true });
       const hover = () => H.to({ x: hx, y: hy, pose: 'joy', tip: false, aim: Math.PI, rate: 10, bob: true });
       // one finger, on a button
       const poke = async (btn) => {
@@ -1946,25 +1961,43 @@
       };
       const call = await new Promise((res) => {
         let busy = false;
-        const go = async (side, btn) => {
+        go = async (side, btn) => {
           if (busy) return;
           if (swatsLeft <= 0) { res(side); return; }
           busy = true; swatsLeft--;
-          // slap: the hand lunges at the button you went for and knocks it aside
-          const b = btn.getBoundingClientRect();
-          H.to({ x: b.left + b.width / 2, y: b.top + b.height / 2, pose: 'clamp', tip: false, aim: Math.PI, rate: 40, bob: false });
-          await sleep(140); btn.classList.remove('swatted'); void btn.offsetWidth; btn.classList.add('swatted'); H.say('slap');
-          await sleep(380); hover();
-          if (swatsLeft > 0) { busy = false; return; }
-          // the second slap is the last straw: it snaps, then either lets you pick or picks for you
+          // it knocks both buttons off the slip, one of three ways: a slap (sweep left), a backhand (sweep right) or a slam (straight down)
           heads.disabled = tails.disabled = true;
-          await sleep(1700); H.to({ pose: 'sulk', rate: 14 }); H.say('snap');
-          await sleep(2200);
+          const hb = heads.getBoundingClientRect(), tb = tails.getBoundingClientRect(), my = (hb.top + hb.bottom) / 2, L = hb.left, R = tb.right, mx = (L + R) / 2;
+          const kind = ['slap', 'backhand', 'slam'][Math.floor(Math.random() * 3)];
+          const fling = (el, kf, delay) => el.animate(kf, { duration: 650, delay, easing: 'cubic-bezier(.2,.7,.4,1)', fill: 'forwards' });
+          if (kind === 'slam') {
+            H.to({ x: mx, y: my - 110, pose: 'clamp', tip: false, aim: Math.PI, rate: 30, bob: false }); await sleep(260);
+            H.to({ x: mx, y: my - 4, rate: 50 }); await sleep(110); H.say('slap');
+            for (const [el, d] of [[heads, -1], [tails, 1]]) fling(el, [{ transform: 'none' }, { transform: 'translateY(4px) scale(1.3, .3)', offset: .2 },
+              { transform: `translate(${d * 60}px, 70px) rotate(${d * 40}deg) scale(1.4, .1)`, opacity: 0 }], 0);
+          } else {
+            const d = kind === 'slap' ? -1 : 1, from = d < 0 ? R + 30 : L - 30, to = d < 0 ? L - 60 : R + 60;
+            H.to({ x: from, y: my, pose: kind === 'slap' ? 'clamp' : 'joy', tip: false, aim: Math.PI, rate: 40, bob: false }); await sleep(220);
+            H.to({ x: to, y: my - 10, rate: 45 }); await sleep(80); H.say('slap');
+            const first = d < 0 ? tails : heads, second = d < 0 ? heads : tails;
+            [first, second].forEach((el, i) => fling(el, [{ transform: 'none' }, { transform: `translate(${d * 30}px, -12px) rotate(${d * 25}deg)`, offset: .15 },
+              { transform: `translate(${d * (320 + i * 60)}px, ${kind === 'slap' ? 140 : -180}px) rotate(${d * (280 + i * 120)}deg)`, opacity: 0 }], i * 70));
+          }
+          await sleep(450); hover();
+          // then it snaps, and a fresh pair poofs in, chattering
+          await sleep(900); H.to({ pose: 'sulk', rate: 14 }); H.say('snap');
+          await sleep(1000);
+          makeBtns(); heads.disabled = tails.disabled = true;
+          const hi = window.__lines.SAY.btnhi, a = Math.floor(Math.random() * hi.length), b2 = (a + 1 + Math.floor(Math.random() * (hi.length - 1))) % hi.length;
+          [heads, tails].forEach((el, i) => {
+            el.classList.add('poof'); const puff = document.createElement('i'); puff.className = 'omi-puff'; el.appendChild(puff); setTimeout(() => puff.remove(), 520);
+            setTimeout(() => { const t = document.createElement('span'); t.className = 'btn-say'; t.textContent = hi[i ? b2 : a]; el.appendChild(t); setTimeout(() => t.remove(), 2700); }, 250 + i * 450);
+          });
+          await sleep(2600);
           if (Math.random() < 0.5) { H.say('yourpick'); hover(); heads.disabled = tails.disabled = false; busy = false; return; }
           const mine = Math.random() < 0.5 ? 'heads' : 'tails'; H.say('mypick');
           await poke(mine === 'heads' ? heads : tails); hover(); res(mine);
         };
-        heads.onclick = () => go('heads', heads); tails.onclick = () => go('tails', tails);
       });
       heads.disabled = tails.disabled = true;
       const r = Math.random(), side = r < 0.45 ? 'heads' : r < 0.9 ? 'tails' : null;
