@@ -7,7 +7,7 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   // Bump VER, and the ?v= on this file's script tag in index.html, whenever this file or the stylesheet changes. GitHub Pages caches each
   // file for ten minutes on its own, and a new script with an old stylesheet looks broken; the version makes them arrive as a pair
-  const VER = 14;
+  const VER = 15;
   const here = (document.currentScript && document.currentScript.src) || '/scripts/phrasebook.js';
 
   // ---- what this file knows: which occasion each list belongs to. src = which list on window.__lines, key = which entry of it ----
@@ -97,12 +97,16 @@
         { src: 'CLAW_SAY', key: 'throw', title: 'Watching a throw', when: 'It saw you throw a card.' },
         { src: 'CLAW_SAY', key: 'katana', title: 'On the katana', when: 'It saw you draw the katana, or take it in hand.' },
         { src: 'CLAW_SAY', key: 'kdrop', title: 'On the katana, dropped', when: 'It saw you drop the katana.' },
-        { src: 'BOOK', key: null, title: 'Bored of your reading', when: 'You keep this menu open for 30 seconds. It starts pulling the cards out of it and throwing them at the left edge of the screen, where they break.' },
+        { src: 'BOOK', key: null, title: 'Bored of your reading', when: 'You keep this menu open for 5 seconds. The Hand comes in and picks something to do, at random, again and again: throw a card at the left edge of the screen, eat one, ask you to help rip one, or take the scroll. It says these as it arrives and as it throws.' },
+        { src: 'HELP', key: null, title: 'Asking for help', when: 'It pulls a card out of this menu and holds it out to you. Grab the card and pull it left, and it rips in two: you get half, it eats the other.' },
+        { src: 'ALONE', key: null, title: 'Nobody helped', when: 'It held the card out for about eight seconds and you did not take the other end. It throws it instead.' },
         { src: 'SWAT', key: null, title: 'Swatted', when: 'You click the Hand while it is in this menu. It drops what it holds and stays away for at least five seconds.' },
         { fig: 'swat' },
         { src: 'GRUDGE', key: null, title: 'Back, and careful', when: 'About half the time it returns from a swat wary, and creeps towards the next card slowly.' },
         { src: 'ANGRY', key: null, title: 'Back, and angry', when: 'The other half of the time it returns furious: it reaches fast, throws three cards in a row, and may take hold of the scroll.' },
-        { src: 'SCROLL', key: null, title: 'Shaking the scroll', when: 'In a temper it grabs the right edge of the menu and yanks the page up and down so you lose your place.' },
+        { src: 'SCROLL', key: null, title: 'Shaking the scroll', when: 'It grabs the right edge of the menu and yanks the page up and down for two to four seconds, so you lose your place.' },
+        { src: 'MORE', key: null, title: 'Still scrolling', when: 'Half the time it does not let go after that, and shakes the scroll for a few seconds more.' },
+        { src: 'HIDE', key: null, title: 'Hiding', when: 'The other half it lets go, says this, and hides off the screen for a few seconds as if it was never there.' },
         { fig: 'scroll' },
         { src: 'CLAW_SAY', key: 'ask', title: 'The question', when: 'Surprise me draws you a fortune and a project. It leans in beside the slip and asks.' },
         { src: 'CLAW_SAY', key: 'hello', title: 'Answering a no', when: 'Surprise me offers you a project and you say No. The Hand comes out to see about that.' },
@@ -136,8 +140,13 @@
   const GRUDGE_SAY = ['fine. slowly.', 'gently, then', 'do not hit me', 'tiptoe…', 'I am being nice now', 'полека…', 'そーっと…'];
   const ANGRY_SAY = ['THAT IS IT', 'you asked for it', 'no more mister nice hand', 'NOW I am angry', 'сега ще видиш!', 'もう怒った!'];
   const SCROLL_SAY = ['lost your place?', 'where were we?', 'up! down! up!', 'wheeee', 'нагоре-надолу!', 'ぐるぐる〜'];
+  const HELP_SAY = ['help me rip this', 'grab the other end!', 'you pull, I pull', 'hold this. PULL.', 'too tough for one hand', 'дърпай!', '手伝って!', '引っぱって!'];
+  const ALONE_SAY = ['fine. alone then.', 'no help? ok.', 'useless.', 'I do everything here', 'сам ще си го…', 'もういい!'];
+  const MORE_SAY = ['again!', 'not done', 'one more lap', 'still lost?', 'още!', 'もう一回!'];
+  const HIDE_SAY = ['was not me.', 'you saw nothing', 'I was never here', '*hides*', 'не бях аз.', 'かくれんぼ!', '知らないよ'];
   // what the Bulgarian and Japanese lines mean. A line that is missing here is simply printed without a gloss
   const GLOSS = {
+    'дърпай!': 'pull!', '手伝って!': 'help me!', '引っぱって!': 'pull!', 'сам ще си го…': 'I will do it myself…', 'もういい!': 'forget it!', 'още!': 'more!', 'もう一回!': 'one more time!', 'не бях аз.': 'it was not me.', 'かくれんぼ!': 'hide and seek!', '知らないよ': 'I know nothing',
     'върна се, а?': 'you came back, huh?', 'не ти хареса, а?': 'did not like it, huh?', 'おかえり。': 'welcome back.', '気に入らなかった?': 'did you not like it?',
     'още едно хвърляне?': 'one more toss?', 'пак ли? ези или тура?': 'again? heads or tails?', 'もう一回?': 'one more time?', 'もう一度、表か裏か?': 'once more: heads or tails?',
     'чакай!': 'wait!', 'だめ!': 'no!', 'стига вече!': 'enough already!', 'もういい!': 'that is enough!', 'избирай.': 'pick.', '選べ。': 'pick.', 'сам ще избера': 'I will pick myself', '貸して': 'give it here', 'здрасти!': 'hi!', 'ей!': 'hey!', 'ето ни пак': 'here we are again', 'やあ!': 'hey!', 'こんにちは': 'hello', 'ただいま': 'we are home', 'おっす': 'yo', 'НЕЕЕЕЕ!': 'NOOOOO!', 'намери тайната!': 'you found the secret!', 'не пипай това!': 'do not touch that!', 'だめーーー!': 'nooooo!', 'ひみつが!': 'my secret!', 'バレた!': 'busted!', 'ずるい': 'no fair', 'измамник.': 'cheat.',
@@ -355,7 +364,7 @@
     }).join('');
   }
   function build() {
-    const L = window.__lines && { ...window.__lines, BOOK: RAID_SAY, SWAT: SWAT_SAY, GRUDGE: GRUDGE_SAY, ANGRY: ANGRY_SAY, SCROLL: SCROLL_SAY }; figN_plate = 0;
+    const L = window.__lines && { ...window.__lines, BOOK: RAID_SAY, SWAT: SWAT_SAY, GRUDGE: GRUDGE_SAY, ANGRY: ANGRY_SAY, SCROLL: SCROLL_SAY, HELP: HELP_SAY, ALONE: ALONE_SAY, MORE: MORE_SAY, HIDE: HIDE_SAY }; figN_plate = 0;
     if (!L) return { head: 'Nothing to list', nav: '', body: '<p class="pb-intro">Nothing on this site moves or speaks while your system asks for reduced motion, so there are no lines to show. Switch that setting off and open this again.</p>' };
     const chapters = CHAPTERS.map((c) => ({ ...c, entries: c.entries.map((e) => e.fig ? e : ({ ...e, lines: listOf(L, e) })).filter((e) => e.fig || (e.lines && e.lines.length)) }));
     // lists the page has that this file has not been told about yet: they are still shown, in the section they belong to
@@ -422,7 +431,7 @@
   // ---- stay too long and the hand gets bored: after 30 s in the menu it reaches in, pulls the cards out one by one and throws them
   // at the left edge of the screen, where they break. The hand is the page's own (window.__hand): while its state is 'book' the page
   // leaves it alone and this file poses it. The thrown cards are real bodies in a small planck world the size of the window. ----
-  const LINGER = 30000, S = 100, DT = 1 / 240, GRAV = 85, FALL = 0.25, SMASH = 13, GRIP = [98, 20];
+  const LINGER = 5000, S = 100, DT = 1 / 240, GRAV = 85, FALL = 0.25, SMASH = 13, GRIP = [98, 20];
   let raid = null, armT = 0, armed = 0;
   const pick = (a) => window.__pick ? window.__pick(a) : a[Math.floor(Math.random() * a.length)], clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   function raidArm() {   // counts only the time the menu is really in front of someone
@@ -433,7 +442,7 @@
   async function raidStart() {
     const H = window.__hand; if (!H || !isOpen || raid) return;
     clearInterval(armT);
-    const r = raid = { st: 'wait', t: 0, now: 0, objs: new Set(), bits: [], hits: [], thrown: 0, broken: 0, last: 0, acc: 0, target: null, held: null, say: null, said: -1e9, mood: 'slow', fury: 0, swats: 0 };
+    const r = raid = { st: 'wait', t: 0, now: 0, objs: new Set(), bits: [], hits: [], thrown: 0, broken: 0, last: 0, acc: 0, target: null, held: null, say: null, said: -1e9, mood: 'slow', fury: 0, swats: 0, act: null, lastAct: null, force: null, pull: null, bouts: 0, eaten: 0, ripped: 0, acts: [] };
     try { await loadPlanck(); } catch (e) { raid = null; return; }
     if (raid !== r || !isOpen) return;
     const pl = window.planck;
@@ -468,21 +477,43 @@
       c.x = document.documentElement.clientWidth + 340; c.pose = { ...H.POSES.lurk }; c.a = Math.PI; H.draw(0, 0, 0); c.st = 'off'; if (r.prev !== 'off') H.set('lurk');
     }
   }
-  function raidSay(text, o) {
-    const r = raid, b = document.createElement('div'); b.className = 'pb-say' + (o ? '' : ' hand'); b.textContent = text; b.style.setProperty('--tilt', (4 + Math.random() * 4).toFixed(1));   // cards lean right, the hand leans left r.layer.appendChild(b);
-    if (o) { if (o.say) o.say.el.remove(); o.say = { el: b, until: r.now + 1300 }; }
-    else { if (r.say) r.say.el.remove(); r.say = { el: b, until: r.now + 1500 }; r.said = r.now; }
+  function raidSay(text, o, ms) {
+    const r = raid, b = document.createElement('div'); b.className = 'pb-say' + (o ? '' : ' hand'); b.textContent = text;
+    b.style.setProperty('--tilt', (4 + Math.random() * 4).toFixed(1));   // cards lean right, the hand leans left
+    if (ms) b.style.animationDuration = ms + 'ms';
+    r.layer.appendChild(b);
+    if (o) { if (o.say) o.say.el.remove(); o.say = { el: b, until: r.now + (ms || 1300) }; }
+    else { if (r.say) r.say.el.remove(); r.say = { el: b, until: r.now + (ms || 1500) }; r.said = r.now; }
+  }
+  function raidCrumbs(x, y, n, dir) {
+    const r = raid;
+    for (let i = 0; i < n; i++) { const e = document.createElement('div'); e.className = 'pb-bit'; const sz = 3 + Math.random() * 5; e.style.width = e.style.height = sz + 'px'; r.layer.appendChild(e); const a = Math.random() * Math.PI * 2, sp = 100 + Math.random() * 350; r.bits.push({ el: e, x, y, vx: dir * (120 + Math.random() * 380) + Math.cos(a) * sp * 0.5, vy: Math.sin(a) * sp * 0.6 - 260, life: 0.5 + Math.random() * 0.5, t: 0 }); }
+  }
+  // the two of you have pulled the card apart: your half drops, the hand keeps its own
+  function raidRip() {
+    const r = raid, o = r.held, pl = window.planck, w = o.w, h = o.h, n = 7, tear = [];
+    for (let i = 0; i <= n; i++) tear.push([w / 2 + (i % 2 ? 9 : -9) + (Math.random() - 0.5) * 8, h * i / n]);
+    const pts = (a) => a.map((q) => `${q[0].toFixed(1)}px ${q[1].toFixed(1)}px`).join(',');
+    const lel = o.el.cloneNode(true); lel.classList.remove('pb-offer'); lel.style.clipPath = `polygon(0px 0px,${pts(tear)},0px ${h}px)`; lel.style.boxShadow = 'none'; r.layer.appendChild(lel);
+    o.el.classList.remove('pb-offer'); o.el.style.clipPath = `polygon(${w}px 0px,${pts(tear)},${w}px ${h}px)`; o.el.style.boxShadow = 'none';
+    const ca = Math.cos(o.a), sa = Math.sin(o.a), st = o.st || 0, lx = o.x - st * ca, ly = o.y - st * sa;   // your half is where you had pulled it to
+    const piece = raidBody({ kind: 'piece', el: lel, w, h, die: r.now + 3600 }, lx / S, ly / S, o.a, new pl.Box(w / 4 / S, h / 2 / S, { x: -w / 4 / S, y: 0 }, 0), { filterGroupIndex: -1 });
+    piece.body.setLinearVelocity({ x: -7 - Math.random() * 4, y: -5 }); piece.body.setAngularVelocity(-2 - Math.random() * 3);
+    raidCrumbs(o.x - st / 2, o.y, 14, -0.3); raidCrumbs(o.x - st / 2, o.y, 8, 0.3);
+    o.st = 0; r.pull = null; r.ripped++;
+    const L = window.__lines, lines = L && L.CLAW_SAY && L.CLAW_SAY.rip; raidSay(lines ? pick(lines) : 'RIIIP', null, 1700);
+    const card = q('.pb-card'); card.classList.remove('pb-jolt'); void card.offsetWidth; card.classList.add('pb-jolt');
   }
   function raidSwat(x, y) {
     const r = raid; if (!r || !r.c || r.st === 'swat' || r.st === 'done') return;
     if (r.target) r.target.classList.remove('pb-tug');
     if (r.held) {   // what it was holding just drops
-      const o = r.held, pl = window.planck; r.held = null; raidBody(o, o.x / S, o.y / S, o.a, new pl.Box(o.w / 2 / S, o.h / 2 / S));
+      const o = r.held, pl = window.planck; r.held = null; o.st = 0; o.el.classList.remove('pb-offer'); raidBody(o, o.x / S, o.y / S, o.a, new pl.Box(o.w / 2 / S, o.h / 2 / S));
       o.body.setLinearVelocity({ x: -2 - Math.random() * 3, y: -3 }); o.body.setAngularVelocity((Math.random() - 0.5) * 5); o.born = r.now;
       const L = window.__lines; if (L && L.SAY && L.SAY.land) raidSay(pick(L.SAY.land), o);
     }
     const ring = document.createElement('div'); ring.className = 'pb-slap'; ring.style.left = x + 'px'; ring.style.top = y + 'px'; r.layer.appendChild(ring); setTimeout(() => ring.remove(), 400);
-    r.swats++; r.away = 5 + Math.random() * 2.5; r.st = 'swat'; r.t = 0; raidSay(pick(SWAT_SAY));
+    r.act = null; r.pull = null; r.grabbed = false; r.bouts = 0; r.swats++; r.away = 5 + Math.random() * 2.5; r.st = 'swat'; r.t = 0; raidSay(pick(SWAT_SAY));
   }
   const intact = () => [...scroller.querySelectorAll('.pb-entry:not(.pb-gone), .pb-fig:not(.pb-gone)')];
   function inView(e) { const a = e.getBoundingClientRect(), b = scroller.getBoundingClientRect(), mid = (a.top + a.bottom) / 2; return mid > b.top + 30 && mid < b.bottom - 30; }
@@ -547,7 +578,7 @@
       c.x = vw + 340; c.y = c.ly = vh * 0.5; c.sh = c.y + 70; c.a = Math.PI; c.pose = { ...P.lurk }; r.st = 'enter'; r.t = 0;
     }
     const c = r.c; c.st = 'book'; r.t += dt;
-    const set = (st) => { r.st = st; r.t = 0; }, wristFor = (Hc, a) => { const ca = Math.cos(a), sa = Math.sin(a); return [Hc[0] - G[0] * ca - G[1] * sa, Hc[1] - G[0] * sa + G[1] * ca]; };
+    const set = (st) => { r.st = st; r.t = 0; }, end = (rest) => { if (r.mood === 'slow' && r.act !== 'scroll') r.mood = 'normal'; r.act = null; r.rest = rest; set('rest'); }, wristFor = (Hc, a) => { const ca = Math.cos(a), sa = Math.sin(a); return [Hc[0] - G[0] * ca - G[1] * sa, Hc[1] - G[0] * sa + G[1] * ca]; };
     const grip = () => { const ca = Math.cos(c.a), sa = Math.sin(c.a); return [c.x + G[0] * ca + G[1] * sa, c.y + G[0] * sa - G[1] * ca]; };
     let T = [vw + 30, c.ly], aim = Math.PI, pose = P.eager, rate = 7, wig = 0.12, shake = 0, strain = 0, vmax = 1e9;
     const angry = r.mood === 'angry', slow = r.mood === 'slow';
@@ -557,6 +588,11 @@
     else if (r.st === 'pick') {
       const all = intact(), seen = all.filter(inView);
       if (!all.length) { set('done'); raidSay('all gone.'); }
+      else if (!r.act) {   // what now? one of four things, never the same twice running
+        const max = scroller.scrollHeight - scroller.clientHeight, opts = ['throw', 'eat', 'help', 'scroll'].filter((a) => a !== r.lastAct && (a !== 'scroll' || max > 40));
+        r.act = r.force || (angry ? 'throw' : opts[Math.floor(Math.random() * opts.length)]); r.force = null; r.lastAct = r.act; r.acts.push(r.act); r.t = 0;
+      }
+      else if (r.act === 'scroll') set('scroll');
       else if (seen.length) { r.target = pick(seen); r.scrolling = false; set('reach'); }
       else if (r.t > 0.4 && !r.scrolling) { const e = all[0], sr = scroller.getBoundingClientRect(), er = e.getBoundingClientRect(); scroller.scrollTo({ top: Math.max(0, scroller.scrollTop + er.top - sr.top - 60), behavior: 'smooth' }); r.scrolling = true; }   // nothing left on screen: it turns the page for you
       else if (r.t > 1.6) { r.scrolling = false; r.t = 0; }
@@ -579,12 +615,19 @@
           const g = grip(), cx = tr.left + tr.width / 2, cy = tr.top + tr.height / 2;
           r.held = { kind: 'card', el: el2, w: tr.width, h: tr.height, off: [g[0] - cx, g[1] - cy], x: cx, y: cy, a: 0, vx: 0, vy: 0 };
           r.y0 = hold[1]; const L = window.__lines; if (L && L.SAY && L.SAY.rip) raidSay(pick(L.SAY.rip), r.held);
-          set('wind');
+          if (r.act === 'eat') set('eat');
+          else if (r.act === 'help') {   // it holds the card out: take the other end and pull
+            const o = r.held; o.st = 0; el2.classList.add('pb-offer');
+            el2.addEventListener('pointerdown', (e) => { if (raid !== r || r.held !== o || r.st !== 'offer') return; e.preventDefault(); try { el2.setPointerCapture(e.pointerId); } catch (x) {} r.pull = { x0: e.clientX, dx: 0 }; });
+            el2.addEventListener('pointermove', (e) => { if (r.pull && r.held === o) r.pull.dx = Math.max(0, r.pull.x0 - e.clientX); });
+            const up = () => { if (r.held === o) r.pull = null; }; el2.addEventListener('pointerup', up); el2.addEventListener('pointercancel', up);
+            set('offer');
+          } else set('wind');
         }
       }
     } else if (r.st === 'wind') {   // back it goes, cocked over its shoulder
       pose = P.clamp; rate = 9; aim = Math.PI + 0.95; T = wristFor([vw - 90, clamp(r.y0 - 60, 110, vh - 110)], aim);
-      if (r.t > 0.2 && r.now - r.said > 2600) raidSay(pick(RAID_SAY));
+      if (r.t > 0.2 && r.now - r.said > 1300) raidSay(pick(RAID_SAY));
       if (r.t > (angry ? 0.4 : 0.62)) set('throw');
     } else if (r.st === 'throw') {   // and the whip forward: the card leaves the fingers with the speed they had
       rate = 34; aim = Math.PI - 0.3; T = wristFor([vw - 420, clamp(r.y0 + 10, 110, vh - 110)], aim); pose = r.held ? P.clamp : P.lunge;
@@ -597,27 +640,58 @@
         const L = window.__lines; if (L && L.SAY && L.SAY.throw) raidSay(pick(L.SAY.throw), o);
       }
       if (r.t > 0.5) {
-        if (slow) r.mood = 'normal';   // it got one: no more creeping
         if (angry && --r.fury <= 0) r.mood = 'normal';
-        if (angry && r.fury > 0 && Math.random() < 0.3) set('scroll'); else { r.rest = angry ? 0.12 : 0.5 + Math.random() * 0.9; set('rest'); }
+        if (angry && r.fury > 0 && Math.random() < 0.3) { r.act = 'scroll'; set('scroll'); } else end(angry ? 0.12 : 0.5 + Math.random() * 0.9);   // it got one: no more creeping
       }
+    } else if (r.st === 'offer') {   // "help me rip this": it holds the card out by one end and waits for you to take the other
+      const o = r.held; if (!o) end(0.3);
+      else {
+        const need = Math.min(150, o.w * 0.45), want = r.pull ? Math.min(r.pull.dx, need + 30) : 0; o.st += (want - o.st) * (1 - Math.exp(-dt * (r.pull ? 40 : 12)));
+        strain = clamp(o.st / need, 0, 1); pose = {}; for (const k in P.clamp) pose[k] = P.clamp[k] + (P.strain[k] - P.clamp[k]) * strain;
+        rate = 10; wig = 0.2; shake = r.pull ? 1 + 3 * strain : 0;
+        const gx = clamp(vw * 0.5 + o.w / 2, Math.min(o.w + 24, vw - 70), vw - 70) + (r.pull ? 0 : Math.sin(r.t * 3.2) * 9) - o.st * 0.2;
+        T = wristFor([gx, clamp(r.y0, 110, vh - 110)], aim);
+        if (!r.pull && r.t > 0.3 && (!o.asked || r.now - r.said > 2900) && r.t < 7) { o.asked = true; raidSay(pick(HELP_SAY), null, 2400); }
+        if (r.pull && o.st >= need) { raidRip(); set('eat'); }
+        else if (!r.pull && r.t > 8) { o.st = 0; o.el.classList.remove('pb-offer'); raidSay(pick(ALONE_SAY)); r.act = 'throw'; set('wind'); }
+      }
+    } else if (r.st === 'eat') {   // it drags the card off the right edge of the screen, to where its mouth must be
+      const o = r.held; if (!o) end(0.4);
+      else {
+        pose = P.clamp; wig = 0.2;
+        if (r.t < 0.55) { rate = 20; T = [c.x, c.y]; } else { rate = 6; vmax = 260 + 520 * Math.min(1, (r.t - 0.55) / 0.5); T = wristFor([vw + o.w + 160, clamp(r.y0, 110, vh - 110)], aim); }
+        if (o.x - o.w / 2 > vw + 4 || r.t > 4.5) {
+          if (o.say) o.say.el.remove(); o.el.remove(); r.held = null; r.eaten++; r.y0 = clamp(o.y, 90, vh - 90);
+          const L = window.__lines, lines = L && L.CLAW_SAY && L.CLAW_SAY.eat; raidSay(lines ? pick(lines) : 'nom.', null, 1600); set('chew');
+        }
+      }
+    } else if (r.st === 'chew') {   // crumbs come flying back in
+      pose = P.joy; wig = 0.3; shake = 2.5; rate = 9; T = [vw + 40, r.y0]; c.ly = r.y0;
+      r.crumb = (r.crumb || 0) + dt; if (r.crumb > 0.13 && r.t < 1.1) { r.crumb = 0; raidCrumbs(vw - 4, r.y0 + (Math.random() - 0.5) * 60, 2, -1); }
+      if (r.t > 1.4) end(0.4 + Math.random() * 0.6);
+    } else if (r.st === 'hide') {   // it was never here
+      pose = P.lurk; rate = 11; wig = 0.02; T = [vw + 420, c.ly]; if (r.t > r.hide) end(0.3);
     } else if (r.st === 'rest') { pose = P.joy; wig = 0.2; T = [vw + 20, c.ly]; if (r.t > r.rest) set('pick'); }
     else if (r.st === 'swat') {   // swatted: it snatches itself back out of the window and nurses its knuckles for at least five seconds
       pose = P.sulk; rate = 13; shake = r.t < 0.35 ? 7 : 0; aim = Math.PI - 0.5; T = [vw + 400, clamp(c.ly - 30, 80, vh - 80)]; wig = 0.02;
       if (r.t > r.away) {
         if (Math.random() < 0.5) { r.mood = 'slow'; raidSay(pick(GRUDGE_SAY)); set('pick'); }
-        else { r.mood = 'angry'; r.fury = 3; raidSay(pick(ANGRY_SAY)); set(Math.random() < 0.65 ? 'scroll' : 'pick'); }
+        else { r.mood = 'angry'; r.fury = 3; raidSay(pick(ANGRY_SAY)); if (Math.random() < 0.65) { r.act = r.lastAct = 'scroll'; r.acts.push('scroll'); } set('pick'); }
       }
-    } else if (r.st === 'scroll') {   // in a temper: it takes the right edge of the menu like a scrollbar and yanks the page about
+    } else if (r.st === 'scroll') {   // it takes the right edge of the menu like a scrollbar and yanks the page about
       const sr = scroller.getBoundingClientRect(), max = scroller.scrollHeight - scroller.clientHeight, top = sr.top + 40, span = Math.max(1, sr.height - 80);
-      if (max < 40) set('pick');
+      if (max < 40) { r.act = null; set('pick'); }
       else if (!r.grabbed) {
         pose = P.lunge; rate = 20; const hp = [Math.min(sr.right - 6, vw - 20), top + span * scroller.scrollTop / max]; T = wristFor(hp, aim); c.ly = hp[1];
-        const g = grip(); if (Math.hypot(g[0] - hp[0], g[1] - hp[1]) < 22 || r.t > 0.9) { r.grabbed = true; r.t = 0; r.s0 = scroller.scrollTop / max; r.ph = Math.random() * 6; raidSay(pick(SCROLL_SAY)); }
+        const g = grip(); if (Math.hypot(g[0] - hp[0], g[1] - hp[1]) < 22 || r.t > 0.9) { r.grabbed = true; r.t = 0; r.dur = 2 + Math.random() * 2; r.s0 = scroller.scrollTop / max; r.ph = Math.random() * 6; r.scrolled = (r.scrolled || []); r.t0 = r.now; raidSay(pick(SCROLL_SAY)); }
       } else {
         const f = clamp(r.s0 + 0.42 * Math.sin(r.t * 8 + r.ph) * Math.min(1, r.t * 3) + 0.12 * Math.sin(r.t * 23), 0, 1);
         pose = P.clamp; rate = 40; shake = 2; T = wristFor([Math.min(sr.right - 6, vw - 20), top + span * f], aim); scroller.scrollTop = f * max;
-        if (r.t > 1.7) { r.grabbed = false; r.rest = 0.2; set('rest'); }
+        if (r.t > r.dur) {   // three seconds, give or take one. Then it either goes on, or lets go and hides
+          r.scrolled.push(Math.round(r.now - r.t0));
+          if (!angry && r.bouts < 2 && Math.random() < 0.5) { r.bouts++; r.t = 0; r.t0 = r.now; r.dur = 2 + Math.random() * 2; r.s0 = f; r.ph = Math.PI - r.ph; raidSay(pick(MORE_SAY)); }
+          else { r.grabbed = false; r.bouts = 0; if (angry) end(0.2); else { r.hide = 2.5 + Math.random() * 2; raidSay(pick(HIDE_SAY), null, 1900); set('hide'); } }
+        }
       }
     }
     else if (r.st === 'done') { pose = P.sulk; rate = 3; T = [vw + (r.t > 1.6 ? 340 : 60), vh * 0.5]; wig = 0.02; }
@@ -628,7 +702,7 @@
     if (r.held) {   // the card is pinned in the fingers: it goes where the grip goes and turns with the wrist
       const o = r.held, g = grip(), th = c.a - Math.PI, ca = Math.cos(th), sa = Math.sin(th), x = g[0] - (o.off[0] * ca - o.off[1] * sa), y = g[1] - (o.off[0] * sa + o.off[1] * ca);
       if (dt > 0) { o.vx = (x - o.x) / dt; o.vy = (y - o.y) / dt; } o.x = x; o.y = y; o.a = th;
-      o.el.style.transform = `translate(${(x - o.w / 2).toFixed(2)}px, ${(y - o.h / 2).toFixed(2)}px) rotate(${th.toFixed(4)}rad)`;
+      const st = o.st || 0; o.el.style.transform = `translate(${(x - o.w / 2 - st / 2).toFixed(2)}px, ${(y - o.h / 2).toFixed(2)}px) rotate(${th.toFixed(4)}rad)` + (st > 0.5 ? ` scaleX(${(1 + st / o.w).toFixed(4)})` : '');
       if (o.say) { if (r.now > o.say.until) { o.say.el.remove(); o.say = null; } else o.say.el.style.translate = `calc(${clamp(x, 70, vw - 70).toFixed(0)}px - 50%) ${clamp(y - o.h / 2 - 36, 8, vh - 40).toFixed(0)}px`; }
     }
     if (r.say) { if (r.now > r.say.until) { r.say.el.remove(); r.say = null; } else { const g = grip(); r.say.el.style.translate = `calc(${clamp(Math.min(c.x, g[0]) - 30, 80, vw - 90).toFixed(0)}px - 50%) ${clamp(Math.min(c.y, g[1]) - 115 - (r.held && r.held.say ? 44 : 0), 10, vh - 50).toFixed(0)}px`; } }
@@ -645,5 +719,5 @@
   btn.innerHTML = '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path fill="currentColor" d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>';
   btn.addEventListener('click', open);
   nav.insertBefore(btn, document.getElementById('theme'));
-  window.__phrasebook = { open, close, raid: raidStart, state: () => ({ isOpen, raid: raid && { st: raid.st, mood: raid.mood, swats: raid.swats, hand: raid.c && [raid.c.x, raid.c.y], objs: raid.objs.size, thrown: raid.thrown, broken: raid.broken, gone: scroller.querySelectorAll('.pb-gone').length } }), get el() { return el; } };
+  window.__phrasebook = { open, close, raid: raidStart, next: (a) => { if (raid) raid.force = a; }, state: () => ({ isOpen, raid: raid && { act: raid.act, acts: raid.acts, eaten: raid.eaten, ripped: raid.ripped, scrolled: raid.scrolled, held: raid.held && [raid.held.x, raid.held.y, raid.held.w, raid.held.h], st: raid.st, mood: raid.mood, swats: raid.swats, hand: raid.c && [raid.c.x, raid.c.y], objs: raid.objs.size, thrown: raid.thrown, broken: raid.broken, gone: scroller.querySelectorAll('.pb-gone').length } }), get el() { return el; } };
 })();

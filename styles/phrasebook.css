@@ -76,7 +76,7 @@ html.pb-lock { overflow: hidden; }
 .pb-fig svg.pb-hand { overflow: hidden; border-radius: 8px; }
 .pb-lines { align-items: center; }
 
-/* ---- the hand in the menu: after 30 s it pulls the cards out and throws them at the left edge of the screen ---- */
+/* ---- the hand in the menu: after 5 s it pulls the cards out and throws them at the left edge of the screen ---- */
 .claw.pb-raid.under { z-index: 47; } .claw.pb-raid.over { z-index: 49; }
 .pb-fly { position: fixed; inset: 0; z-index: 48; pointer-events: none; overflow: hidden; --paper: var(--surface); --rubric: var(--accent); --ink: var(--text); }
 .pb-fly .pb-entry, .pb-fly .pb-fig { position: absolute; left: 0; top: 0; box-sizing: border-box; transform-origin: 50% 50%; will-change: transform; box-shadow: 0 14px 30px rgba(0, 0, 0, .28); }
@@ -102,3 +102,6 @@ html.pb-lock { overflow: hidden; }
 .pb-fig svg.pb-clip { overflow: hidden; border-radius: 8px; max-width: 360px; }
 .pb-fig g.pb-kat { filter: none; }
 .pb-fig g.pb-kat > path:first-of-type { stroke: var(--ink); stroke-width: 1.3; }
+/* the card the hand holds out for you to help rip: this one you can take hold of */
+.pb-fly .pb-offer { pointer-events: auto; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+.pb-fly .pb-offer:active { cursor: grabbing; }
