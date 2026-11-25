@@ -86,7 +86,7 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 | `sev.spawned` | `{ hand }` | `actors/severed/index.js` `spawn`: after the machine starts in `limp`, before the fling velocity and spin draw | none |
 | `sev.state` | `{ self, from, to, data }` | `core/machine.js` on every switch of a cut-off hand | `reactions.js`: on `-> crush`, `hand.wrest(self, prey)` (tug of war over the card: one random draw only when the arm could go for it, rules in `hand/old.js` `wrestable`) |
 | `sev.avenged` | `{ hand }` | `actors/severed/behaviours/avenge.js`: the old hand hauled the loose katana to the right edge and threw it at the arm | `reactions.js`: `hand.cut()` (the new hand comes off; the two old hands then high-five) |
-| `sev.gone` | `{ hand }` | `actors/severed/index.js` `gone` (on `body.removed`): after its machine ended and its SVGs were removed | none |
+| `sev.gone` | `{ hand }` | `actors/severed/index.js` `gone` (on `body.removed`): after its machine ended and its SVGs were removed | `actors/severed/dance.js` (crazy mode's inline overrides put back when it was the last); `reactions.js`: the last one gone, `hand.bob(false)` |
 | `sev.hitched` | `{ hand, card }` | `behaviours/hitch.js`: the jump onto a card you picked up is done and the joint made (after the "latch" line said on the way up) | none |
 | `sev.cheese` | `{ hand, card }` | `behaviours/hitch.js`: an old hand that pounced (`severed.pounce`, on `hand.state` reach -> eat) landed on the far end of the card the arm drags off the shelf; before it checks whether the arm took up the fight | `reactions.js`: `hand.cheese(hand, card)`: the arm goes `cheese` if it is still eating that card |
 | `sev.slipped` | `{ hand, card }` | `behaviours/wrest.js` (severed): you clicked an old hand in a tug of war (pressed and let go within `TUNE.severed.WREST.TAP_S`); before its `sev.wrestSlip` line and `whee` (the arm sees it leave `wrest` and keeps the card) | none |
@@ -118,7 +118,7 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 
 | event | payload | emitted by, exactly when | listeners today |
 |---|---|---|---|
-| `mode.changed` | `{ crazy }` | `page/crazy.js` `applyMode`: after the title timer and the fog loop switch, before `render()` | none |
+| `mode.changed` | `{ crazy }` | `page/crazy.js` `applyMode`: after the title timer and the fog loop switch, before `render()` | `reactions.js` (only with old hands on the page): `severed.groove(crazy)` (on: they dance; off: the dancers freeze and pretend), `hand.bob(crazy)` (the arm bobs at the edge), and off after a dance `hand.notice('danced')` (one or two random draws) |
 | `theme.changed` | `{ dark }` | `page/theme.js` `syncTheme`: at install, on the theme button (before `refog()`), on a system scheme change | `page/fog.js`: recomputes the fog colour |
 | `language.changed` | `{ languages }` | `page/language.js` `set`: after storing the choice, just before `location.reload()` (`null` = all) | none |
 | `world.reset` | `{}` | `world/world.js` `reset` ("Put the cards back"): **first**, before the cards, pieces and shards are removed. Only those are removed: the hand, a cut-off hand and the katana are left exactly as they are (Ivo 2026-11-25) | `actors/cards.js` (grid cards regrow), `world/cut.js` (wounds) |

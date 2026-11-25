@@ -1,0 +1,256 @@
+{
+ "scenario": "sev / old hands dance in crazy mode",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 32,
+   "ms": 800,
+   "who": "card",
+   "key": "SAY.pull|CLAW_SAY.slap",
+   "text": "hands off"
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "ms": 376,
+   "who": "card",
+   "key": "SAY.rip|PB.SWAT_SAY",
+   "text": "ау!"
+  },
+  {
+   "doc": 1,
+   "t": 2976,
+   "ms": 912,
+   "who": "hand",
+   "key": "SEV_SAY.cut",
+   "text": "ow. wait."
+  },
+  {
+   "doc": 1,
+   "t": 2976,
+   "ms": 912,
+   "who": "hand",
+   "key": "SEV_SAY.cut",
+   "text": "where is my arm"
+  },
+  {
+   "doc": 1,
+   "t": 3888,
+   "ms": 3008,
+   "who": "hand",
+   "key": "sev.dance",
+   "text": "is that the title scrolling? it SLAPS"
+  },
+  {
+   "doc": 1,
+   "t": 3888,
+   "ms": 3136,
+   "who": "hand",
+   "key": "sev.dance",
+   "text": "I was born for this. well, cut for this"
+  },
+  {
+   "doc": 1,
+   "t": 4480,
+   "ms": 2176,
+   "who": "hand",
+   "key": "hand.bob",
+   "text": "this beat is… acceptable"
+  },
+  {
+   "doc": 1,
+   "t": 7632,
+   "ms": 1734,
+   "who": "hand",
+   "key": "sev.jive",
+   "text": "the beat goes on, buddy"
+  },
+  {
+   "doc": 1,
+   "t": 9366,
+   "ms": 1306,
+   "who": "hand",
+   "key": "sev.freeze",
+   "text": "uh-oh"
+  },
+  {
+   "doc": 1,
+   "t": 9366,
+   "ms": 1642,
+   "who": "hand",
+   "key": "sev.freeze",
+   "text": "*record scratch*"
+  },
+  {
+   "doc": 1,
+   "t": 11968,
+   "ms": null,
+   "who": "hand",
+   "key": "sev.pretend",
+   "text": "I do not even like music"
+  },
+  {
+   "doc": 1,
+   "t": 11968,
+   "ms": null,
+   "who": "hand",
+   "key": "sev.pretend",
+   "text": "this never leaves the page"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 16,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 48,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1208,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1228,
+   "claw": "off",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 2098,
+   "claw": "off",
+   "sev": "limp,limp",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 3588,
+   "claw": "off",
+   "sev": "dance,dance",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 7640,
+   "claw": "off",
+   "sev": "jive,dance",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "hand",
+   "objs": {
+    "hand": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 9316,
+   "claw": "off",
+   "sev": "limp,dance",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 9366,
+   "claw": "off",
+   "sev": "dance,dance",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 9386,
+   "claw": "off",
+   "sev": "freeze,freeze",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 13786,
+   "claw": "off",
+   "sev": "walk,walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 2
+   }
+  }
+ ]
+}

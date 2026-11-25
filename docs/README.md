@@ -41,6 +41,7 @@ public API. Every module exports `install(app)`; `app` holds every module by its
 | cut-off hands (7 states) | `src/actors/severed/index.js`, `behaviours/<state>.js`, `gait.js` (legs, walking forces) | `src/lines/severed.js` | `styles/hand.css` |
 | the secret shelf (棚 tana) | `src/actors/shelf.js`; opened by `src/page/kiri.js` (typed), `src/page/search.js` (Enter) | `src/lines/shelf.js` (toasts) | `styles/physics.css` |
 | the old hand pokes your still cursor first, then turns with the arm (idle-old) | `src/actors/severed/pester.js` (who, the pace), `severed/behaviours/pester.js`, `hand/behaviours/mine.js` ("that's MY job") | `sev.pester*`, `hand.pester*` | |
+| old hands dance in crazy mode, the arm bobs along | `src/actors/severed/dance.js` (groove, the inline overrides of crazy mode's hiding), `behaviours/dance.js`, `jive.js`, `freeze.js`; `src/actors/hand/bob.js` | `sev.dance/jive/freeze/pretend`, `hand.bob/danced` | inline styles only |
 | who reacts to whom | `src/reactions.js` (`RULES`, plus `hand.senses(...)` for the shelf) | | |
 | speech bubbles (every one) | `src/core/speech.js`; each actor calls `defineSpeaker` in its `install` | | `styles/physics.css`, `hand.css` |
 | toasts | `src/page/toast.js` (actors emit `ui.toast`) | `toast.*` in each `src/lines/*.js` | `styles/base.css` |

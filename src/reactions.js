@@ -56,6 +56,9 @@ export const RULES = [
   ['sev.towerGrab', () => hand.pulled()],                                          // ...the top one has it by the wrist: they pull it out
   ['sev.towerFell', () => hand.towerFell()],                                       // ...it came down first: the arm laughs, or snaps back
   ['hand.shookOff', () => severed.shookOff()],                                     // ...it shook them off: they fly, and land in a heap
+  // ---- crazy mode: the old hands dance (src/actors/severed/dance.js), the arm bobs along (src/actors/hand/bob.js) ----
+  ['mode.changed', ({ crazy }) => { if (!severed.list.size) return; const n = severed.groove(crazy); hand.bob(crazy); if (!crazy && n) hand.notice('danced'); }],   // on: they dance; off: they freeze and pretend, and the arm saw it all
+  ['sev.gone', () => { if (!severed.list.size) hand.bob(false); }],               // the last dancer gone: the arm stops bobbing
   // ---- the shelf ----
   ['hand.reaching', ({ card, fear, dt, t, x }) => cards.panic(card, fear, dt, t, x)], // reach: the card on the shelf panics, bystanders point
   ['hand.state', ({ from, to }) => { if (from === 'reach' && to === 'eat') { const c = hand.get(), g = hand.grip(); severed.pounce(c.o, g && [g[0] + scrollX, g[1] + scrollY]); } }],   // the cheese pull: an old hand may jump on the snack

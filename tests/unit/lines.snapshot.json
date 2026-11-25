@@ -1851,6 +1851,44 @@
    ["知らない!","ja","I don't know anything!"]
   ]
  },
+ "hand.bob": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Crazy mode: bobbing along","when":"Crazy mode goes on while old hands are on the page. They dance; the arm comes in at the right edge and bobs along, pretending it is not."},
+  "lines": [
+   ["I am not dancing. this is a twitch.","en"],
+   ["ugh. fine. ONE song.","en"],
+   ["my wrist just does this","en"],
+   ["do not tell the cards","en"],
+   ["I bob ironically","en"],
+   ["I have a reputation, you know","en"],
+   ["this beat is… acceptable","en"],
+   ["nobody films this","en"],
+   ["just keeping warm","en"],
+   ["these old hands have no shame","en"],
+   ["I'm only here for the snacks","en"],
+   ["не танцувам, мърдам се","bg","I'm not dancing, I'm fidgeting"],
+   ["おどってないし","ja","I'm not dancing"]
+  ]
+ },
+ "hand.danced": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Crazy mode: after the dance","when":"Crazy mode goes off and the old hands pretend they were never dancing. A little later, the arm comments."},
+  "lines": [
+   ["oh, I saw that.","en"],
+   ["nothing happened, sure","en"],
+   ["smooth. very smooth.","en"],
+   ["I have screenshots","en"],
+   ["the floor misses you","en"],
+   ["stretching. right.","en"],
+   ["encore? no? shame.","en"],
+   ["I never bobbed. you have no proof","en"],
+   ["pretend all you like","en"],
+   ["видях ви","bg","I saw you"],
+   ["みてたよ","ja","I was watching"]
+  ]
+ },
  "sev.cut": {
   "who": "sev",
   "legacy": "SEV_SAY.cut",
@@ -2704,6 +2742,87 @@
    ["run!","en"],
    ["мърда!","bg","it moves!"],
    ["動いた!","ja","it moved!"]
+  ]
+ },
+ "sev.dance": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The old hands: crazy mode","when":"Crazy mode goes on with old hands on the page. Every one of them stops where it is and dances on the spot, stepping to the beat of the scrolling tab title."},
+  "lines": [
+   ["oh this is my SONG","en"],
+   ["five, six, seven, eight!","en"],
+   ["nobody puts thumby in a corner","en"],
+   ["I have rhythm in every finger","en"],
+   ["look ma, no body!","en"],
+   ["finally, a reason to live","en"],
+   ["step, tap, step, tap","en"],
+   ["is that the title scrolling? it SLAPS","en"],
+   ["I was born for this. well, cut for this","en"],
+   ["the floor is ours","en"],
+   ["jazz hands! literally!","en"],
+   ["two legs, zero shame","en"],
+   ["купон!","bg","party!"],
+   ["танцувай с мен!","bg","dance with me!"],
+   ["おどろう!","ja","let's dance!"]
+  ]
+ },
+ "sev.jive": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The old hands: picked up mid-dance","when":"You pick up an old hand while it dances in crazy mode. It keeps wiggling to the beat in your grip."},
+  "lines": [
+   ["don't stop the music!","en"],
+   ["I can still feel the beat","en"],
+   ["put me down or spin me, pick one","en"],
+   ["you lead, I follow","en"],
+   ["dip me! DIP ME!","en"],
+   ["I will NOT stop","en"],
+   ["the beat goes on, buddy","en"],
+   ["this is a lift. we are doing a lift","en"],
+   ["hands up! ...I mean, me up","en"],
+   ["mid-routine?! rude.","en"],
+   ["can't stop, won't stop","en"],
+   ["не спирай музиката!","bg","don't stop the music!"],
+   ["とめないで!","ja","don't stop!"]
+  ]
+ },
+ "sev.freeze": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The old hands: the music stops","when":"Crazy mode goes off while they dance. They freeze mid-move."},
+  "lines": [
+   ["!","en"],
+   ["freeze.","en"],
+   ["statue.","en"],
+   ["nobody breathe","en"],
+   ["was that the music?","en"],
+   ["*record scratch*","en"],
+   ["uh-oh","en"],
+   ["the beat… is gone","en"],
+   ["act natural","en"],
+   ["oh no. lights up.","en"],
+   ["замръзни!","bg","freeze!"],
+   ["しーっ","ja","shh"]
+  ]
+ },
+ "sev.pretend": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The old hands: pretending nothing happened","when":"After the music stops they look left and right, and pretend nothing happened. Then they walk on."},
+  "lines": [
+   ["I was just stretching","en"],
+   ["nothing happened.","en"],
+   ["we were… walking. normally.","en"],
+   ["what dance?","en"],
+   ["you saw nothing. NOTHING.","en"],
+   ["just a little cramp","en"],
+   ["I do not even like music","en"],
+   ["this never leaves the page","en"],
+   ["carry on, nothing to see","en"],
+   ["that was a sneeze. with fingers.","en"],
+   ["dignity: restored","en"],
+   ["нищо не е станало","bg","nothing happened"],
+   ["なにもしてないよ","ja","I didn't do anything"]
   ]
  },
  "toast.shelfGone": {

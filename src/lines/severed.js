@@ -482,4 +482,30 @@ defineLines('sev.pesterBack', [
   lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
 });
 
+// ---- crazy mode: the old hands dance (src/actors/severed/dance.js) ----
+defineLines('sev.dance', ["oh this is my SONG", "five, six, seven, eight!", "nobody puts thumby in a corner", "I have rhythm in every finger", "look ma, no body!", "finally, a reason to live", "step, tap, step, tap", "is that the title scrolling? it SLAPS", "I was born for this. well, cut for this", "the floor is ours", "jazz hands! literally!", "two legs, zero shame", "купон!", "танцувай с мен!", "おどろう!"], {
+  who: 'sev',
+  trigger: { title: "The old hands: crazy mode", when: "Crazy mode goes on with old hands on the page. Every one of them stops where it is and dances on the spot, stepping to the beat of the scrolling tab title." },
+  gloss: {"купон!": "party!", "танцувай с мен!": "dance with me!", "おどろう!": "let's dance!"},
+  lang: ["en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "bg", "bg", "ja"],
+});
+defineLines('sev.jive', ["don't stop the music!", "I can still feel the beat", "put me down or spin me, pick one", "you lead, I follow", "dip me! DIP ME!", "I will NOT stop", "the beat goes on, buddy", "this is a lift. we are doing a lift", "hands up! ...I mean, me up", "mid-routine?! rude.", "can't stop, won't stop", "не спирай музиката!", "とめないで!"], {
+  who: 'sev',
+  trigger: { title: "The old hands: picked up mid-dance", when: "You pick up an old hand while it dances in crazy mode. It keeps wiggling to the beat in your grip." },
+  gloss: {"не спирай музиката!": "don't stop the music!", "とめないで!": "don't stop!"},
+  lang: ["en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "bg", "ja"],
+});
+defineLines('sev.freeze', ["!", "freeze.", "statue.", "nobody breathe", "was that the music?", "*record scratch*", "uh-oh", "the beat… is gone", "act natural", "oh no. lights up.", "замръзни!", "しーっ"], {
+  who: 'sev',
+  trigger: { title: "The old hands: the music stops", when: "Crazy mode goes off while they dance. They freeze mid-move." },
+  gloss: {"замръзни!": "freeze!", "しーっ": "shh"},
+  lang: ["en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "bg", "ja"],
+});
+defineLines('sev.pretend', ["I was just stretching", "nothing happened.", "we were… walking. normally.", "what dance?", "you saw nothing. NOTHING.", "just a little cramp", "I do not even like music", "this never leaves the page", "carry on, nothing to see", "that was a sneeze. with fingers.", "dignity: restored", "нищо не е станало", "なにもしてないよ"], {
+  who: 'sev',
+  trigger: { title: "The old hands: pretending nothing happened", when: "After the music stops they look left and right, and pretend nothing happened. Then they walk on." },
+  gloss: {"нищо не е станало": "nothing happened", "なにもしてないよ": "I didn't do anything"},
+  lang: ["en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "bg", "ja"],
+});
+
 export function install(app) {}
