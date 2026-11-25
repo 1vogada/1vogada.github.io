@@ -20,58 +20,58 @@
   },
   {
    "doc": 1,
-   "t": 4784,
-   "ms": 1328,
-   "who": "hand",
-   "key": "CLAW_SAY.eager",
-   "text": "yes yes yes"
-  },
-  {
-   "doc": 1,
-   "t": 6848,
+   "t": 4528,
    "ms": 1312,
    "who": "hand",
-   "key": "CLAW_SAY.grab|CLAW_SAY.keep",
-   "text": "mine."
+   "key": "CLAW_SAY.eager",
+   "text": "дай!"
   },
   {
    "doc": 1,
-   "t": 7760,
+   "t": 6592,
+   "ms": 1312,
+   "who": "hand",
+   "key": "CLAW_SAY.grab",
+   "text": "GOT IT"
+  },
+  {
+   "doc": 1,
+   "t": 7504,
    "ms": 160,
    "who": "card",
    "key": "AGONY.0",
-   "text": "not again"
+   "text": "I bend, I do not br—"
   },
   {
    "doc": 1,
-   "t": 7920,
+   "t": 7664,
    "ms": 240,
    "who": "card",
    "key": "AGONY.1",
-   "text": "IT HURTS",
+   "text": "LET GO LET GO",
    "lvl": "1"
   },
   {
    "doc": 1,
-   "t": 8160,
+   "t": 7904,
    "ms": 272,
    "who": "card",
-   "key": "SAY.slice|AGONY.2",
-   "text": "ぎゃああああ!!",
+   "key": "AGONY.2",
+   "text": "AAAAAAAAAAAAAA",
    "lvl": "2"
   },
   {
    "doc": 1,
-   "t": 8432,
+   "t": 8176,
    "ms": 1312,
    "who": "card",
    "key": "SAY.slice",
-   "text": "NOOOOOOOO—",
+   "text": "GYAAAAAAH!",
    "lvl": "2"
   },
   {
    "doc": 1,
-   "t": 8432,
+   "t": 8176,
    "ms": 1568,
    "who": "hand",
    "key": "CLAW_SAY.rip",
@@ -79,11 +79,11 @@
   },
   {
    "doc": 1,
-   "t": 10000,
+   "t": 9744,
    "ms": null,
    "who": "hand",
-   "key": "CLAW_SAY.eat",
-   "text": "ммм."
+   "key": "CLAW_SAY.eat|SEV_SAY.crush",
+   "text": "*crunch*"
   }
  ],
  "states": [
@@ -126,7 +126,7 @@
   },
   {
    "doc": 1,
-   "t": 4788,
+   "t": 4532,
    "claw": "eager",
    "sev": "",
    "pb": "closed",
@@ -139,7 +139,7 @@
   },
   {
    "doc": 1,
-   "t": 6788,
+   "t": 6532,
    "claw": "lunge",
    "sev": "",
    "pb": "closed",
@@ -152,7 +152,7 @@
   },
   {
    "doc": 1,
-   "t": 6852,
+   "t": 6596,
    "claw": "tug",
    "sev": "",
    "pb": "closed",
@@ -165,7 +165,7 @@
   },
   {
    "doc": 1,
-   "t": 8432,
+   "t": 8176,
    "claw": "triumph",
    "sev": "",
    "pb": "closed",
@@ -178,7 +178,7 @@
   },
   {
    "doc": 1,
-   "t": 8448,
+   "t": 8192,
    "claw": "triumph",
    "sev": "",
    "pb": "closed",
@@ -191,7 +191,7 @@
   },
   {
    "doc": 1,
-   "t": 9848,
+   "t": 9592,
    "claw": "eat",
    "sev": "",
    "pb": "closed",
@@ -204,7 +204,7 @@
   },
   {
    "doc": 1,
-   "t": 10048,
+   "t": 9792,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",

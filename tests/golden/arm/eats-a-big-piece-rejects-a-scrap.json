@@ -21,39 +21,39 @@
   },
   {
    "doc": 1,
-   "t": 4320,
-   "ms": 1312,
+   "t": 4160,
+   "ms": 1328,
    "who": "hand",
    "key": "CLAW_SAY.eager",
-   "text": "gimme"
+   "text": "yes yes yes"
   },
   {
    "doc": 1,
-   "t": 6368,
+   "t": 6208,
    "ms": 608,
    "who": "hand",
-   "key": "CLAW_SAY.grab",
-   "text": "GOT IT"
+   "key": "CLAW_SAY.grab|CLAW_SAY.keep",
+   "text": "mine."
   },
   {
    "doc": 1,
-   "t": 6976,
+   "t": 6816,
    "ms": 1616,
    "who": "hand",
    "key": "CLAW_SAY.eat",
-   "text": "ммм."
+   "text": "papery."
   },
   {
    "doc": 1,
-   "t": 10512,
-   "ms": 1712,
+   "t": 10192,
+   "ms": 1312,
    "who": "hand",
    "key": "hand.small",
-   "text": "not worth chewing"
+   "text": "трохи?!"
   },
   {
    "doc": 1,
-   "t": 18462,
+   "t": 18302,
    "ms": null,
    "who": "card",
    "key": "SAY.throw",
@@ -61,11 +61,11 @@
   },
   {
    "doc": 1,
-   "t": 18768,
+   "t": 18720,
    "ms": null,
    "who": "hand",
    "key": "hand.small",
-   "text": "I said a CARD"
+   "text": "that is a scrap"
   }
  ],
  "states": [
@@ -108,7 +108,7 @@
   },
   {
    "doc": 1,
-   "t": 4320,
+   "t": 4160,
    "claw": "eager",
    "sev": "",
    "pb": "closed",
@@ -121,7 +121,7 @@
   },
   {
    "doc": 1,
-   "t": 6320,
+   "t": 6160,
    "claw": "snatch",
    "sev": "",
    "pb": "closed",
@@ -134,7 +134,7 @@
   },
   {
    "doc": 1,
-   "t": 6368,
+   "t": 6208,
    "claw": "eat",
    "sev": "",
    "pb": "closed",
@@ -147,7 +147,7 @@
   },
   {
    "doc": 1,
-   "t": 6568,
+   "t": 6408,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",
@@ -160,7 +160,7 @@
   },
   {
    "doc": 1,
-   "t": 9986,
+   "t": 9826,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",
@@ -173,7 +173,7 @@
   },
   {
    "doc": 1,
-   "t": 10514,
+   "t": 10194,
    "claw": "sulk",
    "sev": "",
    "pb": "closed",
@@ -186,7 +186,7 @@
   },
   {
    "doc": 1,
-   "t": 12126,
+   "t": 11816,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",
@@ -199,7 +199,7 @@
   },
   {
    "doc": 1,
-   "t": 18478,
+   "t": 18318,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",
@@ -212,7 +212,7 @@
   },
   {
    "doc": 1,
-   "t": 18734,
+   "t": 18686,
    "claw": "catch",
    "sev": "",
    "pb": "closed",
@@ -225,7 +225,7 @@
   },
   {
    "doc": 1,
-   "t": 18782,
+   "t": 18734,
    "claw": "sulk",
    "sev": "",
    "pb": "closed",

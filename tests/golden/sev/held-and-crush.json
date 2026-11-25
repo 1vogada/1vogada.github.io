@@ -84,11 +84,27 @@
   },
   {
    "doc": 1,
+   "t": 15520,
+   "ms": 1056,
+   "who": "hand",
+   "key": "CLAW_SAY.eager",
+   "text": "gimme"
+  },
+  {
+   "doc": 1,
+   "t": 16576,
+   "ms": 1312,
+   "who": "hand",
+   "key": "CLAW_SAY.sulk",
+   "text": "ケチ"
+  },
+  {
+   "doc": 1,
    "t": 17856,
    "ms": 928,
    "who": "card",
    "key": "SAY.land",
-   "text": "ugh"
+   "text": "oof"
   },
   {
    "doc": 1,
@@ -96,15 +112,15 @@
    "ms": 1312,
    "who": "hand",
    "key": "SEV_SAY.hunt",
-   "text": "snack."
+   "text": "ела тук"
   },
   {
    "doc": 1,
    "t": 18784,
    "ms": 16,
    "who": "card",
-   "key": "SAY.pull",
-   "text": "I live here"
+   "key": "SAY.pull|CLAW_SAY.slap",
+   "text": "hands off"
   },
   {
    "doc": 1,
@@ -112,7 +128,7 @@
    "ms": 960,
    "who": "card",
    "key": "AGONY.1",
-   "text": "I am not cheese!",
+   "text": "痛い!!",
    "lvl": "1"
   },
   {
@@ -130,7 +146,7 @@
    "ms": 1312,
    "who": "hand",
    "key": "CLAW_SAY.savour|SEV_SAY.squeeze",
-   "text": "бавно…"
+   "text": "shhh."
   },
   {
    "doc": 1,
@@ -138,7 +154,7 @@
    "ms": 704,
    "who": "card",
    "key": "AGONY.2",
-   "text": "I AM COMING APART",
+   "text": "МАМООООО",
    "lvl": "2"
   },
   {
@@ -147,7 +163,7 @@
    "ms": 560,
    "who": "card",
    "key": "AGONY.2",
-   "text": "AAAAAAAAAAAAAA",
+   "text": "I CAN SEE MY INSIDES",
    "lvl": "2"
   },
   {
@@ -156,7 +172,7 @@
    "ms": 16,
    "who": "card",
    "key": "AGONY.2",
-   "text": "NOT LIKE THIS",
+   "text": "AAAAAAA—",
    "lvl": "2"
   },
   {
@@ -360,7 +376,49 @@
   },
   {
    "doc": 1,
+   "t": 15520,
+   "claw": "eager",
+   "sev": "walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "hand": 1,
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 16588,
+   "claw": "sulk",
+   "sev": "walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "hand": 1,
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
    "t": 17516,
+   "claw": "sulk",
+   "sev": "walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1,
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 18216,
    "claw": "lurk",
    "sev": "walk",
    "pb": "closed",

@@ -52,7 +52,7 @@ scenario(G, 'shelf opens three ways', async (s) => {
   assert.equal(await s.eval(shelf), true, 'wiped clean, a tap on it opens the shelf');
 });
 
-scenario(G, 'hand reach with card panic tiers and bystander lines', { idle: 3000 }, async (s) => {
+scenario(G, 'hand reach with card panic tiers and bystander lines', { idle: 3000, legacy: false }, async (s) => {
   await s.ensurePlanck();
   await s.type('tana');
   await s.run(300);
