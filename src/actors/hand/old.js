@@ -14,7 +14,7 @@ import { bus } from '../../core/bus.js';
 import { now } from '../../core/clock.js';
 import { isFree } from '../../core/claims.js';
 import { world, isHeld } from '../../world/world.js';
-import { sense, set, notice } from './index.js';
+import { sense, set, notice, speak } from './index.js';
 
 const S = TUNE.physics.S, OLD = TUNE.hand.OLD;
 const met = new WeakSet();       // old hands it has looked at
@@ -42,7 +42,8 @@ export function stole(o, t) {
 
 /** it cannot get away (see the rules at the top) */
 function weak(o, t) {
-  const a = o.ai, st = a.st;
+  const a = o.ai, st = a.st, f = sense().onShelf;
+  if (f && f(o)) return false;   // it hid on the shelf: out of bounds
   return st === 'rest' || st === 'limp' || (st === 'walk' && a.gait === 'crawl') || ((st === 'gloat' || st === 'walk') && t < (thieves.get(o) || 0));
 }
 
@@ -80,6 +81,19 @@ export function look(c, x) {
   }
   if (prey) { c.o = prey; set('devour'); return true; }
   return false;
+}
+
+/**
+ * you have been carrying an old hand around for JEALOUS.MS: the arm leans in, drumming its fingers (the flinch of index.js),
+ * and says so. Once per carry, not again for COOL_MS. Called from lurk.
+ */
+export function jealous(c, t) {
+  const g = world.grab, J = TUNE.hand.JEALOUS;
+  if (!g || g.o.kind !== 'hand' || !g.moved) { c.carry = null; return; }
+  if (c.carry !== g) { c.carry = g; c.carryAt = t; return; }
+  if (c.carryAt == null || t - c.carryAt < J.MS || (c.jealousAt != null && t < c.jealousAt + J.COOL_MS)) return;
+  c.carryAt = null; c.jealousAt = t; c.mood = 'jealous'; c.flinch = t + J.LEAN_MS; c.react = null;
+  speak('jealous', true);
 }
 
 export function install(app) {}

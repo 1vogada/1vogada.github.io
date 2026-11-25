@@ -35,6 +35,9 @@ export const RULES = [
   ['hand.met', ({ hand: o }) => { const b = severed.brain(o); if (b && b.is('walk', 'rest', 'limp', 'rise', 'gloat')) severed.set(o, 'stare'); }],   // it stares back
   ['hand.devouring', ({ hand: o }) => severed.set(o, 'caught')],                                                // it flails and begs
   ['hand.dropped', ({ hand: o }) => { const b = severed.brain(o); if (b && b.is('caught')) severed.set(o, 'limp'); }],   // let go: it drops
+  ['hand.devoured', () => severed.mourn(scrollX + document.documentElement.clientWidth - TUNE.severed.MOURN.EDGE_PX)],   // a small funeral
+  ['shelf.opened', () => severed.scare()],
+  ['sev.avenged', () => hand.cut()],                                                                              // revenge: the thrown katana takes the new hand off                                                                       // met old hands hide on it
   ['sev.state', ({ self, from, to }) => from === 'crush' && to === 'gloat' && hand.oldStole(self)],             // it ate a card: the arm saw that
   // ---- the shelf ----
   ['hand.reaching', ({ card, fear, dt, t, x }) => cards.panic(card, fear, dt, t, x)], // reach: the card on the shelf panics, bystanders point
@@ -47,4 +50,6 @@ export function install(app) {
   for (const [type, fn] of RULES) bus.on(type, fn);
   // what the hand can sense of the shelf (legacy: clawTick read shelfSnack / nearShelf / onShelf / shelf.want directly)
   hand.senses({ shelfSnack: () => shelf.snack(), nearShelf: (P) => shelf.near(P), onShelf: (o) => shelf.holds(o), want: (v) => shelf.want(v), shelf: () => shelf.state(), oldHands: () => severed.list });
+  severed.senses({ shelf: () => shelf.state(), onShelf: (o) => shelf.holds(o),   // a place to hide from the new hand
+    armed: () => { const m = hand.brain(); return hand.awake() && !!m && !m.is('stump', 'regrow'); } });   // a hand on the arm to take revenge on
 }

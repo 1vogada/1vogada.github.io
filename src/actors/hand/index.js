@@ -133,7 +133,7 @@ export const shelf = {
 export const busy = () => {
   const c = claw; if (!c) return false;
   const sh = shelf.state();
-  return (!!sh && sh.want) || !!c.react || !!c.later || now() < (c.flinch || 0) || c.strands.length > 0 || !!c.say || m.busy || (!!m.def.busyUntil && now() < c.until) || (m.is('lurk') && wants(c));
+  return (!!sh && sh.want) || !!c.react || !!c.later || now() < (c.flinch || 0) || c.strands.length > 0 || (c.sx ?? 1) !== 1 || !!c.say || m.busy || (!!m.def.busyUntil && now() < c.until) || (m.is('lurk') && wants(c));
 };
 
 // legacy clawTick(dt)
@@ -165,7 +165,7 @@ function tick(dt) {
     else if (idle && t >= c.react.at && t - (c.said || 0) >= REACT_GAP && t >= (c.sayEnd || 0) + TIMING.gap.after) { speak(c.react.kind, true); c.flinch = t + TIMING.react.flinch; c.mood = c.react.kind; c.react = null; }
   }
   if (t < (c.flinch || 0) && m.def.idle) {   // it leans in to say it: fingers drumming, or a fist for the things it disapproves of
-    x.T = [vw + 36, c.ly]; x.rate = 10; x.wig = 0.3; x.aim = Math.PI + Math.sin(m.t * 9) * 0.06; x.pose = c.mood === 'katana' || c.mood === 'smash' ? POSES.sulk : c.mood === 'kdrop' || c.mood === 'stab' ? POSES.joy : POSES.eager;
+    x.T = [c.mood === 'jealous' ? vw - TUNE.hand.JEALOUS.LEAN_PX : vw + 36, c.ly]; x.rate = 10; x.wig = 0.3; x.aim = Math.PI + Math.sin(m.t * 9) * 0.06; x.pose = c.mood === 'katana' || c.mood === 'smash' ? POSES.sulk : c.mood === 'kdrop' || c.mood === 'stab' ? POSES.joy : POSES.eager;   // jealous: well out, drumming its fingers
   }
   const { T, rate, aim, pose } = x;
   const k = 1 - Math.exp(-dt * rate), ka = 1 - Math.exp(-dt * (rate > 20 ? 30 : 9)), kp = 1 - Math.exp(-dt * (m.def.poseRate || 12));
@@ -182,6 +182,7 @@ function tick(dt) {
     s.el.style.transform = `translate(${(A.x * S).toFixed(1)}px, ${(A.y * S).toFixed(1)}px) rotate(${Math.atan2(B.y - A.y, B.x - A.x).toFixed(3)}rad) scaleY(${Math.max(0.2, s.w / 5 * (1 - 0.8 * len / s.max)).toFixed(2)})`;
   }
   if (expire(c, t)) place(c, Math.min(c.x, Hv[0], vw - 80) - 30 + scrollX, Math.max(70, Math.min(c.y, Hv[1]) - 115) + scrollY, c.x + scrollX);   // put on the page in the layout pass
+  squeeze(c, vw, t, dt);
   draw(x.wig, x.shake, x.strain);
   // the katana's tip through the arm, anywhere along it: the hand comes off
   const kt = world.blade;
@@ -193,6 +194,15 @@ function tick(dt) {
       if (q[0] < vw - 6 && (near(q, c.arm2[1], c.arm2[2]) < H_.SEVER_PX[0] || near(q, c.arm2[0], c.arm2[1]) < H_.SEVER_PX[1])) { sever(q, kt.tipDt > 0 ? [(b[0] - a[0]) / kt.tipDt, (b[1] - a[1]) / kt.tipDt] : [0, 0]); break; }
     }
   }
+}
+
+// a window too narrow for it (TUNE.hand.SQUEEZE): while it is out it is pressed flat against the right edge and complains,
+// until the window is wide again. sx is exactly 1 when it is not squeezed, so the drawing is the usual one
+function squeeze(c, vw, t, dt) {
+  const Q = H_.SQUEEZE, out = vw < Q.W && !m.is('off') && c.x < vw - 20, sx = c.sx ?? 1, to = out ? Q.SX : 1;
+  if (!out && sx === 1) { if (c.squeezed) { c.squeezed = 0; if (c.x < vw - 20 && !m.is('off')) speak('unsqueezed', true); } return; }
+  c.cx = vw; c.sx = Math.abs(to - sx) < 0.01 ? to : sx + (to - sx) * (1 - Math.exp(-dt * Q.RATE));
+  if (out && t - (c.squeezed || 0) > Q.SAY_MS) { c.squeezed = t; speak('squeezed', true); }
 }
 
 // whatever the arm's hand was holding is let go, whole, as it was
@@ -267,6 +277,7 @@ export function install(app) {
   clock.hasWork(busy);
   clock.keepAwake(busy);
   bus.on('world.reset', reset);
+  addEventListener('resize', () => { if (claw) clock.wake(); });   // a narrower window may squeeze it
   report('claw', () => claw);
   hook('__hand', { get, draw, set, POSES, katanaSvg: (id) => (app && app.katana && app.katana.katanaSvg ? app.katana.katanaSvg(id) : '')   /* the katana's drawing, read off app (no actor import) */, come, to, say, grip, leave, awake });
 }

@@ -74,6 +74,7 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 |---|---|---|---|
 | `sev.spawned` | `{ hand }` | `actors/severed/index.js` `spawn`: after the machine starts in `limp`, before the fling velocity and spin draw | none |
 | `sev.state` | `{ self, from, to, data }` | `core/machine.js` on every switch of a cut-off hand | none |
+| `sev.avenged` | `{ hand }` | `actors/severed/behaviours/avenge.js`: the old hand hauled the loose katana to the right edge and threw it at the arm | `reactions.js`: `hand.cut()` (the new hand comes off; the two old hands then high-five) |
 | `sev.gone` | `{ hand }` | `actors/severed/index.js` `gone` (on `body.removed`): after its machine ended and its SVGs were removed | none |
 
 ## Shelf, scenes, phrasebook
@@ -84,7 +85,7 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 | `shelf.closed` | `{}` | `actors/shelf.js` `toggle`: after it is removed and `toast.shelfGone` | none |
 | `slip.opened` | `{ project, fortune }` | `scenes/fortune.js` `drawFortune`: last, after the fortune draws and the 700 ms ask timer is set | none |
 | `slip.closed` | `{ how }` | `scenes/fortune.js` `closeFortune` (`'backdrop'`, `'escape'`, `'x'` = No or × with no hand / crazy), the secret × click (`'secret'`); `scenes/coin.js` (`'hand'`) when the hand closes it | none |
-| `coin.tossed` | `{ side, call }` | `scenes/coin.js`: right after the side draw (`< 0.45` heads, `< 0.9` tails, else null) | none |
+| `coin.tossed` | `{ side, call }` | `scenes/coin.js`: right after the side draw (`< 0.45` heads, `< 0.9` tails, `>= 1 - TUNE.coin.EDGE` edge, else null) | none |
 | `scene.started` | `{ name }` | `scenes/scene.js` `scene(name)` | none |
 | `scene.ended` | `{ name, killed }` | `scenes/scene.js` `done()` (the scene's finally) | none |
 | `phrasebook.opened` | `{}` | `phrasebook/menu.js` `open`: last (after the raid timer is armed and the DOM `pb-open` event) | none |

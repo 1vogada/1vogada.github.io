@@ -30,7 +30,7 @@ export function flags() {
   const s = search(), set = new Set();
   for (const m of s.matchAll(/[?&]debug(?:=([^&]*))?/g)) { set.add(''); if (m[1]) for (const v of decodeURIComponent(m[1]).split(',')) set.add(v); }
   const test = typeof window !== 'undefined' && window.__test && typeof window.__test === 'object' ? window.__test : {};
-  return { debug: set, on: set.size > 0, events: set.has('events'), zones: set.has('zones'), dbg: s === '?dbg', strict: set.size > 0 || test.strictBus === true };
+  return { debug: set, on: set.size > 0, events: set.has('events'), zones: set.has('zones'), dbg: s === '?dbg', idle: test.idle !== false, strict: set.size > 0 || test.strictBus === true };
 }
 
 /** publish a legacy test hook (window.__name). Safe to call before or after install */

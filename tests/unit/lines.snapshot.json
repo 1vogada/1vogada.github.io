@@ -287,6 +287,42 @@
    ["tell me what you want","en"]
   ]
  },
+ "card.forgive": {
+  "who": "card",
+  "legacy": null,
+  "trigger": {"title":"Forgiven","when":"Right-click a card you ripped out or tore, and pick \"apologise\". Mostly it forgives you."},
+  "lines": [
+   ["…fine. I forgive you.","en"],
+   ["apology accepted","en"],
+   ["it is ok. it is not ok.","en"],
+   ["just this once","en"],
+   ["прощавам ти","bg","I forgive you"],
+   ["ゆるす…","ja","I forgive…"]
+  ]
+ },
+ "card.grudge": {
+  "who": "card",
+  "legacy": null,
+  "trigger": {"title":"Not forgiven","when":"You apologise to a torn card, and it does not take it."},
+  "lines": [
+   ["no. just no.","en"],
+   ["never.","en"],
+   ["I will remember your face","en"],
+   ["say it like you mean it","en"],
+   ["не.","bg","no."],
+   ["いやだ","ja","no way"]
+  ]
+ },
+ "card.again": {
+  "who": "card",
+  "legacy": null,
+  "trigger": {"title":"Sorry again","when":"You apologise to the same card a second time."},
+  "lines": [
+   ["you said that already","en"],
+   ["words are cheap","en"],
+   ["still torn, though","en"]
+  ]
+ },
  "toast.ripped": {
   "who": "toast",
   "legacy": null,
@@ -1085,6 +1121,88 @@
    ["ずるい!","ja","not fair!"]
   ]
  },
+ "hand.idle": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Are you still there?","when":"After a card has left its slot, leave the mouse still on the page for ten seconds. It creeps out and taps the cursor."},
+  "lines": [
+   ["…hello?","en"],
+   ["you there?","en"],
+   ["poke.","en"],
+   ["are you asleep?","en"],
+   ["blink twice if you need help","en"],
+   ["ало?","bg","hello?"],
+   ["もしもし?","ja","hello? (on the phone)"]
+  ]
+ },
+ "hand.idleback": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Caught poking","when":"You move the mouse while it is tapping the cursor. It whips back out of sight."},
+  "lines": [
+   ["AH","en"],
+   ["I was not doing anything","en"],
+   ["carry on.","en"],
+   ["nothing to see here","en"]
+  ]
+ },
+ "hand.jealous": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Jealous","when":"Pick up an old (cut-off) hand and carry it around for five seconds. The new hand leans in, drumming its fingers."},
+  "lines": [
+   ["you never carry ME.","en"],
+   ["what does it have that I do not","en"],
+   ["I see how it is","en"],
+   ["и мен носи!","bg","carry me too!"],
+   ["えこひいき…","ja","favouritism…"]
+  ]
+ },
+ "hand.squeezed": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Squeezed","when":"Make the window very narrow while the hand is out. It is pressed flat against the edge."},
+  "lines": [
+   ["too tight","en"],
+   ["mmmf. no room","en"],
+   ["who shrank the page?","en"],
+   ["I am being folded","en"],
+   ["тясно ми е","bg","it is tight in here"],
+   ["せまい!","ja","cramped!"]
+  ]
+ },
+ "hand.unsqueezed": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Room again","when":"You make the window wide again after it was squeezed."},
+  "lines": [
+   ["ahh. better.","en"],
+   ["thank you.","en"],
+   ["phew","en"]
+  ]
+ },
+ "hand.edge": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Coin on its edge","when":"One coin toss in a hundred lands on its edge and rolls off the slip."},
+  "lines": [
+   ["…that has never happened.","en"],
+   ["it… stood up?","en"],
+   ["on its EDGE?","en"],
+   ["това не се случва","bg","this does not happen"],
+   ["ありえない","ja","impossible"]
+  ]
+ },
+ "hand.edgepick": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"You choose","when":"After the coin rolls off on its edge, it leaves Yes and No to you."},
+  "lines": [
+   ["…you pick. I need to lie down.","en"],
+   ["fine. your call.","en"],
+   ["I am not touching that.","en"]
+  ]
+ },
  "toast.devoured": {
   "who": "toast",
   "legacy": null,
@@ -1251,6 +1369,124 @@
    ["たすけて!","ja","help!"]
   ]
  },
+ "sev.paint": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: writes on the floor","when":"Leave a cut-off hand alone for two minutes. It finger-paints a word on the floor in its own gore."},
+  "lines": [
+   ["HELP","en"],
+   ["ivo was here","en"],
+   ["手","ja","hand"],
+   ["I WAS HERE FIRST","en"],
+   ["feed me","en"],
+   ["not a glove","en"],
+   ["ПОМОЩ","bg","HELP"],
+   ["たすけて","ja","help me"],
+   ["bring back my arm","en"]
+  ]
+ },
+ "sev.painted": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: admires its writing","when":"It steps back from the word it painted."},
+  "lines": [
+   ["art.","en"],
+   ["do you like it?","en"],
+   ["my best work","en"],
+   ["it is a self portrait","en"],
+   ["хубаво ли е?","bg","is it nice?"],
+   ["傑作だ","ja","a masterpiece"]
+  ]
+ },
+ "sev.avenge": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: goes for the katana","when":"An old hand that has met the new one sees the katana lying loose nearby. It goes for the hilt."},
+  "lines": [
+   ["revenge.","en"],
+   ["this is for me","en"],
+   ["the blade. MY blade now.","en"],
+   ["time to return a favour","en"],
+   ["отмъщение.","bg","revenge."],
+   ["復讐だ","ja","this is revenge"]
+  ]
+ },
+ "sev.haul": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: hauls the katana","when":"It drags the katana by the hilt towards the right edge of the screen."},
+  "lines": [
+   ["heavy… heavy…","en"],
+   ["one more step","en"],
+   ["hnnnngh","en"],
+   ["why is it so LONG","en"],
+   ["тежко е…","bg","it is heavy…"],
+   ["おもい…","ja","heavy…"]
+  ]
+ },
+ "sev.stab": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: revenge","when":"At the edge it throws the katana up at the arm, and the new hand comes off."},
+  "lines": [
+   ["SURPRISE","en"],
+   ["how do YOU like it","en"],
+   ["snip snip","en"],
+   ["eye for a hand","en"],
+   ["на ти!","bg","take that!"],
+   ["天誅!","ja","divine punishment!"]
+  ]
+ },
+ "sev.five": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"Two old hands: a high-five","when":"After the revenge, the old hand and the one it just cut off walk up to each other and high-five."},
+  "lines": [
+   ["up top!","en"],
+   ["welcome to the floor, brother","en"],
+   ["hand five!","en"],
+   ["we are free!","en"],
+   ["дай пет!","bg","give me five!"],
+   ["ハイタッチ!","ja","high five!"]
+  ]
+ },
+ "sev.mourn": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hands: a small funeral","when":"The new hand eats an old hand. The other old hands walk to the spot, bow, and then run for it."},
+  "lines": [
+   ["he was a good hand","en"],
+   ["gone. like a pinky in the wind.","en"],
+   ["rest in pieces","en"],
+   ["he had such nice knuckles","en"],
+   ["беше добра ръка","bg","he was a good hand"],
+   ["…合掌","ja","…palms together (a prayer)"]
+  ]
+ },
+ "sev.hide": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: runs for the shelf","when":"With the secret shelf out, an old hand that has met the new one gets scared and runs to hide on it."},
+  "lines": [
+   ["the SHELF","en"],
+   ["up up up!","en"],
+   ["it cannot reach up there","en"],
+   ["към рафта!","bg","to the shelf!"],
+   ["たなへ!","ja","to the shelf!"]
+  ]
+ },
+ "sev.safe": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: safe on the shelf","when":"It made it onto the shelf. The new hand will not come for it there."},
+  "lines": [
+   ["safe here","en"],
+   ["shhh","en"],
+   ["you did not see me","en"],
+   ["тук съм на сигурно","bg","I am safe here"],
+   ["ここなら安全","ja","safe here"]
+  ]
+ },
  "toast.shelfGone": {
   "who": "toast",
   "legacy": null,
@@ -1307,6 +1543,59 @@
   "trigger": null,
   "lines": [
    ["霧が出た · Мъгла падна · The fog rolls in","ja"]
+  ]
+ },
+ "page.away": {
+  "who": "page",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["come back…","en"],
+   ["where did you go?","en"],
+   ["psst. come back","en"],
+   ["the hand misses you","en"],
+   ["come back… 手","ja","come back… (手 = hand)"]
+  ]
+ },
+ "page.back": {
+  "who": "page",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["oh, there you are","en"],
+   ["welcome back","en"],
+   ["oh. hi.","en"]
+  ]
+ },
+ "page.toastPoke": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["stop poking me","en"],
+   ["I am just a message","en"],
+   ["I said stop.","en"],
+   ["fine. FINE.","en"]
+  ]
+ },
+ "page.toastFall": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["aaaa—","en"]
+  ]
+ },
+ "console.hint": {
+  "who": "console",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["type a word for a thing that holds things.","en"],
+   ["everything here can be pulled. most things can be torn.","en"],
+   ["the fog hides more than the banner.","en"],
+   ["the old hand remembers you.","en"],
+   ["some slips land on their edge.","en"]
   ]
  },
  "raid.bored": {

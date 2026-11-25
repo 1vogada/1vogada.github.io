@@ -210,3 +210,24 @@ scenario(G, 'sever with the katana tip, stump, regrow', O, async (s) => {
   assert.ok(await s.said('CLAW_SAY.regrow'), 'and comes back to show off a new one');
   assert.equal((await s.eval(claw)).stump, false);
 });
+
+scenario(G, 'are you still there: the mouse still for 10 s', { ...O, legacy: false }, async (s) => {
+  const [px, py] = await s.rip(0);
+  await s.run(300);
+  await s.line(px, py, 500, 400, 10);
+  await s.up();
+  await s.runUntil(() => window.__cards.state().claw.st === 'lurk', null, { max: 5000 });
+  await s.eval(() => { window.__test.idle = true; });
+  await s.move(600, 450);
+  await s.run(9000, 100);
+  assert.equal((await s.eval(claw)).st, 'lurk', 'not yet');
+  await s.runUntil(() => window.__cards.state().claw.st === 'poke', null, { max: 2000, step: 100 });
+  await s.run(3500, 50);
+  assert.ok(await s.said('hand.idle'), '…hello?');
+  const c = await s.eval(() => { const c = window.__cards.state().claw; return c.tip; });
+  assert.ok(Math.hypot(c[0] - 600, c[1] - 450) < 40, `its fingertip is on the cursor (${c})`);
+  await s.move(640, 470);
+  await s.run(800, 50);
+  assert.ok(await s.said('hand.idleback'), 'caught');
+  await s.runUntil(() => window.__cards.state().claw.st === 'lurk', null, { max: 2000 });
+});

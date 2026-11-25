@@ -92,6 +92,12 @@ export function turn(o, dt, b, p, ang) {
   } else { h.feet = null; a.feet = null; h.sx = 1; a.face = a.fd = a.dir; }
 }
 
+/**
+ * walk towards d (-1 left, 1 right): turns round on the spot first if it faces the other way. Its feet may point the other
+ * way while it already faces d (walk flips fd at the edges on its own): then they simply follow
+ */
+export function head(a, d) { a.dir = d; if (a.face === d) a.fd = d; }
+
 function stepAll() { for (const o of world.bodies) if (o.kind === 'hand') step(o); }
 
 export function install(app) {

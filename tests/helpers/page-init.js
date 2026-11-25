@@ -11,11 +11,12 @@
 //  - pointermove events that reached the page are counted (window.__pm): Chrome hands mouse moves to the page on its next real
 //    frame, so the harness waits for each one before it moves the clock (see Session.move)
 //  - every speech bubble that is added to or removed from the page is logged with the page time          -> window.__bub
+//  - window.__test.idle = false: no idle poke (src/actors/hand/idle.js); a scenario turns it on with window.__test.idle = true
 //  - window.__test = { strictBus: true }: src/core/debug.js makes the bus strict (an emit or listener of an event type that is not
 //    in src/core/events.js throws, and the page error fails the scenario), as ?debug does, without changing the URL
 module.exports = function pageInit(opts) {
   // ---- test flags read by src/core/debug.js ----
-  window.__test = { strictBus: true };
+  window.__test = { strictBus: true, idle: false };   // idle: the hand's "are you still there?" poke is off unless a scenario sets it
 
   // ---- language ----
   // the site is getting an English-only default; 'all' is today's mixed-language behaviour, which every golden was recorded with.

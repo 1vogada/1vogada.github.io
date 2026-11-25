@@ -34,4 +34,18 @@ defineLines('fortune.slip', [
 // toast: a one-line list (page/kiri.js, the kiri / мъгла flood). Tagged ja by script; English-only drops the non-English parts
 defineLines('toast.fog', ['霧が出た · Мъгла падна · The fog rolls in'], { who: 'toast', lang: 'ja' });
 
+// ---- easter eggs ----
+// the tab title while you are on another tab, and the moment you come back (page/away.js; picked in turn, no random draw)
+defineLines('page.away', ['come back…', 'where did you go?', 'psst. come back', 'the hand misses you', 'come back… 手'], {
+  who: 'page', lang: ['en', 'en', 'en', 'en', 'ja'], gloss: { 'come back… 手': 'come back… (手 = hand)' },
+});
+defineLines('page.back', ['oh, there you are', 'welcome back', 'oh. hi.'], { who: 'page', lang: 'en' });
+// click a toast: it answers, in turn; the fifth click knocks it off the screen (page/toast.js)
+defineLines('page.toastPoke', ['stop poking me', 'I am just a message', 'I said stop.', 'fine. FINE.'], { who: 'toast', lang: 'en' });
+defineLines('page.toastFall', ['aaaa—'], { who: 'toast', lang: 'en' });
+// kiri.hint() in the console (page/console.js)
+defineLines('console.hint', ['type a word for a thing that holds things.', 'everything here can be pulled. most things can be torn.', 'the fog hides more than the banner.', 'the old hand remembers you.', 'some slips land on their edge.'], {
+  who: 'console', lang: 'en',
+});
+
 export function install(app) {}
