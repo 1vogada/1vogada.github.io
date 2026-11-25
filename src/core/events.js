@@ -105,6 +105,10 @@ export const EVENTS = {
   'sev.pestered': '{ hand, n } an old hand poked your still cursor (severed behaviours/pester.js); n: pokes so far, the arm\'s and its own',
   'hand.pestered': '{ hand, n } the arm poked your still cursor in turn with old hand `hand` (hand behaviours/mine.js); n: pokes so far',
   'tana.slashed': '{ at } the katana\'s tip went across the hidden 棚 writing in the banner while the shelf was in (page/slash.js; at: page px). Reactions: the katana gloats, the shelf opens',
+  // ---- the uprising (chain: src/page/uprising.js) ----
+  'uprising.step': '{ step, hand } the uprising reached a step, in order: "revenge" (hand: the avenger) | "tower" | "sewn" | "truce"',
+  'hand.flewOff': '{ x, y } the uprising: shaking the tower off, its own hand flew off too (page px of the grip); the stump stays out on the page ("spent")',
+  'hand.truce': '{ } the uprising: back at the edge with an old hand sewn on, it said "fine. truce." (behaviours/truce.js); it snatches nothing from now on',
 };
 
 export const EVENT_TYPES = new Set(Object.keys(EVENTS));

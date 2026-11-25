@@ -24,7 +24,12 @@
 // it is cleared or replaced.
 // It never imports another actor: the shelf reaches it through senses() (wired in src/reactions.js), the blade through
 // world.blade, and what happens to cards goes out as events (hand.grabbed, hand.reaching, hand.ripped, ...).
+// Blind in the kiri flood (chain blind-fog): the pre-chain asks senses().flooded / fogAt how thick the fog is round its hand
+// (c.blind, with hysteresis: TUNE.blindFog). Blind, it gropes (behaviours/grope.js) and the catch scan, lurk, eager, poke,
+// reach, lunge and snatch leave alone what they cannot see; a hole wiped round its hand and it sees you (c.seen).
 // In crazy mode tick() returns before all of that; while the old hands dance it bobs along at the edge instead (./bob.js).
+// The uprising (src/page/uprising.js): uproot() makes the tower's pull end with its hand flying off ('spent'); truce() sets
+// c.peace for the rest of the visit (lurk.js, old.js: it snatches nothing; behaviours/truce.js says so).
 
 import { TUNE, TIMING } from '../../core/tune.js';
 import { bus } from '../../core/bus.js';
@@ -142,7 +147,7 @@ export function cheese(old, card) {
  * @returns true when it goes for it
  */
 export function wrest(old, card) {
-  const c = claw; if (!c || !awake() || c.stump || isCrazy() || !m.is('lurk') || c.o) return false;
+  const c = claw; if (!c || !awake() || c.stump || isCrazy() || !m.is('lurk') || c.o || c.peace) return false;   // (not since the truce)
   if (!wrestable(c, old, card, now())) return false;
   c.old = old; c.prey = card; set('wrest'); return true;
 }
@@ -163,6 +168,12 @@ export function towerFell() {
   else if (m.is('pulled')) { c.tower = null; set('sulk'); speak('towerSaved', true); }
 }
 
+// The uprising (src/page/uprising.js, wired in src/reactions.js): revenge, the tower, an old hand sewn back on, a truce
+/** revenge came first this visit, and the tower has it: it will shake so hard its own hand flies off (behaviours/pulled.js, spent.js) */
+export function uproot() { const c = claw; if (!c) return; if (m.is('pulled') && c.pull) c.pull.hard = true; else c.uproot = true; }
+/** an old hand is back on after all that: "fine. truce." from the edge (behaviours/truce.js), and it snatches nothing from now on */
+export function truce() { const c = claw; if (!c || c.peace) return; c.peace = true; c.truce = true; clock.wake(); }
+
 /** it lost at rock, paper, scissors (scenes/rps.js): it sulks off out of sight for ms */
 export function sulkFor(ms) { if (!claw) return; claw.sulkUntil = now() + ms; claw.show = null; set('sulk'); }
 /** it won at rock, paper, scissors: the old hand o is fair game for TUNE.rps.FAIR_MS (./old.js) */
@@ -171,12 +182,29 @@ export function oldLost(o) { if (claw && !isCrazy()) lost(o, now() + TUNE.rps.FA
 /** the old hand poked your still cursor (sev.pestered; n: pokes so far): in 'mine' with that old hand, its turn next (behaviours/mine.js) */
 export function pesterTurn(o, n) { const c = claw; if (c && m.is('mine') && c.rival === o) { c.reply = n; clock.wake(); } }
 
+/** it cannot see for the kiri flood round its hand (blind-fog; c.blind is worked out once a frame in tick()) */
+export const blind = () => !!claw && !!claw.blind;
+/** blind, and it has not just seen you through a hole either (lunge / snatch started on sight carry on for TUNE.blindFog.SEEN_MS) */
+export const unseen = () => blind() && !(claw.seen && now() - claw.seen < TUNE.blindFog.SEEN_MS);
+// how thick the flood is round its hand: the thinnest of its grip and its wrist (kept on screen), or 0 with no flood
+function fogRound(c, vw) {
+  if (!sensed.flooded || !sensed.fogAt || !sensed.flooded()) return 0;
+  const g = gripPt(), on = ([x, y]) => [Math.max(0, Math.min(vw - TUNE.blindFog.EYE_IN, x)), Math.max(0, Math.min(innerHeight - 1, y))];
+  return Math.min(sensed.fogAt(...on(g)), sensed.fogAt(...on([c.x, c.y])));
+}
+function sight(c, vw) {
+  const B = TUNE.blindFog, f = fogRound(c, vw);
+  if (!f) { c.blind = false; if (!(sensed.flooded && sensed.flooded())) c.groped = 0; return; }
+  c.blind = c.blind ? f > B.SEE : f >= B.BLIND;
+}
+
 /** out of patience: it takes the held card (legacy snatch(o)) */
 export function snatch(o) { claw.o = o; set('snatch'); }
 
 // what it can sense of other actors, injected by src/reactions.js:
 // { shelfSnack() -> body|null, nearShelf(P) -> bool, onShelf(o) -> bool, want(v), shelf() -> state|null, oldHands() -> Set of cut-off hand bodies,
-//   pester() -> { hand, poked, n } | null (an old hand poking your still cursor) }
+//   pester() -> { hand, poked, n } | null (an old hand poking your still cursor),
+//   flooded() -> bool (the kiri flood is on), fogAt(x, y) -> 0..1 (how thick it is at a viewport point) }
 let sensed = {};
 /** what senses() was given */ export const sense = () => sensed;
 export function senses(s) { sensed = s || {}; }
@@ -207,9 +235,10 @@ function tick(dt) {
   const NEAR = Math.min(H_.NEAR[0], vw * H_.NEAR[1]), FAR = Math.min(300, vw * 0.5), Z = zones(vw), HOLD = Math.min(110, vw * 0.2);
   const ripE = Math.min(330, 0.3 * Math.min(vw, vh)), strainE = 0.4 * ripE;
   if (P && P[0] < vw - FAR) c.far = true;   // a card has to be brought over, not just be there
+  sight(c, vw);   // blind-fog: can it see for the kiri flood?
   // the frame's shared locals (legacy: the consts and lets at the top of clawTick); the behaviour sets the motion target on it
   const x = { t, dt, vw, vh, P, held, o, NEAR, FAR, Z, HOLD, ripE, strainE, T: [vw + H_.LURK_X, c.ly], rate: 6, aim: Math.PI, pose: POSES.lurk, wig: 0.05, shake: 0, strain: 0 };
-  if (!c.o && m.def.catches) {   // a card thrown its way (or the toast that fell off the screen, page/bread.js): it goes for the catch
+  if (!c.o && m.def.catches && !c.blind) {   // a card thrown its way (or the toast that fell off the screen, page/bread.js): it goes for the catch
     for (const q of world.bodies) {
       if (!(edible(q) || q.kind === 'toast') || q.root || q.tug || (world.grab && world.grab.o === q)) continue;
       const v = q.body.getLinearVelocity(), w = q.body.getWorldCenter(), sx = w.x * S - scrollX, sy = w.y * S - scrollY;

@@ -1,10 +1,10 @@
 // hand state "poke": the mouse has been still for TUNE.hand.IDLE.MS (Ivo: 10 s). The hand creeps out, puts one fingertip
 // on the cursor, taps it and asks "…hello?". Move the mouse and it whips back out of sight (lurk). Only from lurk, so only
-// after a card has left its slot, never in a scene or in crazy mode.
+// after a card has left its slot, never in a scene or in crazy mode. Blind in the kiri flood (blind-fog): it gropes (grope.js).
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { POSES } from '../poses.js';
-import { set, speak } from '../index.js';
+import { set, speak, blind } from '../index.js';
 import { pointer, lastMove } from '../idle.js';
 
 const I = TUNE.hand.IDLE;
@@ -15,6 +15,7 @@ export default defineBehaviour('hand', 'poke', {
   enter(c, m) { c.pokeFrom = lastMove(); c.pokeSaid = false; c.pokeBack = 0; },
   tick(c, m, dt) {
     const x = m.x, P = pointer();
+    if (blind() && !c.pokeBack) { set('grope'); return; }   // blind-fog: the flood rolled in, it lost the cursor
     if (c.pokeBack) {   // caught: it whips back out of sight
       x.pose = POSES.lurk; x.rate = 22; x.T = [x.vw + 260, c.ly];
       if (m.t - c.pokeBack > 0.45) { c.cool = x.t + I.COOL_MS; set('lurk'); }

@@ -1,11 +1,11 @@
-// hand state "snatch": out of patience: takes the held card out of your hand into its fist (crush).
+// hand state "snatch": out of patience: takes the held card out of your hand into its fist (crush). Blind in the kiri flood (blind-fog): it gropes instead (grope.js).
 // Legacy clawTick branch `c.st === 'snatch'`, moved verbatim. tick(c, m, dt) sets the motion target on the frame's ctx m.x.
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
 import { drop } from '../../../world/world.js';
 import { POSES } from '../poses.js';
-import { set, speak } from '../index.js';
+import { set, speak, unseen } from '../index.js';
 import { gripPt, wristFor, crushStart } from '../tug.js';
 
 const S = TUNE.physics.S;
@@ -16,7 +16,8 @@ export default defineBehaviour('hand', 'snatch', {
   tick(c, m, dt) {
     const x = m.x, o = x.o;
     x.pose = POSES.lunge; x.rate = 34;
-    if (x.held !== o) { c.o = null; set('sulk'); speak('sulk'); }
+    if (unseen()) { c.o = null; set('grope'); }   // blind-fog: lost in the flood (one started on sight through a hole carries on)
+    else if (x.held !== o) { c.o = null; set('sulk'); speak('sulk'); }
     else {
       const w = o.body.getWorldCenter(), Hc = [w.x * S - scrollX, w.y * S - scrollY], q = gripPt();
       x.aim = Math.atan2(Hc[1] - c.y, Hc[0] - c.x); if (Math.cos(x.aim) > -0.2) x.aim = Math.PI; x.T = wristFor(Hc, x.aim);

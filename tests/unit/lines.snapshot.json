@@ -1771,6 +1771,101 @@
    ["おしかったね","ja","so close"]
   ]
  },
+ "hand.flewOff": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"The uprising: shaken clean off","when":"After the revenge, the hand tower pulls the arm out. It shakes them off so hard that its own new hand flies off too."},
+  "lines": [
+   ["…where did my hand go?","en"],
+   ["MY HAND. AGAIN.","en"],
+   ["I shook too hard. I SHOOK TOO HARD.","en"],
+   ["that was a brand new hand!","en"],
+   ["it was still under warranty","en"],
+   ["oh come ON","en"],
+   ["my good hand! my GOOD hand!","en"],
+   ["did anybody see where it landed?","en"],
+   ["I regret shaking","en"],
+   ["well, that backfired","en"],
+   ["four. that is four hands now.","en"],
+   ["пак ли?!","bg","again?!"],
+   ["またかよ!","ja","not again!"]
+  ]
+ },
+ "hand.spent": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"The uprising: the stump on the page","when":"Its hand flew off and the stump lies out on the page, far from its corner. Drop an old hand onto it and it goes back on."},
+  "lines": [
+   ["a little help here?","en"],
+   ["anybody have a spare hand?","en"],
+   ["so this is what the floor looks like","en"],
+   ["I will just lie here then","en"],
+   ["any hand. I am not picky. today.","en"],
+   ["I can feel a draught where my fingers were","en"],
+   ["this is fine. this is a stump.","en"],
+   ["I would wave, but","en"],
+   ["one of you. please. I will be nice.","en"],
+   ["is that you, old me? come here","en"],
+   ["дайте ми ръка…","bg","give me a hand…"],
+   ["て、かして…","ja","lend me a hand…"]
+  ]
+ },
+ "hand.truce": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"The uprising: truce","when":"Revenge, the hand tower, an old hand sewn back on, in that order: back at its edge, the arm gives up. It snatches nothing for the rest of the visit."},
+  "lines": [
+   ["fine. truce.","en"],
+   ["fine. FINE. truce.","en"],
+   ["okay. you win. truce.","en"],
+   ["truce. but I am not happy about it.","en"],
+   ["truce. your cards are safe. probably.","en"],
+   ["I hereby surrender. with dignity.","en"],
+   ["truce. tell nobody.","en"],
+   ["let us never speak of this. truce.","en"],
+   ["white flag. imagine a white flag.","en"],
+   ["deal. no more snatching. pinky swear.","en"],
+   ["hands off. my own idea, obviously.","en"],
+   ["добре. примирие.","bg","fine. truce."],
+   ["わかった。休戦だ。","ja","fine. truce."]
+  ]
+ },
+ "hand.tempted": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"The uprising: tempted","when":"After the truce, you hold a card out to it. It looks, and leaves it. (Throw it, and it still catches it.)"},
+  "lines": [
+   ["truce. TRUCE. I remember.","en"],
+   ["put that away before I forget","en"],
+   ["I am not looking at it","en"],
+   ["a deal is a deal… sadly","en"],
+   ["do not wave cards at a reformed hand","en"],
+   ["I could. I won't. I want to.","en"],
+   ["is this a test? it feels like a test","en"],
+   ["nope. hands off. see? off.","en"],
+   ["you are enjoying this, aren't you","en"],
+   ["throw it, then. throwing is allowed.","en"],
+   ["не ме изкушавай","bg","do not tempt me"],
+   ["がまん、がまん…","ja","hold it, hold it…"]
+  ]
+ },
+ "toast.truce": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": {"title":"The uprising: the toast","when":"Right after the arm says \"fine. truce.\""},
+  "lines": [
+   ["Truce. The hand will leave your cards alone now.","en"],
+   ["A truce was signed. Nobody can find the pen.","en"],
+   ["Peace on the right edge. For now.","en"],
+   ["The hand has given up snatching. It says so itself.","en"],
+   ["Truce. Throwing things at it is still allowed.","en"],
+   ["The old hands won. The hand calls it a draw.","en"],
+   ["Your cards are safe for the rest of this visit.","en"],
+   ["Revenge, a tower, a stitch. That settles it.","en"],
+   ["Примирие. Ръката няма да пипа картите.","bg","Truce. The hand will not touch the cards."],
+   ["休戦。手はもうカードを取らない。","ja","Truce. The hand takes cards no more."]
+  ]
+ },
  "hand.toast": {
   "who": "hand",
   "legacy": null,
@@ -1908,6 +2003,86 @@
    ["pretend all you like","en"],
    ["видях ви","bg","I saw you"],
    ["みてたよ","ja","I was watching"]
+  ]
+ },
+ "hand.dark": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Blind in the fog: the lights go out","when":"With the hand awake (a card torn out of its slot), type kiri. The fog rolls over the page and the hand cannot see."},
+  "lines": [
+   ["who turned the lights off","en"],
+   ["HEY. who did that","en"],
+   ["I can't see a thing","en"],
+   ["fog?! now?!","en"],
+   ["nobody move. especially the cards","en"],
+   ["is this a prank. it is a prank","en"],
+   ["great. soup.","en"],
+   ["I am not scared of the dark. it is scared of me","en"],
+   ["which way is the snack drawer","en"],
+   ["hello? anybody holding a card?","en"],
+   ["I paid my electricity bill","en"],
+   ["kiri. who typed kiri","en"],
+   ["кой угаси лампата?","bg","who turned off the lamp?"],
+   ["誰が電気消したの?","ja","who turned off the lights?"]
+  ]
+ },
+ "hand.grope": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Blind in the fog: groping","when":"While the fog covers the page, the hand pats its way slowly up and down the right edge. A card carried past it is safe: it cannot see you."},
+  "lines": [
+   ["is that a card? …no. wall.","en"],
+   ["I can hear you breathing","en"],
+   ["pat pat pat","en"],
+   ["come out, little snack","en"],
+   ["I know you're there","en"],
+   ["warmer? colder?","en"],
+   ["this is the edge. I think.","en"],
+   ["nobody sneak past me. I mean it.","en"],
+   ["smells like cardboard over there","en"],
+   ["marco…?","en"],
+   ["ow. corner.","en"],
+   ["one of you is moving, I can feel it","en"],
+   ["къде сте, бе?","bg","where are you, huh?"],
+   ["どこだ…?","ja","where is it…?"]
+  ]
+ },
+ "hand.there": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Blind in the fog: it sees you","when":"Wipe the fog off near the right edge where the hand is groping. It sees you, and goes for whatever you hold."},
+  "lines": [
+   ["THERE you are","en"],
+   ["AHA!","en"],
+   ["peekaboo. MINE.","en"],
+   ["I see you. I SEE YOU","en"],
+   ["a window! and a snack in it!","en"],
+   ["thank you for wiping. now hand it over","en"],
+   ["caught you sneaking","en"],
+   ["nice try, fog","en"],
+   ["got eyes again. bad news for you","en"],
+   ["oh hello there","en"],
+   ["there's my card","en"],
+   ["ето те!","bg","there you are!"],
+   ["みつけた!","ja","found you!"]
+  ]
+ },
+ "hand.light": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Blind in the fog: the fog lifts","when":"The fog thins out again (press Esc, or wait) while the hand is still groping."},
+  "lines": [
+   ["ah. light.","en"],
+   ["I was never scared","en"],
+   ["right. where was I","en"],
+   ["my eyes!","en"],
+   ["everyone still here? I counted.","en"],
+   ["nothing happened in the dark. nothing.","en"],
+   ["and stay lifted","en"],
+   ["who moved my cards","en"],
+   ["that was a fun nap","en"],
+   ["светна!","bg","it's light!"],
+   ["あ、明るい","ja","oh, it's bright"]
   ]
  },
  "sev.cut": {
@@ -2763,6 +2938,28 @@
    ["run!","en"],
    ["мърда!","bg","it moves!"],
    ["動いた!","ja","it moved!"]
+  ]
+ },
+ "sev.uprising": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The old hands: the uprising","when":"Revenge, the hand tower pulling the arm out, an old hand sewn back on, the truce: at each step one of the old hands cheers."},
+  "lines": [
+   ["the palms have risen!","en"],
+   ["power to the fingers!","en"],
+   ["down with the arm!","en"],
+   ["one of us! one of us!","en"],
+   ["we have nothing to lose but our wrists","en"],
+   ["today the floor, tomorrow the page!","en"],
+   ["viva la mano!","en"],
+   ["a hand for the hands!","en"],
+   ["remember this day, brothers","en"],
+   ["they cut us off. we came back.","en"],
+   ["thumbs up! all of them!","en"],
+   ["no more grabbing!","en"],
+   ["ура за пръстите!","bg","hooray for the fingers!"],
+   ["手の革命だ!","ja","the revolution of hands!"],
+   ["ばんざい!","ja","hurrah!"]
   ]
  },
  "sev.dance": {

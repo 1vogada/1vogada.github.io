@@ -18,6 +18,7 @@ import * as rps from './scenes/rps.js';
 import * as toast from './page/toast.js';
 import * as feed from './page/feed.js';
 import * as slash from './page/slash.js';
+import * as kiri from './page/kiri.js';
 
 const notMine = (o) => o.kind !== 'katana' && o.kind !== 'hand';
 
@@ -80,13 +81,18 @@ export const RULES = [
   ['blade.moved', (m) => slash.cut(m)],                                            // the tip slits the banner fog and the kiri flood; across 棚: tana.slashed
   ['tana.slashed', () => katana.tana()],                                           // ...the katana is pleased with itself
   ['tana.slashed', () => { if (!shelf.state()) shelf.toggle(); }],                 // ...and the shelf slides out
+  // ---- the uprising (chain): revenge -> the tower pulls the arm out -> an old hand sewn back on -> truce (src/page/uprising.js) ----
+  ['uprising.step', ({ step }) => step === 'tower' && hand.uproot()],             // revenge came first: it shakes so hard its own hand flies off
+  ['uprising.step', ({ step }) => step === 'sewn' && hand.truce()],               // ...an old hand back on: "fine. truce.", and no more snatching
+  ['uprising.step', ({ step, hand: o }) => severed.cheer(step === 'revenge' ? o : null)],   // ...and the old hands cheer each step
 ];
 
 export function install(app) {
   for (const [type, fn] of RULES) bus.on(type, fn);
   // what the hand can sense of the shelf (legacy: clawTick read shelfSnack / nearShelf / onShelf / shelf.want directly)
   hand.senses({ shelfSnack: () => shelf.snack(), nearShelf: (P) => shelf.near(P), onShelf: (o) => shelf.holds(o), want: (v) => shelf.want(v), shelf: () => shelf.state(), oldHands: () => severed.list,
-    pester: () => severed.pestering() });   // an old hand poking your still cursor first (idle-old)
+    pester: () => severed.pestering(),   // an old hand poking your still cursor first (idle-old)
+    flooded: () => kiri.flooded(), fogAt: (x, y) => kiri.fogAt(x, y) });   // blind in the kiri flood (blind-fog): it gropes until you wipe a hole by it
   severed.senses({ shelf: () => shelf.state(), onShelf: (o) => shelf.holds(o), arm: () => hand.shown(),   // a place to hide from the new hand; the new hand out to copy
     pointer: () => idle.pointer(), moved: () => idle.lastMove(),   // your pointer, for a gift
     armed: () => { const m = hand.brain(); return hand.awake() && !!m && !m.is('stump', 'regrow'); },   // a hand on the arm to take revenge on

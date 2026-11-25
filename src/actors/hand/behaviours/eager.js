@@ -1,9 +1,9 @@
-// hand state "eager": a card held in its zone: says eager, snatches when teased or out of patience, lunges when the card is brought close.
+// hand state "eager": a card held in its zone: says eager, snatches when teased or out of patience, lunges when the card is brought close. Blind in the kiri flood (blind-fog): it gropes instead (grope.js).
 // Legacy clawTick branch `c.st === 'eager'`, moved verbatim. tick(c, m, dt) sets the motion target on the frame's ctx m.x.
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE, TIMING } from '../../../core/tune.js';
 import { POSES } from '../poses.js';
-import { set, speak, snatch, shelf } from '../index.js';
+import { set, speak, snatch, shelf, blind } from '../index.js';
 import { pre } from '../tug.js';
 
 const H_ = TUNE.hand;
@@ -16,7 +16,8 @@ export default defineBehaviour('hand', 'eager', {
     if (P && P[0] > x.Z.grab) { if (!c.catchAt || x.t - c.catchLast > 200) c.catchAt = x.t; c.catchLast = x.t; } else c.catchAt = 0;   // when the held card entered the catch zone (frames are continuous)
     const caught = !!c.catchAt && x.t - c.catchAt >= TIMING.wait.catchHeld;
     x.pose = POSES.eager; x.wig = 0.34; x.rate = 9;
-    if (!held) set('sulk');
+    if (blind()) set('grope');   // blind-fog: the flood rolled over it, it lost sight of the card
+    else if (!held) set('sulk');
     else if (shelf.near(P)) set('lurk');   // you are putting it on the shelf: it pulls back and waits for you to look away
     else if (P[0] < x.Z.tease - 60) { if (Math.random() < H_.SNATCH_CHANCE && teased && P[0] > vw - Math.min(H_.SNATCH_REACH[0], vw * H_.SNATCH_REACH[1])) snatch(held); else { set('sulk'); speak('sulk', true); } }   // teased: it sulks, or (after TIMING.wait.teaseMin of teasing) it loses its temper
     else if (m.t > c.patience && P[0] < vw - x.NEAR) { if (Math.random() < H_.SNATCH_AGAIN) snatch(held); else { c.patience = m.t + TIMING.span(TIMING.wait.teaseAgain) / 1000; speak('eager', true); } }

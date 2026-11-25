@@ -408,6 +408,21 @@ export const TUNE = {
   // only while the tip moves at least SLIT_SPEED px/s. Slashing across the 棚 (TANA_PAD px around it) at SLASH_SPEED px/s or more,
   // in and out over at least ACROSS of its size, splits the writing (SPLIT_PX apart over SPLIT_MS) and opens the shelf; COOL_MS between two
   fogSlash: { SLIT_W: 2.5, HALO_W: 9, HALO_A: 0.35, SLIT_SPEED: 40, SLASH_SPEED: 500, TANA_PAD: 12, ACROSS: 0.7, SPLIT_PX: 7, SPLIT_MS: 1800, COOL_MS: 1500 },
+  // blind in the kiri flood (chain blind-fog, actors/hand/behaviours/grope.js): it goes blind when the fog round its hand (the thinner
+  // of its grip and wrist, EYE_IN px inside the right edge at most) is BLIND thick (0..1), and sees again below SEE. Blind, it gropes up
+  // and down the right edge (wrist EDGE_PX in, MARGIN px from top and bottom, once every PERIOD_S, easing RATE), pawing PAW rad at PAW_HZ
+  // with fingers wiggling WIG, and mutters at most every MUTTER_S. Seen through a hole, its snatch may carry on into the fog for SEEN_MS
+  blindFog: { BLIND: 0.6, SEE: 0.3, EYE_IN: 4, EDGE_PX: 40, MARGIN: 90, PERIOD_S: 7, RATE: 2.2, PAW: 0.3, PAW_HZ: 0.7, WIG: 0.5, MUTTER_S: 4.5, SEEN_MS: 1500 },
+  uprising: {   // the uprising (chain): revenge -> the tower pulls the arm out -> an old hand sewn back on -> truce (src/page/uprising.js)
+    CHEER_MS: 1100,                 // an old hand cheers this long after each step (game ms)
+    FLY_GORE: [18, 0.9],            // the hand shaken clean off at the end of the pull: this much spray, this strong
+    SPENT_S: 10,                    // the stump lies out on the page this long, waiting for a hand, before it slinks home (a plain stump then)
+    SPENT_SAY_S: 1.6, NAG_MS: 4200, // its first line after this long, then now and then
+    DROOP_PX: 60, DROOP_RATE: 0.7,  // it sinks this far, this slowly (easing rate)
+    REACH_PX: 70,                   // carry an old hand near it and it lifts its stump this far towards it
+    TRUCE_SAY_S: 0.9, TRUCE_S: 3.4, OUT_PX: 70,   // "fine. truce.": said this long after it comes out OUT_PX in from the edge; back to lurking after TRUCE_S
+    TEMPT_MS: 7000,                 // after the truce, a card held in its zone gets a remark at most this often (it does not take it)
+  },
 };
 
 // ---- timing: how long every speech bubble stays up, how long anyone waits before speaking again, and how long you get to answer ----
