@@ -1,12 +1,13 @@
 // Crazy mode (legacy calmTitle, slopTitle, titleTimer, applyMode, warn, setCrazy, askCrazy, the toggle / warning handlers).
 // kiripad-mode=crazy in storage only sets data-want-crazy (head script); the flashing-lights warning asks again on every load.
-// The tab title scrolls on a wall-time interval (legacy setInterval). applyMode emits 'mode.changed' where legacy called the
-// fog's setRunning(!crazy && !document.hidden): page/fog.js answers it. Then the grid re-renders (badges in crazy mode).
+// The tab title scrolls on a wall-time interval (legacy setInterval). applyMode calls the fog's setRunning(!crazy && !document.hidden)
+// at the legacy point, then emits 'mode.changed'. Then the grid re-renders (badges in crazy mode).
 
 import { bus } from '../core/bus.js';
 import { real } from '../core/clock.js';
 import { isCrazy } from '../world/world.js';
 import { render } from './directory.js';
+import * as fog from './fog.js';
 
 const TITLE_MS = 180;   // TUNE-REQUEST: TUNE.crazy.TITLE_MS (legacy setInterval 180 ms per scrolled character)
 
@@ -21,6 +22,7 @@ function applyMode() {
   if (titleTimer) { titleTimer(); titleTimer = null; }
   if (crazy) titleTimer = real.every(TITLE_MS, () => { slopTitle = slopTitle.slice(1) + slopTitle[0]; document.title = slopTitle; });
   else document.title = calmTitle;
+  fog.setRunning(!crazy && !document.hidden);
   bus.emit('mode.changed', { crazy });
   render();
 }
