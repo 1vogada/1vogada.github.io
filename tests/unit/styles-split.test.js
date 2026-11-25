@@ -8,7 +8,7 @@
 //     same specificity and pseudo-element as a selector of the other, or the elements the two selectors style cannot be one
 //     element: different tags, different ids (a bare id is looked up in index.html for its tag), or each needs a different class
 //     of COMPONENTS, the classes that name what an element is and that no element ever carries two of. That last fact is checked
-//     here over every class string in index.html and the page scripts, and in the rendered page in 12 states by
+//     here over every class string in index.html and the page scripts, and in the rendered page in every state of
 //     tests/unit/styles-split.screens.js;
 //  3. the <link> lines in styles/README.md (and in index.html, once the inline block is replaced) are in that same order.
 // The inline block is read from index.html, or, once it has been replaced by the links, from the commit the split was made against.

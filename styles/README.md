@@ -45,10 +45,14 @@ The paths are absolute because index.html is also served for other routes (posts
   `html.crazy` rules that hide a feature (`#kiri`, `.katana`, `.secret`, `.claw`, `#phys`) and `.slop-only` to `crazy.css`,
   `html.hand-show .claw.over …` (inside the slip's rules) to `hand.css`, the cards' reduced-motion block (after the warning) to
   `cards.css`, `.toast` to `base.css`. Moving them changes the order of some pairs of rules, and the order of two rules only
-  matters when both set the same property on the same element with the same specificity and importance. For every reordered
-  pair, `tests/unit/styles-split.test.js` checks that they share no property, or that no selector of one has the same specificity
-  (and pseudo-element) as a selector of the other; no pair needs an exception. `fog.css` could go anywhere for the same reason:
-  it comes after `omikuji` only to keep the requested order.
+  matters when both can set the same property on the same element with the same specificity and importance.
+  `tests/unit/styles-split.test.js` goes through every pair whose order changed (3096 pairs of top-level rules, 607 of them set a
+  property in common) and shows each is one of: no longhand in common; no selector of one with the same specificity and
+  pseudo-element as a selector of the other; or selectors whose subjects can never be one element (different tags, different ids,
+  or different *component* classes such as `.toast` / `.card` / `.reader` / `.claw` / `.slip`, the classes that say what an element
+  is). That no element ever carries two component classes is checked over every class string in index.html and the page
+  scripts, and in the rendered page in every state of the screenshot check. `fog.css` could go anywhere for the same reason: it
+  comes after `omikuji` only to keep the planned order.
 - `@keyframes` names are unique, so where a keyframes rule sits does not matter; each lives with the feature that uses it.
 
 ## Checks
@@ -56,5 +60,10 @@ The paths are absolute because index.html is also served for other routes (posts
 - `node --test tests/unit/styles-split.test.js`: parses the inline block and the seven files (concatenated in link order) with
   Chromium's CSSOM and checks the same rules come out, each file in original order, and the reordered pairs as above. Once the
   inline block is gone from index.html it reads it from git and also checks the `<link>` order in index.html.
-- `node --test tests/unit/styles-split.screens.js` (about a minute): screenshots the page with the inline block and a copy with
-  the links (whichever of the two index.html is not, built in memory) in 12 states and checks they are pixel-identical.
+- `node --test tests/unit/styles-split.screens.js` (about two minutes; not matched by `tests/unit/*.test.js`): screenshots the
+  page with the inline block and a copy with the links (whichever of the two index.html is not, built in memory and served through
+  a route, never written) in 15 states with the harness's frozen clock and seed, and checks they are pixel-identical: light, dark,
+  crazy, 390 px wide, reduced motion, crazy with reduced motion, the slip (light and dark), the hand out talking, a held card
+  talking, the katana drawn, the shelf, the kiri flood, the phrasebook, the post reader in dark by choice. A few drives are not
+  perfectly repeatable on a busy machine (a held card can land a pixel apart even on one page: `SELF=1` compares the page with
+  itself), so each state is tried up to five times and passes when one pair of screenshots is equal. `SHOTS_OUT=dir` keeps them.
