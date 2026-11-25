@@ -89,6 +89,7 @@ export function putBack() {
 /** the katana body or null (legacy katObj) */ export const body = () => katObj;
 /** out of the ground and in the world (legacy k9()) */ export const loose = () => !!katObj && !katObj.root;
 /** legacy say(katObj, 'kbrag', true) when it took the hand off */ export const brag = () => say(katObj, 'katana.brag', { force: true });
+/** it slashed the 棚 writing open (chain fog-slash, 'tana.slashed' in src/reactions.js) */ export const tana = () => katObj && say(katObj, 'katana.tana', { force: true });
 /** the fog was wiped off it (legacy found) */ export const isFound = () => found;
 
 export function install(app) {

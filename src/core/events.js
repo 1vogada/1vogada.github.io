@@ -104,6 +104,7 @@ export const EVENTS = {
   // ---- the old hand pokes you instead (idle-old) ----
   'sev.pestered': '{ hand, n } an old hand poked your still cursor (severed behaviours/pester.js); n: pokes so far, the arm\'s and its own',
   'hand.pestered': '{ hand, n } the arm poked your still cursor in turn with old hand `hand` (hand behaviours/mine.js); n: pokes so far',
+  'tana.slashed': '{ at } the katana\'s tip went across the hidden 棚 writing in the banner while the shelf was in (page/slash.js; at: page px). Reactions: the katana gloats, the shelf opens',
 };
 
 export const EVENT_TYPES = new Set(Object.keys(EVENTS));

@@ -404,6 +404,10 @@ export const TUNE = {
     FREEZE: { STILL_S: 0.8, LOOK_S: 0.5, LOOKS: 3, PRETEND_S: 2.6, END_S: 4.4 },   // the music stops: stock still, then it looks left and right LOOKS times, then pretends nothing happened, then walks on
     BOB: { EDGE_PX: 70, PX: 18, SWAY: 0.22, RATE: 7, WIG: 0.35, SAY_MS: 900 },   // the arm: its wrist this far in from the right edge, bobbing this many px a beat, the hand swaying (rad); its line after SAY_MS
   },
+  // the katana's tip slits the banner fog and the kiri flood (page/slash.js): a hard SLIT_W px line inside a HALO_W px halo of HALO_A,
+  // only while the tip moves at least SLIT_SPEED px/s. Slashing across the 棚 (TANA_PAD px around it) at SLASH_SPEED px/s or more,
+  // in and out over at least ACROSS of its size, splits the writing (SPLIT_PX apart over SPLIT_MS) and opens the shelf; COOL_MS between two
+  fogSlash: { SLIT_W: 2.5, HALO_W: 9, HALO_A: 0.35, SLIT_SPEED: 40, SLASH_SPEED: 500, TANA_PAD: 12, ACROSS: 0.7, SPLIT_PX: 7, SPLIT_MS: 1800, COOL_MS: 1500 },
 };
 
 // ---- timing: how long every speech bubble stays up, how long anyone waits before speaking again, and how long you get to answer ----

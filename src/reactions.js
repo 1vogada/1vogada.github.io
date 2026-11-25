@@ -17,6 +17,7 @@ import * as welcome from './scenes/welcome-back.js';
 import * as rps from './scenes/rps.js';
 import * as toast from './page/toast.js';
 import * as feed from './page/feed.js';
+import * as slash from './page/slash.js';
 
 const notMine = (o) => o.kind !== 'katana' && o.kind !== 'hand';
 
@@ -75,6 +76,10 @@ export const RULES = [
   // ---- the old hand pokes you instead (idle-old: src/actors/severed/pester.js, src/actors/hand/behaviours/mine.js) ----
   ['sev.pestered', ({ hand: o, n }) => hand.pesterTurn(o, n)],                    // the old hand poked your still cursor: the arm's turn
   ['hand.pestered', ({ hand: o, n }) => o && severed.pesterTurn(o, n)],           // ...the arm poked it: the old hand's turn, a little sooner
+  // ---- the katana cuts the fog (chain fog-slash) ----
+  ['blade.moved', (m) => slash.cut(m)],                                            // the tip slits the banner fog and the kiri flood; across 棚: tana.slashed
+  ['tana.slashed', () => katana.tana()],                                           // ...the katana is pleased with itself
+  ['tana.slashed', () => { if (!shelf.state()) shelf.toggle(); }],                 // ...and the shelf slides out
 ];
 
 export function install(app) {

@@ -44,7 +44,7 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 | `katana.equipped` | `{ katana }` | `actors/katana.js` `equip` (double-click): after `katana.hello`, before the joint target is set | `reactions.js`: `hand.notice('katana')` |
 | `katana.dropped` | `{ katana }` | `world/drag.js` `drop`: the katana let go, before its throw speed is computed (so before `body.dropped`) | `actors/katana.js`: forced `katana.drop` line; `reactions.js`: `hand.notice('kdrop')` |
 | `katana.sheathed` | `{ katana }` | `actors/katana.js` `putBack`: after the body is removed (`katana` is the body it was, or null) | none |
-| `blade.moved` | `{ from, to, speed, dt }` | `world/cut.js` `bladeCuts` (tick phase `blade`): once per frame while the katana is loose and moved, after the stroke (cuts, stabs) of that frame | none |
+| `blade.moved` | `{ from, to, speed, dt }` | `world/cut.js` `bladeCuts` (tick phase `blade`): once per frame while the katana is loose and moved, after the stroke (cuts, stabs) of that frame | `reactions.js`: `page/slash.js` `cut` (slits in the banner fog and the kiri flood; a slash across 棚 emits `tana.slashed`) |
 
 ## The arm's hand
 
@@ -128,6 +128,7 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 | `cards.rendered` | `{}` | `page/directory.js` `render`: after the calm grid is rebuilt (not in crazy mode), before the DOM `cards-rendered` event | `actors/cards.js`: drops rooted bodies, keeps torn-out cards hidden |
 | `ui.toast` | `{ msg }` | `actors/cards.js` (first rip), `world/shatter.js` (1st and 10th smash), `actors/hand/tug.js` (first halving), `actors/hand/index.js` (first sever), `actors/katana.js` (found, drawn), `actors/shelf.js` (open / close) | `reactions.js`: `toast.show(msg)` |
 | `search.fed` | `{ what, body, key, query }` | `page/feed.js`: something dropped on the search box has typed itself in (`query`) and the grid filtered, after the scrap's toast. `what`: `'card'` (`key`: its slot) \| `'scrap'` \| `'hand'` (`body`: the old hand) | `reactions.js`: `cards.putBack(key)` for a card (it grows back into its slot, `card.home`); `severed.notThere(body)` for an old hand (`sev.notthere`) |
+| `tana.slashed` | `{ at }` | `page/slash.js` `tana`: the katana's tip went fast across the hidden 棚 writing (in and out), the shelf was in and no slash in the last `TUNE.fogSlash.COOL_MS`; after the writing splits. `at`: where it left, page px | `reactions.js`: `katana.tana()` (line `katana.tana`), then `shelf.toggle()` if the shelf is still in |
 
 ## Notes
 

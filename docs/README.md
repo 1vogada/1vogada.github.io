@@ -42,12 +42,14 @@ public API. Every module exports `install(app)`; `app` holds every module by its
 | the secret shelf (棚 tana) | `src/actors/shelf.js`; opened by `src/page/kiri.js` (typed), `src/page/search.js` (Enter) | `src/lines/shelf.js` (toasts) | `styles/physics.css` |
 | the old hand pokes your still cursor first, then turns with the arm (idle-old) | `src/actors/severed/pester.js` (who, the pace), `severed/behaviours/pester.js`, `hand/behaviours/mine.js` ("that's MY job") | `sev.pester*`, `hand.pester*` | |
 | old hands dance in crazy mode, the arm bobs along | `src/actors/severed/dance.js` (groove, the inline overrides of crazy mode's hiding), `behaviours/dance.js`, `jive.js`, `freeze.js`; `src/actors/hand/bob.js` | `sev.dance/jive/freeze/pretend`, `hand.bob/danced` | inline styles only |
+| the secret shelf (棚 tana) | `src/actors/shelf.js`; opened by `src/page/kiri.js` (typed), `src/page/search.js` (Enter), `src/page/slash.js` (katana across 棚) | `src/lines/shelf.js` (toasts) | `styles/physics.css` |
 | who reacts to whom | `src/reactions.js` (`RULES`, plus `hand.senses(...)` for the shelf) | | |
 | speech bubbles (every one) | `src/core/speech.js`; each actor calls `defineSpeaker` in its `install` | | `styles/physics.css`, `hand.css` |
 | toasts | `src/page/toast.js` (actors emit `ui.toast`) | `toast.*` in each `src/lines/*.js` | `styles/base.css` |
 | the knocked-off toast as a body (kind `toast`) you can throw to the hand | `src/page/bread.js` (from `toast.js`; caught in `hand/behaviours/catch.js`) | `bread.*` in `src/lines/page.js`, `hand.toast`, `hand.toastEat` | inline |
 | greeting typewriter | `src/page/greeting.js` | `greeting.hello` in `src/lines/page.js` | |
 | banner fog; kiri flood and typed secrets | `src/page/fog.js`; `src/page/kiri.js` | `toast.fog` | `styles/fog.css` |
+| the katana slits the fog; slashing 棚 opens the shelf | `src/page/slash.js` (on `blade.moved`, in `reactions.js`); `slit` in `fog.js`, `kiri.js` | `katana.tana` | inline |
 | theme, crazy mode, English only | `src/page/theme.js`, `crazy.js`, `language.js` | | `styles/base.css`, `crazy.css` |
 | Surprise me, the omikuji slip, the secret × | `src/scenes/fortune.js` | `fortune.slip` in `src/lines/page.js` | `styles/omikuji.css` |
 | the coin game; welcome back; scene runner | `src/scenes/coin.js`; `welcome-back.js`; `scene.js` | `hand.*`, `button.hi` | `styles/omikuji.css` |
