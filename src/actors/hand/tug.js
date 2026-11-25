@@ -7,7 +7,6 @@
 import { TUNE } from '../../core/tune.js';
 import { bus } from '../../core/bus.js';
 import { now } from '../../core/clock.js';
-import { say } from '../../core/speech.js';
 import { line } from '../../core/lines.js';
 import { world, remove, hold, fragment, rectPoly } from '../../world/world.js';
 import { polyArea, validPoly } from '../../world/cut.js';
@@ -47,7 +46,7 @@ export function tug(o) {
   o.body.getFixtureList().setFilterData(NONE);   // nothing bumps into a card that is being fought over
   claw.hy = Math.max(90, Math.min(innerHeight - 90, gripPt()[1]));
   set('tug'); speak('grab', true);
-  bus.emit('hand.grabbed', { card: o });
+  bus.emit('hand.grabbed', { card: o, how: 'tug' });
 }
 // the card between the pointer P and the claw H (page px): turned to lie along the pull, stretched to its length, thinner in the middle
 /** legacy tugDraw(o, P, H) */
@@ -92,7 +91,7 @@ export function slip(P, H) {
   set('sulk'); speak('slip', true);
   bus.emit('hand.slipped', { card: o });
 }
-/** torn in two between you and it (legacy clawRip(P, H); P, H: page px of the pointer and of the claw's grip); emits 'hand.ripped' after the toast */
+/** torn in two between you and it (legacy clawRip(P, H); P, H: page px of the pointer and of the claw's grip); 'hand.ripped' where your half screamed */
 export function rip(P, H) {
   { const el = get().o.el; el.style.maskImage = el.style.webkitMaskImage = ''; el.style.filter = ''; }   // the pieces are copies of this element: they must not inherit the stretch look
   const c = get(), o = c.o, g = o.tug, W = o.w, Hh = o.h, cf = Math.cos(g.phi), sf = Math.sin(g.phi);
@@ -137,10 +136,9 @@ export function rip(P, H) {
     const q = loc(k / 8), A = mine.body.getWorldPoint(q), B = its.body.getWorldPoint(q);
     gore(A.x * S, A.y * S, ux, uy, 5, 1); gore(B.x * S, B.y * S, -ux, -uy, 5, 1); gore((A.x + B.x) / 2 * S, (A.y + B.y) / 2 * S, -uy, ux, 3, 0.6);
   }
-  say(mine, 'card.slice', { force: true, scream: true }); set('triumph'); speak('rip', true);
+  bus.emit('hand.ripped', { mine, its }); set('triumph'); speak('rip', true);   // legacy say(mine, 'slice', true): your half screams
   shake();
   if (!c.ripped) { c.ripped = true; bus.emit('ui.toast', { msg: line('toast.halved') }); }
-  bus.emit('hand.ripped', { mine, its });
 }
 
 // the crush takes its time: squeeze, stop and savour, squeeze, let it beg, squeeze, hold, and only then the crunch

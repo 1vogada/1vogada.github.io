@@ -6,7 +6,7 @@ import { say } from '../../../core/speech.js';
 import { world } from '../../../world/world.js';
 import { gore } from '../../../world/fx.js';
 import { POSES } from '../poses.js';
-import { set, speak, clamp01 } from '../index.js';
+import { set, speak, clamp01, tell } from '../index.js';
 import { wristFor, tugDraw, slip, rip } from '../tug.js';
 
 export default defineBehaviour('hand', 'tug', {
@@ -32,7 +32,7 @@ export default defineBehaviour('hand', 'tug', {
     const t = x.t, dt = x.dt, { ripE, strainE } = x;
     const g = c.o.tug, Pp = [grab.cx + scrollX, grab.cy + scrollY];
     g.rip = ripE; tugDraw(c.o, Pp, H);
-    if (g.e > 24) say(c.o, 'card.agony', { mode: 'agony', pain: clamp01(g.e / ripE) });
+    if (g.e > 24) { const card = c.o, pain = clamp01(g.e / ripE); tell('card.hurt', { card, pain }, () => say(card, 'card.agony', { mode: 'agony', pain })); }
     const st = clamp01((g.e - strainE) / (ripE - strainE));
     if (g.e > strainE) {
       g.grip -= dt * (0.1 + 1.6 * st * st); speak('tug');

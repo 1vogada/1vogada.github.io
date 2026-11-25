@@ -31,6 +31,7 @@ import { clock, now } from '../../core/clock.js';
 import { defineSpeaker, say as speechSay, expire, place, flushLater, addFirst, hush } from '../../core/speech.js';
 import { list, line } from '../../core/lines.js';
 import { machine } from '../../core/machine.js';
+import { isEvent } from '../../core/events.js';
 import { claim } from '../../core/claims.js';
 import { hook } from '../../core/debug.js';
 import { world, isCrazy, load, init, report } from '../../world/world.js';
@@ -100,11 +101,18 @@ export function notice(kind) {
   clock.wake();
 }
 
+/**
+ * what the hand does to a card goes out as an event the cards answer with their line (legacy: the claw code said it on the
+ * card at this point). An event the catalogue does not carry yet (card.hurt, card.begged, card.crushed, hand.tossed: requested)
+ * falls back to the legacy speech call, so the line is said exactly once either way
+ */
+export function tell(type, payload, fallback) { if (isEvent(type)) bus.emit(type, payload); else fallback(); }
+
 /** out of patience: it takes the held card (legacy snatch(o)) */
 export function snatch(o) { claw.o = o; set('snatch'); }
 
 // what it can sense of other actors, injected by src/reactions.js:
-// { shelfSnack() -> body|null, nearShelf(P) -> bool, onShelf(o) -> bool, want(v), shelf() -> state|null, katanaSvg?(id) }
+// { shelfSnack() -> body|null, nearShelf(P) -> bool, onShelf(o) -> bool, want(v), shelf() -> state|null }
 let sensed = {};
 /** what senses() was given */ export const sense = () => sensed;
 export function senses(s) { sensed = s || {}; }
@@ -184,17 +192,21 @@ function tick(dt) {
 }
 
 // whatever the arm's hand was holding is let go, whole, as it was
-/** legacy clawLetGo() */
+/**
+ * legacy clawLetGo(). @returns the card it was crushing, or null: legacy said 'card.stab' on it right here; the card now says it
+ * on 'hand.severed' { crushed } (legacy only let go inside sever, and nothing between drew a random number)
+ */
 export function letGo() {
-  const c = claw, o = c.o; if (c.joint) { world.b2.destroyJoint(c.joint); c.joint = null; }
+  const c = claw, o = c.o; let crushed = null; if (c.joint) { world.b2.destroyJoint(c.joint); c.joint = null; }
   if (o && world.bodies.has(o)) {
     const grab = world.grab, mineToo = grab && grab.o === o;
-    if (o.tug && o.tug.crush) { o.tug = null; o.el.style.clipPath = ''; o.el.style.filter = ''; speechSay(o, 'card.stab', { force: true }); }
+    if (o.tug && o.tug.crush) { o.tug = null; o.el.style.clipPath = ''; o.el.style.filter = ''; crushed = o; }   // legacy say(o, 'stab', true): see sever()
     else if (o.tug) { const H = gripPt(), Hp = [H[0] + scrollX, H[1] + scrollY], g = o.tug; untug(o, mineToo ? [grab.cx + scrollX, grab.cy + scrollY] : [Hp[0] - Math.cos(g.psi) * g.d0, Hp[1] - Math.sin(g.psi) * g.d0], Hp); }
     o.el.style.pointerEvents = ''; o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF });
     o.body.setGravityScale(mineToo ? 1 : TUNE.physics.FALL); o.body.setAngularDamping(mineToo ? TUNE.physics.HELD_SPIN : TUNE.physics.SPIN); o.body.setAwake(true);
   }
   c.o = null; c.snap = null;
+  return crushed;
 }
 /**
  * the blade went through the arm (legacy sever(q, v); q: viewport px, v: tip px/s). Emits 'hand.severed' where legacy called
@@ -203,14 +215,16 @@ export function letGo() {
  */
 export function sever(q, v) {
   const c = claw;
-  letGo();
+  const crushed = letGo();
   const ca = Math.cos(c.a), sa = Math.sin(c.a);
-  bus.emit('hand.severed', { x: c.x + 35 * ca + scrollX, y: c.y + 35 * sa + scrollY, a: c.a, pose: c.pose, v, at: q });
+  bus.emit('hand.severed', { x: c.x + 35 * ca + scrollX, y: c.y + 35 * sa + scrollY, a: c.a, pose: c.pose, v, at: q, crushed });
   gore(q[0] + scrollX, q[1] + scrollY, -1, 0, 34, 1); gore(q[0] + scrollX, q[1] + scrollY, 1, 0, 22, 0.8); gore(q[0] + scrollX, q[1] + scrollY, 0, -1, 14, 0.7);
   c.stump = true; c.react = null; c.later = null; c.said = 0; set('stump'); speak('severed', true);
   shake();
   if (!c.cutOnce) { c.cutOnce = true; bus.emit('ui.toast', { msg: line('toast.severed') }); }
 }
+/** cut the hand off now (legacy __sev.cut: `claw && sever([claw.x, claw.y], [0, 0])`) */
+export function cut() { return claw && sever([claw.x, claw.y], [0, 0]); }
 /** legacy clawReset() ("Put the cards back") */
 export function reset() {
   const c = claw; if (!c) return;
@@ -249,5 +263,5 @@ export function install(app) {
   clock.keepAwake(busy);
   bus.on('world.reset', reset);
   report('claw', () => claw);
-  hook('__hand', { get, draw, set, POSES, katanaSvg: (id) => (sensed.katanaSvg ? sensed.katanaSvg(id) : ''), come, to, say, grip, leave });
+  hook('__hand', { get, draw, set, POSES, katanaSvg: (id) => (app && app.katana && app.katana.katanaSvg ? app.katana.katanaSvg(id) : '')   /* the katana's drawing, read off app (no actor import) */, come, to, say, grip, leave });
 }

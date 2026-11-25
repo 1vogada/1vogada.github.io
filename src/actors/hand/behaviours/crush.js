@@ -7,7 +7,7 @@ import { bus } from '../../../core/bus.js';
 import { say, sayAt } from '../../../core/speech.js';
 import { remove } from '../../../world/world.js';
 import { gore, shake } from '../../../world/fx.js';
-import { set, speak } from '../index.js';
+import { set, speak, tell } from '../index.js';
 import { wristFor, crushQ, crushPause } from '../tug.js';
 
 const S = TUNE.physics.S;
@@ -30,12 +30,12 @@ export default defineBehaviour('hand', 'crush', {
     ob.el.style.clipPath = `polygon(${g.pts.map(([px, py, r]) => `${(px + (ob.w / 2 - px) * q * r).toFixed(1)}px ${(py + (ob.h / 2 - py) * q * r).toFixed(1)}px`).join(',')})`;
     ob.el.style.filter = `saturate(${(1 + q).toFixed(2)}) sepia(${(0.4 * q).toFixed(2)}) hue-rotate(-${(30 * q).toFixed(0)}deg) brightness(${(1 - 0.25 * q).toFixed(2)})`;
     if (rest && m.t > 2.5 && m.t < 3.7) {   // in the long pause it begs
-      if (!g.beg) { g.beg = true; say(ob, 'card.beg', { mode: 'plain' }); }
-    } else if (!rest) say(ob, 'card.agony', { mode: 'agony', pain: 0.35 + 0.65 * q });
+      if (!g.beg) { g.beg = true; tell('card.begged', { card: ob }, () => say(ob, 'card.beg', { mode: 'plain' })); }
+    } else if (!rest) { const pain = 0.35 + 0.65 * q; tell('card.hurt', { card: ob, pain }, () => say(ob, 'card.agony', { mode: 'agony', pain })); }
     if (t > (g.drip || 0)) { g.drip = t + (rest ? 260 : 70); gore(H[0], H[1], 0, 1, 2 + Math.round(4 * q), 0.3 + 0.4 * q); }
     if (q >= 1) {
       gore(H[0], H[1], -1, 0, 54, 1.1); gore(H[0], H[1], 0, -1, 22, 0.8);
-      sayAt(H[0], H[1] - 70, 'card.slice', { scream: true });
+      tell('card.crushed', { card: ob, at: [H[0], H[1]] }, () => sayAt(H[0], H[1] - 70, 'card.slice', { scream: true }));
       ob.tug = null; remove(ob); c.o = null;
       shake();
       set('gloat'); speak('crush', true);

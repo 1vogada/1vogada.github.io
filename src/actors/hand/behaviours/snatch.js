@@ -23,7 +23,7 @@ export default defineBehaviour('hand', 'snatch', {
       if (Math.hypot(q[0] - Hc[0], q[1] - Hc[1]) < 34) {   // got it: out of your hand and into its fist
         drop(); crushStart(o);
         set('crush'); speak('snatch', true);
-        bus.emit('hand.grabbed', { card: o });
+        bus.emit('hand.grabbed', { card: o, how: 'snatch' });
       } else if (m.t > 0.9) { c.o = null; set('sulk'); speak('sulk'); }
     }
   },

@@ -3,7 +3,6 @@
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
-import { say } from '../../../core/speech.js';
 import { world } from '../../../world/world.js';
 import { POSES } from '../poses.js';
 import { set, speak } from '../index.js';
@@ -23,14 +22,13 @@ export default defineBehaviour('hand', 'catch', {
       x.aim = Math.atan2(Hc[1] - c.y, Hc[0] - c.x); if (Math.cos(x.aim) > -0.2) x.aim = Math.PI; x.T = wristFor(Hc, x.aim);
       if (dist < 70) {
         o.body.setLinearVelocity({ x: 0, y: 0 }); o.body.setAngularVelocity(o.body.getAngularVelocity() * 0.2); o.hot = 0; o.body.setBullet(false);
-        say(o, 'card.pull', { force: true }); speak('caught', true);
+        bus.emit('hand.grabbed', { card: o, how: 'catch' }); speak('caught', true);   // legacy say(o, 'pull', true): the card says it
         if (Math.random() < H_.CATCH_CHANCE_CRUSH) { crushStart(o); set('crush'); }   // sometimes it does not feel like sharing
         else {
           o.body.setAngularDamping(TUNE.physics.HELD_SPIN); c.gh = [0, 0]; c.pre = {}; c.snap = null; c.hy = Math.max(110, Math.min(x.vh - 110, Hc[1]));
           c.joint = world.b2.createJoint(new world.pl.MouseJoint({ maxForce: TUNE.physics.MAX_FORCE * o.body.getMass(), frequencyHz: H_.JOINT_HZ, dampingRatio: 1 }, world.ground, o.body, { x: w.x, y: w.y }));
           set('has');
         }
-        bus.emit('hand.grabbed', { card: o });
       } else if (m.t > 0.6) { c.o = null; c.cool = x.t + H_.COOL.catch; set('sulk'); speak('sulk'); }
     }
   },

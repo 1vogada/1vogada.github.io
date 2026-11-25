@@ -1,10 +1,9 @@
 // hand state "reach": creeps across the screen to a card on the shelf; emits hand.reaching every frame (cards panic); crushes (40%) or drags it off to eat.
 // Legacy clawTick branch `c.st === 'reach'`, moved verbatim (legacy panic(o, fear, dt, t) is the event 'hand.reaching', answered by
-// the cards in src/reactions.js). tick(c, m, dt) sets the motion target on the frame's ctx m.x.
+// the cards in src/reactions.js; legacy say(o, 'pull', true) is 'hand.grabbed' { how: 'reach' }, answered by the cards). tick(c, m, dt) sets the motion target on the frame's ctx m.x.
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
-import { say } from '../../../core/speech.js';
 import { world } from '../../../world/world.js';
 import { POSES } from '../poses.js';
 import { set, speak, shelf, clamp01 } from '../index.js';
@@ -26,14 +25,13 @@ export default defineBehaviour('hand', 'reach', {
       x.T = [c.x + dx / dl * lead, c.y + dy / dl * lead];   // never further ahead than this: a steady creep, easing in only at the very end
       bus.emit('hand.reaching', { card: o, fear, dt, t, x: c.x });   // legacy panic(o, fear, dt, t)
       if (dist < 36 && m.t > 2.4) {   // it hovers over it for a moment, then: got it. A whole card may get crushed on the spot; otherwise it is dragged off and eaten
-        o.hot = 0; say(o, 'card.pull', { force: true }); c.cool = t + H_.COOL.grab; c.d0 = null;
+        o.hot = 0; bus.emit('hand.grabbed', { card: o, how: 'reach' }); c.cool = t + H_.COOL.grab; c.d0 = null;
         if (o.kind === 'card' && Math.random() < H_.REACH_CHANCE_CRUSH) { crushStart(o); set('crush'); speak('snatch', true); }
         else {
           o.body.setAngularDamping(TUNE.physics.HELD_SPIN); o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 }); o.el.style.pointerEvents = 'none';
           c.joint = world.b2.createJoint(new world.pl.MouseJoint({ maxForce: TUNE.physics.MAX_FORCE * o.body.getMass(), frequencyHz: H_.JOINT_HZ, dampingRatio: 1 }, world.ground, o.body, { x: w.x, y: w.y }));
           set('eat'); speak('grab', true);
         }
-        bus.emit('hand.grabbed', { card: o });
       }
     }
   },
