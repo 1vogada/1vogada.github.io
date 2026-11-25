@@ -20,7 +20,8 @@ export default defineBehaviour('hand', 'eager', {
     else if (m.t > c.patience && P[0] < vw - x.NEAR) { if (Math.random() < H_.SNATCH_AGAIN) snatch(held); else { c.patience = m.t + TIMING.span(TIMING.wait.teaseAgain) / 1000; speak('eager', true); } }
     else {
       c.ly = Math.max(80, Math.min(x.vh - 80, P[1])); x.T = [vw - 10, P[1]]; x.aim = Math.atan2(P[1] - c.y, P[0] - c.x); if (Math.cos(x.aim) > -0.4) x.aim = Math.PI;
-      if (c.far && teased && P[0] > vw - x.NEAR) { c.o = held; c.pre = pre(held); set('lunge'); } else if (m.t > 2.6) speak('eager');
+      // brought close: a tug of war for a whole card; a piece is not worth one, it just takes it
+      if (c.far && teased && P[0] > vw - x.NEAR) { if (held.kind !== 'card') snatch(held); else { c.o = held; c.pre = pre(held); set('lunge'); } } else if (m.t > 2.6) speak('eager');
     }
   },
 });

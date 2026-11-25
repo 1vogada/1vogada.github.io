@@ -78,6 +78,7 @@ const CHAPTERS = [
       'hand.eat',
       'hand.keep',
       'hand.toss',
+      'hand.small',
       'hand.sulk',
       { fig: 'sulking' },
       'hand.snatch',

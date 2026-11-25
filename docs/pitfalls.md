@@ -138,6 +138,14 @@ notches live in `world.loose` by card key until "Put the cards back"). The harne
 for its one pull, so scenarios that only need a loose card keep their recorded timing. Use `s.tugOut(i)` to pull one out the way
 a visitor does. Do not add an extra `ensurePlanck()` or mouse move before a pull in a helper: it shifts every later time by a frame.
 
+## 12c. The hand keeps away until a card has left its slot
+
+`hand.awake()` (`world.everRipped()`, sessionStorage `kiripad-ripped`, set by `world.markRipped`) gates everything that calls the
+hand in: `hand.come()`, `H()` in `scenes/fortune.js` (Surprise me, the coin, welcome back) and the phrasebook raid. A scenario that
+wants the hand without ripping a card first passes `session: { 'kiripad-ripped': '1' }`. Pieces: the hand takes `edible()` bodies
+(cards, and pieces that are not fading); `big()` (`TUNE.hand.PIECE_BIG` of the card's area) decides between eating a piece and
+rejecting it (`hand.small`).
+
 ## 13. Legacy bugs deliberately kept
 
 Kept on purpose so old and new behave the same. Fix one only as a deliberate behaviour change (item 12).

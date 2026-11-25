@@ -491,6 +491,21 @@
    ["いらない","ja","do not want it"]
   ]
  },
+ "hand.small": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"A scrap","when":"You offer it, or throw it, a piece that is less than about a third of a card. It will not have it: held out, it turns away; thrown, it bats it back. Bigger pieces it eats."},
+  "lines": [
+   ["too small.","en"],
+   ["crumbs?!","en"],
+   ["that is a scrap","en"],
+   ["I said a CARD","en"],
+   ["not worth chewing","en"],
+   ["bring the rest","en"],
+   ["трохи?!","bg","crumbs?!"],
+   ["ちっちゃい…","ja","so tiny…"]
+  ]
+ },
  "hand.sulk": {
   "who": "hand",
   "legacy": "CLAW_SAY.sulk",

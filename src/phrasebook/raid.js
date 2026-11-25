@@ -18,7 +18,7 @@ import * as menu from './menu.js';
 
 let app = null;
 /** legacy window.__hand (absent under reduced motion) */
-const hand = () => (app && !app.reduced && app.hand ? app.hand : null);
+const hand = () => (app && !app.reduced && app.hand && app.hand.awake() ? app.hand : null);   // no raid before the hand has shown itself on the page
 // every wait and bubble time comes from the page's one table (TIMING)
 const TM = TIMING, LINGER = TM.wait.book, HELP_WAIT = TM.wait.help / 1000, GAP = TM.gap.raid, ASK_GAP = TM.gap.raidAsk;
 const R = TUNE.raid, { S, DT, GRAV, FALL, SMASH, GRIP } = R, TICK = R.ARM_TICK_MS;

@@ -62,6 +62,14 @@ defineLines('hand.toss', ['bored.', 'catch.', 'yeet', 'tastes like JavaScript', 
   lang: ['en', 'en', 'en', 'en', 'ja'],
 });
 
+defineLines('hand.small', ['too small.', 'crumbs?!', 'that is a scrap', 'I said a CARD', 'not worth chewing', 'bring the rest', 'трохи?!', 'ちっちゃい…'], {
+  who: 'hand',
+  trigger: { title: 'A scrap',
+    when: 'You offer it, or throw it, a piece that is less than about a third of a card. It will not have it: held out, it turns away; thrown, it bats it back. Bigger pieces it eats.' },
+  gloss: { 'трохи?!': 'crumbs?!', 'ちっちゃい…': 'so tiny…' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
 defineLines('hand.sulk', ['aww.', 'tease.', 'rude.', 'fine.', 'ケチ', 'пф.'], {
   who: 'hand', legacy: 'CLAW_SAY.sulk',
   trigger: { title: 'Sulking',

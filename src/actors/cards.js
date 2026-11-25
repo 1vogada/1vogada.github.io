@@ -64,7 +64,7 @@ function uproot(o) {
   const card = o.el, el = W.cloneCard(card);
   el.style.width = o.w + 'px'; el.style.height = o.h + 'px'; el._o = o; world.layer.appendChild(el);
   world.rootOf.delete(card); card.classList.remove('pulling'); card.style.transform = ''; card.classList.add('held');
-  o.el = el; o.ex = o.w / 2; o.ey = o.h / 2; o.root = null; world.ripped.add(o.key); world.loose.delete(o.key);
+  o.el = el; o.ex = o.w / 2; o.ey = o.h / 2; o.root = null; W.markRipped(o.key); world.loose.delete(o.key);
   o.body.setGravityScale(TUNE.physics.FALL);
   o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF });
   if (world.grab && world.grab.o === o) { world.grab.joint.setFrequency(TUNE.drag.HAND_HZ); world.grab.joint.setDampingRatio(TUNE.drag.HAND_DAMPING); W.carry(o); }

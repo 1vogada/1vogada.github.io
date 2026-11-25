@@ -124,6 +124,12 @@ export function buildWalls() {
   clock.wake();
 }
 
+const RIPPED = 'kiripad-ripped';
+/** a card left its slot: note its key, and remember for the rest of the tab's session that one ever did (the hand shows itself only after that) */
+export function markRipped(key) { world.ripped.add(key); if (!world.everRipped) { world.everRipped = true; try { sessionStorage.setItem(RIPPED, '1'); } catch (e) {} } }
+/** has a card ever been taken out of its slot in this tab (kept in sessionStorage across reloads) */
+export function everRipped() { if (!world.everRipped) { try { world.everRipped = sessionStorage.getItem(RIPPED) === '1'; } catch (e) {} } return !!world.everRipped; }
+
 /** a copy of a grid card for the physics layer (legacy cloneCard) */
 export function cloneCard(card) {
   const el = card.cloneNode(true);
@@ -178,7 +184,7 @@ export function freeCard(card) {
   el.style.width = r.width + 'px'; el.style.height = r.height + 'px'; world.layer.appendChild(el);
   const o = add({ kind: 'card', el, w: r.width, h: r.height, ex: r.width / 2, ey: r.height / 2, key: card.dataset.key },
     (r.left + r.width / 2 + scrollX) / S, (r.top + r.height / 2 + scrollY) / S, 0, new world.pl.Box(r.width / 2 / S, r.height / 2 / S));
-  el._o = o; card.classList.add('held'); world.ripped.add(o.key); showReset();
+  el._o = o; card.classList.add('held'); markRipped(o.key); showReset();
   return o;
 }
 

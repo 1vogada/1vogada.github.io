@@ -33,7 +33,8 @@ import { list, line } from '../../core/lines.js';
 import { machine } from '../../core/machine.js';
 import { claim } from '../../core/claims.js';
 import { hook } from '../../core/debug.js';
-import { world, isCrazy, load, init, report } from '../../world/world.js';
+import { world, isCrazy, load, init, report, everRipped } from '../../world/world.js';
+import { polyArea } from '../../world/cut.js';
 import { gore, shake } from '../../world/fx.js';
 import { handParts, handDraw } from './draw.js';
 import { POSES } from './poses.js';
@@ -47,6 +48,13 @@ const html = () => document.documentElement;
 export const clamp01 = (v) => Math.max(0, Math.min(1, v)), wrapA = (a) => a - 2 * Math.PI * Math.round(a / (2 * Math.PI));
 
 let claw = null, m = null;
+
+/** it stays away, scenes and the phrasebook included, until a card has been taken out of its slot (in this tab's session) */
+export const awake = () => everRipped();
+/** what it takes for food: whole cards, and pieces of cards that are not crumbling away */
+export const edible = (o) => o.kind === 'card' || (o.kind === 'piece' && !o.die);
+/** a whole card, or a piece big enough to be worth eating (TUNE.hand.PIECE_BIG of the card's area); smaller pieces it rejects */
+export const big = (o) => o.kind === 'card' || !o.poly || polyArea(o.poly) >= H_.PIECE_BIG * o.w * o.h;
 
 /** a direct write of c.st (legacy `c.st = st`): no restart of t, no until, no wake */
 function rawSet(st) { if (!m || st === m.state) return; const t = m.t; m.set(st); m.t = t; }
@@ -131,7 +139,7 @@ function tick(dt) {
   const vw = html().clientWidth, vh = innerHeight, t = now(); m.age(dt);
   if (c.o && !world.bodies.has(c.o)) { c.o = null; c.joint = null; c.snap = null; if (!m.def.calm) { set('sulk'); speak('sulk'); } }   // someone cut or smashed what it was holding
   if (world.grab !== c.g) { c.g = world.grab; c.far = false; }
-  const grab = world.grab, P = grab ? [grab.cx, grab.cy] : null, held = grab && grab.o.kind === 'card' && !grab.o.root ? grab.o : null, o = c.o;
+  const grab = world.grab, P = grab ? [grab.cx, grab.cy] : null, held = grab && !grab.o.root && edible(grab.o) ? grab.o : null, o = c.o;
   const NEAR = Math.min(H_.NEAR[0], vw * H_.NEAR[1]), FAR = Math.min(300, vw * 0.5), Z = zones(vw), HOLD = Math.min(110, vw * 0.2);
   const ripE = Math.min(330, 0.3 * Math.min(vw, vh)), strainE = 0.4 * ripE;
   if (P && P[0] < vw - FAR) c.far = true;   // a card has to be brought over, not just be there
@@ -139,7 +147,7 @@ function tick(dt) {
   const x = { t, dt, vw, vh, P, held, o, NEAR, FAR, Z, HOLD, ripE, strainE, T: [vw + H_.LURK_X, c.ly], rate: 6, aim: Math.PI, pose: POSES.lurk, wig: 0.05, shake: 0, strain: 0 };
   if (!c.o && m.def.catches) {   // a card thrown its way: it goes for the catch
     for (const q of world.bodies) {
-      if (q.kind !== 'card' || q.root || q.tug || (world.grab && world.grab.o === q)) continue;
+      if (!edible(q) || q.root || q.tug || (world.grab && world.grab.o === q)) continue;
       const v = q.body.getLinearVelocity(), w = q.body.getWorldCenter(), sx = w.x * S - scrollX, sy = w.y * S - scrollY;
       if (v.x > 5 && Math.hypot(v.x, v.y) > 8 && sx > Z.grab && sx < vw + 40 && sy > 20 && sy < vh - 20) { c.o = q; set('catch'); break; }
     }
@@ -228,6 +236,7 @@ export function reset() {
 // Surprise me calls it in for a scene: come() brings its grip to a point (viewport px), to() moves or re-poses it, say() and leave()
 /** bring the grip to (x, y) viewport px in a pose; state 'show'. @returns {Promise<void>} */
 export async function come(x, y, pose) {
+  if (!awake()) return;
   await load(); init(); if (!claw) clawInit();
   claw.show = { x, y, pose: pose || 'eager', rate: 6, bob: true }; claw.y = y; claw.ly = y; claw.sh = y + 70; set('show');
 }
@@ -255,5 +264,5 @@ export function install(app) {
   clock.keepAwake(busy);
   bus.on('world.reset', reset);
   report('claw', () => claw);
-  hook('__hand', { get, draw, set, POSES, katanaSvg: (id) => (app && app.katana && app.katana.katanaSvg ? app.katana.katanaSvg(id) : '')   /* the katana's drawing, read off app (no actor import) */, come, to, say, grip, leave });
+  hook('__hand', { get, draw, set, POSES, katanaSvg: (id) => (app && app.katana && app.katana.katanaSvg ? app.katana.katanaSvg(id) : '')   /* the katana's drawing, read off app (no actor import) */, come, to, say, grip, leave, awake });
 }

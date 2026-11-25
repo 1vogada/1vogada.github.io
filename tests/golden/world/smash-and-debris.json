@@ -36,11 +36,27 @@
   },
   {
    "doc": 1,
-   "t": 3696,
+   "t": 2560,
+   "ms": 608,
+   "who": "hand",
+   "key": "hand.small",
+   "text": "bring the rest"
+  },
+  {
+   "doc": 1,
+   "t": 3168,
+   "ms": 1312,
+   "who": "hand",
+   "key": "hand.small",
+   "text": "too small."
+  },
+  {
+   "doc": 1,
+   "t": 5168,
    "ms": 1312,
    "who": "hand",
    "key": "CLAW_SAY.throw",
-   "text": "pass it!"
+   "text": "over here!"
   }
  ],
  "states": [
@@ -84,6 +100,34 @@
   {
    "doc": 1,
    "t": 1872,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 27,
+    "piece": 8
+   }
+  },
+  {
+   "doc": 1,
+   "t": 2572,
+   "claw": "sulk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 27,
+    "piece": 8
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4272,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",
