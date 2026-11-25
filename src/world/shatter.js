@@ -15,7 +15,7 @@
 import { TUNE } from '../core/tune.js';
 import { bus } from '../core/bus.js';
 import { clock } from '../core/clock.js';
-import { say, sayAt } from '../core/speech.js';
+import { sayAt } from '../core/speech.js';
 import { line } from '../core/lines.js';
 import { world, remove, rectPoly, fragment } from './world.js';
 import { polyArea, inside } from './cut.js';
