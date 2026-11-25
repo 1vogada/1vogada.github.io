@@ -44,7 +44,7 @@ scenario(G, 'open, every line list shown, close', async (s) => {
   assert.equal((await s.eval(pb)).raid, null, 'and none once it is closed');
 });
 
-scenario(G, 'raid with all four picks (throw, eat, help, scroll) and the swat', { rand: 0.3, timeout: 240000 }, async (s) => {
+scenario(G, 'raid with all four picks (throw, eat, help, scroll) and the swat', { rand: 0.3, timeout: 240000, legacy: false }, async (s) => {
   await s.ensurePlanck();
   await openBook(s);
   await s.run(4800, 100);

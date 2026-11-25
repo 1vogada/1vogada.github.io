@@ -334,11 +334,34 @@ class Session {
   }
   // tear a card out of the grid: a 420 px pull, by default straight up, in about a second (a faster rip is not shouted about:
   // the pull line is younger than TIMING.gap.show). The button stays down and the card hangs from the pointer
+  // A card comes out like a tooth (TUNE.drag.TUGS tugs, see tugOut). rip() is the shortcut most scenarios want: for this one pull the
+  // card needs a single tug (window.__cards.drag.TUGS = 1), so it tears out as it did when the scenarios were recorded.
   async rip(i, { dx = 0, dy = -420, fx = 0.5, fy = 0.5, n = 60 } = {}) {
+    const tugs = LEGACY ? 0 : await this.page.evaluate(() => { const d = window.__cards.drag, was = d.TUGS; d.TUGS = 1; return was; });
     const p = await this.pull(i, dx, dy, { fx, fy, n });
+    if (tugs) await this.page.evaluate((n) => { window.__cards.drag.TUGS = n; }, tugs);
     const ok = await this.page.evaluate(() => { const g = window.__cards.state().grab; return !!g && !g.o.root; });
     if (!ok) throw new Error('rip: the card did not tear');
     return p;
+  }
+  // tear a card out the way a visitor has to: tug to 62% of the way until the root gives a notch, ease off, wait for the line to
+  // age (a forced line does not replace one younger than TIMING.gap.show), and again; the last tug goes all the way
+  async tugOut(i, { dx = 0, dy = -420, fx = 0.5, fy = 0.5, n = 60 } = {}) {
+    await this.ensurePlanck();
+    const c = await this.cardBox(i), x = c.x + c.w * fx, y = c.y + c.h * fy, at = (f) => [x + dx * f, y + dy * f];
+    await this.move(x, y, 16); await this.down(16);
+    await this.line(x, y, ...at(0.1), 4);
+    const o = await this.page.evaluate(() => { const g = window.__cards.state().grab; return g ? { tugs: g.o.tugs || 1, loose: g.o.loose || 0 } : null; });
+    if (!o) throw new Error('tugOut: no card was taken hold of');
+    for (let k = o.loose; k < o.tugs - 1; k++) {
+      await this.line(...at(0.1), ...at(0.62), 12);
+      await this.runUntil((k) => window.__cards.state().grab.o.loose > k, k, { max: 4000, step: 16 });
+      await this.line(...at(0.62), ...at(0.1), 8); await this.run(640, 16);
+    }
+    await this.line(...at(0.1), ...at(1), Math.max(8, Math.round(n / 2)));
+    const ok = await this.page.evaluate(() => { const g = window.__cards.state().grab; return !!g && !g.o.root; });
+    if (!ok) throw new Error('tugOut: the card did not tear');
+    return at(1);
   }
   // scroll the page to y (default: the bottom) in steps of `step` px a frame, while whatever is held stays under the pointer
   async scrollHolding(y = null, step = 60) {

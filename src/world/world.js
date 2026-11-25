@@ -31,10 +31,10 @@ import { clock } from '../core/clock.js';
 import { hush, defineSpeaker, setLayoutSource } from '../core/speech.js';
 import { hook, flags } from '../core/debug.js';
 import { onContact } from './shatter.js';
-import { hold, drop, carry, onPull, onTear } from './drag.js';
+import { hold, drop, carry, onPull, onTear, onGive, onSnap } from './drag.js';
 import { clearBits } from './fx.js';
 
-export { hold, drop, carry, onPull, onTear };
+export { hold, drop, carry, onPull, onTear, onGive, onSnap };
 
 export const S = TUNE.physics.S;
 export const DT = TUNE.physics.DT;
@@ -65,6 +65,7 @@ export const world = {
   /** every body record, in insertion order (legacy objs) */ bodies: new Set(),
   /** grid card element -> its rooted body while pulled or springing back */ rootOf: new Map(),
   /** data-keys of cards torn out of the grid */ ripped: new Set(),
+  /** data-key -> how many notches a grid card's root has given (it comes out like a tooth, TUNE.drag.TUGS) */ loose: new Map(),
   /** @type {Grab|null} */ grab: null,
   /** a pointer press on a grid card that has not started a pull yet */ press: null,
   /** the katana body whose tip cuts, or null */ blade: null,
@@ -213,7 +214,7 @@ export function reset() {
   bus.emit('world.reset', {});
   for (const o of [...world.bodies]) remove(o);
   clearBits();
-  world.hits.length = 0; world.blasts.length = 0; world.ripped.clear(); if (resetBtn) resetBtn.hidden = true;
+  world.hits.length = 0; world.blasts.length = 0; world.ripped.clear(); world.loose.clear(); if (resetBtn) resetBtn.hidden = true;
 }
 
 /** the body whose tip cuts (the katana actor calls it) */
@@ -242,6 +243,6 @@ export function install(app) {
   // sayAt bubbles (the smash scream, a stab or a cut in the grid) are left in the #phys layer, like legacy bubble()
   defineSpeaker('page', { layer: () => world.layer });
   setLayoutSource(() => world.bodies);
-  hook('__cards', { objs: world.bodies, S, bits: world.bits,
+  hook('__cards', { objs: world.bodies, S, bits: world.bits, drag: TUNE.drag /* live: the harness sets TUGS to 1 for a one-pull rip */,
     state: () => ({ grab: world.grab, press: world.press, loopOn: clock.running(), size: world.size, found: ask('found', false), katana: ask('katana', world.blade), claw: ask('claw', null), shelf: ask('shelf', null) }), reported });
 }

@@ -130,6 +130,14 @@ These were built to prove the refactor changed nothing; an intended change trips
 
 **Do:** say in your commit which goldens, snapshots or fixtures changed on purpose and why.
 
+## 12b. Cards come out like teeth; `s.rip` is a shortcut
+
+A grid card needs `TUNE.drag.TUGS` tugs (hold the strain until the root gives a notch, ease under `EASE`, tug again); pulled past
+`RIP` before the last notch it tears in two (`actors/cards.js` `give`, `snap`; the counting is in `world/loop.js` `bodies`; the
+notches live in `world.loose` by card key until "Put the cards back"). The harness's `s.rip(i)` sets `window.__cards.drag.TUGS = 1`
+for its one pull, so scenarios that only need a loose card keep their recorded timing. Use `s.tugOut(i)` to pull one out the way
+a visitor does. Do not add an extra `ensurePlanck()` or mouse move before a pull in a helper: it shifts every later time by a frame.
+
 ## 13. Legacy bugs deliberately kept
 
 Kept on purpose so old and new behave the same. Fix one only as a deliberate behaviour change (item 12).

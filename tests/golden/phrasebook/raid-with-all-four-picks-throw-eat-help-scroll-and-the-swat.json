@@ -92,7 +92,7 @@
   },
   {
    "doc": 1,
-   "t": 21920,
+   "t": 21936,
    "ms": 1520,
    "who": "pb-hand",
    "key": "PB.SCROLL_SAY",
@@ -100,7 +100,7 @@
   },
   {
    "doc": 1,
-   "t": 24528,
+   "t": 24544,
    "ms": 1504,
    "who": "pb-hand",
    "key": "PB.MORE_SAY",
@@ -108,7 +108,7 @@
   },
   {
    "doc": 1,
-   "t": 27136,
+   "t": 27152,
    "ms": 1504,
    "who": "pb-hand",
    "key": "PB.MORE_SAY",
@@ -116,7 +116,7 @@
   },
   {
    "doc": 1,
-   "t": 29744,
+   "t": 29760,
    "ms": 1904,
    "who": "pb-hand",
    "key": "NOTME|PB.HIDE_SAY",
@@ -418,6 +418,17 @@
   {
    "doc": 1,
    "t": 33188,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:pick:throw",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 33238,
    "claw": "book",
    "sev": "",
    "pb": "raid:reach:throw",

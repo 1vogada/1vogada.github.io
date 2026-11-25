@@ -22,6 +22,7 @@ export const RULES = [
   ['katana.dropped', () => hand.notice('kdrop')],                                  // drop(): after the katana's "kdrop"
   ['body.thrown', ({ body }) => notMine(body) && hand.notice('throw')],            // drop(): after the card's "throw"
   ['card.ripped', () => hand.notice('loose')],                                     // tear(): after "rip", before the first-rip toast
+  ['card.snapped', () => hand.notice('loose')],                                    // snap(): after your half's scream (the hand sees a card leave the grid)
   ['card.smashed', () => hand.notice('smash')],                                    // shatter(): after the smash scream, before remove
   ['katana.drawn', () => hand.notice('katana')],                                   // freeKatana(): after "khello"
   ['katana.equipped', () => hand.notice('katana')],                                // equip(): after "khello"

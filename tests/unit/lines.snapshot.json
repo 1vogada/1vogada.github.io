@@ -42,7 +42,7 @@
  "card.rip": {
   "who": "card",
   "legacy": "SAY.rip",
-  "trigger": {"title":"Torn out","when":"You pull past 350 px, or hold the strain until the root gives up. The card comes loose in your hand."},
+  "trigger": {"title":"Torn out","when":"The third tug. The root gives up and the card comes loose in your hand."},
   "lines": [
    ["AAAH!","en"],
    ["nooo!","en"],
@@ -50,6 +50,21 @@
    ["ау!","bg","ow!"],
    ["I was comfy!","en"],
    ["put me back!","en"]
+  ]
+ },
+ "card.loosen": {
+  "who": "card",
+  "legacy": null,
+  "trigger": {"title":"A tug, like a tooth","when":"You hold the strain until the root gives a notch. Ease off and tug again: a card comes out on the third tug. Yank it past 350 px before that and it tears in two."},
+  "lines": [
+   ["*crack*","en"],
+   ["I felt that!","en"],
+   ["that was a root!","en"],
+   ["wiggle wiggle","en"],
+   ["not again…","en"],
+   ["one more and I go","en"],
+   ["пук!","bg","crack!"],
+   ["ぐらぐら…","ja","wobbly…"]
   ]
  },
  "card.throw": {
@@ -294,6 +309,14 @@
   "trigger": null,
   "lines": [
    ["10 cards smashed. Feeling better?","en"]
+  ]
+ },
+ "toast.snapped": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["Too hard: it tore. Tug a few times instead, like pulling a tooth.","en"]
   ]
  },
  "toast.halved": {
