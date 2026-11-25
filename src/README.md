@@ -1,6 +1,6 @@
 # src/: the new kiripad.dev code
 
-Native ES modules, no build step. Loaded only through `/src/main.js` behind `?next` until the parity suite passes on old
+Native ES modules, no build step. Loaded through `/src/main.js` by default since the parity suite passed (all 35 scenarios, strict); `?legacy` loads the old script. Was behind `?next` until the parity suite passes on old
 and new; then the default flips. **Nothing here may change behaviour**: same lines, same timings, same random draws in the
 same order (a seeded `Math.random` gives identical runs old vs new), same order of effects within a frame.
 

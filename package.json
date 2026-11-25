@@ -3,8 +3,8 @@
   "private": true,
   "description": "kiripad.dev: the static site and its browser test suite (no build step; the site itself needs none of this)",
   "scripts": {
-    "test": "node --test --test-concurrency=1 --test-reporter=spec \"tests/scenarios/*.test.js\"",
-    "test:next": "NEXT=1 node --test --test-concurrency=1 --test-reporter=spec \"tests/scenarios/*.test.js\"",
+    "test": "NEXT=1 node --test --test-concurrency=1 --test-reporter=spec \"tests/scenarios/*.test.js\"",
+    "test:legacy": "node --test --test-concurrency=1 --test-reporter=spec \"tests/scenarios/*.test.js\"",
     "test:golden": "UPDATE_GOLDEN=1 node --test --test-concurrency=1 --test-reporter=spec \"tests/scenarios/*.test.js\"",
     "check:legacy": "node tests/helpers/check-legacy-move.js",
     "stamp": "node scripts/stamp.mjs",

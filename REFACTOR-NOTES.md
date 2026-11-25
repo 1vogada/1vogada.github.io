@@ -1,3 +1,5 @@
+> **Since the flip (wave 4):** the modules under `src/` are the default and the old script loads only with `?legacy`. `npm test` runs the scenarios on the modules, `npm run test:legacy` on the old script, both with strict matching. Where the notes below say `?next`, read "the default".
+
 # Refactor notes
 
 What package N0 ("Safety net") found surprising about the legacy code of kiripad.dev while moving it and writing the scenario suite.
