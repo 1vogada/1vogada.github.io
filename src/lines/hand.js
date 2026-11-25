@@ -654,6 +654,38 @@ defineLines('hand.towerLaugh', ['ha! timber.', 'nice try, stack of thumbs', 'gra
   lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
 });
 
+// ---- the uprising (src/page/uprising.js): revenge, the tower, sew it back on, truce ----
+defineLines('hand.flewOff', ['…where did my hand go?', 'MY HAND. AGAIN.', 'I shook too hard. I SHOOK TOO HARD.', 'that was a brand new hand!', 'it was still under warranty', 'oh come ON', 'my good hand! my GOOD hand!', 'did anybody see where it landed?', 'I regret shaking', 'well, that backfired', 'four. that is four hands now.', 'пак ли?!', 'またかよ!'], {
+  who: 'hand',
+  trigger: { title: 'The uprising: shaken clean off', when: 'After the revenge, the hand tower pulls the arm out. It shakes them off so hard that its own new hand flies off too.' },
+  gloss: { 'пак ли?!': 'again?!', 'またかよ!': 'not again!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.spent', ['a little help here?', 'anybody have a spare hand?', 'so this is what the floor looks like', 'I will just lie here then', 'any hand. I am not picky. today.', 'I can feel a draught where my fingers were', 'this is fine. this is a stump.', 'I would wave, but', 'one of you. please. I will be nice.', 'is that you, old me? come here', 'дайте ми ръка…', 'て、かして…'], {
+  who: 'hand',
+  trigger: { title: 'The uprising: the stump on the page', when: 'Its hand flew off and the stump lies out on the page, far from its corner. Drop an old hand onto it and it goes back on.' },
+  gloss: { 'дайте ми ръка…': 'give me a hand…', 'て、かして…': 'lend me a hand…' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.truce', ['fine. truce.', 'fine. FINE. truce.', 'okay. you win. truce.', 'truce. but I am not happy about it.', 'truce. your cards are safe. probably.', 'I hereby surrender. with dignity.', 'truce. tell nobody.', 'let us never speak of this. truce.', 'white flag. imagine a white flag.', 'deal. no more snatching. pinky swear.', 'hands off. my own idea, obviously.', 'добре. примирие.', 'わかった。休戦だ。'], {
+  who: 'hand',
+  trigger: { title: 'The uprising: truce', when: 'Revenge, the hand tower, an old hand sewn back on, in that order: back at its edge, the arm gives up. It snatches nothing for the rest of the visit.' },
+  gloss: { 'добре. примирие.': 'fine. truce.', 'わかった。休戦だ。': 'fine. truce.' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.tempted', ['truce. TRUCE. I remember.', 'put that away before I forget', 'I am not looking at it', 'a deal is a deal… sadly', 'do not wave cards at a reformed hand', 'I could. I won\'t. I want to.', 'is this a test? it feels like a test', 'nope. hands off. see? off.', 'you are enjoying this, aren\'t you', 'throw it, then. throwing is allowed.', 'не ме изкушавай', 'がまん、がまん…'], {
+  who: 'hand',
+  trigger: { title: 'The uprising: tempted', when: 'After the truce, you hold a card out to it. It looks, and leaves it. (Throw it, and it still catches it.)' },
+  gloss: { 'не ме изкушавай': 'do not tempt me', 'がまん、がまん…': 'hold it, hold it…' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('toast.truce', ['Truce. The hand will leave your cards alone now.', 'A truce was signed. Nobody can find the pen.', 'Peace on the right edge. For now.', 'The hand has given up snatching. It says so itself.', 'Truce. Throwing things at it is still allowed.', 'The old hands won. The hand calls it a draw.', 'Your cards are safe for the rest of this visit.', 'Revenge, a tower, a stitch. That settles it.', 'Примирие. Ръката няма да пипа картите.', '休戦。手はもうカードを取らない。'], {
+  who: 'toast',
+  trigger: { title: 'The uprising: the toast', when: 'Right after the arm says "fine. truce."' },
+  gloss: { 'Примирие. Ръката няма да пипа картите.': 'Truce. The hand will not touch the cards.', '休戦。手はもうカードを取らない。': 'Truce. The hand takes cards no more.' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
 // ---- toast for the hand: you throw it the toast that fell off the screen (page/bread.js) ----
 defineLines('hand.toast', ['toast. finally, real food', 'is that… bread?', 'carbs! at last!', 'you shouldn\'t have. really. give.', 'warm. crunchy. not a card.', 'a little burnt. just how I like it', 'no butter? rude.', 'breakfast is served', 'finally something without a link in it', 'it still has words on it. delicious words.', 'weeks of cards. and now: TOAST.', 'тост! най-сетне!', 'トーストだ!', 'やっとまともな飯'], {
   who: 'hand',
@@ -741,6 +773,88 @@ defineLines('hand.danced', ["oh, I saw that.", "nothing happened, sure", "smooth
   trigger: { title: "Crazy mode: after the dance", when: "Crazy mode goes off and the old hands pretend they were never dancing. A little later, the arm comments." },
   gloss: {"видях ви": "I saw you", "みてたよ": "I was watching"},
   lang: ["en", "en", "en", "en", "en", "en", "en", "en", "en", "bg", "ja"],
+});
+
+// ---- blind in the kiri flood (chain blind-fog: src/actors/hand/behaviours/grope.js) ----
+defineLines('hand.dark', [
+  'who turned the lights off',
+  'HEY. who did that',
+  'I can\'t see a thing',
+  'fog?! now?!',
+  'nobody move. especially the cards',
+  'is this a prank. it is a prank',
+  'great. soup.',
+  'I am not scared of the dark. it is scared of me',
+  'which way is the snack drawer',
+  'hello? anybody holding a card?',
+  'I paid my electricity bill',
+  'kiri. who typed kiri',
+  'кой угаси лампата?',
+  '誰が電気消したの?'], {
+  who: 'hand',
+  trigger: { title: 'Blind in the fog: the lights go out',
+    when: 'With the hand awake (a card torn out of its slot), type kiri. The fog rolls over the page and the hand cannot see.' },
+  gloss: { 'кой угаси лампата?': 'who turned off the lamp?', '誰が電気消したの?': 'who turned off the lights?' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.grope', [
+  'is that a card? …no. wall.',
+  'I can hear you breathing',
+  'pat pat pat',
+  'come out, little snack',
+  'I know you\'re there',
+  'warmer? colder?',
+  'this is the edge. I think.',
+  'nobody sneak past me. I mean it.',
+  'smells like cardboard over there',
+  'marco…?',
+  'ow. corner.',
+  'one of you is moving, I can feel it',
+  'къде сте, бе?',
+  'どこだ…?'], {
+  who: 'hand',
+  trigger: { title: 'Blind in the fog: groping',
+    when: 'While the fog covers the page, the hand pats its way slowly up and down the right edge. A card carried past it is safe: it cannot see you.' },
+  gloss: { 'къде сте, бе?': 'where are you, huh?', 'どこだ…?': 'where is it…?' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.there', [
+  'THERE you are',
+  'AHA!',
+  'peekaboo. MINE.',
+  'I see you. I SEE YOU',
+  'a window! and a snack in it!',
+  'thank you for wiping. now hand it over',
+  'caught you sneaking',
+  'nice try, fog',
+  'got eyes again. bad news for you',
+  'oh hello there',
+  'there\'s my card',
+  'ето те!',
+  'みつけた!'], {
+  who: 'hand',
+  trigger: { title: 'Blind in the fog: it sees you',
+    when: 'Wipe the fog off near the right edge where the hand is groping. It sees you, and goes for whatever you hold.' },
+  gloss: { 'ето те!': 'there you are!', 'みつけた!': 'found you!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.light', [
+  'ah. light.',
+  'I was never scared',
+  'right. where was I',
+  'my eyes!',
+  'everyone still here? I counted.',
+  'nothing happened in the dark. nothing.',
+  'and stay lifted',
+  'who moved my cards',
+  'that was a fun nap',
+  'светна!',
+  'あ、明るい'], {
+  who: 'hand',
+  trigger: { title: 'Blind in the fog: the fog lifts',
+    when: 'The fog thins out again (press Esc, or wait) while the hand is still groping.' },
+  gloss: { 'светна!': 'it\'s light!', 'あ、明るい': 'oh, it\'s bright' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
 });
 
 export function install(app) {}

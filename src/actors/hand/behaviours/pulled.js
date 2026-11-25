@@ -3,11 +3,13 @@
 // the three hanging on along the line from its grip to the floor (src/actors/severed/tower.js follows its grip). Then it has
 // had enough: it shakes them off (SHAKE_S), emits 'hand.shookOff' (they fly, and land in a heap) and snaps back out of sight
 // to sulk for SULK_MS. Should the tower come down first (you picked one off), towerFell() in ../index.js lets it go: sulk.
+// The uprising (src/page/uprising.js: revenge came first this visit, uproot() in ../index.js sets c.pull.hard): it shakes so
+// hard that its own new hand flies off too (gore, 'hand.flewOff') and the stump is left lying out on the page ('spent').
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
 import { now } from '../../../core/clock.js';
-import { shake } from '../../../world/fx.js';
+import { shake, gore } from '../../../world/fx.js';
 import { POSES } from '../poses.js';
 import { set, speak, clamp01 } from '../index.js';
 import { gripPt, wristFor } from '../tug.js';
@@ -16,7 +18,7 @@ const TW = TUNE.hand.TOWER;
 
 export default defineBehaviour('hand', 'pulled', {
   pose: 'strain',
-  enter(c, m) { c.pull = { G0: gripPt(), shook: false, said: false }; },
+  enter(c, m) { c.pull = { G0: gripPt(), shook: false, said: false, hard: !!c.uproot }; c.uproot = false; },
   tick(c, m, dt) {
     const x = m.x, p = c.pull, vw = x.vw, vh = x.vh;
     if (!p) { set('lurk'); return; }
@@ -34,7 +36,13 @@ export default defineBehaviour('hand', 'pulled', {
       G[0] += Math.sin(k * TW.SHAKE_W) * TW.SHAKE_PX; G[1] += Math.cos(k * TW.SHAKE_W * 0.77) * TW.SHAKE_PX;
       x.rate = 14; x.shake = 6; x.pose = POSES.clamp;
       if (k > TW.SHAKE_S) {
-        c.pull = null; c.tower = null; bus.emit('hand.shookOff', {});
+        const hard = p.hard; c.pull = null; c.tower = null; bus.emit('hand.shookOff', {});
+        if (hard) {   // the uprising: its hand flies off with them, and the stump stays out on the page
+          const H = gripPt(), F = TUNE.uprising.FLY_GORE;
+          gore(H[0] + scrollX, H[1] + scrollY, 0.4, -1, F[0], F[1]); gore(c.x + scrollX, c.y + scrollY, -1, 0, F[0] / 2, F[1]); shake();
+          c.stump = true; c.react = null; c.later = null; set('spent'); speak('flewOff', true); bus.emit('hand.flewOff', { x: H[0] + scrollX, y: H[1] + scrollY });
+          return;
+        }
         c.sulkUntil = now() + TW.SULK_MS; set('sulk'); speak('towerSulk', true);
         return;
       }

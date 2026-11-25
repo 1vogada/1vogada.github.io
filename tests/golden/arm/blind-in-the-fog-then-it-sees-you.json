@@ -1,0 +1,133 @@
+{
+ "scenario": "arm / blind in the fog, then it sees you",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 3032,
+   "ms": 792,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 3824,
+   "ms": 1392,
+   "who": "card",
+   "key": "SAY.rip",
+   "text": "I was comfy!"
+  },
+  {
+   "doc": 1,
+   "t": 4688,
+   "ms": 1392,
+   "who": "hand",
+   "key": "hand.dark",
+   "text": "great. soup."
+  },
+  {
+   "doc": 1,
+   "t": 9200,
+   "ms": 1856,
+   "who": "hand",
+   "key": "hand.grope",
+   "text": "is that a card? …no. wall."
+  },
+  {
+   "doc": 1,
+   "t": 11056,
+   "ms": null,
+   "who": "hand",
+   "key": "hand.there",
+   "text": "caught you sneaking"
+  },
+  {
+   "doc": 1,
+   "t": 11088,
+   "ms": null,
+   "who": "card",
+   "key": "AGONY.1",
+   "text": "痛い!!",
+   "lvl": "1"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 100,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 3048,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 3832,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4780,
+   "claw": "grope",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 11060,
+   "claw": "snatch",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 11092,
+   "claw": "crush",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  }
+ ]
+}

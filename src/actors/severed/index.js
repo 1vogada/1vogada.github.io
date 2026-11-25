@@ -10,6 +10,7 @@
 // hand -> gone(o), body.thrown of a hand -> say(o, 'thrown', true), hook('__sev', { list, SEV, POSES, set, spawn, say, cut }).
 // The 'hand.severed' event is wired to spawn() in src/reactions.js.
 // Once a frame before the hands think: the hand tower (./tower.js) and the old hand that pokes your still cursor (./pester.js).
+// The uprising (src/page/uprising.js): cheer() has one of them cheer each step (src/reactions.js, uprising.step).
 // Crazy mode (src/reactions.js, mode.changed -> groove): ./dance.js sets them dancing (behaviours dance, jive, freeze) and shows
 // them through crazy mode's hiding rules; danceTick() runs once a frame here.
 
@@ -98,6 +99,21 @@ export function senses(s) { sensed = s || {}; }
 let waiting = null;
 /** o threw the katana at the arm (avenge): the next hand that is cut off and drops high-fives it */
 export function avenger(o) { waiting = { o, until: clock.now() + TUNE.severed.AVENGE.WAIT_MS }; }
+/**
+ * the uprising (src/page/uprising.js, uprising.step): one of the old hands cheers TUNE.uprising.CHEER_MS later (line
+ * 'sev.uprising'): the first one on the page that is not being carried, eaten or sewn on, and not `but` or its mate (they are
+ * busy high-fiving). Draws only for the line, and only on this path.
+ */
+export function cheer(but) {
+  clock.after(TUNE.uprising.CHEER_MS, () => {
+    if (isCrazy()) return;
+    for (const o of list) {
+      const m = brains.get(o);
+      if (!world.bodies.has(o) || !m || isHeld(o) || m.is('held', 'caught', 'home', 'jive') || (but && (o === but || o === but.ai.mate))) continue;
+      say(o, 'uprising', true); return;
+    }
+  });
+}
 /** a loose katana lies still within AVENGE.SEE_PX of this walking old hand, which has met the new hand: revenge */
 function vengeful(o, m) {
   const a = o.ai, k = world.blade, AV = TUNE.severed.AVENGE;

@@ -4,6 +4,8 @@
 // at install (after page/fog.js). Emits 'kiri.flooded'.
 // The katana's tip cuts thin slits in the flood (slit(a, b), from page/slash.js on 'blade.moved'); while it is in your hand the
 // pointer's round wipe is off (fog.js bladeInHand). The flood's regrow closes the slits again.
+// What the arm's hand can sense of it (chain blind-fog, wired in reactions.js hand.senses): flooded() (rolled in or rolling, not
+// yet lifting) and fogAt(x, y) (how thick the flood is at a viewport point, 0..1, wipes and slits included).
 // The shelf is reached through its contract name app.shelf.toggle (legacy window.__shelf?.(), which did not exist under
 // reduced motion), never by importing actors/shelf.js.
 
@@ -57,13 +59,23 @@ export function slit(a, b) {
   if (!state || !km.width) return;
   cutLine(kmctx, a[0], a[1], b[0], b[1], kS);
 }
+const liftAt = (f) => f.lift ?? (K.FLOOD_IN_S + K.FLOOD_HOLD_S);
+/** the flood is on the page and not lifting yet (blind-fog: the hand cannot see) */
+export function flooded() { return !!state && (clock.wall() - state.t0) / 1000 < liftAt(state); }
+/** how thick the flood is at viewport point (x, y): 0 (none, wiped, slit, or the front not there yet) .. 1 (solid fog) */
+export function fogAt(x, y) {
+  if (!state || !km.width) return 0;
+  const py = y + scrollY; if (py < 0 || py > state.filled) return 0;
+  const s = (clock.wall() - state.t0) / 1000, a = 1 - Math.min(1, Math.max(0, (s - liftAt(state)) / K.FLOOD_OUT_S));
+  const mx = Math.max(0, Math.min(km.width - 1, Math.round(x * kS))), my = Math.max(0, Math.min(km.height - 1, Math.round(py * kS)));
+  return kmctx.getImageData(mx, my, 1, 1).data[3] / 255 * a;
+}
 function kFrame(t) {
   const flood = state;
   if (!flood) return;
   clock.nextFrame(kFrame);
   const s = (t - flood.t0) / 1000;
-  const liftAt = flood.lift ?? (K.FLOOD_IN_S + K.FLOOD_HOLD_S);
-  const alpha = 1 - Math.min(1, Math.max(0, (s - liftAt) / K.FLOOD_OUT_S));
+  const alpha = 1 - Math.min(1, Math.max(0, (s - liftAt(flood)) / K.FLOOD_OUT_S));
   if (alpha <= 0) { state = null; kv.classList.remove('on'); return; }
   kMaskSize();
   regrowMask(kmctx, km, t, kGrow);

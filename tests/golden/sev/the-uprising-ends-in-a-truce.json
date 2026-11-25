@@ -1,0 +1,746 @@
+{
+ "scenario": "sev / the uprising ends in a truce",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 32,
+   "ms": 800,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "ms": 376,
+   "who": "card",
+   "key": "SAY.rip",
+   "text": "I was comfy!"
+  },
+  {
+   "doc": 1,
+   "t": 2976,
+   "ms": 1584,
+   "who": "hand",
+   "key": "SEV_SAY.cut",
+   "text": "where is my arm"
+  },
+  {
+   "doc": 1,
+   "t": 2976,
+   "ms": 1312,
+   "who": "hand",
+   "key": "SEV_SAY.cut",
+   "text": "*twitch*"
+  },
+  {
+   "doc": 1,
+   "t": 3548,
+   "ms": 1460,
+   "who": "hand",
+   "key": "CLAW_SAY.severed",
+   "text": "I NEEDED THAT"
+  },
+  {
+   "doc": 1,
+   "t": 4448,
+   "ms": 1312,
+   "who": "hand",
+   "key": "SEV_SAY.cut",
+   "text": "ow. wait."
+  },
+  {
+   "doc": 1,
+   "t": 4648,
+   "ms": 1448,
+   "who": "hand",
+   "key": "sev.uprising",
+   "text": "viva la mano!"
+  },
+  {
+   "doc": 1,
+   "t": 5488,
+   "ms": 1312,
+   "who": "hand",
+   "key": "SEV_SAY.drag",
+   "text": "…ow"
+  },
+  {
+   "doc": 1,
+   "t": 6848,
+   "ms": 1904,
+   "who": "hand",
+   "key": "SEV_SAY.drag",
+   "text": "just… a bit… further"
+  },
+  {
+   "doc": 1,
+   "t": 6960,
+   "ms": 1648,
+   "who": "hand",
+   "key": "SEV_SAY.drag",
+   "text": "everything hurts"
+  },
+  {
+   "doc": 1,
+   "t": 7696,
+   "ms": 1312,
+   "who": "hand",
+   "key": "SEV_SAY.drag",
+   "text": "ох, ох, ох"
+  },
+  {
+   "doc": 1,
+   "t": 9056,
+   "ms": 1776,
+   "who": "hand",
+   "key": "SEV_SAY.drag",
+   "text": "legs. I need legs."
+  },
+  {
+   "doc": 1,
+   "t": 9168,
+   "ms": 1648,
+   "who": "hand",
+   "key": "SEV_SAY.drag",
+   "text": "everything hurts"
+  },
+  {
+   "doc": 1,
+   "t": 12240,
+   "ms": 1328,
+   "who": "hand",
+   "key": "CLAW_SAY.regrow",
+   "text": "good as new"
+  },
+  {
+   "doc": 1,
+   "t": 13948,
+   "ms": 1652,
+   "who": "hand",
+   "key": "hand.towerPeer",
+   "text": "what are you three up to?"
+  },
+  {
+   "doc": 1,
+   "t": 15600,
+   "ms": 1968,
+   "who": "hand",
+   "key": "hand.pulled",
+   "text": "unhand me! literally!"
+  },
+  {
+   "doc": 1,
+   "t": 16548,
+   "ms": 2364,
+   "who": "hand",
+   "key": "sev.uprising",
+   "text": "remember this day, brothers"
+  },
+  {
+   "doc": 1,
+   "t": 18080,
+   "ms": 768,
+   "who": "hand",
+   "key": "hand.pulled",
+   "text": "hey! HEY! let go!"
+  },
+  {
+   "doc": 1,
+   "t": 18848,
+   "ms": 1600,
+   "who": "hand",
+   "key": "hand.shakeOff",
+   "text": "shake shake SHAKE"
+  },
+  {
+   "doc": 1,
+   "t": 19776,
+   "ms": 1456,
+   "who": "hand",
+   "key": "SEV_SAY.rest",
+   "text": "five minutes…"
+  },
+  {
+   "doc": 1,
+   "t": 20448,
+   "ms": 1600,
+   "who": "hand",
+   "key": "hand.flewOff",
+   "text": "…where did my hand go?"
+  },
+  {
+   "doc": 1,
+   "t": 22048,
+   "ms": 2944,
+   "who": "hand",
+   "key": "hand.spent",
+   "text": "so this is what the floor looks like"
+  },
+  {
+   "doc": 1,
+   "t": 22272,
+   "ms": 1312,
+   "who": "hand",
+   "key": "SEV_SAY.held",
+   "text": "I bite"
+  },
+  {
+   "doc": 1,
+   "t": 23680,
+   "ms": 1408,
+   "who": "hand",
+   "key": "sev.home",
+   "text": "scoot over, wrist"
+  },
+  {
+   "doc": 1,
+   "t": 25600,
+   "ms": 1712,
+   "who": "hand",
+   "key": "hand.sewn",
+   "text": "stitched. mostly."
+  },
+  {
+   "doc": 1,
+   "t": 26188,
+   "ms": 1380,
+   "who": "hand",
+   "key": "sev.uprising",
+   "text": "they cut us off. we came back."
+  },
+  {
+   "doc": 1,
+   "t": 26288,
+   "ms": 1328,
+   "who": "hand",
+   "key": "SEV_SAY.rest",
+   "text": "ねむい…"
+  },
+  {
+   "doc": 1,
+   "t": 27568,
+   "ms": 1648,
+   "who": "hand",
+   "key": "SEV_SAY.rise",
+   "text": "who needs an arm"
+  },
+  {
+   "doc": 1,
+   "t": 28624,
+   "ms": 2512,
+   "who": "hand",
+   "key": "hand.truce",
+   "text": "truce. but I am not happy about it."
+  },
+  {
+   "doc": 1,
+   "t": 29724,
+   "ms": 2308,
+   "who": "hand",
+   "key": "sev.uprising",
+   "text": "we have nothing to lose but our wrists"
+  },
+  {
+   "doc": 1,
+   "t": 31136,
+   "ms": 2208,
+   "who": "hand",
+   "key": "hand.meet",
+   "text": "you look… worse"
+  },
+  {
+   "doc": 1,
+   "t": 32032,
+   "ms": 1312,
+   "who": "hand",
+   "key": "sev.meet",
+   "text": "already?!"
+  },
+  {
+   "doc": 1,
+   "t": 33644,
+   "ms": 788,
+   "who": "card",
+   "key": "SAY.pull|CLAW_SAY.slap",
+   "text": "hands off"
+  },
+  {
+   "doc": 1,
+   "t": 34432,
+   "ms": 1312,
+   "who": "card",
+   "key": "SAY.rip|CLAW_SAY.sulk|PB.SWAT_SAY",
+   "text": "rude."
+  },
+  {
+   "doc": 1,
+   "t": 35072,
+   "ms": 2240,
+   "who": "hand",
+   "key": "hand.tempted",
+   "text": "truce. TRUCE. I remember."
+  },
+  {
+   "doc": 1,
+   "t": 37808,
+   "ms": 1648,
+   "who": "hand",
+   "key": "CLAW_SAY.loose",
+   "text": "ooh, a loose one"
+  },
+  {
+   "doc": 1,
+   "t": 42080,
+   "ms": null,
+   "who": "hand",
+   "key": "hand.tempted",
+   "text": "не ме изкушавай"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 16,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 48,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1208,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1228,
+   "claw": "off",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 2098,
+   "claw": "lurk",
+   "sev": "limp,limp",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 3598,
+   "claw": "stump/stump",
+   "sev": "limp,limp,limp",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 3
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4698,
+   "claw": "stump/stump",
+   "sev": "rise,rise,limp",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 3
+   }
+  },
+  {
+   "doc": 1,
+   "t": 5548,
+   "claw": "stump/stump",
+   "sev": "walk,walk,limp",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 3
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6148,
+   "claw": "stump/stump",
+   "sev": "walk,walk,rise",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 3
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6948,
+   "claw": "stump/stump",
+   "sev": "walk,walk,walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 3
+   }
+  },
+  {
+   "doc": 1,
+   "t": 11548,
+   "claw": "regrow",
+   "sev": "walk,walk,walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 3
+   }
+  },
+  {
+   "doc": 1,
+   "t": 13948,
+   "claw": "lurk",
+   "sev": "walk,walk,walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 3
+   }
+  },
+  {
+   "doc": 1,
+   "t": 13998,
+   "claw": "peer",
+   "sev": "walk,walk,walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 3
+   }
+  },
+  {
+   "doc": 1,
+   "t": 15548,
+   "claw": "pulled",
+   "sev": "walk,walk,walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 3
+   }
+  },
+  {
+   "doc": 1,
+   "t": 19848,
+   "claw": "pulled",
+   "sev": "rise,walk,walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 3
+   }
+  },
+  {
+   "doc": 1,
+   "t": 20448,
+   "claw": "spent/stump",
+   "sev": "rise,walk,walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 3
+   }
+  },
+  {
+   "doc": 1,
+   "t": 20648,
+   "claw": "spent/stump",
+   "sev": "walk,walk,walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 3
+   }
+  },
+  {
+   "doc": 1,
+   "t": 22280,
+   "claw": "spent/stump",
+   "sev": "held,walk,walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "hand",
+   "objs": {
+    "hand": 3
+   }
+  },
+  {
+   "doc": 1,
+   "t": 23692,
+   "claw": "sew/stump",
+   "sev": "home,walk,walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 3
+   }
+  },
+  {
+   "doc": 1,
+   "t": 25092,
+   "claw": "sewn",
+   "sev": "walk,walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 26292,
+   "claw": "sewn",
+   "sev": "walk,rest",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 26392,
+   "claw": "sewn",
+   "sev": "walk,rise",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 26992,
+   "claw": "sewn",
+   "sev": "rest,rise",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 27092,
+   "claw": "sewn",
+   "sev": "rise,rise",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 27192,
+   "claw": "sewn",
+   "sev": "rise,walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 27792,
+   "claw": "truce",
+   "sev": "rise,walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 27892,
+   "claw": "truce",
+   "sev": "walk,walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 31192,
+   "claw": "meet",
+   "sev": "stare,walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 33592,
+   "claw": "lurk",
+   "sev": "stare,walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 33660,
+   "claw": "lurk",
+   "sev": "stare,walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "hand": 2,
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 33740,
+   "claw": "lurk",
+   "sev": "walk,walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "hand": 2,
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 34444,
+   "claw": "lurk",
+   "sev": "walk,walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "hand": 2,
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 43400,
+   "claw": "lurk",
+   "sev": "walk,walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 2,
+    "card": 1
+   }
+  }
+ ]
+}

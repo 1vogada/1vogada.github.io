@@ -50,6 +50,7 @@ public API. Every module exports `install(app)`; `app` holds every module by its
 | greeting typewriter | `src/page/greeting.js` | `greeting.hello` in `src/lines/page.js` | |
 | banner fog; kiri flood and typed secrets | `src/page/fog.js`; `src/page/kiri.js` | `toast.fog` | `styles/fog.css` |
 | the katana slits the fog; slashing 棚 opens the shelf | `src/page/slash.js` (on `blade.moved`, in `reactions.js`); `slit` in `fog.js`, `kiri.js` | `katana.tana` | inline |
+| blind in the kiri flood: the hand gropes, a hole wiped by it and it sees you (blind-fog) | `src/actors/hand/behaviours/grope.js`; `sight()` / `blind()` / `unseen()` in `hand/index.js`; `flooded()` / `fogAt()` in `src/page/kiri.js`, injected via `hand.senses` in `reactions.js` | `hand.dark/grope/there/light` | |
 | theme, crazy mode, English only | `src/page/theme.js`, `crazy.js`, `language.js` | | `styles/base.css`, `crazy.css` |
 | Surprise me, the omikuji slip, the secret × | `src/scenes/fortune.js` | `fortune.slip` in `src/lines/page.js` | `styles/omikuji.css` |
 | the coin game; welcome back; scene runner | `src/scenes/coin.js`; `welcome-back.js`; `scene.js` | `hand.*`, `button.hi` | `styles/omikuji.css` |
@@ -58,6 +59,7 @@ public API. Every module exports `install(app)`; `app` holds every module by its
 | every tuning number and timing | `src/core/tune.js` (`TUNE`, `TIMING`) | | |
 | test hooks (`window.__*`), `?debug` | `src/core/debug.js` | | |
 | feed the search box: drop a card, a scrap or an old hand on it and it searches for it | `src/page/feed.js` (`body.dropped` in `reactions.js`; `cards.putBack`, `severed.notThere`) | `card.eaten`, `card.home`, `sev.notthere`, `search.gulp`, `search.spit`, `toast.scrap` | |
+| the uprising: revenge, then the tower pulls the arm out (its hand flies off), an old hand sewn on the stump, then a truce (no more snatching) | `src/page/uprising.js` (counts the steps, `uprising.step` in `reactions.js`); `hand/behaviours/pulled.js`, `spent.js`, `truce.js`; `c.peace` in `lurk.js`, `old.js`; `severed` `cheer()` | `hand.flewOff`, `hand.spent`, `hand.truce`, `hand.tempted`, `toast.truce`, `sev.uprising` | inline |
 | install order | `src/main.js` (`ORDER`) | | |
 
 ## How a frame runs

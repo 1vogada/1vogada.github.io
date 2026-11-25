@@ -129,6 +129,9 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 | `ui.toast` | `{ msg }` | `actors/cards.js` (first rip), `world/shatter.js` (1st and 10th smash), `actors/hand/tug.js` (first halving), `actors/hand/index.js` (first sever), `actors/katana.js` (found, drawn), `actors/shelf.js` (open / close) | `reactions.js`: `toast.show(msg)` |
 | `search.fed` | `{ what, body, key, query }` | `page/feed.js`: something dropped on the search box has typed itself in (`query`) and the grid filtered, after the scrap's toast. `what`: `'card'` (`key`: its slot) \| `'scrap'` \| `'hand'` (`body`: the old hand) | `reactions.js`: `cards.putBack(key)` for a card (it grows back into its slot, `card.home`); `severed.notThere(body)` for an old hand (`sev.notthere`) |
 | `tana.slashed` | `{ at }` | `page/slash.js` `tana`: the katana's tip went fast across the hidden 棚 writing (in and out), the shelf was in and no slash in the last `TUNE.fogSlash.COOL_MS`; after the writing splits. `at`: where it left, page px | `reactions.js`: `katana.tana()` (line `katana.tana`), then `shelf.toggle()` if the shelf is still in |
+| `uprising.step` | `{ step, hand }` | `page/uprising.js`: the uprising reached its next step, in order: `'revenge'` (on `sev.avenged`; `hand`: the avenger), `'tower'` (on `sev.towerGrab`), `'sewn'` (on `hand.sewn`), `'truce'` (on `hand.truce`, before its toast) | `reactions.js`: `hand.uproot()` on `tower` (its hand will fly off), `hand.truce()` on `sewn`, `severed.cheer()` on each (an old hand says `sev.uprising` after `TUNE.uprising.CHEER_MS`) |
+| `hand.flewOff` | `{ x, y }` | `actors/hand/behaviours/pulled.js`: uprising only, right after `hand.shookOff`: its own hand flew off too (grip, page px); after `set('spent')` and its `hand.flewOff` line | none |
+| `hand.truce` | `{}` | `actors/hand/behaviours/truce.js`: after its `hand.truce` line ("fine. truce.") | `page/uprising.js`: step `truce`, toast `toast.truce` |
 
 ## Notes
 

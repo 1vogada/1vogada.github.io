@@ -15,6 +15,7 @@
 //            full, not cooling off): now and then (TUNE.hand.WREST.CHANCE, rolled once per crush) it grabs the other end (wrest.js).
 //   rival    an old hand got to your still cursor first and pokes it (severed/pester.js): the arm leaves it alone meanwhile
 //            (look() skips it) and, once it has poked, comes out to do its job anyway ('mine', see rival()).
+//   truce    after the uprising (src/page/uprising.js, c.peace): no devour, no prod, no wrest, no "not paper", ever again.
 import { TUNE } from '../../core/tune.js';
 import { bus } from '../../core/bus.js';
 import { now } from '../../core/clock.js';
@@ -106,8 +107,8 @@ export function look(c, x) {
     const f = sense().onShelf;
     if (!awake && o.ai.st === 'walk' && o.ai.gait !== 'crawl' && !(f && f(o)) && t >= (rolled.get(o) || 0)) { rolled.set(o, t + OLD.ROLL_MS); if (Math.random() < OLD.AWAKE) awake = o; }
   }
-  if (prey) { c.o = prey; set('devour'); return true; }
-  if (awake) { c.o = awake; set('prod'); return true; }
+  if (prey && !c.peace) { c.o = prey; set('devour'); return true; }   // (not since the truce: src/page/uprising.js)
+  if (awake && !c.peace) { c.o = awake; set('prod'); return true; }
   return false;
 }
 

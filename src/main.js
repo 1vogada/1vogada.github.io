@@ -69,6 +69,8 @@ import * as hCheese from './actors/hand/behaviours/cheese.js';
 import * as hWrest from './actors/hand/behaviours/wrest.js';
 import * as hPeer from './actors/hand/behaviours/peer.js';
 import * as hPulled from './actors/hand/behaviours/pulled.js';
+import * as hSpent from './actors/hand/behaviours/spent.js';
+import * as hTruce from './actors/hand/behaviours/truce.js';
 import * as handIdle from './actors/hand/idle.js';
 import * as handOld from './actors/hand/old.js';
 import * as handBob from './actors/hand/bob.js';
@@ -136,8 +138,10 @@ import * as basement from './page/basement.js';
 import * as bread from './page/bread.js';
 import * as phraseSay from './phrasebook/say.js';
 import * as slash from './page/slash.js';
+import * as hGrope from './actors/hand/behaviours/grope.js';
 import * as konsole from './page/console.js';
 import * as feed from './page/feed.js';
+import * as uprising from './page/uprising.js';
 import * as commands from './core/commands.js';
 
 import * as menu from './phrasebook/menu.js';
@@ -182,6 +186,8 @@ export const ORDER = [
   ['feed', feed],
   ['phraseSay', phraseSay],
   ['slash', slash],
+  ['hGrope', hGrope],
+  ['hSpent', hSpent], ['hTruce', hTruce], ['uprising', uprising],   // the uprising: revenge, the tower, sew it back on, truce
 ];
 
 /** the app every install(app) receives: each module by name, plus a few flags */

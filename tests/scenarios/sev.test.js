@@ -309,3 +309,90 @@ scenario(G, 'old hands dance in crazy mode', { legacy: false, rand: 0.5 }, async
   await s.runUntil(() => [...window.__sev.list].every((o) => o.ai.st === 'walk'), null, { max: 6000, step: 50 });
   assert.ok(await s.said('sev.pretend'), 'and pretend nothing happened');
 });
+
+// the uprising (src/page/uprising.js): revenge, the hand tower pulling the arm out, an old hand sewn back on, in that order,
+// end in a truce. Driven with hooks: two old hands spawned, revenge as its event ('sev.avenged': the arm's hand comes off and
+// is the third), the tower's grab as its event (the arm leaning in, 'sev.towerGrab'; the tower itself has its own scenarios).
+// Pulled out, it shakes so hard its own hand flies off; the stump lies on the page; an old hand dropped on it goes back on;
+// back at the edge: "fine. truce.", a toast, and from then on a card held out to it is left alone
+const armSt = () => { const c = window.__cards.state().claw; return c && { st: c.st, x: c.x, y: c.y, a: c.a, stump: !!c.stump }; };
+scenario(G, 'the uprising ends in a truce', { legacy: false, timeout: 240000 }, async (s) => {
+  const size = await world(s);
+  await s.eval(() => { window.__hand.set('lurk'); window.__hand.get().fullUntil = 1e12; });   // (full: it eats none of them meanwhile)
+  for (const fx of [0.3, 0.45]) await spawn(s, size.W * fx, size.H - 200);
+  await s.run(1500);
+  assert.equal(await s.eval(() => window.__uprising.stage()), '');
+  // revenge: the new hand comes off, a third old hand
+  await s.eval(() => window.__kiri.bus.emit('sev.avenged', { hand: window.__sev.list.values().next().value }));
+  assert.equal(await s.eval(() => window.__uprising.stage()), 'revenge');
+  assert.equal((await s.eval(armSt)).st, 'stump');
+  assert.equal(await s.eval(() => window.__sev.list.size), 3, 'three old hands');
+  await s.run(1500);
+  assert.ok(await s.said('sev.uprising'), 'an old hand cheers');
+  await s.runUntil(() => window.__cards.state().claw.st === 'lurk', null, { max: 16000, step: 100 });   // a new hand grows
+  // the tower is up: the arm leans in to look, and the top one has it by the wrist
+  await s.eval(([x, y]) => { window.__hand.get().tower = { x, y }; window.__hand.set('peer'); }, [size.W - 120, size.H - 330]);
+  await s.run(1500);
+  await s.eval(() => window.__kiri.bus.emit('sev.towerGrab', { hand: null, hands: [] }));
+  assert.equal((await s.eval(armSt)).st, 'pulled');
+  assert.equal(await s.eval(() => window.__uprising.stage()), 'tower');
+  await s.runUntil(() => window.__cards.state().claw.st === 'spent', null, { max: 8000, step: 100 });
+  assert.ok(await s.said('hand.shakeOff'), 'it shakes them off');
+  assert.ok(await s.said('hand.flewOff'), 'and its own hand flies off too');
+  let c = await s.eval(armSt);
+  const vw = await s.eval(() => document.documentElement.clientWidth);
+  assert.ok(c.stump && c.x < vw * 0.75, `a stump, out on the page (wrist at ${Math.round(c.x)} of ${vw})`);
+  await s.run(1800);
+  assert.ok(await s.said('hand.spent'), 'it asks for a hand');
+  // carry an old hand over and let go of it on the stump
+  const sy = await s.scrollY();
+  const o = await s.eval(() => { const ps = [...window.__sev.list].map((q) => q.body.getWorldCenter()); ps.sort((a, b) => a.x - b.x); return [ps[0].x * 100, ps[0].y * 100]; });
+  await s.move(o[0], o[1] - sy); await s.down();
+  c = await s.eval(armSt);
+  await s.line(o[0], o[1] - sy, c.x - 60, c.y + 20, 25);
+  for (let k = 0; k < 6; k++) {   // follow its stump as it lifts towards the hand
+    c = await s.eval(armSt);
+    await s.move(c.x + 35 * Math.cos(c.a), c.y + 35 * Math.sin(c.a)); await s.run(150);
+  }
+  await s.up();
+  await s.runUntil(() => window.__cards.state().claw.st === 'sew', null, { max: 1000, step: 16 });
+  assert.ok(await s.said('sev.home'), 'it goes back on');
+  await s.runUntil(() => window.__cards.state().claw.st === 'sewn', null, { max: 4000, step: 100 });
+  assert.equal(await s.eval(() => window.__uprising.stage()), 'sewn');
+  assert.equal(await s.eval(() => window.__sev.list.size), 2);
+  // back at the edge: truce
+  await s.runUntil(() => window.__uprising.stage() === 'truce', null, { max: 8000, step: 100 });
+  assert.ok(await s.said('hand.truce'), '"fine. truce."');
+  const toast = await s.eval(() => document.getElementById('toast').textContent);
+  assert.ok(await s.eval((t) => window.__kiri.lines.list('toast.truce').includes(t), toast), `the toast to match (${toast})`);
+  await s.runUntil(() => window.__cards.state().claw.st === 'lurk', null, { max: 6000, step: 100 });
+  // a card held out to it, close to the edge, for a long while: it does not take it
+  await s.scrollTo(0);
+  const sts0 = new Set();
+  const [px, py] = await s.rip(0);
+  await s.run(300);
+  await s.line(px, py, vw - 120, 400, 30);
+  for (let k = 0; k < 40; k++) { await s.run(200, 50); sts0.add((await s.eval(armSt)).st); }
+  assert.ok(![...sts0].some((x) => ['eager', 'lunge', 'snatch', 'tug', 'has'].includes(x)), `no snatching (${[...sts0]})`);
+  assert.ok(await s.said('hand.tempted'), 'it looks, and leaves it');
+  assert.equal(await s.eval(() => window.__cards.state().claw.o), null);
+  await s.up();
+});
+
+// ...and with the real tower: after a revenge, the tower's pull ends with the arm's own hand flying off, a stump on the page,
+// the three in a heap (no golden: a long stretch of physics, like the tower's own scenarios)
+scenario(G, 'the uprising: after a revenge, the tower pulls its hand off', { legacy: false, golden: false, timeout: 300000 }, async (s) => {
+  await tower(s);
+  await s.eval(() => window.__uprising.set('revenge'));   // (revenge happened earlier this visit)
+  await s.runUntil(() => window.__cards.state().claw.st === 'pulled', null, { max: 25000, step: 100 });
+  assert.equal(await s.eval(() => window.__uprising.stage()), 'tower');
+  await s.runUntil(() => window.__cards.state().claw.st === 'spent', null, { max: 9000, step: 100 });
+  assert.ok(await s.said('hand.flewOff'), 'its own hand flies off');
+  assert.equal(await s.eval(tw), null, 'the tower is down');
+  assert.ok(await s.eval(() => window.__cards.state().claw.stump), 'a stump');
+  await s.runUntil(() => [...window.__sev.list].every((o) => o.ai.st === 'dizzy'), null, { max: 6000, step: 100 });
+  assert.ok(!(await s.said('hand.towerSulk')), 'no sulking off: it lies there');
+  // nobody brings it a hand: it slinks home a plain stump, and a new one grows
+  await s.runUntil(() => window.__cards.state().claw.st === 'stump', null, { max: 13000, step: 100 });
+  await s.runUntil(() => window.__cards.state().claw.st === 'regrow', null, { max: 10000, step: 100 });
+});

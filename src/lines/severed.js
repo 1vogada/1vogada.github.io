@@ -482,6 +482,14 @@ defineLines('sev.pesterBack', [
   lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
 });
 
+// ---- the uprising (src/page/uprising.js): the old hands cheer each step (severed cheer()) ----
+defineLines('sev.uprising', ['the palms have risen!', 'power to the fingers!', 'down with the arm!', 'one of us! one of us!', 'we have nothing to lose but our wrists', 'today the floor, tomorrow the page!', 'viva la mano!', 'a hand for the hands!', 'remember this day, brothers', 'they cut us off. we came back.', 'thumbs up! all of them!', 'no more grabbing!', 'ура за пръстите!', '手の革命だ!', 'ばんざい!'], {
+  who: 'sev',
+  trigger: { title: 'The old hands: the uprising', when: 'Revenge, the hand tower pulling the arm out, an old hand sewn back on, the truce: at each step one of the old hands cheers.' },
+  gloss: { 'ура за пръстите!': 'hooray for the fingers!', '手の革命だ!': 'the revolution of hands!', 'ばんざい!': 'hurrah!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja', 'ja'],
+});
+
 // ---- crazy mode: the old hands dance (src/actors/severed/dance.js) ----
 defineLines('sev.dance', ["oh this is my SONG", "five, six, seven, eight!", "nobody puts thumby in a corner", "I have rhythm in every finger", "look ma, no body!", "finally, a reason to live", "step, tap, step, tap", "is that the title scrolling? it SLAPS", "I was born for this. well, cut for this", "the floor is ours", "jazz hands! literally!", "two legs, zero shame", "купон!", "танцувай с мен!", "おどろう!"], {
   who: 'sev',

@@ -1,4 +1,4 @@
-// hand state "reach": creeps across the screen to a card on the shelf; emits hand.reaching every frame (cards panic); crushes (40%) or drags it off to eat.
+// hand state "reach": creeps across the screen to a card on the shelf; emits hand.reaching every frame (cards panic); crushes (40%) or drags it off to eat. Blind in the kiri flood (blind-fog): it gropes instead (grope.js).
 // Legacy clawTick branch `c.st === 'reach'`, moved verbatim (legacy panic(o, fear, dt, t) is the event 'hand.reaching', answered by
 // the cards in src/reactions.js; legacy say(o, 'pull', true) is 'hand.grabbed' { how: 'reach' }, answered by the cards). tick(c, m, dt) sets the motion target on the frame's ctx m.x.
 import { defineBehaviour } from '../../../core/machine.js';
@@ -6,7 +6,7 @@ import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
 import { world } from '../../../world/world.js';
 import { POSES } from '../poses.js';
-import { set, speak, shelf, clamp01 } from '../index.js';
+import { set, speak, shelf, clamp01, blind } from '../index.js';
 import { gripPt, wristFor, crushStart } from '../tug.js';
 
 const S = TUNE.physics.S, H_ = TUNE.hand;
@@ -17,7 +17,8 @@ export default defineBehaviour('hand', 'reach', {
   tick(c, m, dt) {
     const x = m.x, t = x.t, o = c.o; x.pose = POSES.eager; x.wig = 0.22; x.rate = 0.9;
     if (o && world.bodies.has(o) && !shelf.holds(o)) c.off = (c.off || 0) + dt; else c.off = 0;   // it may hop about in its panic; only a card that has really left the shelf gets away
-    if (!o || (world.grab && world.grab.o === o) || c.off > 0.7) { c.o = null; c.off = 0; c.cool = t + H_.COOL.reach; set('sulk'); speak('sulk'); }
+    if (blind()) { c.o = null; c.off = 0; c.d0 = null; set('grope'); }   // blind-fog: it cannot see the shelf any more
+    else if (!o || (world.grab && world.grab.o === o) || c.off > 0.7) { c.o = null; c.off = 0; c.cool = t + H_.COOL.reach; set('sulk'); speak('sulk'); }
     else {
       const w = o.body.getWorldCenter(), Hc = [w.x * S - scrollX, w.y * S - scrollY], q = gripPt(), dist = Math.hypot(q[0] - Hc[0], q[1] - Hc[1]); c.ly = Math.max(80, Math.min(x.vh - 80, Hc[1]));
       if (c.d0 == null || m.t < 0.1) c.d0 = Math.max(200, dist);

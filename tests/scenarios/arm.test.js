@@ -313,3 +313,42 @@ scenario(G, 'the fallen toast goes with the cards', { ...O, legacy: false }, asy
   await s.run(100);
   assert.equal(await s.eval(() => [...window.__cards.objs].some((o) => o.kind === 'toast') || !!document.querySelector('#phys .toast-bread')), false, 'Put the cards back clears it');
 });
+
+// chain blind-fog: under the kiri flood the hand is blind. It gropes up and down the right edge and a card carried through
+// its tease zone is safe; wipe the fog off round its hand and it sees you, and snatches what you hold
+scenario(G, 'blind in the fog, then it sees you', { ...O, legacy: false }, async (s) => {
+  await carry(s, 0, 540, 300);
+  assert.equal((await s.eval(claw)).st, 'lurk');
+  await s.type('kiri');
+  await s.run(3000, 100);                          // the flood rolls over it
+  assert.equal((await s.eval(claw)).st, 'grope', 'blind: it gropes');
+  assert.ok(await s.said('hand.dark'), 'who turned the lights off');
+  const W = await s.eval(vw);
+  const ys = [];
+  await s.line(540, 300, W - 330, 300, 20);        // into its tease zone, out of its reach
+  for (let i = 0; i < 6; i++) { await s.run(500); ys.push((await s.eval(claw)).y); }
+  assert.equal((await s.eval(claw)).st, 'grope', 'no tease, no lunge, no snatch: it cannot see the card');
+  assert.ok(Math.max(...ys) - Math.min(...ys) > 100, `it pats its way up or down the edge (${ys.map(Math.round)})`);
+  assert.equal(await s.eval(() => window.__cards.state().grab.o.kind), 'card', 'you still have your card');
+  // wipe a hole right where its hand is
+  const c = await s.eval(claw), hy = Math.round(c.y);
+  await s.line(W - 330, 300, W - 150, hy, 12);
+  await s.line(W - 150, hy, W - 60, hy, 6);
+  await s.runUntil(() => ['snatch', 'crush'].includes(window.__cards.state().claw.st), null, { max: 2000, step: 16 });
+  assert.ok(await s.said('hand.there'), 'THERE you are');
+  await s.runUntil(() => window.__cards.state().claw.st === 'crush', null, { max: 2000, step: 16 });
+  assert.equal(await s.eval(() => window.__cards.state().grab), null, 'it took your card');
+});
+
+scenario(G, 'blind in the fog until it lifts', { ...O, legacy: false }, async (s) => {
+  await carry(s, 0, 540, 300);
+  await s.up();
+  await s.run(2000);
+  await s.type('kiri');
+  await s.run(3000, 100);
+  assert.equal((await s.eval(claw)).st, 'grope', 'blind: it gropes');
+  await s.key('Escape');                           // the fog thins out
+  await s.run(500, 100);
+  assert.equal((await s.eval(claw)).st, 'lurk', 'it can see again');
+  assert.ok(await s.said('hand.light'), 'and says so');
+});
