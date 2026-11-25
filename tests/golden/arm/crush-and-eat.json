@@ -20,15 +20,15 @@
   },
   {
    "doc": 1,
-   "t": 4544,
+   "t": 4560,
    "ms": 1312,
    "who": "hand",
    "key": "CLAW_SAY.eager",
-   "text": "closer…"
+   "text": "gimme"
   },
   {
    "doc": 1,
-   "t": 6720,
+   "t": 6800,
    "ms": 800,
    "who": "hand",
    "key": "CLAW_SAY.snatch",
@@ -36,7 +36,7 @@
   },
   {
    "doc": 1,
-   "t": 6720,
+   "t": 6800,
    "ms": 1312,
    "who": "card",
    "key": "AGONY.1",
@@ -45,33 +45,7 @@
   },
   {
    "doc": 1,
-   "t": 7520,
-   "ms": 1456,
-   "who": "hand",
-   "key": "CLAW_SAY.savour",
-   "text": "does it hurt?"
-  },
-  {
-   "doc": 1,
-   "t": 8432,
-   "ms": 336,
-   "who": "card",
-   "key": "AGONY.1",
-   "text": "LET GO LET GO",
-   "lvl": "1"
-  },
-  {
-   "doc": 1,
-   "t": 8768,
-   "ms": 464,
-   "who": "card",
-   "key": "AGONY.2",
-   "text": "МАМООООО",
-   "lvl": "2"
-  },
-  {
-   "doc": 1,
-   "t": 9232,
+   "t": 7600,
    "ms": 1312,
    "who": "hand",
    "key": "CLAW_SAY.savour|SEV_SAY.squeeze",
@@ -79,15 +53,41 @@
   },
   {
    "doc": 1,
-   "t": 9232,
-   "ms": 1200,
+   "t": 8512,
+   "ms": 336,
    "who": "card",
-   "key": "BEG",
-   "text": "we can talk about this"
+   "key": "AGONY.1",
+   "text": "I am not cheese!",
+   "lvl": "1"
   },
   {
    "doc": 1,
-   "t": 10432,
+   "t": 8848,
+   "ms": 464,
+   "who": "card",
+   "key": "SAY.slice|AGONY.2",
+   "text": "ぎゃああああ!!",
+   "lvl": "2"
+  },
+  {
+   "doc": 1,
+   "t": 9312,
+   "ms": 1648,
+   "who": "hand",
+   "key": "CLAW_SAY.savour",
+   "text": "one more squeeze"
+  },
+  {
+   "doc": 1,
+   "t": 9312,
+   "ms": 1200,
+   "who": "card",
+   "key": "BEG",
+   "text": "やめて…"
+  },
+  {
+   "doc": 1,
+   "t": 10512,
    "ms": 1296,
    "who": "card",
    "key": "AGONY.2",
@@ -96,41 +96,41 @@
   },
   {
    "doc": 1,
-   "t": 11024,
+   "t": 11104,
    "ms": 880,
    "who": "hand",
    "key": "CLAW_SAY.savour",
-   "text": "look at me."
+   "text": "slowly…"
   },
   {
    "doc": 1,
-   "t": 11728,
+   "t": 11808,
    "ms": 176,
    "who": "card",
    "key": "AGONY.2",
-   "text": "I AM COMING APART",
+   "text": "NOT LIKE THIS",
    "lvl": "2"
   },
   {
    "doc": 1,
-   "t": 11904,
-   "ms": 1510,
+   "t": 11984,
+   "ms": 1300,
    "who": "card",
    "key": "SAY.slice",
-   "text": "AAAAAAAAAAA!!!",
+   "text": "GYAAAAAAH!",
    "lvl": "2"
   },
   {
    "doc": 1,
-   "t": 11904,
-   "ms": 1328,
+   "t": 11984,
+   "ms": 2496,
    "who": "hand",
-   "key": "CLAW_SAY.crush|SEV_SAY.crush",
-   "text": "смачках го."
+   "key": "CLAW_SAY.crush",
+   "text": "that is what teasing gets you"
   },
   {
    "doc": 1,
-   "t": 14772,
+   "t": 14852,
    "ms": 796,
    "who": "card",
    "key": "SAY.pull",
@@ -138,74 +138,74 @@
   },
   {
    "doc": 1,
-   "t": 15568,
+   "t": 15648,
    "ms": 1312,
    "who": "card",
-   "key": "SAY.rip|PB.SWAT_SAY",
-   "text": "ау!"
+   "key": "SAY.rip",
+   "text": "AAAH!"
   },
   {
    "doc": 1,
-   "t": 15568,
+   "t": 15648,
    "ms": 608,
    "who": "hand",
    "key": "CLAW_SAY.eager",
-   "text": "ooh. snack."
+   "text": "closer…"
   },
   {
    "doc": 1,
-   "t": 16176,
+   "t": 16256,
    "ms": 1312,
    "who": "hand",
    "key": "CLAW_SAY.sulk",
-   "text": "fine."
+   "text": "пф."
+  },
+  {
+   "doc": 1,
+   "t": 18896,
+   "ms": 1312,
+   "who": "hand",
+   "key": "CLAW_SAY.grab",
+   "text": "thank you!"
   },
   {
    "doc": 1,
    "t": 19792,
-   "ms": 1312,
-   "who": "hand",
-   "key": "CLAW_SAY.grab",
-   "text": "GOT IT"
-  },
-  {
-   "doc": 1,
-   "t": 20688,
    "ms": 160,
    "who": "card",
    "key": "AGONY.0",
-   "text": "pick a side!"
+   "text": "not again"
   },
   {
    "doc": 1,
-   "t": 20848,
-   "ms": 224,
+   "t": 19952,
+   "ms": 240,
    "who": "card",
    "key": "AGONY.1",
-   "text": "STOP PULLING",
+   "text": "LET GO LET GO",
    "lvl": "1"
   },
   {
    "doc": 1,
-   "t": 21072,
-   "ms": 288,
+   "t": 20192,
+   "ms": 272,
    "who": "card",
    "key": "AGONY.2",
-   "text": "AAAAAAAAAAAAAA",
+   "text": "I AM COMING APART",
    "lvl": "2"
   },
   {
    "doc": 1,
-   "t": 21360,
-   "ms": null,
+   "t": 20464,
+   "ms": 1312,
    "who": "card",
-   "key": "SAY.slice|AGONY.2",
-   "text": "ぎゃああああ!!",
+   "key": "SAY.slice",
+   "text": "HHHHRRRKK—",
    "lvl": "2"
   },
   {
    "doc": 1,
-   "t": 21360,
+   "t": 20464,
    "ms": 1568,
    "who": "hand",
    "key": "CLAW_SAY.rip",
@@ -213,11 +213,11 @@
   },
   {
    "doc": 1,
-   "t": 22928,
+   "t": 22032,
    "ms": null,
    "who": "hand",
    "key": "CLAW_SAY.eat",
-   "text": "ごちそうさま"
+   "text": "papery."
   }
  ],
  "states": [
@@ -260,21 +260,8 @@
   },
   {
    "doc": 1,
-   "t": 4548,
+   "t": 4564,
    "claw": "eager",
-   "sev": "",
-   "pb": "closed",
-   "kat": "hidden",
-   "shelf": false,
-   "grab": "card",
-   "objs": {
-    "card": 1
-   }
-  },
-  {
-   "doc": 1,
-   "t": 6644,
-   "claw": "snatch",
    "sev": "",
    "pb": "closed",
    "kat": "hidden",
@@ -287,6 +274,19 @@
   {
    "doc": 1,
    "t": 6724,
+   "claw": "snatch",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6804,
    "claw": "crush",
    "sev": "",
    "pb": "closed",
@@ -299,7 +299,7 @@
   },
   {
    "doc": 1,
-   "t": 11940,
+   "t": 12020,
    "claw": "gloat",
    "sev": "",
    "pb": "closed",
@@ -310,7 +310,7 @@
   },
   {
    "doc": 1,
-   "t": 13240,
+   "t": 13320,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",
@@ -321,7 +321,7 @@
   },
   {
    "doc": 1,
-   "t": 14788,
+   "t": 14868,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",
@@ -334,7 +334,7 @@
   },
   {
    "doc": 1,
-   "t": 15572,
+   "t": 15652,
    "claw": "eager",
    "sev": "",
    "pb": "closed",
@@ -347,7 +347,7 @@
   },
   {
    "doc": 1,
-   "t": 16112,
+   "t": 16192,
    "claw": "sulk",
    "sev": "",
    "pb": "closed",
@@ -360,7 +360,7 @@
   },
   {
    "doc": 1,
-   "t": 17712,
+   "t": 17792,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",
@@ -373,7 +373,7 @@
   },
   {
    "doc": 1,
-   "t": 17728,
+   "t": 17808,
    "claw": "eager",
    "sev": "",
    "pb": "closed",
@@ -386,7 +386,7 @@
   },
   {
    "doc": 1,
-   "t": 19728,
+   "t": 18832,
    "claw": "lunge",
    "sev": "",
    "pb": "closed",
@@ -399,7 +399,7 @@
   },
   {
    "doc": 1,
-   "t": 19792,
+   "t": 18896,
    "claw": "tug",
    "sev": "",
    "pb": "closed",
@@ -412,7 +412,7 @@
   },
   {
    "doc": 1,
-   "t": 21372,
+   "t": 20476,
    "claw": "triumph",
    "sev": "",
    "pb": "closed",
@@ -425,7 +425,7 @@
   },
   {
    "doc": 1,
-   "t": 21388,
+   "t": 20492,
    "claw": "triumph",
    "sev": "",
    "pb": "closed",
@@ -438,7 +438,7 @@
   },
   {
    "doc": 1,
-   "t": 22788,
+   "t": 21892,
    "claw": "eat",
    "sev": "",
    "pb": "closed",
@@ -451,7 +451,7 @@
   },
   {
    "doc": 1,
-   "t": 22938,
+   "t": 22042,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",
