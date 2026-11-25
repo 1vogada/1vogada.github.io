@@ -1,0 +1,67 @@
+/* Physics: cards as bodies in #phys (held, pulled, regrowing, speech bubbles .say), shards, throwing, the katana and the action buttons, debris and slashes, the secret shelf, the screen shake.
+   Moved unchanged from the inline <style> of index.html. Link order and why: styles/README.md */
+
+/* card physics */
+.card.held { visibility: hidden; }
+.card.grab-ready { transform: scale(1.03); border-color: var(--accent); }
+.card.pulling { transition: none; animation: none; opacity: 1; z-index: 5; box-shadow: 0 14px 30px rgba(0,0,0,.18); }
+.card.settled { animation: none; opacity: 1; }
+.card.regrow { animation: regrow .6s cubic-bezier(.3,1.5,.5,1) both; }
+@keyframes regrow { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: none; } }
+#phys { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 35; overflow: hidden; }
+#phys .phys { position: absolute; left: 0; top: 0; margin: 0; pointer-events: auto; animation: none !important; opacity: 1; transition: none !important;
+              transform-origin: 50% 50%; will-change: transform; cursor: grab; touch-action: none; translate: none; }
+#phys .phys.grabbed { box-shadow: 0 18px 40px rgba(0,0,0,.25); }
+#phys .say { position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; white-space: nowrap; background: var(--text); color: var(--bg);
+             font-size: .82rem; font-weight: 650; padding: 4px 11px; border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,.2); animation: say var(--say, 1.3s) both; rotate: calc(var(--tilt, 5) * 1deg); }
+#phys .say::after { content: ""; position: absolute; left: calc(50% + var(--tail, 0px)); bottom: -5px; width: 10px; height: 10px; background: inherit; transform: translateX(-50%) rotate(45deg); border-radius: 2px; }
+#phys .say.agony { font-size: calc(.82rem + .5rem * var(--pain, 0)); animation: say var(--say, 1.3s) both, agony .09s linear infinite; }
+#phys .say.agony[data-lvl] { background: var(--accent); color: #fff; }
+#phys .say.agony[data-lvl="2"] { letter-spacing: .04em; }
+@keyframes agony { 0% { margin: 0; } 25% { margin: calc(-2px * var(--pain)) 0 0 calc(2px * var(--pain)); } 75% { margin: calc(2px * var(--pain)) 0 0 calc(-2px * var(--pain)); } }
+@keyframes say { 0% { opacity: 0; scale: .4; } 12% { opacity: 1; scale: 1.12; } 20% { scale: 1; } 80% { opacity: 1; } 100% { opacity: 0; scale: .9; } }
+#phys .shard { pointer-events: none; box-shadow: none; background: color-mix(in srgb, var(--surface) 93%, var(--text)); }
+html.throwing, html.throwing * { cursor: grabbing !important; user-select: none; }
+html.throwing .grid .card { pointer-events: none; }
+.grid .card { cursor: grab; }
+.grid .card, #phys .phys { user-select: none; -webkit-user-select: none; }
+/* katana */
+.katana { position: absolute; left: calc(max(18px, 50vw - 674px) - 130px); bottom: 0; width: 300px; height: 420px; overflow: hidden; pointer-events: none; }
+.katana-in { position: absolute; left: 130px; bottom: 0; width: 40px; height: 300px; transform: translateY(284px); transition: transform .55s cubic-bezier(.3,1.7,.5,1), opacity .2s; touch-action: none; }
+.katana.found { z-index: 3; }
+.katana.found .katana-in { transform: translateY(190px); cursor: grab; }
+.katana.found .katana-in:hover { transform: translateY(180px); }
+.katana-in.pulling { transition: none; }
+.katana.away .katana-in { opacity: 0; pointer-events: none; }
+.katana.away::after { content: ""; position: absolute; left: 136px; bottom: 1px; width: 28px; height: 6px; border-radius: 50%; background: rgba(0,0,0,.4); }
+#phys .katana-body.equipped { cursor: none; }
+#phys .katana-body, #phys .katana-body.grabbed { box-shadow: none; background: none; border: 0; border-radius: 0; pointer-events: none; }
+.katana-body svg, .katana-in svg { overflow: visible; }
+.katana.found .katana-in svg *, #phys .katana-body svg * { pointer-events: auto; }
+#phys .katana-body { width: 40px; height: 300px; filter: drop-shadow(0 6px 8px rgba(0,0,0,.3)); z-index: 2; }
+#phys .katana-body svg, .katana-in svg { display: block; }
+.phys-actions { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: max(16px, env(safe-area-inset-bottom, 0px)); z-index: 45; display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
+.phys-actions .btn { box-shadow: var(--shadow); justify-content: center; text-align: center; margin: 0; }
+.sheathe[hidden] { display: none; }
+
+#phys .piece { cursor: grab; }
+#phys .bit { position: absolute; left: 0; top: 0; z-index: 4; border-radius: 50%; background: var(--accent); pointer-events: none; }
+#phys .bit.paper { border-radius: 1px; background: var(--surface); border: 1px solid var(--border); }
+#phys .slash { position: absolute; left: 0; top: -2px; height: 4px; z-index: 4; transform-origin: 0 50%; border-radius: 2px; pointer-events: none;
+               background: #fff; box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 60%, transparent), 0 0 10px var(--accent); animation: slash .28s forwards; }
+@keyframes slash { to { opacity: 0; } }
+/* 棚 the secret shelf: the code is written in the top corner of the banner, under the fog */
+.secret { position: absolute; right: 16px; top: 12px; display: flex; align-items: center; gap: 9px; color: var(--ink); opacity: .8; rotate: 3deg; user-select: none; -webkit-user-select: none; font-size: .8rem; letter-spacing: .03em; }
+.secret b { font-size: 1.5rem; line-height: 1; color: var(--accent); font-weight: 800; }
+.secret kbd { font: inherit; font-weight: 800; letter-spacing: .22em; padding: 1px 4px 1px 7px; border: 1px dashed currentColor; border-radius: 6px; }
+
+/* drawn like the banner: flat shapes in its colours, a beam with a dark cap like the torii's, on two posts */
+#phys .shelf { position: absolute; height: 14px; background: var(--torii); border-radius: 0 0 2px 2px; transform-origin: 0 50%; animation: shelf-in .5s cubic-bezier(.3,1.6,.5,1) both; }
+#phys .shelf::before { content: ""; position: absolute; left: 0; right: -9px; top: -5px; height: 7px; background: var(--torii-cap); border-radius: 0 3px 3px 0; clip-path: polygon(0 0, 100% 0, calc(100% - 5px) 100%, 0 100%); }
+#phys .shelf::after { content: ""; position: absolute; left: 0; right: 0; top: 14px; height: 30px; background: linear-gradient(var(--torii), var(--torii)) 22% 0 / 9px 100% no-repeat, linear-gradient(var(--torii), var(--torii)) 78% 0 / 9px 100% no-repeat, linear-gradient(var(--torii), var(--torii)) 0 14px / 88% 6px no-repeat; opacity: .92; }
+@keyframes shelf-in { from { opacity: 0; scale: .1 1; } to { opacity: 1; scale: 1; } }
+
+.reset-cards[hidden] { display: none; }
+
+main.shake { animation: shake .28s; }
+@keyframes shake { 20% { translate: -5px 2px; } 40% { translate: 4px -3px; } 60% { translate: -3px 2px; } 80% { translate: 2px -1px; } }

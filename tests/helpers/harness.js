@@ -60,8 +60,8 @@ let setupDone = false;
 // session: {k: v}, local: {k: v}, query, idle: ms to let pass after load, golden: false, skip: 'reason', timeout }
 function scenario(group, name, opts, fn) {
   if (typeof opts === 'function') { fn = opts; opts = {}; }
+  if (process.env.ONLY && !name.includes(process.env.ONLY)) return;   // first: a file with no matching scenario must not launch a browser, or it never exits
   if (!setupDone) { setup(); setupDone = true; }
-  if (process.env.ONLY && !name.includes(process.env.ONLY)) return;
   test(name, { skip: opts.skip || false, timeout: opts.timeout || 180000 }, async () => {
     const s = await Session.open(group, name, opts);
     let ok = false;

@@ -19,6 +19,7 @@ import * as linesHand from './lines/hand.js';
 import * as linesSevered from './lines/severed.js';
 import * as linesShelf from './lines/shelf.js';
 import * as linesPhrasebook from './lines/phrasebook.js';
+import * as linesPage from './lines/page.js';
 
 import * as toast from './page/toast.js';
 import * as directory from './page/directory.js';
@@ -94,7 +95,7 @@ export const ORDER = [
   ['machine', machineMod], ['claims', claimsMod], ['debug', debug],
   // 2 line tables (defineLines runs when they are imported; install is for anything that needs the DOM)
   ['linesCards', linesCards], ['linesKatana', linesKatana], ['linesHand', linesHand], ['linesSevered', linesSevered],
-  ['linesShelf', linesShelf], ['linesPhrasebook', linesPhrasebook],
+  ['linesShelf', linesShelf], ['linesPhrasebook', linesPhrasebook], ['linesPage', linesPage],
   // 3 the page above the physics in legacy script order: toast, directory (+ fetches), reader, search, tilt (+ band roll)
   ['toast', toast], ['directory', directory], ['reader', reader], ['search', search], ['tilt', tilt],
   // 4 legacy cardPhysics(): the world, then the actors in the order their legacy listeners were registered
