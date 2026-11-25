@@ -149,6 +149,14 @@ wants the hand without ripping a card first passes `session: { 'kiripad-ripped':
 (cards, and pieces that are not fading); `big()` (`TUNE.hand.PIECE_BIG` of the card's area) decides between eating a piece and
 rejecting it (`hand.small`).
 
+## 12d. A piece is a card with an outline
+
+Everything the hand does to a whole card it does to a piece that is `big()`: eager, lunge, the tug of war with the stretch and
+the cheese pull, the crush. The code that used to assume the card's rectangle goes through the body's own outline instead
+(`o.poly`, else the rectangle; in `world/stretch.js` `rim(o, n)` and in `actors/hand/tug.js` `outline(o)`, `middle(o)`,
+`reachOf`). A piece keeps its shape in `o.clip` (`keepClip` / `ownClip`) while the stretch or the crumple draws over its
+clip-path. New code that handles "a card" should take `edible()` bodies and use these, not `o.w` and `o.h`.
+
 ## 13. Legacy bugs deliberately kept
 
 Kept on purpose so old and new behave the same. Fix one only as a deliberate behaviour change (item 12).
