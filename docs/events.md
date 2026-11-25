@@ -13,6 +13,8 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 |---|---|---|---|
 | `card.pulled` | `{ card }` | `actors/cards.js` `startPull`: after the body is made and held and after its forced `card.pull` line | none |
 | `card.strained` | `{ card, first }` | `world/loop.js` step phase `bodies`: **every 1/240 s step** while a held rooted card's pull is past `TUNE.drag.STRAIN`, after the grip drains, before the tear check; `first` only on the first step of a pull | `actors/cards.js`: `card.strain` line (forced when `first`; not for the katana) |
+| `card.loosened` | `{ card, left }` | `actors/cards.js` `give`: a tug used up the root's grip and it gave one notch (after its `card.loosen` line) | nobody yet |
+| `card.snapped` | `{ mine, rest }` | `actors/cards.js` `snap`: yanked past RIP before the root was loose, torn in two (after your half's scream, before the toast) | `reactions.js`: `hand.notice('loose')` |
 | `card.sprangBack` | `{ card }` | `world/drag.js` `drop`: a rooted card let go after moving | `actors/cards.js`: forced `card.back` (not for the katana) |
 | `card.ripped` | `{ card }` | `actors/cards.js` `tear`: after the forced `card.rip` line, before the first-rip `ui.toast` | `reactions.js`: `hand.notice('loose')` |
 | `card.landed` | `{ card, at, closing }` | `world/shatter.js` `onContact`, **inside the planck contact callback**: closing speed > `TUNE.physics.LAND` without a smash; once per card of the pair (kind `card`) | `actors/cards.js`: `card.land` line (gate decides). Do not create or destroy bodies in a listener |

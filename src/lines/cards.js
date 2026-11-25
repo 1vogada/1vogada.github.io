@@ -30,9 +30,17 @@ defineLines('card.back', ['ha!', 'told you', 'too weak', 'nice try', 'stubborn >
 defineLines('card.rip', ['AAAH!', 'nooo!', 'rude.', 'ау!', 'I was comfy!', 'put me back!'], {
   who: 'card', legacy: 'SAY.rip',
   trigger: { title: 'Torn out',
-    when: 'You pull past 350 px, or hold the strain until the root gives up. The card comes loose in your hand.' },
+    when: 'The third tug. The root gives up and the card comes loose in your hand.' },
   gloss: { 'ау!': 'ow!' },
   lang: ['en', 'en', 'en', 'bg', 'en', 'en'],
+});
+
+defineLines('card.loosen', ['*crack*', 'I felt that!', 'that was a root!', 'wiggle wiggle', 'not again…', 'one more and I go', 'пук!', 'ぐらぐら…'], {
+  who: 'card',
+  trigger: { title: 'A tug, like a tooth',
+    when: 'You hold the strain until the root gives a notch. Ease off and tug again: a card comes out on the third tug. Yank it past 350 px before that and it tears in two.' },
+  gloss: { 'пук!': 'crack!', 'ぐらぐら…': 'wobbly…' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
 });
 
 defineLines('card.throw', ['wheee', 'NOOO', 'not the wall!', 'I can fly?!', 'aaaaaa'], {
@@ -164,6 +172,7 @@ defineLines('card.beg', ['please', 'I will be good', 'I have unmerged commits!',
 defineLines('toast.ripped', ['Ripped it out! Stack them, or throw one hard to smash it.'], { who: 'toast', lang: 'en' });
 defineLines('toast.smashed', ['Smashed!'], { who: 'toast', lang: 'en' });
 defineLines('toast.smashed10', ['10 cards smashed. Feeling better?'], { who: 'toast', lang: 'en' });
+defineLines('toast.snapped', ['Too hard: it tore. Tug a few times instead, like pulling a tooth.'], { who: 'toast', lang: 'en' });
 defineLines('toast.halved', ['It keeps its half.'], { who: 'toast', lang: 'en' });
 
 export function install(app) {}

@@ -23,7 +23,7 @@ import { bus } from '../core/bus.js';
 import { clock } from '../core/clock.js';
 import { ride } from '../core/speech.js';
 import { world, remove } from './world.js';
-import { tear } from './drag.js';
+import { tear, give, snap } from './drag.js';
 
 const S = TUNE.physics.S, DT = TUNE.physics.DT, P = TUNE.physics, D = TUNE.drag;
 
@@ -39,7 +39,7 @@ function forces() {
   for (const o of world.bodies) {
     if (!o.root) continue;   // the root: a damped spring back to the slot, and one that keeps the card level
     const b = o.body, p = b.getPosition();
-    const v = b.getLinearVelocity(), m = b.getMass(), wn = 2 * Math.PI * D.ROOT_HZ, wa = 2 * Math.PI * D.ANGLE_HZ, k = D.ROOT_GIVE[0] + D.ROOT_GIVE[1] * o.grip;   // a root that is losing its grip gives way
+    const v = b.getLinearVelocity(), m = b.getMass(), wn = 2 * Math.PI * D.ROOT_HZ, wa = 2 * Math.PI * D.ANGLE_HZ, k = (D.ROOT_GIVE[0] + D.ROOT_GIVE[1] * o.grip) * (1 - D.LOOSE_GIVE * (o.loose || 0));   // a root that is losing its grip gives way, and a loosened one is softer for good
     b.applyForceToCenter({ x: -m * (k * wn * wn * (p.x - o.root.x) + D.ROOT_DAMP * wn * v.x), y: -m * (k * wn * wn * (p.y - o.root.y) + D.ROOT_DAMP * wn * v.y) }, true);
     b.applyTorque(-b.getInertia() * (k * wa * wa * o.pa + D.ANGLE_DAMP * wa * b.getAngularVelocity() + (o.grip < 1 ? (Math.random() - 0.5) * D.SHAKE_TORQUE * (1 - o.grip) : 0)), true);
   }
@@ -58,9 +58,15 @@ function bodies() {
     const b = o.body, p = b.getPosition(), d = Math.hypot(p.x - o.root.x, p.y - o.root.y), grab = world.grab;
     if (grab && grab.o === o) {   // the pull is the stretch of the hand spring: how far the pointer is from the spot it holds
       const g = grab.joint.getTarget(), pull = Math.hypot(g.x - grab.hx, g.y - grab.hy);   // how far the hand is from where it took hold
-      if (pull > D.STRAIN) { o.grip -= DT * (D.GRIP_DRAIN[0] + D.GRIP_DRAIN[1] * (pull - D.STRAIN) / (D.RIP - D.STRAIN)); const first = !o.strained; o.strained = true; bus.emit('card.strained', { card: o, first }); }
+      // A body with o.tugs comes out like a tooth: each time its grip runs out the root gives one notch (o.loose) and the pull has to
+      // ease off (o.spent) before the next tug counts; the last notch frees it. Yanked past RIP before that, it snaps instead
+      const last = (o.loose || 0) >= (o.tugs || 1) - 1;
+      if (o.spent) { if (pull < D.EASE) o.spent = false; o.grip = Math.min(1, o.grip + DT * D.GRIP_RECOVER); }
+      else if (pull > D.STRAIN) { o.grip -= DT * (D.GRIP_DRAIN[0] + D.GRIP_DRAIN[1] * (pull - D.STRAIN) / (D.RIP - D.STRAIN)); const first = !o.strained; o.strained = true; bus.emit('card.strained', { card: o, first }); }
       else o.grip = Math.min(1, o.grip + DT * D.GRIP_RECOVER);
-      if (pull > D.RIP || o.grip <= 0 || Math.abs(b.getAngle()) > D.TWIST) tear(o);
+      if (last) { if (pull > D.RIP || o.grip <= 0 || Math.abs(b.getAngle()) > D.TWIST) tear(o); }
+      else if (pull > D.RIP) snap(o);
+      else if (!o.spent && (o.grip <= 0 || Math.abs(b.getAngle()) > D.TWIST)) { o.loose = (o.loose || 0) + 1; o.spent = true; o.grip = D.LOOSE_GRIP; give(o); }
     }
     else if ((o.grip = Math.min(1, o.grip + DT * D.GRIP_RECOVER_FREE)) && d < D.SETTLE.dist && Math.abs(b.getAngle()) < D.SETTLE.angle && b.getLinearVelocity().length() < D.SETTLE.v && Math.abs(b.getAngularVelocity()) < D.SETTLE.w) remove(o);
   }
