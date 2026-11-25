@@ -12,6 +12,7 @@
 //   tick (stroke tick), screamed    cut.js
 //   katObj                          world.blade: the body whose tip cuts (the katana actor sets it with setBlade). The hand reads
 //                                   world.blade for the sever check and the severed hand for fleeing: actors never import katana.js
+import { unstretch } from './stretch.js';
 //   smashed, resetBtn, suppress     world.smashed, showReset(), world.suppress
 //   loopOn/last/acc, hiddenAt/away  core/clock.js
 //   DBG                             world.dbg (core/debug.js flags().dbg, read at install; a test may switch it on later)
@@ -159,7 +160,7 @@ export function remove(o) {
   hush(o);
   bus.emit('body.removed', { body: o });   // legacy: if (o === katObj) katObj = null; if (o.kind === 'hand') sevGone(o)
   world.b2.destroyBody(o.body); world.bodies.delete(o);
-  if (o.root) { world.rootOf.delete(o.el); o.el.classList.remove('pulling'); o.el.style.transform = ''; }
+  if (o.root) { world.rootOf.delete(o.el); o.el.classList.remove('pulling'); o.el.style.transform = ''; if (o.sg) unstretch(o); }
   else o.el.remove();
 }
 

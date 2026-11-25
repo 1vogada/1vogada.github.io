@@ -58,6 +58,10 @@ scenario(G, 'most cards come out on one held tug', { legacy: false }, async (s) 
 
 scenario(G, 'a card yanked too far tears in two', { legacy: false }, async (s) => {
   await s.pull(0, 0, -420, { n: 10 });   // fast and far on the first pull
+  // it does not tear at once: it stretches between its slot and your hand first, like in the tug of war with the hand
+  assert.deepEqual(await s.eval(kinds), { card: 1 }, 'still one card, stretching');
+  await s.run(200, 20); await s.shot('stretching');
+  await s.run(260, 20);
   const k = await s.eval(kinds);
   assert.deepEqual(k, { piece: 2 }, 'two halves, no whole card');
   const st = await s.eval(() => ({ grab: window.__cards.state().grab.o.kind, held: document.querySelector('#grid .card').classList.contains('held'), toast: document.getElementById('toast').textContent }));

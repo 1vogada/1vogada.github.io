@@ -79,7 +79,7 @@ async function tugOfWar(s, from, y = 300) {
 
 scenario(G, 'a piece gets the whole tug of war, a scrap is rejected', { ...O, legacy: false, timeout: 240000 }, async (s) => {
   // a card yanked too far tears in two: the bigger part in your hand, under a third left behind
-  await s.pull(0, 0, -420, { n: 10 });
+  await s.pull(0, 0, -420, { n: 10 }); await s.run(460, 20);
   assert.deepEqual(await s.eval(shares), [0.3, 0.7]);
   await s.run(600);
   const at0 = await s.eval(() => { const g = window.__cards.state().grab; return [g.cx, g.cy]; });

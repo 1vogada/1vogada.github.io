@@ -33,6 +33,7 @@ import * as W from '../world/world.js';
 import { drawOffset } from '../world/loop.js';
 import { validPoly } from '../world/cut.js';
 import { gore, shake } from '../world/fx.js';
+import { unstretch } from '../world/stretch.js';
 
 const { world } = W;
 const S = TUNE.physics.S;
@@ -75,6 +76,7 @@ function need(key) {
 
 // out of its slot: the grid card stays behind as an empty place, a copy in the physics layer is the body from here on
 function uproot(o) {
+  if (o.sg) unstretch(o);   // the stretch look stays on the grid card otherwise, and the copy would inherit it
   const card = o.el, el = W.cloneCard(card);
   el.style.width = o.w + 'px'; el.style.height = o.h + 'px'; el._o = o; world.layer.appendChild(el);
   world.rootOf.delete(card); card.classList.remove('pulling'); card.style.transform = ''; card.classList.add('held');

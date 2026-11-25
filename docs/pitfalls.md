@@ -157,6 +157,15 @@ the cheese pull, the crush. The code that used to assume the card's rectangle go
 `reachOf`). A piece keeps its shape in `o.clip` (`keepClip` / `ownClip`) while the stretch or the crumple draws over its
 clip-path. New code that handles "a card" should take `edible()` bodies and use these, not `o.w` and `o.h`.
 
+## 12e. A yanked card stretches before it tears
+
+`world/stretch.js` holds the stretch look (`stretchLook`: long, thin, necked, see-through, red, trembling). The hand's tug of war
+draws with it (`tugDraw`), and so does a card still rooted in its slot: `rootStretch` (called from the loop's draw) pins the spot
+you hold to the pointer and leaves the far end where the root holds it. It is style only; the body moves as before. `o.pain`
+(loop `bodies`) follows the pull but takes `TUNE.drag.STRETCH_S` to reach 1, and the card only snaps in two once it is 1, so a
+scenario has to wait about half a second after a fast yank. The stretched card is the grid card itself, so `uproot` and
+`world.remove` clear the look (`unstretch`), and `#projects` is raised above the hero for that long (inline style: `styles/` is frozen by a unit test).
+
 ## 13. Legacy bugs deliberately kept
 
 Kept on purpose so old and new behave the same. Fix one only as a deliberate behaviour change (item 12).

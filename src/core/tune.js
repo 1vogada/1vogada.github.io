@@ -34,6 +34,7 @@ export const TUNE = {
     LOOSE_GIVE: 0.2, LOOSE_GRIP: 0.5,    // each tug it has given makes the root spring this much softer; the grip it has left right after giving
     LOOSE_TILT: 1.3,                     // deg a loosened card sits crooked in its slot, per tug
     SNAP_KEEP: 0.3,                      // a card yanked in two: neither half is under this share of its length
+    STRETCH: [0.5, 1.4], STRETCH_S: 0.32, // a rooted card stretches toward your hand from STRETCH[0] m of pull, fully by STRETCH[1]; a yank takes STRETCH_S s to tear it
     ROOT_HZ: 14, ANGLE_HZ: 9,            // root spring, root torque spring
     PULL_HZ: 7, PULL_DAMPING: 0.8,       // hand while rooted
     HAND_HZ: 60, HAND_DAMPING: 1,        // hand once free

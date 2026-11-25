@@ -11,6 +11,8 @@ import { line } from '../../core/lines.js';
 import { world, remove, hold, fragment, rectPoly } from '../../world/world.js';
 import { polyArea, validPoly } from '../../world/cut.js';
 import { gore, shake } from '../../world/fx.js';
+import { rim, keepClip, ownClip, stretchLook } from '../../world/stretch.js';
+export { ownClip };
 import { GRIP } from './poses.js';
 import { get, set, speak, clamp01 } from './index.js';
 
@@ -38,19 +40,6 @@ function reachOf(o, x, y, ux, uy) {
   }
   return best === 1e9 ? 0 : best;
 }
-// the points along o's edge that the stretch and the crumple move: 26 (or n) per side of a card, every 12 px or so of a piece
-function rim(o, n) {
-  const out = [];
-  if (!o.poly) { for (let k = 0; k < 4 * n; k++) { const f = (k % n) / n, e = Math.floor(k / n); out.push([e === 0 ? f * o.w : e === 1 ? o.w : e === 2 ? o.w - f * o.w : 0, e === 0 ? 0 : e === 1 ? f * o.h : e === 2 ? o.h : o.h - f * o.h]); } return out; }
-  const p = o.poly;
-  for (let i = 0; i < p.length; i++) { const a = p[i], b = p[(i + 1) % p.length], m = Math.max(2, Math.round(Math.hypot(b[0] - a[0], b[1] - a[1]) / (n > 10 ? 12 : 40))); for (let k = 0; k < m; k++) out.push([a[0] + (b[0] - a[0]) * k / m, a[1] + (b[1] - a[1]) * k / m]); }
-  return out;
-}
-// a piece has a shape of its own (its clip-path): remembered before the stretch or the crumple draws over it, put back after
-const keepClip = (o) => { if (o.clip === undefined) o.clip = o.el.style.clipPath || ''; };
-/** o's own shape again (a whole card: none) */
-export const ownClip = (o) => { o.el.style.clipPath = o.clip || ''; };
-
 /** the claw's grip point, viewport px (legacy gripPt) */
 export const gripPt = () => { const c = get(), ca = Math.cos(c.a), sa = Math.sin(c.a); return [c.x + GRIP[0] * ca + GRIP[1] * sa, c.y + GRIP[0] * sa - GRIP[1] * ca]; };
 /** where the wrist goes for the grip to be at H with the hand turned to a (legacy wristFor) */
@@ -93,26 +82,7 @@ export function tugDraw(o, P, H) {
   const cf = Math.cos(g.phi), sf = Math.sin(g.phi), a = (g.gp[0] * cf + g.gp[1] * sf) * s, b = (-g.gp[0] * sf + g.gp[1] * cf) * tt, cp = Math.cos(psi), sp = Math.sin(psi);
   const cx = P[0] - (a * cp - b * sp), cy = P[1] - (a * sp + b * cp);
   o.body.setTransform({ x: cx / S, y: cy / S }, psi - g.phi); o.body.setLinearVelocity({ x: 0, y: 0 }); o.body.setAngularVelocity(0); o.body.setAwake(true);
-  // pain: 0 slack, 1 about to tear. Near the limit the whole card trembles (real time, not frames)
-  const pain = clamp01((d - g.d0) / (g.rip || 300)), tm = now(), shk = 2.6 * pain * pain * pain, jx = shk * Math.sin(tm * 0.083) * -sp + shk * 0.4 * Math.sin(tm * 0.131) * cp, jy = shk * Math.sin(tm * 0.083) * cp + shk * 0.4 * Math.sin(tm * 0.131) * sp;
-  o.el.style.transform = `translate(${(cx - o.ex + jx).toFixed(2)}px, ${(cy - o.ey + jy).toFixed(2)}px) rotate(${psi.toFixed(4)}rad) scale(${s.toFixed(4)}, ${tt.toFixed(4)}) rotate(${(-g.phi).toFixed(4)}rad)`;
-  const waist = Math.min(0.86, 0.5 * Math.pow(pain, 0.7) + 0.4 * pain * pain), crack = clamp01((pain - 0.45) / 0.55);
-  // the paper goes thin where it necks: you start to see through the middle, and it reddens under the strain
-  const nx = g.gp[0] + 0.5 * g.dn * cf + o.w / 2, ny = g.gp[1] + 0.5 * g.dn * sf + o.h / 2, thin = (1 - 0.6 * pain * pain).toFixed(3), r0 = 0.1 * g.dn, r1 = (0.2 + 0.25 * pain) * g.dn;
-  o.el.style.maskImage = o.el.style.webkitMaskImage = pain < 0.08 ? '' : `radial-gradient(circle at ${nx.toFixed(1)}px ${ny.toFixed(1)}px, rgba(0,0,0,${thin}) ${r0.toFixed(1)}px, #000 ${r1.toFixed(1)}px)`;
-  o.el.style.filter = pain < 0.3 ? '' : `saturate(${(1 + 0.8 * pain).toFixed(2)}) sepia(${(0.35 * (pain - 0.3)).toFixed(2)}) hue-rotate(-${(28 * (pain - 0.3)).toFixed(0)}deg)`;
-  if (waist < 0.02) ownClip(o);
-  else {
-    const W = o.w, Hh = o.h, pts = [], R = g.rim || (g.rim = rim(o, 26));
-    for (let k = 0; k < R.length; k++) {
-      const x = R[k][0], y = R[k][1];
-      const rx = x - W / 2 - g.gp[0], ry = y - Hh / 2 - g.gp[1], al = rx * cf + ry * sf, bell = Math.exp(-Math.pow((al / g.dn - 0.5) / (0.3 - 0.1 * pain), 2));
-      // necking, and past the halfway point little tears open along the neck: every other point bites inwards by a fixed, uneven amount
-      const bite = crack * bell * (k % 2 ? 0.1 + 0.5 * (Math.sin(k * 12.9898) * 43758.5453 % 1 + 1) % 1 : 0), pe = (-rx * sf + ry * cf) * (1 - waist * bell) * (1 - bite);
-      pts.push(`${(g.gp[0] + al * cf - pe * sf + W / 2).toFixed(1)}px ${(g.gp[1] + al * sf + pe * cf + Hh / 2).toFixed(1)}px`);
-    }
-    o.el.style.clipPath = `polygon(${pts.join(',')})`;
-  }
+  stretchLook(o, g, cx, cy, psi, s, tt, clamp01((d - g.d0) / (g.rip || 300)));
   g.s = s; g.d = d; g.psi = psi; g.e = d - g.d0;
 }
 /** back to an ordinary card, at its own size (legacy clawUntug(o, P, H)) */
