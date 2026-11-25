@@ -2293,7 +2293,10 @@
   "legacy": null,
   "trigger": null,
   "lines": [
-   ["棚 · A shelf. Leave a card on it and look away.","ja"]
+   ["棚 · A shelf spawned at a random spot. Leave a card on it and look away.","ja"],
+   ["棚 · A shelf popped up somewhere random this time. Leave a card on it and look away.","ja"],
+   ["棚 · New shelf, random height. Find it, leave a card, look away.","ja"],
+   ["棚 · The shelf landed somewhere new under the banner. Leave a card there and look away.","ja"]
   ]
  },
  "toast.shelfFirst": {
@@ -2301,7 +2304,10 @@
   "legacy": null,
   "trigger": null,
   "lines": [
-   ["棚 · A shelf. Pull a card out and leave it there.","ja"]
+   ["棚 · A shelf spawned at a random spot. Pull a card out and leave it there.","ja"],
+   ["棚 · A shelf popped up somewhere random under the banner. Pull a card out and leave it there.","ja"],
+   ["棚 · A shelf, randomly placed. Scroll to find it, then leave a card on it.","ja"],
+   ["棚 · Somewhere down the page a shelf just spawned. Pull a card out and put it there.","ja"]
   ]
  },
  "greeting.hello": {

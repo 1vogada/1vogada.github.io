@@ -13,7 +13,7 @@ scenario(G, 'shelf opens three ways', async (s) => {
   await s.type('tana');
   await s.run(100);
   assert.equal(await s.eval(shelf), true, 'typing tana brings the shelf out');
-  assert.equal(await s.eval(toast), '棚 · A shelf. Pull a card out and leave it there.');
+  assert.ok(/^棚 · .*(random|spawned).*/.test(await s.eval(toast)), 'the toast says it came out at a random spot');
   const sh = await s.eval(() => { const x = window.__cards.state().shelf; return { x0: x.x0, w: x.w, y: x.y }; });
   assert.equal(sh.x0, 0, 'at the very left edge');
   await s.type('tana');
@@ -54,6 +54,7 @@ scenario(G, 'shelf opens three ways', async (s) => {
 
 scenario(G, 'hand reach with card panic tiers and bystander lines', { idle: 3000, legacy: false }, async (s) => {
   await s.ensurePlanck();
+  await s.randQueue(0, 0);   // the shelf at the top of its random range (just under the banner) and the first toast
   await s.type('tana');
   await s.run(300);
   await s.scrollTo(250);
