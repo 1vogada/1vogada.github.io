@@ -7,7 +7,7 @@ const G = 'shelf';
 const shelf = () => { const st = window.__cards && window.__cards.state(); return !!(st && st.shelf) && !!document.querySelector('#phys .shelf'); };
 const toast = () => document.getElementById('toast').textContent;
 
-scenario(G, 'shelf opens three ways', async (s) => {
+scenario(G, 'shelf opens three ways', { legacy: false }, async (s) => {
   await s.ensurePlanck();
   // 1. typing tana anywhere on the page (and again to put it away)
   await s.type('tana');

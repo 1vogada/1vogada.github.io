@@ -161,7 +161,7 @@ scenario(G, 'crush and eat', { ...O, legacy: false }, async (s) => {
 // the arm's polyline (viewport px): the point on it at x
 const onArm = (arm, x) => { for (let i = 0; i + 1 < arm.length; i++) { const [a, b] = [arm[i], arm[i + 1]], f = (x - a[0]) / (b[0] - a[0]); if (f >= 0 && f <= 1) return [x, a[1] + (b[1] - a[1]) * f]; } return null; };
 
-scenario(G, 'sever with the katana tip, stump, regrow', O, async (s) => {
+scenario(G, 'sever with the katana tip, stump, regrow', { ...O, legacy: false }, async (s) => {
   // the katana first (wiping the fog near it uncovers it), then the shelf (type tana), and a card left on the shelf:
   // the hand comes for it with its whole arm out across the screen
   await s.ensurePlanck();
