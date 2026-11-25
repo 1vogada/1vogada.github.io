@@ -151,8 +151,8 @@ scenario(G, 'catch a thrown card', { ...O, legacy: false }, async (s) => {
 });
 
 scenario(G, 'crush and eat', { ...O, legacy: false }, async (s) => {
-  // held in its zone for too long, out of reach: it loses patience and snatches it
-  await carry(s, 0, 1000, 300);
+  // held in its zone for too long, out of reach (tease zone, left of the catch zone): it loses patience and snatches it
+  await carry(s, 0, 900, 300);
   assert.equal((await s.eval(claw)).st, 'eager');
   await s.rand(0.1);    // snatch, not another "gimme"
   await s.runUntil(() => window.__cards.state().claw.st === 'crush', null, { max: 5000, step: 16 });
