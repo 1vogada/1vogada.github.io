@@ -51,7 +51,7 @@ scenario(G, 'limp, rise, walk and turn', { rand: 0.5 }, async (s) => {
   assert.equal((await s.eval(hands))[0].st, 'walk');
 });
 
-scenario(G, 'held and crush', async (s) => {
+scenario(G, 'held and crush', { legacy: false }, async (s) => {
   const size = await world(s);
   await spawn(s, size.W / 2, size.H - 300);
   await s.runUntil(() => { const o = window.__sev.list.values().next().value; return o.ai.st === 'walk' && performance.now() > o.ai.hurt; }, null, { max: 12000, step: 100 });

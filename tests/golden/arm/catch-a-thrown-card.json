@@ -20,6 +20,14 @@
   },
   {
    "doc": 1,
+   "t": 3856,
+   "ms": 1472,
+   "who": "hand",
+   "key": "CLAW_SAY.eager",
+   "text": "do not test me"
+  },
+  {
+   "doc": 1,
    "t": 5036,
    "ms": 1316,
    "who": "card",
@@ -28,7 +36,7 @@
   },
   {
    "doc": 1,
-   "t": 5344,
+   "t": 5328,
    "ms": 1776,
    "who": "hand",
    "key": "CLAW_SAY.caught",
@@ -36,7 +44,7 @@
   },
   {
    "doc": 1,
-   "t": 7344,
+   "t": 7328,
    "ms": 1488,
    "who": "hand",
    "key": "CLAW_SAY.toss",
@@ -52,7 +60,7 @@
   },
   {
    "doc": 1,
-   "t": 9344,
+   "t": 9328,
    "ms": null,
    "who": "hand",
    "key": "CLAW_SAY.throw",
@@ -99,8 +107,21 @@
   },
   {
    "doc": 1,
+   "t": 3864,
+   "claw": "eager",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
    "t": 5052,
-   "claw": "lurk",
+   "claw": "sulk",
    "sev": "",
    "pb": "closed",
    "kat": "hidden",
@@ -125,7 +146,7 @@
   },
   {
    "doc": 1,
-   "t": 5356,
+   "t": 5340,
    "claw": "has",
    "sev": "",
    "pb": "closed",
@@ -138,7 +159,7 @@
   },
   {
    "doc": 1,
-   "t": 7356,
+   "t": 7340,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",
