@@ -1,0 +1,7 @@
+/* Fog: the banner's wipeable fog canvas and the kiri flood canvas.
+   Moved unchanged from the inline <style> of index.html. Link order and why: styles/README.md */
+
+#fog { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* 霧 kiri flood: typing "kiri" buries the whole page, everything goes behind the fog */
+#kiri { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 48; pointer-events: none; display: none; }
+#kiri.on { display: block; }

@@ -1,0 +1,64 @@
+/* Cards: the project grid and its cards (tilt, band motif), sections, pins, posts, the post reader, and the reduced-motion rule for the cards and the caret.
+   Moved unchanged from the inline <style> of index.html. Link order and why: styles/README.md */
+
+/* cards */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; margin: 18px 0 56px; perspective: 900px; }
+.card { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+        display: flex; flex-direction: column; box-shadow: var(--shadow);
+        transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--ty, 0)); transition: transform .25s ease-out, border-color .2s;
+        opacity: 0; animation: rise .5s ease-out forwards; animation-delay: calc(var(--i, 0) * 45ms); }
+@keyframes rise { from { opacity: 0; translate: 0 14px; } to { opacity: 1; translate: 0 0; } }
+.card:hover { border-color: color-mix(in srgb, var(--accent) 55%, var(--border)); --ty: -3px; }
+.card::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .2s;
+               background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%); }
+.card:hover::after { opacity: 1; }
+.band { height: 46px; display: block; background: color-mix(in srgb, var(--c1) 9%, var(--surface)); border-bottom: 1px solid var(--border); }
+/* the motif tiles seamlessly, always a whole number across, and slides with the card's tilt (--bx) */
+.band { position: relative; overflow: hidden; }
+.band::before { content: ""; position: absolute; inset: 0; background-image: var(--tile); background-size: 44px 46px;
+                background-repeat: round no-repeat; background-position: var(--bx, 0px) 0; transition: background-position .35s ease-out; }
+#phys .band::before, .card.pulling .band::before { transition: none; }
+:root[data-theme="dark"] .band::before { filter: brightness(1.45) saturate(1.1); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .band::before { filter: brightness(1.45) saturate(1.1); } }
+.card .body { padding: 14px 18px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.card h3 { margin: 0; font-size: 1.08rem; font-weight: 650; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.card h3 a { color: var(--text); text-decoration: none; }
+.card h3 a::before { content: ""; position: absolute; inset: 0; z-index: 1; }
+.pill { font-size: .7rem; font-weight: 500; color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 1px 8px; }
+.card p { margin: 0; color: var(--muted); font-size: .92rem; flex: 1; }
+.card p.none { font-style: italic; opacity: .8; }
+.card .links { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; font-size: .85rem; position: relative; z-index: 2; }
+.card .links a { color: var(--accent); text-decoration: none; word-break: break-all; }
+.card .links a:hover { text-decoration: underline; }
+.card.picked { animation: none; opacity: 1; outline: 3px solid var(--accent); outline-offset: 2px; }
+.empty { color: var(--muted); grid-column: 1 / -1; text-align: center; padding: 30px 0; }
+
+
+/* sections, pins and posts */
+.sec { grid-column: 1 / -1; margin: 18px 0 -4px; font-size: .8rem; font-weight: 650; letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+       display: flex; align-items: center; gap: 10px; }
+.sec::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+.sec:first-child { margin-top: 0; }
+.pin { position: absolute; top: 8px; right: 10px; z-index: 2; font-size: .72rem; font-weight: 600; color: #fff; background: var(--accent);
+       border-radius: 999px; padding: 2px 9px; }
+.card.post .band { background: color-mix(in srgb, var(--c1) 5%, var(--surface)); }
+.pill.postpill { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); }
+.reader { position: fixed; inset: 0; z-index: 40; background: color-mix(in srgb, var(--bg) 70%, transparent); backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px); overflow-y: auto; padding: 40px 16px; }
+.reader article { max-width: 680px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+                  box-shadow: var(--shadow); overflow: hidden; }
+.reader .body { padding: 22px 28px 30px; }
+.reader h1 { margin: 0 0 4px; font-size: clamp(1.5rem, 4vw, 2rem); letter-spacing: -0.02em; text-wrap: balance; }
+.reader .date { color: var(--muted); font-size: .85rem; margin: 0 0 18px; }
+.reader .md { line-height: 1.7; }
+.reader .md h2, .reader .md h3 { margin: 1.4em 0 .4em; }
+.reader .md a { color: var(--accent); }
+.reader .md code { background: var(--accent-soft); border-radius: 4px; padding: 1px 5px; font-size: .9em; }
+.reader .md img { border-radius: 10px; }
+.reader .close { float: right; }
+@media (max-width: 640px) { .reader { padding: 16px 10px; } .reader .body { padding: 18px 18px 24px; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .card { animation: none; opacity: 1; transform: none !important; }
+  .hello .cursor { animation: none; }
+}
