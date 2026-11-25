@@ -173,7 +173,7 @@ export const TUNE = {
     LEG: { force: 520, damp: 42, cap: 170, walk: 14, drag: 30, torque: 900, torqueDamp: 54 },
   },
   // ---- the secret shelf ----
-  shelf: { MAX_W: 260, W_FRAC: 0.42, CLEAR_PX: 250, TOP: 140, BOTTOM: 160, VIEW: 0.56, VIEW_BOTTOM: 70, FRICTION: 0.9, NEAR: [120, 60, 380, 80], EYE_MS: 700 },
+  shelf: { MAX_W: 260, W_FRAC: 0.42, CLEAR_PX: 250, TOP: 140, BOTTOM: 160, CARDS_BELOW: 2, FRICTION: 0.9, NEAR: [120, 60, 380, 80], EYE_MS: 700 },
   // ---- the hand in the phrasebook menu (its own little world in viewport px) ----
   raid: { S: 100, DT: 1 / 240, GRAV: 85, FALL: 0.25, SMASH: 13, GRIP: [98, 20], ARM_TICK_MS: 250, CARD_TTL_MS: 6000 },
   // ---- page ----
