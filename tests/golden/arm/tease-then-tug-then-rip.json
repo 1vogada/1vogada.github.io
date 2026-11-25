@@ -20,16 +20,16 @@
   },
   {
    "doc": 1,
-   "t": 4720,
+   "t": 4816,
    "ms": 608,
    "who": "hand",
    "key": "CLAW_SAY.eager",
-   "text": "ooh. snack."
+   "text": "yes yes yes"
   },
   {
    "doc": 1,
-   "t": 5328,
-   "ms": 1232,
+   "t": 5424,
+   "ms": 1136,
    "who": "hand",
    "key": "CLAW_SAY.grab",
    "text": "мое!"
@@ -126,7 +126,7 @@
   },
   {
    "doc": 1,
-   "t": 4724,
+   "t": 4820,
    "claw": "eager",
    "sev": "",
    "pb": "closed",
@@ -139,7 +139,7 @@
   },
   {
    "doc": 1,
-   "t": 4916,
+   "t": 4948,
    "claw": "lunge",
    "sev": "",
    "pb": "closed",

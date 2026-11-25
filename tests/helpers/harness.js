@@ -66,12 +66,13 @@ function setup() {
 let setupDone = false;
 
 // group: the spec file's group (golden subfolder); name: the scenario; opts: { seed, rand, viewport, colorScheme, reducedMotion,
-// session: {k: v}, local: {k: v}, query, idle: ms to let pass after load, golden: false, skip: 'reason', timeout }
+// session: {k: v}, local: {k: v}, query, idle: ms to let pass after load, golden: false, skip: 'reason', timeout,
+// legacy: false = behaviour changed after the flip, so skipped under LEGACY=1 (scripts/legacy.js is frozen) }
 function scenario(group, name, opts, fn) {
   if (typeof opts === 'function') { fn = opts; opts = {}; }
   if (process.env.ONLY && !name.includes(process.env.ONLY)) return;   // first: a file with no matching scenario must not launch a browser, or it never exits
   if (!setupDone) { setup(); setupDone = true; }
-  test(name, { skip: opts.skip || false, timeout: opts.timeout || 180000 }, async () => {
+  test(name, { skip: opts.skip || (LEGACY && opts.legacy === false && 'changed after the flip: scripts/legacy.js is frozen') || false, timeout: opts.timeout || 180000 }, async () => {
     const s = await Session.open(group, name, opts);
     let ok = false;
     try {

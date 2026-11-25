@@ -97,7 +97,7 @@ The phases are fixed in `core/clock.js` (`STEP_PHASES`, `TICK_PHASES`, `DRAW_PHA
 |---|---|
 | `npm test` | the 35 browser scenarios (Playwright, Chromium) on the modules, compared **strictly** with `tests/golden/` (about 9 min: prefer `ONLY`) |
 | `ONLY="part of a name" npm test` | only the scenarios whose name contains the text |
-| `npm run test:legacy` | the same scenarios on `?legacy` (`LEGACY=1`; until legacy.js is deleted) |
+| `npm run test:legacy` | the same scenarios on `?legacy` (`LEGACY=1`; until legacy.js is deleted). A scenario whose behaviour changed after the flip takes `legacy: false` and is skipped there |
 | `UPDATE_GOLDEN=1 ONLY="..." npm run test:golden` | record (or re-record) the goldens of the matching scenarios from the modules; review `git diff tests/golden` (recipes.md 10) |
 | `TRACE_MATCH=kind ONLY="..." npm test` | looser compare: same order of line lists and state changes, no times or texts |
 | `SHOTS=1`, `HEADED=1` | screenshots to `tests/shots/` / a visible browser |

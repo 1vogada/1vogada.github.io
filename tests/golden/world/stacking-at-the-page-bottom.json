@@ -31,12 +31,12 @@
    "t": 4432,
    "ms": 1312,
    "who": "card",
-   "key": "SAY.rip",
-   "text": "nooo!"
+   "key": "SAY.rip|PB.SWAT_SAY",
+   "text": "ау!"
   },
   {
    "doc": 1,
-   "t": 6688,
+   "t": 6656,
    "ms": 1312,
    "who": "hand",
    "key": "CLAW_SAY.loose",
@@ -47,28 +47,28 @@
    "t": 7304,
    "ms": 792,
    "who": "card",
-   "key": "SAY.pull",
-   "text": "nope."
+   "key": "SAY.pull|CLAW_SAY.slap",
+   "text": "hands off"
   },
   {
    "doc": 1,
    "t": 8096,
-   "ms": 1312,
+   "ms": 1392,
    "who": "card",
-   "key": "SAY.rip|CLAW_SAY.sulk|PB.SWAT_SAY",
-   "text": "rude."
+   "key": "SAY.rip",
+   "text": "put me back!"
   },
   {
    "doc": 1,
-   "t": 8752,
+   "t": 8688,
    "ms": 1312,
    "who": "hand",
    "key": "CLAW_SAY.sulk",
-   "text": "aww."
+   "text": "пф."
   },
   {
    "doc": 1,
-   "t": 10752,
+   "t": 10688,
    "ms": null,
    "who": "hand",
    "key": "CLAW_SAY.loose",
@@ -193,7 +193,7 @@
   },
   {
    "doc": 1,
-   "t": 8760,
+   "t": 8696,
    "claw": "sulk",
    "sev": "",
    "pb": "closed",
@@ -219,7 +219,7 @@
   },
   {
    "doc": 1,
-   "t": 10428,
+   "t": 10328,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",

@@ -132,7 +132,7 @@ function tick(dt) {
   if (c.o && !world.bodies.has(c.o)) { c.o = null; c.joint = null; c.snap = null; if (!m.def.calm) { set('sulk'); speak('sulk'); } }   // someone cut or smashed what it was holding
   if (world.grab !== c.g) { c.g = world.grab; c.far = false; }
   const grab = world.grab, P = grab ? [grab.cx, grab.cy] : null, held = grab && grab.o.kind === 'card' && !grab.o.root ? grab.o : null, o = c.o;
-  const NEAR = Math.min(230, vw * 0.34), FAR = Math.min(300, vw * 0.5), Z = zones(vw), HOLD = Math.min(110, vw * 0.2);
+  const NEAR = Math.min(H_.NEAR[0], vw * H_.NEAR[1]), FAR = Math.min(300, vw * 0.5), Z = zones(vw), HOLD = Math.min(110, vw * 0.2);
   const ripE = Math.min(330, 0.3 * Math.min(vw, vh)), strainE = 0.4 * ripE;
   if (P && P[0] < vw - FAR) c.far = true;   // a card has to be brought over, not just be there
   // the frame's shared locals (legacy: the consts and lets at the top of clawTick); the behaviour sets the motion target on it
