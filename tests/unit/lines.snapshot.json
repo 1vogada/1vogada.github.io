@@ -1709,6 +1709,46 @@
    ["おしかったね","ja","so close"]
   ]
  },
+ "hand.toast": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Toast!","when":"You threw the toast that fell off the screen at the hand. It catches it out of the air."},
+  "lines": [
+   ["toast. finally, real food","en"],
+   ["is that… bread?","en"],
+   ["carbs! at last!","en"],
+   ["you shouldn't have. really. give.","en"],
+   ["warm. crunchy. not a card.","en"],
+   ["a little burnt. just how I like it","en"],
+   ["no butter? rude.","en"],
+   ["breakfast is served","en"],
+   ["finally something without a link in it","en"],
+   ["it still has words on it. delicious words.","en"],
+   ["weeks of cards. and now: TOAST.","en"],
+   ["тост! най-сетне!","bg","toast! at last!"],
+   ["トーストだ!","ja","it is toast!"],
+   ["やっとまともな飯","ja","real food at last"]
+  ]
+ },
+ "hand.toastEat": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Ate the toast","when":"It caught the toast and dragged it off the edge."},
+  "lines": [
+   ["*crunch*","en"],
+   ["tastes like a notification","en"],
+   ["needed jam","en"],
+   ["crumbs everywhere. worth it.","en"],
+   ["that message was delicious","en"],
+   ["mmm. sourdough.","en"],
+   ["better than paper","en"],
+   ["slightly burnt. ten out of ten.","en"],
+   ["I could get used to this","en"],
+   ["more toasts. go poke more toasts.","en"],
+   ["хрупкаво.","bg","crunchy."],
+   ["さくさく","ja","crispy-crunchy"]
+  ]
+ },
  "sev.cut": {
   "who": "sev",
   "legacy": "SEV_SAY.cut",
@@ -2619,6 +2659,63 @@
    ["the fog hides more than the banner.","en"],
    ["the old hand remembers you.","en"],
    ["some slips land on their edge.","en"]
+  ]
+ },
+ "bread.pop": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": {"title":"Knocked off","when":"You clicked a toast five times. It falls off the bottom of the screen and lands on the page as a slice of slightly burnt bread, the message still on it."},
+  "lines": [
+   ["aaaa—","en"],
+   ["I was in the middle of a sentence","en"],
+   ["well. that was the floor.","en"],
+   ["you knocked a notification off the screen. proud?","en"],
+   ["this is not in my job description","en"],
+   ["I used to be a message.","en"],
+   ["noted: do not poke the toast","en"],
+   ["I have crumbs in places now","en"],
+   ["fine. I live down here now.","en"],
+   ["slightly burnt. thanks to you.","en"],
+   ["ау.","bg","ow."],
+   ["あーあ","ja","oh well"]
+  ]
+ },
+ "bread.thrown": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": {"title":"Thrown toast","when":"You threw the fallen toast."},
+  "lines": [
+   ["I am not a frisbee","en"],
+   ["wheee. I mean: noted.","en"],
+   ["this message will deliver itself","en"],
+   ["airmail.","en"],
+   ["please do not throw the notifications","en"],
+   ["flying is just falling with a message","en"],
+   ["I take no responsibility for where I land","en"],
+   ["crumbs! crumbs everywhere!","en"],
+   ["throw me again and I unsubscribe","en"],
+   ["butter side up. butter side up.","en"],
+   ["летя!","bg","I am flying!"],
+   ["飛んでる…","ja","I am flying…"]
+  ]
+ },
+ "bread.caught": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": {"title":"Caught by the hand","when":"You threw the fallen toast at the hand. It plucks it out of the air."},
+  "lines": [
+   ["oh no.","en"],
+   ["I was told there would be butter","en"],
+   ["this message has been read. and eaten.","en"],
+   ["tell the other toasts I was crunchy","en"],
+   ["not the hand. anything but the hand.","en"],
+   ["I regret everything. mostly the poking.","en"],
+   ["delivered.","en"],
+   ["so this is how notifications die","en"],
+   ["at least I was warm","en"],
+   ["mark me as read","en"],
+   ["ще ме изяде!","bg","it is going to eat me!"],
+   ["食べられる…","ja","I am going to be eaten…"]
   ]
  },
  "raid.bored": {

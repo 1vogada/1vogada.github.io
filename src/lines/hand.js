@@ -654,4 +654,18 @@ defineLines('hand.towerLaugh', ['ha! timber.', 'nice try, stack of thumbs', 'gra
   lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
 });
 
+// ---- toast for the hand: you throw it the toast that fell off the screen (page/bread.js) ----
+defineLines('hand.toast', ['toast. finally, real food', 'is that… bread?', 'carbs! at last!', 'you shouldn\'t have. really. give.', 'warm. crunchy. not a card.', 'a little burnt. just how I like it', 'no butter? rude.', 'breakfast is served', 'finally something without a link in it', 'it still has words on it. delicious words.', 'weeks of cards. and now: TOAST.', 'тост! най-сетне!', 'トーストだ!', 'やっとまともな飯'], {
+  who: 'hand',
+  trigger: { title: 'Toast!', when: 'You threw the toast that fell off the screen at the hand. It catches it out of the air.' },
+  gloss: { 'тост! най-сетне!': 'toast! at last!', 'トーストだ!': 'it is toast!', 'やっとまともな飯': 'real food at last' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja', 'ja'],
+});
+defineLines('hand.toastEat', ['*crunch*', 'tastes like a notification', 'needed jam', 'crumbs everywhere. worth it.', 'that message was delicious', 'mmm. sourdough.', 'better than paper', 'slightly burnt. ten out of ten.', 'I could get used to this', 'more toasts. go poke more toasts.', 'хрупкаво.', 'さくさく'], {
+  who: 'hand',
+  trigger: { title: 'Ate the toast', when: 'It caught the toast and dragged it off the edge.' },
+  gloss: { 'хрупкаво.': 'crunchy.', 'さくさく': 'crispy-crunchy' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
 export function install(app) {}

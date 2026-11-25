@@ -259,3 +259,54 @@ scenario(G, 'are you still there: the mouse still for 10 s', { ...O, legacy: fal
   assert.ok(await s.said('hand.idleback'), 'caught');
   await s.runUntil(() => window.__cards.state().claw.st === 'lurk', null, { max: 2000 });
 });
+
+// toast for the hand: a toast clicked five times lands on the page as a slice of bread (page/bread.js); thrown at the hand, it is
+// caught and eaten with its own lines, and the trophy wall keeps it
+const slice = () => { const o = [...window.__cards.objs].find((q) => q.kind === 'toast'); if (!o) return null; const p = o.body.getPosition(), S = window.__cards.S; return { x: p.x * S - scrollX, y: p.y * S - scrollY, v: o.body.getLinearVelocity().length(), msg: o.msg, text: o.el.textContent }; };
+async function knockToast(s) {
+  const [px, py] = await s.rip(0);
+  await s.run(300);
+  await s.line(px, py, 400, 420, 10);
+  await s.up();
+  await s.run(200);
+  for (let i = 0; i < 5; i++) { await s.press('#toast'); await s.run(120); }
+  await s.runUntil(() => [...window.__cards.objs].some((o) => o.kind === 'toast'), null, { max: 2000, step: 16 });
+}
+
+scenario(G, 'toast for the hand', { ...O, legacy: false }, async (s) => {
+  await knockToast(s);
+  assert.ok(await s.said('bread.pop'), 'the toast says something on its way down');
+  assert.equal(await s.eval(() => document.getElementById('toast').classList.contains('show')), false, 'the toast bar is gone');
+  await s.runUntil(() => { const o = [...window.__cards.objs].find((q) => q.kind === 'toast'); return o.body.getLinearVelocity().length() < 0.5 && o.body.getPosition().y * window.__cards.S > 2000; }, null, { max: 6000, step: 50 });
+  const b = await s.eval(slice);
+  assert.equal(b.text, 'Ripped it out! Stack them, or throw one hard to smash it.', 'it landed at the bottom of the page, the message still on it');
+  // down at the bottom of the page: pick it up and throw it at the hand
+  await s.scrollTo(99999);
+  const at = await s.eval(slice);
+  await s.move(at.x, at.y); await s.down();
+  assert.equal(await s.eval(() => window.__cards.state().grab.o.kind), 'toast', 'it can be picked up');
+  await s.line(at.x, at.y, 560, 300, 20);
+  await s.run(400);
+  assert.equal((await s.eval(claw)).st, 'lurk', 'held, it does not tempt the hand');
+  await s.throwTo([560, 300], [560 + 18 * 5, 300], { n: 5 });   // 11 m/s to the right
+  assert.ok(await s.said('bread.thrown'), 'thrown, it complains');
+  await s.runUntil(() => window.__cards.state().claw.st === 'eat', null, { max: 1500, step: 16 });
+  assert.ok(await s.said('hand.toast'), 'toast. finally, real food');
+  await s.runUntil(() => window.__cards.state().claw.st === 'lurk', null, { max: 6000, step: 16 });
+  await s.run(800);
+  assert.ok(await s.said('hand.toastEat'), 'it eats it');
+  assert.equal(await s.eval(() => [...window.__cards.objs].some((o) => o.kind === 'toast')), false, 'gone');
+  const t = await s.eval(() => JSON.parse(sessionStorage.getItem('kiripad-trophies') || '[]').map((q) => [q.kind, q.msg]));
+  assert.deepEqual(t, [['toast', 'Ripped it out! Stack them, or throw one hard to smash it.']], 'and the trophy wall keeps it');
+  await s.scrollTo(99999);
+  for (let i = 0; i < 3; i++) { await s.eval(() => dispatchEvent(new WheelEvent('wheel', { deltaY: 500 }))); await s.real(300); }
+  assert.equal(await s.eval(() => { const w = document.querySelector('.basement'); return w && [...w.querySelectorAll('div')].some((d) => d.textContent === 'Ripped it out! Stack them, or throw one hard to smash it.' && d.style.borderRadius.startsWith('46%')); }), true, 'pinned up as a slice of bread');
+});
+
+scenario(G, 'the fallen toast goes with the cards', { ...O, legacy: false }, async (s) => {
+  await knockToast(s);
+  await s.run(1500);
+  await s.press('.reset-cards');
+  await s.run(100);
+  assert.equal(await s.eval(() => [...window.__cards.objs].some((o) => o.kind === 'toast') || !!document.querySelector('#phys .toast-bread')), false, 'Put the cards back clears it');
+});

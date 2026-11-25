@@ -1,4 +1,5 @@
-// hand state "catch": plucks a thrown card out of the air; crush (30%) or has.
+// hand state "catch": plucks a thrown card out of the air; crush (30%) or has. A ball of paper (an old hand's gift) or the fallen
+// toast (kind 'toast', page/bread.js) is eaten on the spot (eat), with its own line (hand.caught / hand.toast).
 // Legacy clawTick branch `c.st === 'catch'`, moved verbatim. tick(c, m, dt) sets the motion target on the frame's ctx m.x.
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
@@ -22,8 +23,8 @@ export default defineBehaviour('hand', 'catch', {
       x.aim = Math.atan2(Hc[1] - c.y, Hc[0] - c.x); if (Math.cos(x.aim) > -0.2) x.aim = Math.PI; x.T = wristFor(Hc, x.aim);
       if (dist < 70) {
         o.body.setLinearVelocity({ x: 0, y: 0 }); o.body.setAngularVelocity(o.body.getAngularVelocity() * 0.2); o.hot = 0; o.body.setBullet(false);
-        if (o.ball) {   // a ball of paper an old hand brought you: always a treat, eaten on the spot
-          bus.emit('hand.grabbed', { card: o, how: 'catch' }); speak('caught', true);
+        if (o.ball || o.kind === 'toast') {   // a ball of paper an old hand brought you, or the toast (page/bread.js): always a treat, eaten on the spot
+          bus.emit('hand.grabbed', { card: o, how: 'catch' }); speak(o.ball ? 'caught' : 'toast', true);   // toast. finally, real food
           o.body.setAngularDamping(TUNE.physics.HELD_SPIN); o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 }); o.el.style.pointerEvents = 'none';
           c.joint = world.b2.createJoint(new world.pl.MouseJoint({ maxForce: TUNE.physics.MAX_FORCE * o.body.getMass(), frequencyHz: H_.JOINT_HZ, dampingRatio: 1 }, world.ground, o.body, { x: w.x, y: w.y }));
           set('eat'); return;

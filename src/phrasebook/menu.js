@@ -61,6 +61,9 @@ const CHAPTERS = [
       'card.notme',
       'card.beg',
       { fig: 'crush' },
+      'bread.pop',
+      'bread.thrown',
+      'bread.caught',
     ] },
   { id: 'katana', num: 'II', title: 'The Katana', head: 'Of the Katana',
     intro: 'Hidden in the mist of the banner stands a katana, and it has a very high opinion of itself. It is drawn like a card, by pulling, and a double click keeps it in the hand. Only its very tip cuts, at any speed whatever. It speaks once and is then quiet for two seconds, however much it has done in the meantime.',
@@ -241,6 +244,8 @@ const CHAPTERS = [
       'hand.mypick',
       'hand.back',
       'hand.rematch',
+      'hand.toast',
+      'hand.toastEat',
     ] },
 ];
 

@@ -294,6 +294,13 @@ export const TUNE = {
   crazy: { TITLE_MS: 180 },
   away: { BACK_MS: 1600 },   // "there you are" stays in the tab title this long after you come back (page/away.js)
   toast: { FALL_MS: 900 },   // the toast you clicked five times falls off the screen this fast
+  bread: {   // toast for the hand: the knocked-off toast lands on the page as a slice of bread (page/bread.js)
+    W: 132, H: 116,          // px, the slice
+    POP: [2.5, -9],          // m/s it leaves the toast bar with (x is mirrored with the spin), like out of a toaster
+    SPIN: 5,                 // rad/s
+    DAMPING: 0.4,            // linear damping: bread is light
+    DENSITY: 0.6,
+  },
   eggs: { YEAR_MS: 4000, SWITCHES: 7, SWITCH_MS: 4000 },   // 1926: hover the year this long; 7 theme switches within this long: the moon
   rps: {   // rock, paper, scissors between the new hand and an old one (scenes/rps.js)
     CHANCE: 0.5,                      // share of meetings (hand.met) that end in a game

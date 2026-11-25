@@ -201,9 +201,9 @@ function tick(dt) {
   if (P && P[0] < vw - FAR) c.far = true;   // a card has to be brought over, not just be there
   // the frame's shared locals (legacy: the consts and lets at the top of clawTick); the behaviour sets the motion target on it
   const x = { t, dt, vw, vh, P, held, o, NEAR, FAR, Z, HOLD, ripE, strainE, T: [vw + H_.LURK_X, c.ly], rate: 6, aim: Math.PI, pose: POSES.lurk, wig: 0.05, shake: 0, strain: 0 };
-  if (!c.o && m.def.catches) {   // a card thrown its way: it goes for the catch
+  if (!c.o && m.def.catches) {   // a card thrown its way (or the toast that fell off the screen, page/bread.js): it goes for the catch
     for (const q of world.bodies) {
-      if (!edible(q) || q.root || q.tug || (world.grab && world.grab.o === q)) continue;
+      if (!(edible(q) || q.kind === 'toast') || q.root || q.tug || (world.grab && world.grab.o === q)) continue;
       const v = q.body.getLinearVelocity(), w = q.body.getWorldCenter(), sx = w.x * S - scrollX, sy = w.y * S - scrollY;
       if (v.x > 5 && Math.hypot(v.x, v.y) > 8 && sx > Z.grab && sx < vw + 40 && sy > 20 && sy < vh - 20) { c.o = q; set('catch'); break; }
     }

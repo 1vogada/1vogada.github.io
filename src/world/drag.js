@@ -2,7 +2,7 @@
 // dragstart, the loose-body pointerdown).
 // Listener registration order is part of the contract (install registers them in legacy order):
 //   grid pointerdown (press), window pointermove (onMove), window pointerup + pointercancel (drop), window touchmove (passive: false),
-//   document click (capture: swallow the click after a drag), document dragstart, document pointerdown (pick up a loose body).
+//   document click (capture: swallow the click after a drag), document dragstart, document pointerdown (pick up a loose body: card, piece, katana, cut-off hand, or the fallen toast of page/bread.js).
 // A press that travels TUNE.drag.MOVE_PX on an armed grid card calls the handler set with onPull (the cards actor's startPull).
 // A rooted body whose root gives way (world/loop.js 'bodies' step) is handed to the handler its kind set with onTear
 // (legacy tear(o): the cards actor's tear for cards, the katana's free for the planted katana).
@@ -116,7 +116,7 @@ export function install(app) {
   // loose cards can be picked up again anywhere on them
   document.addEventListener('pointerdown', (e) => {
     const el = e.target.closest?.('#phys .phys'), o = el && el._o;
-    if (!o || (o.kind !== 'card' && o.kind !== 'piece' && o.kind !== 'katana' && o.kind !== 'hand') || world.grab || e.button > 0) return;
+    if (!o || (o.kind !== 'card' && o.kind !== 'piece' && o.kind !== 'katana' && o.kind !== 'hand' && o.kind !== 'toast') || world.grab || e.button > 0) return;
     e.preventDefault(); hold(o, e.clientX + scrollX, e.clientY + scrollY, e);
   });
 }

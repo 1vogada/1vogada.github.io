@@ -62,4 +62,25 @@ defineLines('console.hint', ['type a word for a thing that holds things.', 'ever
   who: 'console', lang: 'en',
 });
 
+// toast for the hand: the toast you knocked off the screen lands on the page as a slice of bread you can throw (page/bread.js).
+// It speaks as the 'bread' speaker (body kind 'toast'), dry, like every toast
+defineLines('bread.pop', ['aaaa—', 'I was in the middle of a sentence', 'well. that was the floor.', 'you knocked a notification off the screen. proud?', 'this is not in my job description', 'I used to be a message.', 'noted: do not poke the toast', 'I have crumbs in places now', 'fine. I live down here now.', 'slightly burnt. thanks to you.', 'ау.', 'あーあ'], {
+  who: 'toast',
+  trigger: { title: 'Knocked off', when: 'You clicked a toast five times. It falls off the bottom of the screen and lands on the page as a slice of slightly burnt bread, the message still on it.' },
+  gloss: { 'ау.': 'ow.', 'あーあ': 'oh well' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('bread.thrown', ['I am not a frisbee', 'wheee. I mean: noted.', 'this message will deliver itself', 'airmail.', 'please do not throw the notifications', 'flying is just falling with a message', 'I take no responsibility for where I land', 'crumbs! crumbs everywhere!', 'throw me again and I unsubscribe', 'butter side up. butter side up.', 'летя!', '飛んでる…'], {
+  who: 'toast',
+  trigger: { title: 'Thrown toast', when: 'You threw the fallen toast.' },
+  gloss: { 'летя!': 'I am flying!', '飛んでる…': 'I am flying…' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('bread.caught', ['oh no.', 'I was told there would be butter', 'this message has been read. and eaten.', 'tell the other toasts I was crunchy', 'not the hand. anything but the hand.', 'I regret everything. mostly the poking.', 'delivered.', 'so this is how notifications die', 'at least I was warm', 'mark me as read', 'ще ме изяде!', '食べられる…'], {
+  who: 'toast',
+  trigger: { title: 'Caught by the hand', when: 'You threw the fallen toast at the hand. It plucks it out of the air.' },
+  gloss: { 'ще ме изяде!': 'it is going to eat me!', '食べられる…': 'I am going to be eaten…' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
 export function install(app) {}

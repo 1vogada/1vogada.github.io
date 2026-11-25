@@ -43,6 +43,7 @@ public API. Every module exports `install(app)`; `app` holds every module by its
 | who reacts to whom | `src/reactions.js` (`RULES`, plus `hand.senses(...)` for the shelf) | | |
 | speech bubbles (every one) | `src/core/speech.js`; each actor calls `defineSpeaker` in its `install` | | `styles/physics.css`, `hand.css` |
 | toasts | `src/page/toast.js` (actors emit `ui.toast`) | `toast.*` in each `src/lines/*.js` | `styles/base.css` |
+| the knocked-off toast as a body (kind `toast`) you can throw to the hand | `src/page/bread.js` (from `toast.js`; caught in `hand/behaviours/catch.js`) | `bread.*` in `src/lines/page.js`, `hand.toast`, `hand.toastEat` | inline |
 | greeting typewriter | `src/page/greeting.js` | `greeting.hello` in `src/lines/page.js` | |
 | banner fog; kiri flood and typed secrets | `src/page/fog.js`; `src/page/kiri.js` | `toast.fog` | `styles/fog.css` |
 | theme, crazy mode, English only | `src/page/theme.js`, `crazy.js`, `language.js` | | `styles/base.css`, `crazy.css` |

@@ -125,6 +125,7 @@ import * as eggs from './page/eggs.js';
 import * as omikuji from './page/omikuji.js';
 import * as diary from './page/diary.js';
 import * as basement from './page/basement.js';
+import * as bread from './page/bread.js';
 import * as konsole from './page/console.js';
 import * as commands from './core/commands.js';
 
@@ -164,6 +165,7 @@ export const ORDER = [
   ['language', language],
   // 9 easter eggs (after everything they reach)
   ['commands', commands], ['away', away], ['console', konsole], ['eggs', eggs], ['omikuji', omikuji], ['diary', diary], ['basement', basement],
+  ['bread', bread],
 ];
 
 /** the app every install(app) receives: each module by name, plus a few flags */
