@@ -12,14 +12,15 @@
 //   hand.grabbed       'card.pull' when the arm plucks it (how: catch | reach)    legacy clawTick catch / reach
 //   hand.ripped        'card.slice' scream on your half                           legacy clawRip
 //   hand.severed       'card.stab' on the card it was crushing (crushed)          legacy clawLetGo inside sever
-//   card.hurt          'card.agony' tiers at the given pain                        legacy cardSay (tug, crush, cut-off hand)
+//   card.hurt          'card.agony' tiers at the given pain                        legacy cardSay (the arm's tug and crush)
 //   card.begged        'card.beg'                                                 legacy crush pause talkOn(ob, pick(BEG))
-//   card.crushed       'card.slice' scream left standing where it was crushed     legacy sayAt(..., pick(SAY.slice), 'scream')
+//   card.crushed       'card.slice' scream left standing where the arm crushed it  legacy sayAt(H[0], H[1] - 70, pick(SAY.slice), 'scream')
 //   hand.tossed        'card.throw' when the arm throws it back hard              legacy clawTick has
-//   sev.state -> crush 'card.pull' on the prey                                    legacy SEV.crush.enter
 //   hand.reaching      panic(): reactions.js calls it                             legacy panic(o, fear, dt, t)
 // The blade's own card lines (cutting, the slice of a cut, the stab) stay in world/cut.js: 'card.cut' is emitted after the
 // katana's line and 'card.stabbed' before the wound's random life, so a listener there would change the draw order.
+// The cut-off hand's crush (actors/severed, package V2) speaks for its prey through this speaker directly ('card.pull' forced,
+// 'card.agony' in agony mode, sayAt 'card.slice' scream): the 'card' speaker, the agony mode and the scream are all core/speech.
 // Event types not yet in src/core/events.js are listened to only once they are (isEvent), so a strict bus never throws.
 
 import { defineSpeaker, say, sayAt } from '../core/speech.js';
@@ -34,7 +35,7 @@ import { drawOffset } from '../world/loop.js';
 const { world } = W;
 const S = TUNE.physics.S;
 const REGROW_MS = 700;                     // TUNE-REQUEST TUNE.cards.REGROW_MS: the torn-out grid cards regrow (CSS 'regrow' class)
-const CRUSH_DY = { arm: -70, sev: -110 };  // TUNE-REQUEST TUNE.cards.CRUSH_DY: the crushed card's last scream, above the fist
+const CRUSH_DY = -70;                      // TUNE-REQUEST TUNE.cards.CRUSH_DY: the crushed card's last scream, above the arm's fist
 const notMine = (o) => o.kind !== 'katana' && o.kind !== 'hand';   // the katana and the cut-off hands have their own lines
 
 // ---- pull and tear (the world calls them through onPull / onTear('card')) ----
@@ -135,9 +136,8 @@ export function install(app) {
   bus.on('hand.grabbed', ({ card, how }) => { if ((how === 'catch' || how === 'reach') && live(card)) say(card, 'card.pull', { force: true }); });
   bus.on('hand.ripped', ({ mine }) => { if (live(mine)) say(mine, 'card.slice', { force: true, scream: true }); });
   bus.on('hand.severed', ({ crushed }) => { if (live(crushed)) say(crushed, 'card.stab', { force: true }); });
-  bus.on('sev.state', ({ to, data }) => { if (to === 'crush' && data && live(data.prey)) say(data.prey, 'card.pull', { force: true }); });
   when('card.hurt', ({ card, pain }) => { if (live(card)) agony(card, pain); });
   when('card.begged', ({ card }) => { if (live(card)) say(card, 'card.beg', { mode: 'plain' }); });
-  when('card.crushed', ({ at, by }) => sayAt(at[0], at[1] + (CRUSH_DY[by] ?? CRUSH_DY.arm), 'card.slice', { scream: true }));
+  when('card.crushed', ({ at }) => sayAt(at[0], at[1] + CRUSH_DY, 'card.slice', { scream: true }));
   when('hand.tossed', ({ card, hard }) => { if (hard && live(card)) say(card, 'card.throw', { force: true }); });
 }
