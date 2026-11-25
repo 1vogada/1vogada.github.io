@@ -31,10 +31,10 @@ scenario(G, 'tease then tug then rip', { ...O, legacy: false }, async (s) => {
   await carry(s, 0, 540, 300);
   assert.equal((await s.eval(claw)).st, 'lurk', 'a loose card wakes it, but it waits');
   const W = await s.eval(vw);
-  await s.line(540, 300, 1000, 300, 12);   // into the tease zone: two cards wide from the right edge
+  await s.line(540, 300, 900, 300, 12);   // into the tease zone: two cards wide from the right edge
   assert.equal((await s.eval(claw)).st, 'eager');
   assert.ok(await s.said('CLAW_SAY.eager'), 'it wants it');
-  await s.line(1000, 300, W - 180, 300, 8); // close to the edge: it lunges for the far end and takes hold
+  await s.line(900, 300, W - 180, 300, 8); // close to the edge: it lunges for the far end and takes hold
   await s.runUntil(() => window.__cards.state().claw.st === 'tug', null, { max: 4000, step: 16 });
   await s.run(700);
   assert.ok(await s.said('CLAW_SAY.grab'), 'it says so (a forced line waits until the last one has been up TIMING.gap.show)');
