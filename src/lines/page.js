@@ -1,4 +1,5 @@
-// What the page itself says: the greeting's words (legacy hellos), the omikuji slips (legacy FORTUNES) and the fog toast.
+// What the page itself says: the greeting's words (legacy hellos), the omikuji slips (legacy FORTUNES), the fog toast, the
+// easter eggs, and the search box when you feed it something (search.gulp, search.spit, toast.scrap; page/feed.js).
 // Imported by lines/phrasebook.js so it loads with the other lines modules (main.js imports the six stubs only).
 // Generated once from the old scripts; tests/unit/lines.snapshot.json pins every list (edit, UPDATE_SNAPSHOT=1, review the diff).
 // Keep each array's contents and order exactly: line() draws by index, and the array itself is the picker's memory key.
@@ -60,6 +61,46 @@ defineLines('page.trophyEmpty', ['Nothing here yet. Bring me something.', 'Empty
 // kiri.hint() in the console (page/console.js)
 defineLines('console.hint', ['type a word for a thing that holds things.', 'everything here can be pulled. most things can be torn.', 'the fog hides more than the banner.', 'the old hand remembers you.', 'some slips land on their edge.'], {
   who: 'console', lang: 'en',
+});
+// ---- feed the search box (page/feed.js): what the box says when something is dropped on it, and the toast for a scrap ----
+defineLines('search.gulp', ['*gulp*', 'nom nom. indexing.', 'mm. paper.', 'crunchy', 'indexed.', 'searching…', 'tastes like a README', 'chewing…', 'more please', 'a bit dry', 'hmm, ad-free', '*burp* sorry', 'ам.', 'もぐもぐ'], {
+  who: 'page',
+  trigger: { title: 'The search box eats', when: 'You drop a card or a scrap of one on the search box. It swallows it, and looks for what it was.' },
+  gloss: { 'ам.': 'nom.', 'もぐもぐ': 'munch munch' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('search.spit', ['ptui!', 'hairy. no.', 'not food', 'that one has fingers', 'I only eat paper', 'it waved at me', 'too many knuckles', 'blech. knuckles.', 'ew, it\'s warm', 'returned to sender', 'пфу!', 'ぺっ!'], {
+  who: 'page',
+  trigger: { title: 'The search box spits', when: 'You drop a cut-off hand on the search box. It will not swallow that, but it searches for it anyway.' },
+  gloss: { 'пфу!': 'ptui!', 'ぺっ!': 'ptui!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('toast.scrap', ['Nothing left of it.', 'No results. There was not enough of it to search for.', 'It searched for a scrap and found a scrap-shaped hole.', 'Too little left to go on.', 'Whatever that was, it is not in the index.', '0 results. It was mostly crumbs.', 'A scrap has no name.', 'The search box is still hungry.', 'Нищо не остана от нея.', '何も残っていない。'], {
+  who: 'toast',
+  trigger: { title: 'A scrap in the search box', when: 'You drop a piece or a crumpled ball on the search box. It types "…" and finds nothing.' },
+  gloss: { 'Нищо не остана от нея.': 'Nothing is left of it.', '何も残っていない。': 'Nothing is left.' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+// toast for the hand: the toast you knocked off the screen lands on the page as a slice of bread you can throw (page/bread.js).
+// It speaks as the 'bread' speaker (body kind 'toast'), dry, like every toast
+defineLines('bread.pop', ['aaaa— (toast noises)', 'I was in the middle of a sentence', 'well. that was the floor.', 'you knocked a notification off the screen. proud?', 'this is not in my job description', 'I used to be a message.', 'noted: do not poke the toast', 'I have crumbs in places now', 'fine. I live down here now.', 'slightly burnt. thanks to you.', 'ау.', 'あーあ'], {
+  who: 'toast',
+  trigger: { title: 'Knocked off', when: 'You clicked a toast five times. It falls off the bottom of the screen and lands on the page as a slice of slightly burnt bread, the message still on it.' },
+  gloss: { 'ау.': 'ow.', 'あーあ': 'oh well' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('bread.thrown', ['I am not a frisbee', 'wheee. I mean: noted.', 'this message will deliver itself', 'airmail.', 'please do not throw the notifications', 'flying is just falling with a message', 'I take no responsibility for where I land', 'crumbs! crumbs everywhere!', 'throw me again and I unsubscribe', 'butter side up. butter side up.', 'летя!', '飛んでる…'], {
+  who: 'toast',
+  trigger: { title: 'Thrown toast', when: 'You threw the fallen toast.' },
+  gloss: { 'летя!': 'I am flying!', '飛んでる…': 'I am flying…' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('bread.caught', ['oh no.', 'I was told there would be butter', 'this message has been read. and eaten.', 'tell the other toasts I was crunchy', 'not the hand. anything but the hand.', 'I regret everything. mostly the poking.', 'delivered.', 'so this is how notifications die', 'at least I was warm', 'mark me as read', 'ще ме изяде!', '食べられる…'], {
+  who: 'toast',
+  trigger: { title: 'Caught by the hand', when: 'You threw the fallen toast at the hand. It plucks it out of the air.' },
+  gloss: { 'ще ме изяде!': 'it is going to eat me!', '食べられる…': 'I am going to be eaten…' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
 });
 
 export function install(app) {}

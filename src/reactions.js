@@ -16,6 +16,8 @@ import * as katana from './actors/katana.js';
 import * as welcome from './scenes/welcome-back.js';
 import * as rps from './scenes/rps.js';
 import * as toast from './page/toast.js';
+import * as feed from './page/feed.js';
+import * as slash from './page/slash.js';
 
 const notMine = (o) => o.kind !== 'katana' && o.kind !== 'hand';
 
@@ -55,6 +57,9 @@ export const RULES = [
   ['sev.towerGrab', () => hand.pulled()],                                          // ...the top one has it by the wrist: they pull it out
   ['sev.towerFell', () => hand.towerFell()],                                       // ...it came down first: the arm laughs, or snaps back
   ['hand.shookOff', () => severed.shookOff()],                                     // ...it shook them off: they fly, and land in a heap
+  // ---- crazy mode: the old hands dance (src/actors/severed/dance.js), the arm bobs along (src/actors/hand/bob.js) ----
+  ['mode.changed', ({ crazy }) => { if (!severed.list.size) return; const n = severed.groove(crazy); hand.bob(crazy); if (!crazy && n) hand.notice('danced'); }],   // on: they dance; off: they freeze and pretend, and the arm saw it all
+  ['sev.gone', () => { if (!severed.list.size) hand.bob(false); }],               // the last dancer gone: the arm stops bobbing
   // ---- the shelf ----
   ['hand.reaching', ({ card, fear, dt, t, x }) => cards.panic(card, fear, dt, t, x)], // reach: the card on the shelf panics, bystanders point
   ['hand.state', ({ from, to }) => { if (from === 'reach' && to === 'eat') { const c = hand.get(), g = hand.grip(); severed.pounce(c.o, g && [g[0] + scrollX, g[1] + scrollY]); } }],   // the cheese pull: an old hand may jump on the snack
@@ -64,12 +69,24 @@ export const RULES = [
   // ---- the page ----
   ['data.loaded', () => clock.real.after(TUNE.surprise.WELCOME_MS, welcome.welcomeBack)],   // legacy setTimeout(welcomeBack, 900)
   ['ui.toast', ({ msg }) => toast.show(msg)],
+  // ---- feed the search box (page/feed.js) ----
+  ['body.dropped', (ev) => feed.dropped(ev)],                                      // let go on the search box: it eats it and searches
+  ['search.fed', ({ what, key }) => what === 'card' && cards.putBack(key)],         // ...found its project: the card grows back into its slot
+  ['search.fed', ({ what, body }) => what === 'hand' && severed.notThere(body)],    // ...searched for "hand": the old hand is not in there
+  // ---- the old hand pokes you instead (idle-old: src/actors/severed/pester.js, src/actors/hand/behaviours/mine.js) ----
+  ['sev.pestered', ({ hand: o, n }) => hand.pesterTurn(o, n)],                    // the old hand poked your still cursor: the arm's turn
+  ['hand.pestered', ({ hand: o, n }) => o && severed.pesterTurn(o, n)],           // ...the arm poked it: the old hand's turn, a little sooner
+  // ---- the katana cuts the fog (chain fog-slash) ----
+  ['blade.moved', (m) => slash.cut(m)],                                            // the tip slits the banner fog and the kiri flood; across 棚: tana.slashed
+  ['tana.slashed', () => katana.tana()],                                           // ...the katana is pleased with itself
+  ['tana.slashed', () => { if (!shelf.state()) shelf.toggle(); }],                 // ...and the shelf slides out
 ];
 
 export function install(app) {
   for (const [type, fn] of RULES) bus.on(type, fn);
   // what the hand can sense of the shelf (legacy: clawTick read shelfSnack / nearShelf / onShelf / shelf.want directly)
-  hand.senses({ shelfSnack: () => shelf.snack(), nearShelf: (P) => shelf.near(P), onShelf: (o) => shelf.holds(o), want: (v) => shelf.want(v), shelf: () => shelf.state(), oldHands: () => severed.list });
+  hand.senses({ shelfSnack: () => shelf.snack(), nearShelf: (P) => shelf.near(P), onShelf: (o) => shelf.holds(o), want: (v) => shelf.want(v), shelf: () => shelf.state(), oldHands: () => severed.list,
+    pester: () => severed.pestering() });   // an old hand poking your still cursor first (idle-old)
   severed.senses({ shelf: () => shelf.state(), onShelf: (o) => shelf.holds(o), arm: () => hand.shown(),   // a place to hide from the new hand; the new hand out to copy
     pointer: () => idle.pointer(), moved: () => idle.lastMove(),   // your pointer, for a gift
     armed: () => { const m = hand.brain(); return hand.awake() && !!m && !m.is('stump', 'regrow'); },   // a hand on the arm to take revenge on

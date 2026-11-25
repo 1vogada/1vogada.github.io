@@ -393,5 +393,119 @@ defineLines('sev.towerHeap', ['worth it', 'did we win?', 'get your thumb out of 
   gloss: { 'всичко ме боли': 'everything hurts', 'めがまわる…': 'my head is spinning…' },
   lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
 });
+defineLines('sev.notthere', ['I\'m not in there', 'zero results. story of my life', 'searched for "hand". found nothing. accurate.', 'it doesn\'t even know I exist', 'not indexed, not wanted', 'I tasted bad, didn\'t I', 'try "wrist". no, don\'t.', 'I used to be on page one', 'my own kind, and it found nobody', 'fine. I\'ll search for myself.', 'did you mean: "card"? no. NO.', 'няма ме там', '僕はいないよ'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: fed to the search box', when: 'You drop it on the search box. The box spits it back out, types "hand", and finds nothing.' },
+  gloss: { 'няма ме там': 'I\'m not in there', '僕はいないよ': 'I\'m not there' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+// ---- the old hand pokes you instead (idle-old): your mouse went still (behaviours/pester.js) ----
+defineLines('sev.pester', [
+  'is it asleep?',
+  'hello? big one?',
+  'it stopped moving…',
+  "I'll check on it",
+  "don't die on me",
+  'is it… broken?',
+  'tiptoe, tiptoe',
+  "oh no. it's gone still.",
+  'someone has to make sure',
+  'me first, me first',
+  'nobody tell the new one',
+  'жив ли си?',
+  'だいじょうぶ?'], {
+  who: 'sev',
+  trigger: { title: 'The old hand pokes you instead',
+    when: 'With an old (cut-off) hand on the page, leave the mouse still. It walks over to below your cursor to check on you.' },
+  gloss: { 'жив ли си?': 'are you alive?', 'だいじょうぶ?': 'are you okay?' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.pesterPoke', [
+  'boop',
+  '*poke*',
+  'you awake?',
+  'wake up',
+  'poke poke',
+  'helloooo?',
+  'anybody in there?',
+  'tap',
+  'still there?',
+  'boop. boop.',
+  "don't make me poke twice",
+  "I'm small but I'm persistent",
+  'събуди се',
+  'つんつん'], {
+  who: 'sev',
+  trigger: { title: 'The old hand pokes you instead: poke',
+    when: 'It jumps up and pokes the cursor with one finger, again and again.' },
+  gloss: { 'събуди се': 'wake up', 'つんつん': 'poke poke' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.pesterRetort', [
+  'I was here first',
+  'finders keepers, cursor-wise',
+  'you snooze, you lose',
+  "job's taken",
+  'you used to be ME',
+  'I learned from the best. you.',
+  'it likes my poke better',
+  "there's room for two pokers",
+  'make me',
+  "it's a free cursor",
+  'I have one finger and I will use it',
+  'първо дойдох аз',
+  '早い者勝ち'], {
+  who: 'sev',
+  trigger: { title: 'The old hand pokes you instead: it talks back',
+    when: 'The new hand says the poking is its job. The old hand answers with its next poke.' },
+  gloss: { 'първо дойдох аз': 'I came first', '早い者勝ち': 'first come, first served' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.pesterBack', [
+  'eep! it moved!',
+  "it's alive!",
+  'I knew it',
+  'it moved! it moved!',
+  'we were never here',
+  'abort, abort',
+  "good. you're fine.",
+  'phew. phew phew.',
+  'told you it was alive',
+  'run!',
+  'мърда!',
+  '動いた!'], {
+  who: 'sev',
+  trigger: { title: 'The old hand pokes you instead: you move',
+    when: 'You move the mouse while it pokes the cursor. It drops back down and scurries off.' },
+  gloss: { 'мърда!': 'it moves!', '動いた!': 'it moved!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+// ---- crazy mode: the old hands dance (src/actors/severed/dance.js) ----
+defineLines('sev.dance', ["oh this is my SONG", "five, six, seven, eight!", "nobody puts thumby in a corner", "I have rhythm in every finger", "look ma, no body!", "finally, a reason to live", "step, tap, step, tap", "is that the title scrolling? it SLAPS", "I was born for this. well, cut for this", "the floor is ours", "jazz hands! literally!", "two legs, zero shame", "купон!", "танцувай с мен!", "おどろう!"], {
+  who: 'sev',
+  trigger: { title: "The old hands: crazy mode", when: "Crazy mode goes on with old hands on the page. Every one of them stops where it is and dances on the spot, stepping to the beat of the scrolling tab title." },
+  gloss: {"купон!": "party!", "танцувай с мен!": "dance with me!", "おどろう!": "let's dance!"},
+  lang: ["en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "bg", "bg", "ja"],
+});
+defineLines('sev.jive', ["don't stop the music!", "I can still feel the beat", "put me down or spin me, pick one", "you lead, I follow", "dip me! DIP ME!", "I will NOT stop", "the beat goes on, buddy", "this is a lift. we are doing a lift", "hands up! ...I mean, me up", "mid-routine?! rude.", "can't stop, won't stop", "не спирай музиката!", "とめないで!"], {
+  who: 'sev',
+  trigger: { title: "The old hands: picked up mid-dance", when: "You pick up an old hand while it dances in crazy mode. It keeps wiggling to the beat in your grip." },
+  gloss: {"не спирай музиката!": "don't stop the music!", "とめないで!": "don't stop!"},
+  lang: ["en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "bg", "ja"],
+});
+defineLines('sev.freeze', ["!", "freeze.", "statue.", "nobody breathe", "was that the music?", "*record scratch*", "uh-oh", "the beat… is gone", "act natural", "oh no. lights up.", "замръзни!", "しーっ"], {
+  who: 'sev',
+  trigger: { title: "The old hands: the music stops", when: "Crazy mode goes off while they dance. They freeze mid-move." },
+  gloss: {"замръзни!": "freeze!", "しーっ": "shh"},
+  lang: ["en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "bg", "ja"],
+});
+defineLines('sev.pretend', ["I was just stretching", "nothing happened.", "we were… walking. normally.", "what dance?", "you saw nothing. NOTHING.", "just a little cramp", "I do not even like music", "this never leaves the page", "carry on, nothing to see", "that was a sneeze. with fingers.", "dignity: restored", "нищо не е станало", "なにもしてないよ"], {
+  who: 'sev',
+  trigger: { title: "The old hands: pretending nothing happened", when: "After the music stops they look left and right, and pretend nothing happened. Then they walk on." },
+  gloss: {"нищо не е станало": "nothing happened", "なにもしてないよ": "I didn't do anything"},
+  lang: ["en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "bg", "ja"],
+});
 
 export function install(app) {}

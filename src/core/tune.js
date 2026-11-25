@@ -120,7 +120,8 @@ export const TUNE = {
     SNATCH_REACH: [440, 0.36],        // it only snatches a card this close to the right edge (px, or share of vw); further away it just sulks
     JEALOUS: { MS: 5000, LEAN_MS: 2600, LEAN_PX: 150, COOL_MS: 30000 },   // you carry an old hand this long: the arm leans in, drumming its fingers, and says so
     SQUEEZE: { W: 520, SX: 0.4, RATE: 6, SAY_MS: 6000 },   // window narrower than W px while the hand is out: it is pressed flat (sx), complains every SAY_MS
-    IDLE: { MS: 10000, CREEP_S: 2.6, GIVE_UP_S: 9, COOL_MS: 30000 },   // "are you still there?": mouse still this long (Ivo: 10 s), creep, give up, not again for
+    IDLE: { MS: 10000, CREEP_S: 2.6, GIVE_UP_S: 9, COOL_MS: 30000 },
+    RIVAL: { CREEP_S: 1.6, STOP_PX: 60, SAY_S: 1.6, TAP_S: 0.5, TAP_MIN_S: 0.18, FLAT: 1.3, RATE: 30, SOLO_S: 3, MAX_S: 120 },   // "that's MY job" (idle-old, behaviours/mine.js): creep out, wait STOP_PX right of the cursor, speak, then poke in turn with the old hand (each TAP_S, its fingertip on the cursor while sin * FLAT >= 1, shortening with TUNE.severed.PESTER.RALLY.DECAY); alone after SOLO_S without an answer; give up after MAX_S   // "are you still there?": mouse still this long (Ivo: 10 s), creep, give up, not again for
     CIRCLE: { WINDOW_MS: 1000, TURNS: 0.75, R_MIN: 20, R_MAX: 420, HOLD_MS: 700, EYE_PX: 5 },   // the mouse going round in circles: the last WINDOW_MS of it winds TURNS times round its middle, R_MIN..R_MAX px out; eyes follow it for HOLD_MS after, the pupil up to EYE_PX off centre
     SHOWN_PX: 40,                     // the arm counts as out (the old hands may play the mirror game) while its wrist is within this many px past the right edge
     OLD: {                            // the new hand and the old (cut-off) one
@@ -279,6 +280,21 @@ export const TUNE = {
       SPIN: 12,                       // and spun up to this fast (rad/s)
       LAND_V: 1, LAND_S: 3,           // landed (slower than this, m/s) or after this long: dizzy
     },
+    PESTER: {                         // the old hand pokes you instead (idle-old): your mouse still, it jumps up and pokes the cursor
+      STILL_MS: 7000,                 // the pointer still this long (game ms; the arm's own poke is TUNE.hand.IDLE.MS): the nearest old hand goes
+      AT_PX: 30, FAR_PX: 260,         // it stops this close below the cursor (px across); further than FAR_PX it scuttles
+      GO_S: 14, MAX_S: 120,           // gives up getting there after this long; and pestering altogether after this long
+      LOOK_S: 0.6,                    // it looks up this long before the first jump
+      BOUNCE: 0.05,                   // waiting its turn it bounces on its fingers this much (leg length, m)
+      HOP_S: 0.9, HOP_MIN_S: 0.3,     // a jump up to the cursor and back takes this long, shortening with the rally (RALLY.DECAY per poke) to HOP_MIN_S
+      MIN_UP_PX: 40,                  // it always jumps at least this high (a cursor at or below it)
+      REACH_PX: 70,                   // first guess: its fingertip this far above its middle at the top (then measured from the drawing)
+      FLAT: 1.25,                     // the arc's height is min(1, sin * FLAT): it holds still at the top for a moment
+      SOLO_S: 2.2,                    // alone (nobody answering) it jumps again this long after a poke
+      BACK_S: 1,                      // you moved: it stands there this long, saying so, then walks off
+      RALLY: { GAP_MS: 1300, DECAY: 0.86, MIN_MS: 140 },   // taking turns with the arm: each answers its rival's poke after GAP_MS * DECAY^n (n pokes so far), at least MIN_MS
+      POSE: { curl: 0.95, th: 0.9, spread: 0.5, eye: 1.35, pupil: 0.7, happy: 0, point: 1, legs: 0 },   // in the air: one finger out
+    },
   },
   // ---- the secret shelf ----
   shelf: { MAX_W: 260, W_FRAC: 0.42, CLEAR_PX: 250, TOP: 140, BOTTOM: 160, CARDS_BELOW: 2, FRICTION: 0.9, NEAR: [120, 60, 380, 80], EYE_MS: 700 },
@@ -294,6 +310,15 @@ export const TUNE = {
   crazy: { TITLE_MS: 180 },
   away: { BACK_MS: 1600 },   // "there you are" stays in the tab title this long after you come back (page/away.js)
   toast: { FALL_MS: 900 },   // the toast you clicked five times falls off the screen this fast
+  bread: {   // toast for the hand: the knocked-off toast lands on the page as a slice of bread (page/bread.js)
+    W: 132, H: 116,          // px, the slice
+    POP: [2.5, -9],          // m/s it leaves the toast bar with (x is mirrored with the spin), like out of a toaster
+    SPIN: 5,                 // rad/s
+    DAMPING: 0.4,            // linear damping: bread is light
+    DENSITY: 0.6,
+    LEDGE_BIT: 0x8000,       // collision category of the ledge at the bottom of the screen that holds it until you pick it up or scroll
+    LEDGE_SCROLL_PX: 40,     // scrolled this far: the ledge goes
+  },
   eggs: { YEAR_MS: 4000, SWITCHES: 7, SWITCH_MS: 4000 },   // 1926: hover the year this long; 7 theme switches within this long: the moon
   rps: {   // rock, paper, scissors between the new hand and an old one (scenes/rps.js)
     CHANCE: 0.5,                      // share of meetings (hand.met) that end in a game
@@ -334,6 +359,19 @@ export const TUNE = {
   // bottom counts. The wall is H_MAX px (or H_VH of the window) tall and opens in OPEN_MS; each trophy is TROPHY_PX wide; MAX kept
   basement: { PUSHES: 3, GAP_MS: 220, PUSH_PX: 400, RESET_MS: 2500, TOUCH_PX: 40, BOTTOM_PX: 2, H_MAX: 460, H_VH: 0.62, OPEN_MS: 700, LID_DEG: 55, TROPHY_PX: 150, MAX: 40 },
   word: { SETTLE_MS: 450, OVER_PX: 70, HOVER_MS: 650, PINCH_MS: 260, HOLD_MS: 1500, DRAG_MS: 1300, GONE_PX: 260 },
+  // feed the search box (page/feed.js): a card, a scrap or an old hand let go within PAD_PX of the box, slower than MAX_SPEED m/s
+  // (a throw flies on), is swallowed in GULP_MS (the box gulps after GULP_AT of it); then its name types itself in, TYPE_MS a
+  // letter, and HOLD_MS after the last one the grid has its answer. An old hand is spat back up at SPIT m/s. SAY_DY: px above the box
+  feed: { PAD_PX: 24, MAX_SPEED: 9, GULP_MS: 420, GULP_AT: 0.55, TYPE_MS: 75, HOLD_MS: 350, SPIT: 9, SAY_DY: -44 },
+  // phrase-say (phrasebook/say.js): select a line in the open phrasebook and its owner says it beside the menu. SETTLE_MS: the
+  // selection sits still this long first; IN_MS / OUT_MS: the slide in from the edge and back; CARD_W: px wide the card (or
+  // katana) that peeks out; SHOW: the share of it that comes out from behind the menu (or in from the screen's edge when the
+  // margin is too narrow, under GAP_PX to spare); TOP_PX: room kept above it for its bubble; BUBBLE_DY: the bubble's top this far
+  // above it; TILT / SHAKE: degrees it leans and trembles; HAND_IN: px the hand reaches in over the menu's right edge;
+  // HAND_DY: its bubble's top this far above the wrist; OLD_IN: px an old hand's fingers reach in over the left edge; BUBBLE_W: the
+  // widest a bubble gets before it wraps; MAX: lines remembered
+  phraseSay: { SETTLE_MS: 350, IN_MS: 420, OUT_MS: 360, CARD_W: 190, SHOW: 0.62, GAP_PX: 12, TOP_PX: 70, BUBBLE_DY: 46, TILT: -7, SHAKE: 2.5,
+    HAND_IN: 70, HAND_DY: 115, OLD_IN: 46, BUBBLE_W: 340, MAX: 800 },
   speech: {
     TILT: [4, 4],                // every bubble leans right by 4 + up to 4 degrees
     RIDE_DY: -40,                // a body's bubble sits this far above the top of its rotated box
@@ -343,6 +381,33 @@ export const TUNE = {
     EDGE: 6, APART: 10, APART_HOLD: 34, APART_TOUCH: 4, STACK: 16, DODGE: 10, DODGE_GAP: 14, TAIL: 14, LEAN_GROW: 0.07,
     BUTTON_EXTRA_MS: 100,
   },
+  // crazy mode with old hands on the page (src/actors/severed/dance.js, behaviours dance / jive / freeze; src/actors/hand/bob.js):
+  // they dance in place to a beat of BEAT_TICKS ticks of the scrolling tab title (TUNE.crazy.TITLE_MS), and the arm bobs at the edge
+  dance: {
+    BEAT_TICKS: 3,                    // one beat = this many title scroll steps (3 x 180 ms: about 111 bpm)
+    FROM: ['walk', 'rest', 'limp', 'rise', 'stare', 'gloat', 'mirror', 'cower', 'dizzy', 'dead'],   // what an old hand may be doing when the music takes it
+    STILL_V: 1,                       // limp: only once it lies this still (m/s), so a thrown one lands first
+    STEP_PX: 16,                      // on each beat one foot steps out this far to the side and back
+    SHUFFLE: 0.22,                    // m/s: the body sways two beats right, two beats left
+    DIP: 0.24,                        // m: it dips on every beat (and comes back up before the next)
+    SPIN_EVERY: 8,                    // beats between two spins on the spot
+    POSE_RATE: 14,                    // how fast the free fingers snap to the beat's move
+    WIG: 0.22,                        // finger wiggle while dancing (held: HELD_WIG)
+    HELD_WIG: 0.6,
+    SAY_MS: 7000, HELD_SAY_MS: 2600,  // how often it chats while dancing / while you hold it (unforced)
+    MOVES: [                          // its moves, one per beat (fingers 0 and 1 are its legs; the others do the moves)
+      { curl: 0.9, th: 0.95, spread: 0.5, eye: 1, pupil: 1, happy: 1, point: 0, legs: 1 },
+      { curl: 0.2, th: 0.15, spread: 1.35, eye: 1.3, pupil: 0.8, happy: 0, point: 0, legs: 1 },
+      { curl: 0.9, th: 0.9, spread: 0.5, eye: 1.1, pupil: 1, happy: 1, point: 1, legs: 1 },
+      { curl: 1.1, th: 1.05, spread: 0.3, eye: 0.5, pupil: 0.6, happy: 0, point: 0, legs: 1 },
+    ],
+    FREEZE: { STILL_S: 0.8, LOOK_S: 0.5, LOOKS: 3, PRETEND_S: 2.6, END_S: 4.4 },   // the music stops: stock still, then it looks left and right LOOKS times, then pretends nothing happened, then walks on
+    BOB: { EDGE_PX: 70, PX: 18, SWAY: 0.22, RATE: 7, WIG: 0.35, SAY_MS: 900 },   // the arm: its wrist this far in from the right edge, bobbing this many px a beat, the hand swaying (rad); its line after SAY_MS
+  },
+  // the katana's tip slits the banner fog and the kiri flood (page/slash.js): a hard SLIT_W px line inside a HALO_W px halo of HALO_A,
+  // only while the tip moves at least SLIT_SPEED px/s. Slashing across the 棚 (TANA_PAD px around it) at SLASH_SPEED px/s or more,
+  // in and out over at least ACROSS of its size, splits the writing (SPLIT_PX apart over SPLIT_MS) and opens the shelf; COOL_MS between two
+  fogSlash: { SLIT_W: 2.5, HALO_W: 9, HALO_A: 0.35, SLIT_SPEED: 40, SLASH_SPEED: 500, TANA_PAD: 12, ACROSS: 0.7, SPLIT_PX: 7, SPLIT_MS: 1800, COOL_MS: 1500 },
 };
 
 // ---- timing: how long every speech bubble stays up, how long anyone waits before speaking again, and how long you get to answer ----

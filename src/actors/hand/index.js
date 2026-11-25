@@ -24,6 +24,7 @@
 // it is cleared or replaced.
 // It never imports another actor: the shelf reaches it through senses() (wired in src/reactions.js), the blade through
 // world.blade, and what happens to cards goes out as events (hand.grabbed, hand.reaching, hand.ripped, ...).
+// In crazy mode tick() returns before all of that; while the old hands dance it bobs along at the edge instead (./bob.js).
 
 import { TUNE, TIMING } from '../../core/tune.js';
 import { bus } from '../../core/bus.js';
@@ -42,6 +43,9 @@ import { zones } from './zones.js';
 import { gripPt, untug, ownClip } from './tug.js';
 import { stole, wants, lost, wrestable } from './old.js';
 import { circling } from './idle.js';
+import { bob, bobbing, bobTick } from './bob.js';
+
+export { bob, bobbing };
 
 export { POSES };
 
@@ -164,11 +168,15 @@ export function sulkFor(ms) { if (!claw) return; claw.sulkUntil = now() + ms; cl
 /** it won at rock, paper, scissors: the old hand o is fair game for TUNE.rps.FAIR_MS (./old.js) */
 export function oldLost(o) { if (claw && !isCrazy()) lost(o, now() + TUNE.rps.FAIR_MS); }
 
+/** the old hand poked your still cursor (sev.pestered; n: pokes so far): in 'mine' with that old hand, its turn next (behaviours/mine.js) */
+export function pesterTurn(o, n) { const c = claw; if (c && m.is('mine') && c.rival === o) { c.reply = n; clock.wake(); } }
+
 /** out of patience: it takes the held card (legacy snatch(o)) */
 export function snatch(o) { claw.o = o; set('snatch'); }
 
 // what it can sense of other actors, injected by src/reactions.js:
-// { shelfSnack() -> body|null, nearShelf(P) -> bool, onShelf(o) -> bool, want(v), shelf() -> state|null, oldHands() -> Set of cut-off hand bodies }
+// { shelfSnack() -> body|null, nearShelf(P) -> bool, onShelf(o) -> bool, want(v), shelf() -> state|null, oldHands() -> Set of cut-off hand bodies,
+//   pester() -> { hand, poked, n } | null (an old hand poking your still cursor) }
 let sensed = {};
 /** what senses() was given */ export const sense = () => sensed;
 export function senses(s) { sensed = s || {}; }
@@ -185,13 +193,13 @@ export const shelf = {
 export const busy = () => {
   const c = claw; if (!c) return false;
   const sh = shelf.state();
-  return (!!sh && sh.want) || !!c.react || !!c.later || now() < (c.flinch || 0) || c.strands.length > 0 || (c.sx ?? 1) !== 1 || !!c.say || m.busy || (!!m.def.busyUntil && now() < c.until) || (m.is('lurk') && wants(c));
+  return (!!sh && sh.want) || !!c.react || !!c.later || now() < (c.flinch || 0) || c.strands.length > 0 || (c.sx ?? 1) !== 1 || !!c.say || m.busy || (!!m.def.busyUntil && now() < c.until) || (m.is('lurk') && wants(c)) || bobbing();
 };
 
 // legacy clawTick(dt)
 function tick(dt) {
   if (!claw) { if (!world.ripped.size || isCrazy()) return; clawInit(); }
-  const c = claw; if (isCrazy() || m.def.borrowed) return;
+  const c = claw; if (isCrazy() || m.def.borrowed) { if (!m.def.borrowed) bobTick(c, dt); return; }   // crazy mode: it only bobs along to the old hands' dance (./bob.js)
   const vw = html().clientWidth, vh = innerHeight, t = now(); m.age(dt);
   if (c.o && !world.bodies.has(c.o)) { c.o = null; c.joint = null; c.snap = null; if (!m.def.calm) { set('sulk'); speak('sulk'); } }   // someone cut or smashed what it was holding
   if (world.grab !== c.g) { c.g = world.grab; c.far = false; }
@@ -201,9 +209,9 @@ function tick(dt) {
   if (P && P[0] < vw - FAR) c.far = true;   // a card has to be brought over, not just be there
   // the frame's shared locals (legacy: the consts and lets at the top of clawTick); the behaviour sets the motion target on it
   const x = { t, dt, vw, vh, P, held, o, NEAR, FAR, Z, HOLD, ripE, strainE, T: [vw + H_.LURK_X, c.ly], rate: 6, aim: Math.PI, pose: POSES.lurk, wig: 0.05, shake: 0, strain: 0 };
-  if (!c.o && m.def.catches) {   // a card thrown its way: it goes for the catch
+  if (!c.o && m.def.catches) {   // a card thrown its way (or the toast that fell off the screen, page/bread.js): it goes for the catch
     for (const q of world.bodies) {
-      if (!edible(q) || q.root || q.tug || (world.grab && world.grab.o === q)) continue;
+      if (!(edible(q) || q.kind === 'toast') || q.root || q.tug || (world.grab && world.grab.o === q)) continue;
       const v = q.body.getLinearVelocity(), w = q.body.getWorldCenter(), sx = w.x * S - scrollX, sy = w.y * S - scrollY;
       if (v.x > 5 && Math.hypot(v.x, v.y) > 8 && sx > Z.grab && sx < vw + 40 && sy > 20 && sy < vh - 20) { c.o = q; set('catch'); break; }
     }

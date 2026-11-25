@@ -1,0 +1,398 @@
+{
+ "scenario": "arm / toast for the hand",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 3032,
+   "ms": 792,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 3824,
+   "ms": 628,
+   "who": "card",
+   "key": "SAY.rip",
+   "text": "I was comfy!"
+  },
+  {
+   "doc": 1,
+   "t": 4452,
+   "ms": 1068,
+   "who": "card",
+   "key": "SAY.throw",
+   "text": "not the wall!"
+  },
+  {
+   "doc": 1,
+   "t": 5228,
+   "ms": 1316,
+   "who": "card",
+   "key": "bread.pop",
+   "text": "あーあ"
+  },
+  {
+   "doc": 1,
+   "t": 5520,
+   "ms": 1300,
+   "who": "card",
+   "key": "SAY.smash",
+   "text": "ААААА!!"
+  },
+  {
+   "doc": 1,
+   "t": 6752,
+   "ms": 1312,
+   "who": "hand",
+   "key": "CLAW_SAY.throw",
+   "text": "over here!"
+  },
+  {
+   "doc": 1,
+   "t": 9300,
+   "ms": 332,
+   "who": "card",
+   "key": "bread.thrown",
+   "text": "airmail."
+  },
+  {
+   "doc": 1,
+   "t": 9632,
+   "ms": 224,
+   "who": "card",
+   "key": "bread.caught",
+   "text": "not the hand. anything but the hand."
+  },
+  {
+   "doc": 1,
+   "t": 9632,
+   "ms": 608,
+   "who": "hand",
+   "key": "hand.toast",
+   "text": "a little burnt. just how I like it"
+  },
+  {
+   "doc": 1,
+   "t": 10240,
+   "ms": null,
+   "who": "hand",
+   "key": "hand.toastEat",
+   "text": "tastes like a notification"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 100,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 3048,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 3832,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4468,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 5248,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1,
+    "toast": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 5568,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "toast": 1,
+    "shard": 18,
+    "piece": 10
+   }
+  },
+  {
+   "doc": 1,
+   "t": 8500,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "toast",
+   "objs": {
+    "toast": 1,
+    "shard": 18,
+    "piece": 10
+   }
+  },
+  {
+   "doc": 1,
+   "t": 9316,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "toast": 1,
+    "shard": 18,
+    "piece": 10
+   }
+  },
+  {
+   "doc": 1,
+   "t": 9588,
+   "claw": "catch",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "toast": 1,
+    "shard": 18,
+    "piece": 10
+   }
+  },
+  {
+   "doc": 1,
+   "t": 9636,
+   "claw": "eat",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "toast": 1,
+    "shard": 18,
+    "piece": 10
+   }
+  },
+  {
+   "doc": 1,
+   "t": 9812,
+   "claw": "eat",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "toast": 1,
+    "shard": 17,
+    "piece": 10
+   }
+  },
+  {
+   "doc": 1,
+   "t": 9828,
+   "claw": "eat",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "toast": 1,
+    "shard": 15,
+    "piece": 10
+   }
+  },
+  {
+   "doc": 1,
+   "t": 9844,
+   "claw": "eat",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "toast": 1,
+    "shard": 14,
+    "piece": 10
+   }
+  },
+  {
+   "doc": 1,
+   "t": 9860,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 13,
+    "piece": 10
+   }
+  },
+  {
+   "doc": 1,
+   "t": 9910,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 12,
+    "piece": 10
+   }
+  },
+  {
+   "doc": 1,
+   "t": 9960,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 11,
+    "piece": 10
+   }
+  },
+  {
+   "doc": 1,
+   "t": 10010,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 10,
+    "piece": 10
+   }
+  },
+  {
+   "doc": 1,
+   "t": 10060,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 9,
+    "piece": 10
+   }
+  },
+  {
+   "doc": 1,
+   "t": 10110,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 8,
+    "piece": 10
+   }
+  },
+  {
+   "doc": 1,
+   "t": 10410,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 5,
+    "piece": 10
+   }
+  },
+  {
+   "doc": 1,
+   "t": 10560,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 4,
+    "piece": 10
+   }
+  },
+  {
+   "doc": 1,
+   "t": 10610,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 3,
+    "piece": 10
+   }
+  }
+ ]
+}

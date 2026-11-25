@@ -2,12 +2,14 @@
 // footer lifts like a trapdoor onto the hand's trophy wall: every card and piece it ate on this visit ('hand.ate') and every old
 // hand it ate ('hand.devoured'), pinned up in the order it ate them. Scroll up, click, tap or press Escape and the lid drops
 // back. Nothing hints at it. The trophies are kept in sessionStorage (a copy of each card as it went down), so a reload keeps them.
+// The toast you fed it (page/bread.js, kind 'toast') is kept as its message and pinned up as a slice of bread (bread.js look()).
 // Styles are set from here (inline), so styles/*.css stay as they were. Random draws: the plaque's line, only when the wall opens.
 import { TUNE } from '../core/tune.js';
 import { clock, real } from '../core/clock.js';
 import { bus } from '../core/bus.js';
 import { line } from '../core/lines.js';
 import { isCrazy } from '../world/world.js';
+import { look } from './bread.js';
 
 const B = TUNE.basement, KEY = 'kiripad-trophies';
 const MINCHO = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
@@ -27,6 +29,7 @@ function keep(t) {
 /** the card as it went down its throat: a copy without its place on the page, its id or its state */
 function stuff(o) {
   if (!o || !o.el) return;
+  if (o.kind === 'toast') return keep({ kind: 'toast', msg: o.msg || '' });   // the slice of bread: its message is enough to make it again
   const el = o.el.cloneNode(true);
   el.querySelectorAll('[id]').forEach((x) => x.removeAttribute('id'));
   const c1 = o.el.style.getPropertyValue('--c1'), clip = o.el.style.clipPath;
@@ -49,6 +52,14 @@ function frame(t, i) {
       background: 'linear-gradient(160deg, #8a5a36, #5b3a22)', boxShadow: '0 8px 18px rgba(0,0,0,.45), inset 0 0 0 3px rgba(255,255,255,.08)' });
     shield.appendChild(div({ fontFamily: MINCHO, fontSize: S * 0.38 + 'px', fontWeight: '800', color: '#c8372d', textShadow: '0 2px 0 rgba(0,0,0,.35)' }, '手'));
     box.append(shield, div({ font: '600 .72rem/1.2 system-ui, sans-serif', color: '#e9dcc6', letterSpacing: '.06em', textTransform: 'uppercase' }, 'its old hand · ' + hhmm(t.at)));
+    return box;
+  }
+  if (t.kind === 'toast') {   // the toast it ate, pinned through the crust
+    const slice = div({ position: 'relative' });
+    slice.appendChild(look(div({ pointerEvents: 'none' }), t.msg));
+    slice.appendChild(div({ position: 'absolute', left: '50%', top: '2px', width: '14px', height: '14px', marginLeft: '-7px', borderRadius: '50%', zIndex: '2',
+      background: 'radial-gradient(circle at 35% 35%, #ff8a7a, #c8372d 60%, #7d1d16)', boxShadow: '0 3px 4px rgba(0,0,0,.5)' }));   // the pin
+    box.append(slice, div({ font: '600 .72rem/1.2 system-ui, sans-serif', color: '#e9dcc6', letterSpacing: '.06em', textTransform: 'uppercase' }, 'toast · ' + hhmm(t.at)));
     return box;
   }
   const s = S / (t.w || S), card = div({ position: 'relative', width: S + 'px', height: (t.h || S) * s + 'px' });

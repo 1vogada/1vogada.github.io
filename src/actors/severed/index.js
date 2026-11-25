@@ -9,6 +9,9 @@
 // install(app): onTick 'severed' (legacy sevTick), clock.hasWork/keepAwake(busy), the 'severed' speaker, body.removed of a
 // hand -> gone(o), body.thrown of a hand -> say(o, 'thrown', true), hook('__sev', { list, SEV, POSES, set, spawn, say, cut }).
 // The 'hand.severed' event is wired to spawn() in src/reactions.js.
+// Once a frame before the hands think: the hand tower (./tower.js) and the old hand that pokes your still cursor (./pester.js).
+// Crazy mode (src/reactions.js, mode.changed -> groove): ./dance.js sets them dancing (behaviours dance, jive, freeze) and shows
+// them through crazy mode's hiding rules; danceTick() runs once a frame here.
 
 import { TUNE } from '../../core/tune.js';
 import { bus } from '../../core/bus.js';
@@ -22,6 +25,8 @@ import { drawOffset } from '../../world/loop.js';
 import { gore } from '../../world/fx.js';
 import { turn } from './gait.js';
 import { towerTick, shookOff, tower } from './tower.js';
+import { pesterTick, pestering, pesterTurn } from './pester.js';
+import { danceTick, groove, grooving } from './dance.js';
 
 const S = TUNE.physics.S, P = TUNE.physics, SV = TUNE.severed, B = SV.BODY;
 
@@ -106,6 +111,8 @@ export const lurks = () => (sensed.lurks ? !!sensed.lurks() : false);
 /** the arm's wrist and grip (viewport px), its state and seconds in it, or null: { st, t, x, y, grip, is(...states) } */
 export const wrist = () => { const r = sensed.wrist ? sensed.wrist() : null; return r && { ...r, is: (...s) => s.includes(r.st) }; };
 export { shookOff, tower };
+export { pestering, pesterTurn };   // the old hand pokes your cursor first (./pester.js)
+export { groove, grooving };
 /** the new hand, when the arm is out showing it (the mirror game), else null */ export const armOut = () => (sensed.arm ? sensed.arm() : null);
 
 // the mirror game: a walking old hand that has met the new one, in view, with nothing better to do (not hunting, running, hurt,
@@ -119,6 +126,7 @@ function mirrors(o) {
 /** the shelf, if it is out (a place to hide) */ export const refuge = () => (sensed.shelf ? sensed.shelf() : null);
 /** o is on the shelf */ export const onRefuge = (o) => (sensed.onShelf ? sensed.onShelf(o) : false);
 /** your mouse pointer on the page, viewport px, or null */ export const pointer = () => (sensed.pointer ? sensed.pointer() : null);
+/** when your pointer last moved (game ms), or null */ export const moved = () => (sensed.moved ? sensed.moved() : null);
 /**
  * a gift for you: your pointer is on the page and has rested for GIFT.STILL_MS (off while window.__test.idle === false, like the
  * arm's "are you still there?": the scenarios leave the mouse still)
@@ -165,6 +173,8 @@ export function poked(o, twitch) {
 export function mistaken(o) { const m = brains.get(o); if (!m) return; o.ai.why = 'notcard'; m.set('caught'); }
 /** ...and gave it back (hand.returned): it drops, and says something about it */
 export function returned(o) { const m = brains.get(o); if (!m || !m.is('caught')) return; m.set('limp'); say(o, 'returned', true); }
+/** dropped on the search box, spat back out, and the box searched for "hand" (page/feed.js 'search.fed'): it is not in there */
+export function notThere(o) { if (o && list.has(o) && world.bodies.has(o) && !isCrazy()) say(o, 'notthere', true); }
 
 /**
  * the cheese pull: the arm is dragging card q off the shelf (its grip at page px `from`). The nearest old hand in view close to
@@ -266,9 +276,11 @@ export function tick(dt) {
   frameT = clock.now();
   hitchhike();
   towerTick(dt);
+  pesterTick();
+  danceTick();
   for (const o of [...list]) {
     const a = o.ai, h = o.hand, m = brains.get(o); m.age(dt);
-    if (isHeld(o) && m.state !== 'held' && !m.def.tap) m.set('held');   // (a state with tap: true tells a tap from a pick-up itself)
+    if (isHeld(o) && m.state !== 'held' && !m.def.tap && !m.def.held) m.set(m.def.heldAs || 'held');   // (a state with tap: true tells a tap from a pick-up itself; held: true is a state you hold it in; heldAs: where it goes when picked up)
     else if (m.state === 'walk' && mirrors(o)) m.set('mirror');
     if (vengeful(o, m)) m.set('avenge');
     if (m.state === 'held') a.alone = frameT; else if (!a.painted && frameT - (a.alone ?? a.born) > SV.PAINT.MS && m.is('walk', 'rest')) { a.painted = true; m.set('paint'); }   // left alone long enough: it writes something

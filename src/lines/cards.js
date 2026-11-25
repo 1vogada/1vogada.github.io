@@ -214,6 +214,20 @@ defineLines('card.tornslip', ['you tore my fortune!', 'that is seven years of ba
   lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
 });
 
+// ---- feed the search box (page/feed.js): the card you drop on it is swallowed, and grows back once its name is found ----
+defineLines('card.eaten', ['not the search box!!', 'it has TEETH', 'I was only browsing!', 'tell my slot I loved it', 'nooo, not indexed!', 'I don\'t want to be a query!', 'it\'s so dark in here', 'ctrl+Z! CTRL+Z!', 'wait, I can explain my description', 'mind the cursor!', 'I am not a keyword!', 'this is NOT how SEO works', 'изяде ме!', '検索されるー!'], {
+  who: 'card',
+  trigger: { title: 'Fed to the search box', when: 'You drop a whole card on the search box. It swallows the card in one gulp.' },
+  gloss: { 'изяде ме!': 'it ate me!', '検索されるー!': 'I\'m being searched!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('card.home', ['I\'m home!', 'never feed me to that thing again', 'it spat me out by NAME', '1 result. me. I\'m the result.', 'it knew my name…', 'I have seen the inside of a search box', 'I\'m still sticky', 'home sweet slot', 'they found me!', 'top result, baby', 'I am back and I am traumatised', 'обратно у дома!', 'ただいま、スロット!'], {
+  who: 'card',
+  trigger: { title: 'Found, and home again', when: 'The search box swallowed it and typed its name; the grid finds its project and the card grows back into its slot.' },
+  gloss: { 'обратно у дома!': 'back home!', 'ただいま、スロット!': 'I am home, slot!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
 defineLines('toast.ripped', ['Ripped it out! Stack them, or throw one hard to smash it.'], { who: 'toast', lang: 'en' });
 defineLines('toast.smashed', ['Smashed!'], { who: 'toast', lang: 'en' });
 defineLines('toast.smashed10', ['10 cards smashed. Feeling better?'], { who: 'toast', lang: 'en' });

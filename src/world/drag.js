@@ -2,14 +2,14 @@
 // dragstart, the loose-body pointerdown).
 // Listener registration order is part of the contract (install registers them in legacy order):
 //   grid pointerdown (press), window pointermove (onMove), window pointerup + pointercancel (drop), window touchmove (passive: false),
-//   document click (capture: swallow the click after a drag), document dragstart, document pointerdown (pick up a loose body).
+//   document click (capture: swallow the click after a drag), document dragstart, document pointerdown (pick up a loose body: card, piece, katana, cut-off hand, or the fallen toast of page/bread.js).
 // A press that travels TUNE.drag.MOVE_PX on an armed grid card calls the handler set with onPull (the cards actor's startPull).
 // A rooted body whose root gives way (world/loop.js 'bodies' step) is handed to the handler its kind set with onTear
 // (legacy tear(o): the cards actor's tear for cards, the katana's free for the planted katana).
 //
 // Events emitted here (legacy direct calls in drop()):
 //   'katana.dropped' { katana }       a loose katana let go: legacy say(o, 'kdrop', true); notice('kdrop'), before the throw speed
-//   'body.dropped'   { body, speed }  any free body let go, after its release velocity is set
+//   'body.dropped'   { body, speed, x, y }  any free body let go, after its release velocity is set (x, y: the pointer, page px)
 //   'body.thrown'    { body, speed }  released faster than HOT: a hand (legacy sevSay(o, 'thrown', true)); any other body after
 //                                     o.hot is set (legacy say(o, 'throw', true); notice('throw') unless a katana)
 //   'card.sprangBack' { card }        a rooted body let go after it moved (legacy say(o, 'back', true))
@@ -69,7 +69,7 @@ export function drop(e) {
       if (sp > D.THROW_MAX) { v = { x: v.x * D.THROW_MAX / sp, y: v.y * D.THROW_MAX / sp }; sp = D.THROW_MAX; }
       b.setLinearVelocity(v);
       if (world.dbg) console.log('release speed', sp.toFixed(1));   // eslint-disable-line no-console
-      bus.emit('body.dropped', { body: o, speed: sp });
+      bus.emit('body.dropped', { body: o, speed: sp, x: g.cx + scrollX, y: g.cy + scrollY });
       if (o.kind === 'hand') { b.setBullet(false); if (sp > P.HOT) bus.emit('body.thrown', { body: o, speed: sp }); }   // legacy sevSay(o, 'thrown', true)
       else if (sp > P.HOT) { o.hot = clock.now() + P.HOT_MS; bus.emit('body.thrown', { body: o, speed: sp }); }   // legacy say(o, 'throw', true); notice('throw')
       else b.setBullet(false);
@@ -116,7 +116,7 @@ export function install(app) {
   // loose cards can be picked up again anywhere on them
   document.addEventListener('pointerdown', (e) => {
     const el = e.target.closest?.('#phys .phys'), o = el && el._o;
-    if (!o || (o.kind !== 'card' && o.kind !== 'piece' && o.kind !== 'katana' && o.kind !== 'hand') || world.grab || e.button > 0) return;
+    if (!o || (o.kind !== 'card' && o.kind !== 'piece' && o.kind !== 'katana' && o.kind !== 'hand' && o.kind !== 'toast') || world.grab || e.button > 0) return;
     e.preventDefault(); hold(o, e.clientX + scrollX, e.clientY + scrollY, e);
   });
 }

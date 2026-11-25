@@ -87,7 +87,7 @@ hand. Test with `{ reducedMotion: 'reduce' }`.
 ## 8. Crazy mode
 
 `html.crazy` (`isCrazy()` from `src/world/world.js`). The arm's tick and `notice` return, the katana cannot be equipped or found,
-the shelf and the kiri flood do nothing, the fog loop stops, CSS hides the claw and `#phys`. It is asked for on every load (stored
+the shelf and the kiri flood do nothing, the fog loop stops, CSS hides the claw and `#phys` (except while old hands dance: `actors/severed/dance.js` shows #phys invisible, and only the old hands, the arm and their bubbles, with inline styles). It is asked for on every load (stored
 `kiripad-mode=crazy` only pre-selects). **Do:** every new feature checks `isCrazy()` where it would start something.
 
 ## 9. English-only mode and the test pin

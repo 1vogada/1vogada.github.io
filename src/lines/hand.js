@@ -654,4 +654,93 @@ defineLines('hand.towerLaugh', ['ha! timber.', 'nice try, stack of thumbs', 'gra
   lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
 });
 
+// ---- toast for the hand: you throw it the toast that fell off the screen (page/bread.js) ----
+defineLines('hand.toast', ['toast. finally, real food', 'is that… bread?', 'carbs! at last!', 'you shouldn\'t have. really. give.', 'warm. crunchy. not a card.', 'a little burnt. just how I like it', 'no butter? rude.', 'breakfast is served', 'finally something without a link in it', 'it still has words on it. delicious words.', 'weeks of cards. and now: TOAST.', 'тост! най-сетне!', 'トーストだ!', 'やっとまともな飯'], {
+  who: 'hand',
+  trigger: { title: 'Toast!', when: 'You threw the toast that fell off the screen at the hand. It catches it out of the air.' },
+  gloss: { 'тост! най-сетне!': 'toast! at last!', 'トーストだ!': 'it is toast!', 'やっとまともな飯': 'real food at last' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja', 'ja'],
+});
+defineLines('hand.toastEat', ['*crunch* (toasted)', 'tastes like a notification', 'needed jam', 'crumbs everywhere. worth it.', 'that message was delicious', 'mmm. sourdough.', 'better than paper', 'slightly burnt. ten out of ten.', 'I could get used to bread', 'more toasts. go poke more toasts.', 'хрупкаво.', 'さくさく'], {
+  who: 'hand',
+  trigger: { title: 'Ate the toast', when: 'It caught the toast and dragged it off the edge.' },
+  gloss: { 'хрупкаво.': 'crunchy.', 'さくさく': 'crispy-crunchy' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+// ---- the old hand pokes you instead (idle-old): an old hand got to your still cursor first (behaviours/mine.js) ----
+defineLines('hand.pesterMine', [
+  "hey. that's MY job",
+  'excuse me. I do the poking here.',
+  'who said YOU could poke it?',
+  'that is literally my one hobby',
+  'step aside, amateur',
+  "you're doing it wrong. watch.",
+  'I was poking cursors before you were cut off',
+  'get your own cursor',
+  'unbelievable. replaced by my own leftovers',
+  'I was GOING to poke it',
+  'oh, so we BOTH poke now?',
+  'this is my bit.',
+  'ей, това е МОЯ работа',
+  'それ、ぼくの仕事!'], {
+  who: 'hand',
+  trigger: { title: 'The old hand pokes you instead: “MY job”',
+    when: 'With an old (cut-off) hand on the page, leave the mouse still. The old hand gets to the cursor first and pokes it; the new hand comes out to do the same and finds the job taken.' },
+  gloss: { 'ей, това е МОЯ работа': 'hey, that is MY job', 'それ、ぼくの仕事!': "that's my job!" },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.pesterTurn', [
+  'my turn',
+  'MINE',
+  'poke. your move.',
+  'beat that',
+  'I poke better',
+  'faster, slowpoke',
+  'ha! my turn',
+  'and again',
+  'still not waking up?',
+  'out of my way',
+  'tap tap tap',
+  'watch the master',
+  'мой ред!',
+  'ぼくの番!'], {
+  who: 'hand',
+  trigger: { title: 'The old hand pokes you instead: taking turns',
+    when: 'Keep the mouse still while both hands are at it. They take turns poking the cursor, faster and faster.' },
+  gloss: { 'мой ред!': 'my turn!', 'ぼくの番!': 'my turn!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.pesterBack', [
+  'it started it',
+  'we were just checking',
+  'it was THIS one',
+  'nobody poked anything',
+  "it's awake! scatter!",
+  'I was never poking anything',
+  'not my idea',
+  'a team effort. mostly me.',
+  'carry on. we were never here',
+  'I was winning',
+  'не бях аз',
+  '知らない!'], {
+  who: 'hand',
+  trigger: { title: 'The old hand pokes you instead: caught',
+    when: 'You move the mouse while the two hands take turns poking it. The new hand whips back out of sight.' },
+  gloss: { 'не бях аз': "it wasn't me", '知らない!': "I don't know anything!" },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+// ---- crazy mode: the arm bobs along (src/actors/hand/bob.js) ----
+defineLines('hand.bob', ["I am not dancing. this is a twitch.", "ugh. fine. ONE song.", "my wrist just does this", "do not tell the cards", "I bob ironically", "I have a reputation, you know", "this beat is… acceptable", "nobody films this", "just keeping warm", "these old hands have no shame", "I'm only here for the snacks", "не танцувам, мърдам се", "おどってないし"], {
+  who: 'hand',
+  trigger: { title: "Crazy mode: bobbing along", when: "Crazy mode goes on while old hands are on the page. They dance; the arm comes in at the right edge and bobs along, pretending it is not." },
+  gloss: {"не танцувам, мърдам се": "I'm not dancing, I'm fidgeting", "おどってないし": "I'm not dancing"},
+  lang: ["en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "bg", "ja"],
+});
+defineLines('hand.danced', ["oh, I saw that.", "nothing happened, sure", "smooth. very smooth.", "I have screenshots", "the floor misses you", "stretching. right.", "encore? no? shame.", "I never bobbed. you have no proof", "pretend all you like", "видях ви", "みてたよ"], {
+  who: 'hand',
+  trigger: { title: "Crazy mode: after the dance", when: "Crazy mode goes off and the old hands pretend they were never dancing. A little later, the arm comments." },
+  gloss: {"видях ви": "I saw you", "みてたよ": "I was watching"},
+  lang: ["en", "en", "en", "en", "en", "en", "en", "en", "en", "bg", "ja"],
+});
+
 export function install(app) {}

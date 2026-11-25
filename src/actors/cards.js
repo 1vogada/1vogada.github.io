@@ -1,6 +1,6 @@
 // The cards: rooted in the grid, pulled, torn out, thrown; everything a card says (legacy startPull, tear, the card lines of
 // say(), cardSay with the AGONY tiers, BEG, panic with the PANIC tiers and the NOTME bystanders, the cards-rendered listener,
-// the regrow of resetAll).
+// the regrow of resetAll, and putBack: one card grown back into its slot after the search box ate it).
 //
 // A card speaks only from the world's pull/tear hooks and from its own event listeners (registered in install, so they run
 // before src/reactions.js). Each listener runs where the legacy code said the line, so the line picks and the random draws
@@ -191,6 +191,21 @@ export function panic(o, fear, dt, t, handX) {
 function regrow() {
   document.querySelectorAll('#grid .card').forEach((c) => { c.style.rotate = ''; });
   document.querySelectorAll('#grid .card.held').forEach((c) => { c.classList.remove('held'); c.classList.add('regrow'); clock.real.after(REGROW_MS, () => c.classList.replace('regrow', 'settled')); });
+}
+/**
+ * one card goes home (the search box swallowed it and found its project, page/feed.js 'search.fed' via src/reactions.js): its
+ * slot is no longer torn out, it grows back like "Put the cards back" does it, and says so over the slot ('card.home').
+ * The "Put the cards back" button stays: there may be more out there
+ */
+export function putBack(key) {
+  if (!key) return;
+  world.ripped.delete(key); world.loose.delete(key); world.tugs.delete(key);
+  const c = [...document.querySelectorAll('#grid .card')].find((x) => x.dataset.key === key);
+  if (!c) return;
+  c.style.rotate = '';
+  if (c.classList.contains('held')) { c.classList.remove('held'); c.classList.add('regrow'); clock.real.after(REGROW_MS, () => c.classList.replace('regrow', 'settled')); }
+  const r = c.getBoundingClientRect();
+  if (r.width) sayAt(r.left + scrollX + r.width / 2, r.top + scrollY + TUNE.speech.RIDE_DY, 'card.home');
 }
 /** the grid re-rendered on search or theme changes: keep torn-out cards out of it (legacy cards-rendered listener) */
 function rendered() {

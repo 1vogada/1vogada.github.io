@@ -25,7 +25,7 @@ export const EVENTS = {
   // ---- any body ----
   'body.added': '{ body } a body joined world.bodies',
   'body.removed': '{ body } about to leave: emitted after the grab is dropped and its bubble hushed, before destroyBody (legacy sevGone point)',
-  'body.dropped': '{ body, speed } released by the pointer (any body, any speed)',
+  'body.dropped': '{ body, speed, x, y } released by the pointer (any body, any speed; x, y: the pointer, page px)',
   'body.thrown': '{ body, speed } released faster than TUNE.physics.HOT (cards are hot from here on)',
   // ---- katana ----
   'katana.found': '{ } the fog was wiped off it',
@@ -89,6 +89,7 @@ export const EVENTS = {
   // ---- phrasebook ----
   'phrasebook.opened': '{ }',
   'phrasebook.closed': '{ }',
+  'phrasebook.spoke': '{ key, text, who, heard } a line was picked in the open phrasebook and its owner (who: card | katana | hand | old) said it (heard) or refused (text: the refusal); after the bubble went up (phrasebook/say.js)',
   // ---- page ----
   'mode.changed': '{ crazy }',
   'theme.changed': '{ dark }',
@@ -99,6 +100,11 @@ export const EVENTS = {
   'data.loaded': '{ data } projects.json arrived and the grid rendered',
   'cards.rendered': '{ } the grid re-rendered (legacy "cards-rendered" DOM event)',
   'ui.toast': '{ msg } show a toast (actors cannot import page/toast.js)',
+  'search.fed': '{ what, body, key, query } something dropped on the search box has typed itself in and the grid filtered (page/feed.js). what: "card" (key: its slot) | "scrap" | "hand" (body: the old hand)',
+  // ---- the old hand pokes you instead (idle-old) ----
+  'sev.pestered': '{ hand, n } an old hand poked your still cursor (severed behaviours/pester.js); n: pokes so far, the arm\'s and its own',
+  'hand.pestered': '{ hand, n } the arm poked your still cursor in turn with old hand `hand` (hand behaviours/mine.js); n: pokes so far',
+  'tana.slashed': '{ at } the katana\'s tip went across the hidden 棚 writing in the banner while the shelf was in (page/slash.js; at: page px). Reactions: the katana gloats, the shelf opens',
 };
 
 export const EVENT_TYPES = new Set(Object.keys(EVENTS));

@@ -32,8 +32,8 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 |---|---|---|---|
 | `body.added` | `{ body }` | `world/world.js` `add`: after the body joined `world.bodies` | none |
 | `body.removed` | `{ body }` | `world/world.js` `remove`: after the grab is dropped and the bubble hushed, before `destroyBody` and before it leaves `world.bodies` | `actors/severed/index.js`: `gone(body)` for a hand (runs the behaviour's `leave`); `actors/katana.js`: forgets the katana body |
-| `body.dropped` | `{ body, speed }` | `world/drag.js` `drop`: a free body let go by the pointer, after its throw velocity is set (any speed) | none |
-| `body.thrown` | `{ body, speed }` | `world/drag.js` `drop`: right after `body.dropped` when `speed > TUNE.physics.HOT`; a card is hot from here (`o.hot`) | `actors/severed/index.js`: forced `sev.thrown` for a hand; `actors/cards.js`: forced `card.throw` (not katana or hand); `reactions.js`: `hand.notice('throw')` (not katana or hand) |
+| `body.dropped` | `{ body, speed, x, y }` | `world/drag.js` `drop`: a free body let go by the pointer, after its throw velocity is set (any speed; `x`, `y`: the pointer, page px) | `reactions.js`: `feed.dropped` (on the search box: it eats it and searches, `page/feed.js`) |
+| `body.thrown` | `{ body, speed }` | `world/drag.js` `drop`: right after `body.dropped` when `speed > TUNE.physics.HOT`; a card is hot from here (`o.hot`) | `actors/severed/index.js`: forced `sev.thrown` for a hand; `actors/cards.js`: forced `card.throw` (not katana or hand); `reactions.js`: `hand.notice('throw')` (not katana or hand); `page/bread.js`: forced `bread.thrown` for the fallen toast (the cards' `card.throw` is dropped by the `bread.` prefix) |
 
 ## Katana and blade
 
@@ -44,7 +44,7 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 | `katana.equipped` | `{ katana }` | `actors/katana.js` `equip` (double-click): after `katana.hello`, before the joint target is set | `reactions.js`: `hand.notice('katana')` |
 | `katana.dropped` | `{ katana }` | `world/drag.js` `drop`: the katana let go, before its throw speed is computed (so before `body.dropped`) | `actors/katana.js`: forced `katana.drop` line; `reactions.js`: `hand.notice('kdrop')` |
 | `katana.sheathed` | `{ katana }` | `actors/katana.js` `putBack`: after the body is removed (`katana` is the body it was, or null) | none |
-| `blade.moved` | `{ from, to, speed, dt }` | `world/cut.js` `bladeCuts` (tick phase `blade`): once per frame while the katana is loose and moved, after the stroke (cuts, stabs) of that frame | none |
+| `blade.moved` | `{ from, to, speed, dt }` | `world/cut.js` `bladeCuts` (tick phase `blade`): once per frame while the katana is loose and moved, after the stroke (cuts, stabs) of that frame | `reactions.js`: `page/slash.js` `cut` (slits in the banner fog and the kiri flood; a slash across 棚 emits `tana.slashed`) |
 
 ## The arm's hand
 
@@ -52,13 +52,13 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 |---|---|---|---|
 | `hand.state` | `{ self, from, to, data }` | `core/machine.js` on every switch of the arm (`set`, a direct `c.st` write too), after `enter`; `from: null` for the first | `reactions.js`: on `reach` -> `eat`, `severed.pounce(card, grip)` (the cheese pull; one random draw only when an old hand is about) |
 | `hand.said` | `{ kind, ms, text }` | the `arm` speaker's `onSaid`: a hand line went up (`kind` = key without `hand.`, `text` = the bubble's words) | `reactions.js`: on `severed`, if the katana is loose, `katana.brag()`; `page/diary.js` writes it down (the phrasebook's secret chapter) |
-| `hand.grabbed` | `{ card, how }` | `tug.js` `tug` (`how: 'tug'`): after `set('tug')` and the forced `hand.grab`. `behaviours/catch.js` (`'catch'`): **before** the `hand.caught` line and the 0.3 crush draw. `behaviours/reach.js` (`'reach'`): before the 0.4 crush draw. `behaviours/snatch.js` (`'snatch'`): after `set('crush')` and `hand.snatch` | `actors/cards.js`: forced `card.pull` for `catch` / `reach` |
+| `hand.grabbed` | `{ card, how }` | `tug.js` `tug` (`how: 'tug'`): after `set('tug')` and the forced `hand.grab`. `behaviours/catch.js` (`'catch'`): **before** the `hand.caught` line and the 0.3 crush draw. `behaviours/reach.js` (`'reach'`): before the 0.4 crush draw. `behaviours/snatch.js` (`'snatch'`): after `set('crush')` and `hand.snatch` | `actors/cards.js`: forced `card.pull` for `catch` / `reach`; `page/bread.js`: the caught toast's `bread.caught` (plain) |
 | `hand.slipped` | `{ card }` | `tug.js` `slip` (a sharp yank): after `set('sulk')` and `hand.slip`; `behaviours/triumph.js`: you took its half back, after `hand.slip` | none |
 | `hand.rejected` | `{ card }` | `actors/hand/behaviours/catch.js`: it batted a thrown scrap (a piece under `TUNE.hand.PIECE_BIG` of a card) back | nobody yet |
 | `hand.ripped` | `{ mine, its }` | `tug.js` `rip`: after the strands and gore, before `set('triumph')`, the `hand.rip` line and the shake | `actors/cards.js`: forced `card.slice` scream on your half |
 | `hand.tossed` | `{ card, hard }` | `behaviours/has.js`: bored after 2 s; after the 0.3 hard draw and the toss velocity, before `set('lurk')` and `hand.toss` | `actors/cards.js`: forced `card.throw` when `hard` |
 | `hand.crushed` | `{ at }` | `behaviours/crush.js` `hold`: last, after `card.crushed`, `set('gloat')` and `hand.crush` | none |
-| `hand.ate` | `{ card }` | `behaviours/eat.js`: after `remove(card)`, the gore and the forced `hand.eat` (`hand.burp` for an old hand's gift, `card.ball`) | `reactions.js`: for a gift, `severed.regift(card)` (the old hand that brought it complains) |
+| `hand.ate` | `{ card }` | `behaviours/eat.js`: after `remove(card)`, the gore and the forced `hand.eat` (`hand.burp` for an old hand's gift, `card.ball`; `hand.toastEat` for the fallen toast, kind `'toast'`) | `reactions.js`: for a gift, `severed.regift(card)` (the old hand that brought it complains); `page/basement.js`: pins it on the trophy wall (a toast as its message) |
 | `hand.severed` | `{ x, y, a, pose, v, at, crushed }` | `index.js` `sever` (the blade crossed the arm, tick phase `hand`): after `letGo()`, **before** the gore, `set('stump')` and the forced `hand.severed` line. `crushed`: the card it was crushing, or null | `actors/cards.js`: forced `card.stab` on `crushed`; `reactions.js`: `severed.spawn(x, y, a, pose, { v })` (random facing and spin) |
 | `hand.regrown` | `{}` | `behaviours/stump.js`: after `TUNE.hand.STUMP_S`, after `set('regrow')` | none |
 | `hand.met` | `{ hand }` | `behaviours/meet.js` enter, after its "meet" line (rules in `actors/hand/old.js`) | `reactions.js`: the old hand stares back (`stare`); `scenes/rps.js` `maybe` (rock, paper, scissors: off under tests, then one random draw) |
@@ -77,6 +77,7 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 | `hand.wrest` | `{ hand, card }` | `behaviours/wrest.js`: tug of war over a card. Its grip reached the free end of the card old hand `hand` is crushing; before it sets up the tug (`card.tug.wrest`) and says its line | `reactions.js`: `severed.wrest(hand, card)`: the old hand stops squeezing (`crush` leaves, the card is unsquashed) and hangs on to its end (`wrest`) |
 | `hand.wrested` | `{ hand, card, mine, its }` | `behaviours/wrest.js`: the tug of war ended. Torn in two (after `split`'s draws, the strands, the card's scream, `set('eat')`; `mine` the old hand's half, `its` the arm's); the old hand slipped or was picked up (after `untug`, `set('eat')`; `mine: null`, `its` the whole card); you clicked the arm (after `untug`, `set('sulk')`; `mine` the whole card, `its: null`); before the `hand.wrestEnd` / `hand.wrestWon` / `hand.wrestSlip` line | `reactions.js`: `severed.wrested(hand, mine, !its)`: with the card or its half it says `sev.wrestWon` / `sev.wrestEnd` and crushes it (`crush`) |
 | `hand.shookOff` | `{}` | `behaviours/pulled.js`: the hand tower dragged it out and it shook the old hands off (after `SHAKE_S` of shaking); before `set('sulk')` and its `hand.towerSulk` line | `reactions.js`: `severed.shookOff()`: the three are flung (`tumble`, random speeds and spins) and land dizzy in a heap |
+| `hand.pestered` | `{ hand, n }` | `behaviours/mine.js` (idle-old): its fingertip reached your still cursor in its turn with old hand `hand` (it goes on alone if that one stops answering); `n`: pokes so far, the old hand's and its own; after its unforced `hand.pesterTurn` line (from the third poke) | `reactions.js`: `severed.pesterTurn(hand, n)`: the old hand's turn, after `TUNE.severed.PESTER.RALLY` `GAP_MS * DECAY^n` |
 
 ## Cut-off hands
 
@@ -85,7 +86,7 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 | `sev.spawned` | `{ hand }` | `actors/severed/index.js` `spawn`: after the machine starts in `limp`, before the fling velocity and spin draw | none |
 | `sev.state` | `{ self, from, to, data }` | `core/machine.js` on every switch of a cut-off hand | `reactions.js`: on `-> crush`, `hand.wrest(self, prey)` (tug of war over the card: one random draw only when the arm could go for it, rules in `hand/old.js` `wrestable`) |
 | `sev.avenged` | `{ hand }` | `actors/severed/behaviours/avenge.js`: the old hand hauled the loose katana to the right edge and threw it at the arm | `reactions.js`: `hand.cut()` (the new hand comes off; the two old hands then high-five) |
-| `sev.gone` | `{ hand }` | `actors/severed/index.js` `gone` (on `body.removed`): after its machine ended and its SVGs were removed | none |
+| `sev.gone` | `{ hand }` | `actors/severed/index.js` `gone` (on `body.removed`): after its machine ended and its SVGs were removed | `actors/severed/dance.js` (crazy mode's inline overrides put back when it was the last); `reactions.js`: the last one gone, `hand.bob(false)` |
 | `sev.hitched` | `{ hand, card }` | `behaviours/hitch.js`: the jump onto a card you picked up is done and the joint made (after the "latch" line said on the way up) | none |
 | `sev.cheese` | `{ hand, card }` | `behaviours/hitch.js`: an old hand that pounced (`severed.pounce`, on `hand.state` reach -> eat) landed on the far end of the card the arm drags off the shelf; before it checks whether the arm took up the fight | `reactions.js`: `hand.cheese(hand, card)`: the arm goes `cheese` if it is still eating that card |
 | `sev.slipped` | `{ hand, card }` | `behaviours/wrest.js` (severed): you clicked an old hand in a tug of war (pressed and let go within `TUNE.severed.WREST.TAP_S`); before its `sev.wrestSlip` line and `whee` (the arm sees it leave `wrest` and keeps the card) | none |
@@ -95,6 +96,7 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 | `sev.tower` | `{ hand, x, y }` | `actors/severed/tower.js` `towerTick`: the tower is up (phase `reach`) and the arm lurks; at most once a second; x, y: the top one's fingertips, page px | `reactions.js`: `hand.peer(x, y)`: the arm leans in to look (`peer`) |
 | `sev.towerGrab` | `{ hand, hands }` | `actors/severed/tower.js` `towerTick`: the top one's fingertips are within `TOWER.GRAB_PX` of the peering arm's grip; after its `sev.towerPull` line | `reactions.js`: `hand.pulled()`: the arm goes `pulled` |
 | `sev.towerFell` | `{ why }` | `actors/severed/tower.js` `end`: the tower came down before the arm shook them off (`held`: you picked one up; `knocked`; `slow`: `BUILD_S`; `bored`: `REACH_S`; `gone`: the arm left); after the hands switched to `tumble` | `reactions.js`: `hand.towerFell()`: peering, it laughs (`lurk`); pulled, it snaps back (`sulk`) |
+| `sev.pestered` | `{ hand, n }` | `actors/severed/behaviours/pester.js` (idle-old): at the top of a jump, its fingertip on your still cursor (`actors/severed/pester.js` sent it: the mouse still `TUNE.severed.PESTER.STILL_MS`, off while `window.__test.idle === false`); `n`: pokes so far; after its `sev.pesterPoke` / `sev.pesterRetort` line | `reactions.js`: `hand.pesterTurn(hand, n)`: in `mine` with that old hand, the arm's turn |
 
 ## Shelf, scenes, phrasebook
 
@@ -110,12 +112,13 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 | `scene.ended` | `{ name, killed }` | `scenes/scene.js` `done()` (the scene's finally) | none |
 | `phrasebook.opened` | `{}` | `phrasebook/menu.js` `open`: last (after the raid timer is armed and the DOM `pb-open` event) | none |
 | `phrasebook.closed` | `{}` | `phrasebook/menu.js` `close`: after `raidStop` and the DOM `pb-close` event | none |
+| `phrasebook.spoke` | `{ key, text, who, heard }` | `phrasebook/say.js`: a line chip was selected in the open phrasebook and its owner (`who`: `card`, `katana`, `hand`, `old`) poked in beside the menu; after its bubble went up. `heard` false: it refused, and `text` is the refusal | none |
 
 ## Page and world
 
 | event | payload | emitted by, exactly when | listeners today |
 |---|---|---|---|
-| `mode.changed` | `{ crazy }` | `page/crazy.js` `applyMode`: after the title timer and the fog loop switch, before `render()` | none |
+| `mode.changed` | `{ crazy }` | `page/crazy.js` `applyMode`: after the title timer and the fog loop switch, before `render()` | `reactions.js` (only with old hands on the page): `severed.groove(crazy)` (on: they dance; off: the dancers freeze and pretend), `hand.bob(crazy)` (the arm bobs at the edge), and off after a dance `hand.notice('danced')` (one or two random draws) |
 | `theme.changed` | `{ dark }` | `page/theme.js` `syncTheme`: at install, on the theme button (before `refog()`), on a system scheme change | `page/fog.js`: recomputes the fog colour |
 | `language.changed` | `{ languages }` | `page/language.js` `set`: after storing the choice, just before `location.reload()` (`null` = all) | none |
 | `world.reset` | `{}` | `world/world.js` `reset` ("Put the cards back"): **first**, before the cards, pieces and shards are removed. Only those are removed: the hand, a cut-off hand and the katana are left exactly as they are (Ivo 2026-11-25) | `actors/cards.js` (grid cards regrow), `world/cut.js` (wounds) |
@@ -124,6 +127,8 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 | `data.loaded` | `{ data }` | `page/directory.js`: `projects.json` arrived, after `render()` | `reactions.js`: `welcomeBack` after `TUNE.surprise.WELCOME_MS` (wall time) |
 | `cards.rendered` | `{}` | `page/directory.js` `render`: after the calm grid is rebuilt (not in crazy mode), before the DOM `cards-rendered` event | `actors/cards.js`: drops rooted bodies, keeps torn-out cards hidden |
 | `ui.toast` | `{ msg }` | `actors/cards.js` (first rip), `world/shatter.js` (1st and 10th smash), `actors/hand/tug.js` (first halving), `actors/hand/index.js` (first sever), `actors/katana.js` (found, drawn), `actors/shelf.js` (open / close) | `reactions.js`: `toast.show(msg)` |
+| `search.fed` | `{ what, body, key, query }` | `page/feed.js`: something dropped on the search box has typed itself in (`query`) and the grid filtered, after the scrap's toast. `what`: `'card'` (`key`: its slot) \| `'scrap'` \| `'hand'` (`body`: the old hand) | `reactions.js`: `cards.putBack(key)` for a card (it grows back into its slot, `card.home`); `severed.notThere(body)` for an old hand (`sev.notthere`) |
+| `tana.slashed` | `{ at }` | `page/slash.js` `tana`: the katana's tip went fast across the hidden 棚 writing (in and out), the shelf was in and no slash in the last `TUNE.fogSlash.COOL_MS`; after the writing splits. `at`: where it left, page px | `reactions.js`: `katana.tana()` (line `katana.tana`), then `shelf.toggle()` if the shelf is still in |
 
 ## Notes
 

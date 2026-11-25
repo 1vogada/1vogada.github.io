@@ -40,17 +40,24 @@ public API. Every module exports `install(app)`; `app` holds every module by its
 | the arm's hand (18 states) | `src/actors/hand/index.js` (tick, speech, sever), `behaviours/<state>.js`, `tug.js` (tug, slip, rip, crush helpers), `draw.js`, `poses.js`, `zones.js` | `src/lines/hand.js` | `styles/hand.css` |
 | cut-off hands (7 states) | `src/actors/severed/index.js`, `behaviours/<state>.js`, `gait.js` (legs, walking forces) | `src/lines/severed.js` | `styles/hand.css` |
 | the secret shelf (棚 tana) | `src/actors/shelf.js`; opened by `src/page/kiri.js` (typed), `src/page/search.js` (Enter) | `src/lines/shelf.js` (toasts) | `styles/physics.css` |
+| the old hand pokes your still cursor first, then turns with the arm (idle-old) | `src/actors/severed/pester.js` (who, the pace), `severed/behaviours/pester.js`, `hand/behaviours/mine.js` ("that's MY job") | `sev.pester*`, `hand.pester*` | |
+| old hands dance in crazy mode, the arm bobs along | `src/actors/severed/dance.js` (groove, the inline overrides of crazy mode's hiding), `behaviours/dance.js`, `jive.js`, `freeze.js`; `src/actors/hand/bob.js` | `sev.dance/jive/freeze/pretend`, `hand.bob/danced` | inline styles only |
+| the secret shelf (棚 tana) | `src/actors/shelf.js`; opened by `src/page/kiri.js` (typed), `src/page/search.js` (Enter), `src/page/slash.js` (katana across 棚) | `src/lines/shelf.js` (toasts) | `styles/physics.css` |
 | who reacts to whom | `src/reactions.js` (`RULES`, plus `hand.senses(...)` for the shelf) | | |
 | speech bubbles (every one) | `src/core/speech.js`; each actor calls `defineSpeaker` in its `install` | | `styles/physics.css`, `hand.css` |
 | toasts | `src/page/toast.js` (actors emit `ui.toast`) | `toast.*` in each `src/lines/*.js` | `styles/base.css` |
+| the knocked-off toast as a body (kind `toast`) you can throw to the hand | `src/page/bread.js` (from `toast.js`; caught in `hand/behaviours/catch.js`) | `bread.*` in `src/lines/page.js`, `hand.toast`, `hand.toastEat` | inline |
 | greeting typewriter | `src/page/greeting.js` | `greeting.hello` in `src/lines/page.js` | |
 | banner fog; kiri flood and typed secrets | `src/page/fog.js`; `src/page/kiri.js` | `toast.fog` | `styles/fog.css` |
+| the katana slits the fog; slashing 棚 opens the shelf | `src/page/slash.js` (on `blade.moved`, in `reactions.js`); `slit` in `fog.js`, `kiri.js` | `katana.tana` | inline |
 | theme, crazy mode, English only | `src/page/theme.js`, `crazy.js`, `language.js` | | `styles/base.css`, `crazy.css` |
 | Surprise me, the omikuji slip, the secret × | `src/scenes/fortune.js` | `fortune.slip` in `src/lines/page.js` | `styles/omikuji.css` |
 | the coin game; welcome back; scene runner | `src/scenes/coin.js`; `welcome-back.js`; `scene.js` | `hand.*`, `button.hi` | `styles/omikuji.css` |
 | phrasebook menu, its drawings, the raid | `src/phrasebook/menu.js` (`CHAPTERS`), `figures.js`, `raid.js` | `src/lines/phrasebook.js` (`raid.*`) | `styles/phrasebook.css` |
+| phrase-say: select a line in the open phrasebook, its owner says it beside the menu (or refuses a line you never heard) | `src/phrasebook/say.js` (heard via `core/speech.js` `onSaid`) | `card.notyet`, `katana.notyet`, `hand.notyet`, `sev.notyet`, `toast.sayNobody` in `src/lines/phrasebook.js` | inline |
 | every tuning number and timing | `src/core/tune.js` (`TUNE`, `TIMING`) | | |
 | test hooks (`window.__*`), `?debug` | `src/core/debug.js` | | |
+| feed the search box: drop a card, a scrap or an old hand on it and it searches for it | `src/page/feed.js` (`body.dropped` in `reactions.js`; `cards.putBack`, `severed.notThere`) | `card.eaten`, `card.home`, `sev.notthere`, `search.gulp`, `search.spit`, `toast.scrap` | |
 | install order | `src/main.js` (`ORDER`) | | |
 
 ## How a frame runs

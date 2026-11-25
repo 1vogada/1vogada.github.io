@@ -71,6 +71,7 @@ import * as hPeer from './actors/hand/behaviours/peer.js';
 import * as hPulled from './actors/hand/behaviours/pulled.js';
 import * as handIdle from './actors/hand/idle.js';
 import * as handOld from './actors/hand/old.js';
+import * as handBob from './actors/hand/bob.js';
 import * as hand from './actors/hand/index.js';
 import * as sevGait from './actors/severed/gait.js';
 import * as sLimp from './actors/severed/behaviours/limp.js';
@@ -104,7 +105,14 @@ import * as sGather from './actors/severed/behaviours/gather.js';
 import * as sTower from './actors/severed/behaviours/tower.js';
 import * as sTumble from './actors/severed/behaviours/tumble.js';
 import * as sevTower from './actors/severed/tower.js';
+import * as sDance from './actors/severed/behaviours/dance.js';
+import * as sJive from './actors/severed/behaviours/jive.js';
+import * as sFreeze from './actors/severed/behaviours/freeze.js';
+import * as sevDance from './actors/severed/dance.js';
 import * as severed from './actors/severed/index.js';
+import * as hMine from './actors/hand/behaviours/mine.js';
+import * as sPester from './actors/severed/behaviours/pester.js';
+import * as sevPester from './actors/severed/pester.js';
 import * as shelf from './actors/shelf.js';
 
 import * as reactions from './reactions.js';
@@ -125,7 +133,11 @@ import * as eggs from './page/eggs.js';
 import * as omikuji from './page/omikuji.js';
 import * as diary from './page/diary.js';
 import * as basement from './page/basement.js';
+import * as bread from './page/bread.js';
+import * as phraseSay from './phrasebook/say.js';
+import * as slash from './page/slash.js';
 import * as konsole from './page/console.js';
+import * as feed from './page/feed.js';
 import * as commands from './core/commands.js';
 
 import * as menu from './phrasebook/menu.js';
@@ -150,9 +162,10 @@ export const ORDER = [
   ['handPoses', handPoses], ['handDraw', handDraw], ['handZones', handZones], ['handTug', handTug],
   ['hOff', hOff], ['hLurk', hLurk], ['hReach', hReach], ['hEager', hEager], ['hLunge', hLunge], ['hSnatch', hSnatch], ['hCatch', hCatch],
   ['hCrush', hCrush], ['hGloat', hGloat], ['hTug', hTug], ['hHas', hHas], ['hTriumph', hTriumph], ['hEat', hEat], ['hShow', hShow],
-  ['hStump', hStump], ['hRegrow', hRegrow], ['hSulk', hSulk], ['hBook', hBook], ['hMeet', hMeet], ['hDevour', hDevour], ['handOld', handOld], ['hPoke', hPoke], ['hProd', hProd], ['hPaper', hPaper], ['hSew', hSew], ['hSewn', hSewn], ['hCheese', hCheese], ['hWrest', hWrest], ['hPeer', hPeer], ['hPulled', hPulled], ['handIdle', handIdle], ['hand', hand],
-  ['sevGait', sevGait], ['sLimp', sLimp], ['sRise', sRise], ['sWalk', sWalk], ['sHeld', sHeld], ['sCrush', sCrush], ['sGloat', sGloat], ['sRest', sRest], ['sStare', sStare], ['sCaught', sCaught], ['sMourn', sMourn], ['sBow', sBow], ['sHide', sHide], ['sLeap', sLeap], ['sCower', sCower], ['sPaint', sPaint], ['sAvenge', sAvenge], ['sFive', sFive], ['sMirror', sMirror], ['sDead', sDead], ['sHome', sHome], ['sHitch', sHitch], ['sWhee', sWhee], ['sDizzy', sDizzy], ['sCheese', sCheese], ['sWrest', sWrest], ['sGift', sGift], ['sRps', sRps], ['sGather', sGather], ['sTower', sTower], ['sTumble', sTumble], ['sevTower', sevTower],
+  ['hStump', hStump], ['hRegrow', hRegrow], ['hSulk', hSulk], ['hBook', hBook], ['hMeet', hMeet], ['hDevour', hDevour], ['handOld', handOld], ['hPoke', hPoke], ['hProd', hProd], ['hPaper', hPaper], ['hSew', hSew], ['hSewn', hSewn], ['hCheese', hCheese], ['hWrest', hWrest], ['hPeer', hPeer], ['hPulled', hPulled], ['handIdle', handIdle], ['handBob', handBob], ['hand', hand],
+  ['sevGait', sevGait], ['sLimp', sLimp], ['sRise', sRise], ['sWalk', sWalk], ['sHeld', sHeld], ['sCrush', sCrush], ['sGloat', sGloat], ['sRest', sRest], ['sStare', sStare], ['sCaught', sCaught], ['sMourn', sMourn], ['sBow', sBow], ['sHide', sHide], ['sLeap', sLeap], ['sCower', sCower], ['sPaint', sPaint], ['sAvenge', sAvenge], ['sFive', sFive], ['sMirror', sMirror], ['sDead', sDead], ['sHome', sHome], ['sHitch', sHitch], ['sWhee', sWhee], ['sDizzy', sDizzy], ['sCheese', sCheese], ['sWrest', sWrest], ['sGift', sGift], ['sRps', sRps], ['sGather', sGather], ['sTower', sTower], ['sTumble', sTumble], ['sevTower', sevTower], ['sDance', sDance], ['sJive', sJive], ['sFreeze', sFreeze], ['sevDance', sevDance],
   ['severed', severed], ['shelf', shelf],
+  ['hMine', hMine], ['sPester', sPester], ['sevPester', sevPester],   // the old hand pokes you instead (idle-old)
   // 5 the rules between features (after every actor: own listeners first)
   ['reactions', reactions],
   // 6 the page below the physics in legacy script order
@@ -164,6 +177,11 @@ export const ORDER = [
   ['language', language],
   // 9 easter eggs (after everything they reach)
   ['commands', commands], ['away', away], ['console', konsole], ['eggs', eggs], ['omikuji', omikuji], ['diary', diary], ['basement', basement],
+  ['bread', bread],
+  // 10 chains
+  ['feed', feed],
+  ['phraseSay', phraseSay],
+  ['slash', slash],
 ];
 
 /** the app every install(app) receives: each module by name, plus a few flags */
