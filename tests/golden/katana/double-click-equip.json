@@ -1,0 +1,189 @@
+{
+ "scenario": "katana / double-click equip",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 400,
+   "ms": 2420,
+   "who": "card",
+   "key": "SAY.khello",
+   "text": "世界一切れる刀です"
+  },
+  {
+   "doc": 1,
+   "t": 2820,
+   "ms": 1772,
+   "who": "card",
+   "key": "SAY.kdrop",
+   "text": "I meant to do that"
+  },
+  {
+   "doc": 1,
+   "t": 3552,
+   "ms": 1315,
+   "who": "card",
+   "key": "SAY.cutting",
+   "text": "IT IS IN ME"
+  },
+  {
+   "doc": 1,
+   "t": 3680,
+   "ms": 1312,
+   "who": "card",
+   "key": "SAY.slice",
+   "text": "HHHHRRRKK—",
+   "lvl": "2"
+  },
+  {
+   "doc": 1,
+   "t": 5024,
+   "ms": null,
+   "who": "hand",
+   "key": "CLAW_SAY.cut",
+   "text": "messy."
+  },
+  {
+   "doc": 1,
+   "t": 5940,
+   "ms": null,
+   "who": "card",
+   "key": "SAY.kdrop|CLAW_SAY.kdrop",
+   "text": "butterfingers"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 16,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 256,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "found",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 450,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "equipped",
+   "shelf": false,
+   "grab": "katana",
+   "objs": {
+    "katana": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 2870,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "katana": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 3720,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "katana": 1,
+    "piece": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 3920,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "katana": 1,
+    "piece": 4
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4020,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "katana": 1,
+    "piece": 6
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4220,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "katana": 1,
+    "piece": 8
+   }
+  },
+  {
+   "doc": 1,
+   "t": 5990,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "equipped",
+   "shelf": false,
+   "grab": "katana",
+   "objs": {
+    "katana": 1,
+    "piece": 8
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6260,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "katana": 1,
+    "piece": 8
+   }
+  }
+ ]
+}

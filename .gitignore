@@ -1,0 +1,3 @@
+node_modules/
+# screenshots and actual traces the test harness writes when asked (SHOTS=1) or when a trace differs
+tests/shots/

@@ -1,0 +1,463 @@
+{
+ "scenario": "phrasebook / raid with all four picks (throw, eat, help, scroll) and the swat",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 5536,
+   "ms": 1712,
+   "who": "pb-hand",
+   "key": "PB.RAID_SAY",
+   "text": "you read too slow"
+  },
+  {
+   "doc": 1,
+   "t": 10400,
+   "ms": 720,
+   "who": "pb-card",
+   "key": "SAY.rip",
+   "text": "nooo!"
+  },
+  {
+   "doc": 1,
+   "t": 10608,
+   "ms": 1712,
+   "who": "pb-hand",
+   "key": "PB.RAID_SAY",
+   "text": "I am in this one!"
+  },
+  {
+   "doc": 1,
+   "t": 11120,
+   "ms": 160,
+   "who": "pb-card",
+   "key": "SAY.throw",
+   "text": "NOOO"
+  },
+  {
+   "doc": 1,
+   "t": 11280,
+   "ms": 1300,
+   "who": "pb-scream",
+   "key": "SAY.smash",
+   "text": "NOOOOO!!"
+  },
+  {
+   "doc": 1,
+   "t": 13024,
+   "ms": 1312,
+   "who": "pb-card",
+   "key": "SAY.rip|CLAW_SAY.sulk|PB.SWAT_SAY",
+   "text": "rude."
+  },
+  {
+   "doc": 1,
+   "t": 14352,
+   "ms": 1616,
+   "who": "pb-hand",
+   "key": "CLAW_SAY.eat|SEV_SAY.crush",
+   "text": "*crunch*"
+  },
+  {
+   "doc": 1,
+   "t": 17200,
+   "ms": 1312,
+   "who": "pb-card",
+   "key": "SAY.rip|PB.SWAT_SAY",
+   "text": "ау!"
+  },
+  {
+   "doc": 1,
+   "t": 17504,
+   "ms": 416,
+   "who": "pb-hand",
+   "key": "PB.HELP_SAY",
+   "text": "you pull, I pull"
+  },
+  {
+   "doc": 1,
+   "t": 17920,
+   "ms": 1792,
+   "who": "pb-hand",
+   "key": "CLAW_SAY.rip",
+   "text": "CHEESE PULL!!!!"
+  },
+  {
+   "doc": 1,
+   "t": 19712,
+   "ms": 1616,
+   "who": "pb-hand",
+   "key": "CLAW_SAY.eat",
+   "text": "papery."
+  },
+  {
+   "doc": 1,
+   "t": 21920,
+   "ms": 1520,
+   "who": "pb-hand",
+   "key": "PB.SCROLL_SAY",
+   "text": "where were we?"
+  },
+  {
+   "doc": 1,
+   "t": 24528,
+   "ms": 1504,
+   "who": "pb-hand",
+   "key": "PB.MORE_SAY",
+   "text": "not done"
+  },
+  {
+   "doc": 1,
+   "t": 27136,
+   "ms": 1504,
+   "who": "pb-hand",
+   "key": "PB.MORE_SAY",
+   "text": "one more lap"
+  },
+  {
+   "doc": 1,
+   "t": 29744,
+   "ms": 1904,
+   "who": "pb-hand",
+   "key": "NOTME|PB.HIDE_SAY",
+   "text": "I was never here"
+  },
+  {
+   "doc": 1,
+   "t": 33254,
+   "ms": 1498,
+   "who": "pb-hand",
+   "key": "PB.SWAT_SAY",
+   "text": "my knuckles!"
+  },
+  {
+   "doc": 1,
+   "t": 39008,
+   "ms": 46,
+   "who": "pb-hand",
+   "key": "PB.GRUDGE_SAY",
+   "text": "do not hit me"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 20,
+   "claw": "off",
+   "sev": "",
+   "pb": "open",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 5020,
+   "claw": "off",
+   "sev": "",
+   "pb": "raid:wait",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 5070,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:enter",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 6770,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:reach:throw",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 9520,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:grip:throw",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 10420,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:wind:throw",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 11070,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:throw:throw",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 11570,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:rest",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 12320,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:pick",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 12370,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:reach:eat",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 12470,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:grip:eat",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 13070,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:eat:eat",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 14370,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:chew:eat",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 15770,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:rest",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 16370,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:pick:help",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 16420,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:reach:help",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 16670,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:grip:help",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 17220,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:offer:help",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 17924,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:eat:help",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 19738,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:chew:help",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 21138,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:rest",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 21738,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:pick:scroll",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 21788,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:scroll:scroll",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 29788,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:hide:scroll",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 32888,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:rest",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 33188,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:reach:throw",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 33304,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:swat",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 39054,
+   "claw": "book",
+   "sev": "",
+   "pb": "raid:reach:eat",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 39074,
+   "claw": "off",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  }
+ ]
+}

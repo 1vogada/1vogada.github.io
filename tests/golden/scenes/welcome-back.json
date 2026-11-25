@@ -1,0 +1,97 @@
+{
+ "scenario": "scenes / welcome back",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 1600,
+   "ms": 1520,
+   "who": "hand",
+   "key": "CLAW_SAY.back",
+   "text": "that bad, huh?"
+  },
+  {
+   "doc": 1,
+   "t": 4800,
+   "ms": 1312,
+   "who": "hand",
+   "key": "CLAW_SAY.smashbtn",
+   "text": "not these."
+  },
+  {
+   "doc": 1,
+   "t": 7510,
+   "ms": 1514,
+   "who": "hand",
+   "key": "CLAW_SAY.better",
+   "text": "there. better."
+  },
+  {
+   "doc": 1,
+   "t": 9610,
+   "ms": 614,
+   "who": "hand",
+   "key": "CLAW_SAY.rematch",
+   "text": "double or nothing?"
+  },
+  {
+   "doc": 1,
+   "t": 10224,
+   "ms": 1392,
+   "who": "hand",
+   "key": "CLAW_SAY.heads",
+   "text": "it is heads."
+  },
+  {
+   "doc": 1,
+   "t": 12250,
+   "ms": 1302,
+   "who": "hand",
+   "key": "CLAW_SAY.won",
+   "text": "lucky."
+  },
+  {
+   "doc": 1,
+   "t": 14350,
+   "ms": 1522,
+   "who": "hand",
+   "key": "CLAW_SAY.stay",
+   "text": "stay. for now."
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 50,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 900,
+   "claw": "show",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 17270,
+   "claw": "sulk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  }
+ ]
+}

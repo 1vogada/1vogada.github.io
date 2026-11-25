@@ -1,0 +1,85 @@
+{
+ "scenario": "katana / draw from the banner",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 912,
+   "ms": 2560,
+   "who": "card",
+   "key": "SAY.khello",
+   "text": "careful: I cut things just by touching them"
+  },
+  {
+   "doc": 1,
+   "t": 3472,
+   "ms": 1312,
+   "who": "card",
+   "key": "SAY.kdrop",
+   "text": "oops."
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 16,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 256,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "found",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 432,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "rooted",
+   "shelf": false,
+   "grab": "katana:rooted",
+   "objs": {
+    "katana": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 912,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": false,
+   "grab": "katana",
+   "objs": {
+    "katana": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 3488,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "katana": 1
+   }
+  }
+ ]
+}

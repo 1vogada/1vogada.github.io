@@ -1,0 +1,409 @@
+{
+ "scenario": "shelf / hand reach with card panic tiers and bystander lines",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 3432,
+   "ms": 792,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 4224,
+   "ms": 1392,
+   "who": "card",
+   "key": "SAY.rip",
+   "text": "I was comfy!"
+  },
+  {
+   "doc": 1,
+   "t": 6320,
+   "ms": 800,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "hey!"
+  },
+  {
+   "doc": 1,
+   "t": 7120,
+   "ms": 1312,
+   "who": "card",
+   "key": "SAY.rip|CLAW_SAY.sulk|PB.SWAT_SAY",
+   "text": "rude."
+  },
+  {
+   "doc": 1,
+   "t": 8080,
+   "ms": 1456,
+   "who": "hand",
+   "key": "CLAW_SAY.loose",
+   "text": "bring it here"
+  },
+  {
+   "doc": 1,
+   "t": 10368,
+   "ms": 1776,
+   "who": "hand",
+   "key": "CLAW_SAY.shelf",
+   "text": "don't mind if I do"
+  },
+  {
+   "doc": 1,
+   "t": 10384,
+   "ms": 1008,
+   "who": "card",
+   "key": "PANIC.0",
+   "text": "is that… coming here?"
+  },
+  {
+   "doc": 1,
+   "t": 10384,
+   "ms": 1456,
+   "who": "card",
+   "key": "NOTME",
+   "text": "not me. phew."
+  },
+  {
+   "doc": 1,
+   "t": 11392,
+   "ms": 1056,
+   "who": "card",
+   "key": "PANIC.1",
+   "text": "somebody pick me up!",
+   "lvl": "1"
+  },
+  {
+   "doc": 1,
+   "t": 12448,
+   "ms": 896,
+   "who": "card",
+   "key": "PANIC.1",
+   "text": "not me not me not me",
+   "lvl": "1"
+  },
+  {
+   "doc": 1,
+   "t": 13072,
+   "ms": 1648,
+   "who": "card",
+   "key": "NOTME",
+   "text": "don't look at me"
+  },
+  {
+   "doc": 1,
+   "t": 13344,
+   "ms": 800,
+   "who": "card",
+   "key": "PANIC.2",
+   "text": "PICK ME UP PICK ME UP",
+   "lvl": "2"
+  },
+  {
+   "doc": 1,
+   "t": 14144,
+   "ms": 688,
+   "who": "card",
+   "key": "PANIC.2",
+   "text": "I CAN SMELL IT",
+   "lvl": "2"
+  },
+  {
+   "doc": 1,
+   "t": 14832,
+   "ms": 608,
+   "who": "card",
+   "key": "PANIC.2",
+   "text": "PICK ME UP PICK ME UP",
+   "lvl": "2"
+  },
+  {
+   "doc": 1,
+   "t": 15440,
+   "ms": 576,
+   "who": "card",
+   "key": "PANIC.2",
+   "text": "I CAN SMELL IT",
+   "lvl": "2"
+  },
+  {
+   "doc": 1,
+   "t": 15760,
+   "ms": 1456,
+   "who": "card",
+   "key": "NOTME",
+   "text": "not me. phew."
+  },
+  {
+   "doc": 1,
+   "t": 16016,
+   "ms": 560,
+   "who": "card",
+   "key": "PANIC.2",
+   "text": "PICK ME UP PICK ME UP",
+   "lvl": "2"
+  },
+  {
+   "doc": 1,
+   "t": 16576,
+   "ms": 1024,
+   "who": "card",
+   "key": "PANIC.2",
+   "text": "I CAN SMELL IT",
+   "lvl": "2"
+  },
+  {
+   "doc": 1,
+   "t": 16976,
+   "ms": 800,
+   "who": "hand",
+   "key": "CLAW_SAY.snatch",
+   "text": "YOINK"
+  },
+  {
+   "doc": 1,
+   "t": 17424,
+   "ms": 1312,
+   "who": "card",
+   "key": "SAY.land",
+   "text": "I'm fine"
+  },
+  {
+   "doc": 1,
+   "t": 17600,
+   "ms": 1088,
+   "who": "card",
+   "key": "AGONY.1",
+   "text": "IT HURTS",
+   "lvl": "1"
+  },
+  {
+   "doc": 1,
+   "t": 17776,
+   "ms": 1488,
+   "who": "hand",
+   "key": "CLAW_SAY.savour",
+   "text": "まだだよ"
+  },
+  {
+   "doc": 1,
+   "t": 18688,
+   "ms": 336,
+   "who": "card",
+   "key": "AGONY.1",
+   "text": "LET GO LET GO",
+   "lvl": "1"
+  },
+  {
+   "doc": 1,
+   "t": 19024,
+   "ms": 464,
+   "who": "card",
+   "key": "AGONY.2",
+   "text": "AAAAAAA—",
+   "lvl": "2"
+  },
+  {
+   "doc": 1,
+   "t": 19488,
+   "ms": 1312,
+   "who": "hand",
+   "key": "CLAW_SAY.savour|SEV_SAY.squeeze",
+   "text": "shhh."
+  },
+  {
+   "doc": 1,
+   "t": 19488,
+   "ms": 1200,
+   "who": "card",
+   "key": "BEG",
+   "text": "моля те…"
+  },
+  {
+   "doc": 1,
+   "t": 20688,
+   "ms": 1296,
+   "who": "card",
+   "key": "AGONY.2",
+   "text": "I CAN SEE MY INSIDES",
+   "lvl": "2"
+  },
+  {
+   "doc": 1,
+   "t": 21280,
+   "ms": 880,
+   "who": "hand",
+   "key": "CLAW_SAY.savour|SEV_SAY.squeeze",
+   "text": "бавно…"
+  },
+  {
+   "doc": 1,
+   "t": 21984,
+   "ms": 176,
+   "who": "card",
+   "key": "AGONY.2",
+   "text": "AAAAAAAAAAAAAA",
+   "lvl": "2"
+  },
+  {
+   "doc": 1,
+   "t": 22160,
+   "ms": 1315,
+   "who": "card",
+   "key": "SAY.slice",
+   "text": "EEEEEEEEK!!",
+   "lvl": "2"
+  },
+  {
+   "doc": 1,
+   "t": 22160,
+   "ms": null,
+   "who": "hand",
+   "key": "CLAW_SAY.crush",
+   "text": "that is what teasing gets you"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 100,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 3080,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 3448,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4232,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 5988,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6336,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 7120,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": "card",
+   "objs": {
+    "card": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 10376,
+   "claw": "reach",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": null,
+   "objs": {
+    "card": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 16976,
+   "claw": "crush",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": null,
+   "objs": {
+    "card": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 22176,
+   "claw": "gloat",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 23476,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  }
+ ]
+}

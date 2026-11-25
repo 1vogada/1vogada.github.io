@@ -1,0 +1,18 @@
+{
+ "scenario": "world / reduced motion starts no physics",
+ "seed": 1,
+ "bubbles": [],
+ "states": [
+  {
+   "doc": 1,
+   "t": 16,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": null,
+   "shelf": null,
+   "grab": null,
+   "objs": {}
+  }
+ ]
+}

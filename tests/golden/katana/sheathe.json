@@ -1,0 +1,273 @@
+{
+ "scenario": "katana / sheathe",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 784,
+   "ms": 1644,
+   "who": "card",
+   "key": "SAY.khello",
+   "text": "sharpest blade in the world, hi!"
+  },
+  {
+   "doc": 1,
+   "t": 1856,
+   "ms": null,
+   "who": "card",
+   "key": "SAY.cutting",
+   "text": "痛い痛い痛い!!"
+  },
+  {
+   "doc": 1,
+   "t": 1872,
+   "ms": 1835,
+   "who": "card",
+   "key": "SAY.stab",
+   "text": "you missed. mostly."
+  },
+  {
+   "doc": 1,
+   "t": 1968,
+   "ms": 1776,
+   "who": "card",
+   "key": "SAY.stab",
+   "text": "just a flesh wound"
+  },
+  {
+   "doc": 1,
+   "t": 2080,
+   "ms": 1392,
+   "who": "card",
+   "key": "SAY.slice",
+   "text": "AAAAAAARGH!!",
+   "lvl": "2"
+  },
+  {
+   "doc": 1,
+   "t": 2832,
+   "ms": 944,
+   "who": "card",
+   "key": "SAY.khello",
+   "text": "hello! I'm the sharpest katana ever!"
+  },
+  {
+   "doc": 1,
+   "t": 2960,
+   "ms": null,
+   "who": "hand",
+   "key": "CLAW_SAY.cut",
+   "text": "いい切れ味"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 16,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 256,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "found",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 432,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "rooted",
+   "shelf": false,
+   "grab": "katana:rooted",
+   "objs": {
+    "katana": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 784,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": false,
+   "grab": "katana",
+   "objs": {
+    "katana": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 928,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "katana": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 2028,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "katana": 1,
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 2128,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "katana": 1,
+    "card": 1,
+    "piece": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 2228,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "katana": 1,
+    "card": 1,
+    "piece": 4
+   }
+  },
+  {
+   "doc": 1,
+   "t": 2328,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "katana": 1,
+    "card": 1,
+    "piece": 6
+   }
+  },
+  {
+   "doc": 1,
+   "t": 2428,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "katana": 1,
+    "card": 1,
+    "piece": 8
+   }
+  },
+  {
+   "doc": 1,
+   "t": 2448,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "found",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1,
+    "piece": 8
+   }
+  },
+  {
+   "doc": 1,
+   "t": 2480,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "rooted",
+   "shelf": false,
+   "grab": "katana:rooted",
+   "objs": {
+    "card": 1,
+    "piece": 8,
+    "katana": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 2832,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": false,
+   "grab": "katana",
+   "objs": {
+    "card": 1,
+    "piece": 8,
+    "katana": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 2976,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "loose",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1,
+    "piece": 8,
+    "katana": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 3796,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "found",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1,
+    "piece": 8
+   }
+  }
+ ]
+}

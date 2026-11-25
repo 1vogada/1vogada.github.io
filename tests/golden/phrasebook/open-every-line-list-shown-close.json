@@ -1,0 +1,51 @@
+{
+ "scenario": "phrasebook / open, every line list shown, close",
+ "seed": 1,
+ "bubbles": [],
+ "states": [
+  {
+   "doc": 1,
+   "t": 20,
+   "claw": "off",
+   "sev": "",
+   "pb": "open",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 220,
+   "claw": "off",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 540,
+   "claw": "off",
+   "sev": "",
+   "pb": "open",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 3660,
+   "claw": "off",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  }
+ ]
+}

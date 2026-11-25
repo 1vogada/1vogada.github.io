@@ -1,0 +1,156 @@
+{
+ "scenario": "scenes / coin win",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 5170,
+   "ms": 950,
+   "who": "hand",
+   "key": "CLAW_SAY.ask",
+   "text": "this one. go?"
+  },
+  {
+   "doc": 1,
+   "t": 6120,
+   "ms": 1848,
+   "who": "hand",
+   "key": "CLAW_SAY.hello",
+   "text": "you said no. to ME?"
+  },
+  {
+   "doc": 1,
+   "t": 9020,
+   "ms": 1300,
+   "who": "hand",
+   "key": "CLAW_SAY.smashbtn",
+   "text": "not these."
+  },
+  {
+   "doc": 1,
+   "t": 11730,
+   "ms": 1518,
+   "who": "hand",
+   "key": "CLAW_SAY.better",
+   "text": "there. better."
+  },
+  {
+   "doc": 1,
+   "t": 13830,
+   "ms": 602,
+   "who": "hand",
+   "key": "CLAW_SAY.flip",
+   "text": "call it."
+  },
+  {
+   "doc": 1,
+   "t": 14432,
+   "ms": 1058,
+   "who": "hand",
+   "key": "CLAW_SAY.slap",
+   "text": "*slap*"
+  },
+  {
+   "doc": 1,
+   "t": 15490,
+   "ms": 1326,
+   "who": "hand",
+   "key": "CLAW_SAY.snap",
+   "text": "FINE. FINE!"
+  },
+  {
+   "doc": 1,
+   "t": 16740,
+   "ms": 2700,
+   "who": "btn",
+   "key": "SAY.btnhi",
+   "text": "pick me!"
+  },
+  {
+   "doc": 1,
+   "t": 17190,
+   "ms": 2700,
+   "who": "btn",
+   "key": "SAY.btnhi",
+   "text": "ей!"
+  },
+  {
+   "doc": 1,
+   "t": 19090,
+   "ms": 1320,
+   "who": "hand",
+   "key": "CLAW_SAY.yourpick",
+   "text": "pick. now."
+  },
+  {
+   "doc": 1,
+   "t": 20410,
+   "ms": 1382,
+   "who": "hand",
+   "key": "CLAW_SAY.heads",
+   "text": "it is heads."
+  },
+  {
+   "doc": 1,
+   "t": 22510,
+   "ms": 1314,
+   "who": "hand",
+   "key": "CLAW_SAY.won",
+   "text": "lucky."
+  },
+  {
+   "doc": 1,
+   "t": 24610,
+   "ms": 1518,
+   "who": "hand",
+   "key": "CLAW_SAY.stay",
+   "text": "stay. for now."
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 100,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 4620,
+   "claw": "show",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 27530,
+   "claw": "sulk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 29130,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  }
+ ]
+}

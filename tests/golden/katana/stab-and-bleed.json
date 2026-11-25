@@ -1,0 +1,67 @@
+{
+ "scenario": "katana / stab and bleed",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 420,
+   "ms": 2588,
+   "who": "card",
+   "key": "SAY.khello",
+   "text": "世界一切れる刀です"
+  },
+  {
+   "doc": 1,
+   "t": 1792,
+   "ms": 1315,
+   "who": "card",
+   "key": "SAY.cutting",
+   "text": "IT IS IN ME"
+  },
+  {
+   "doc": 1,
+   "t": 2192,
+   "ms": 1900,
+   "who": "card",
+   "key": "SAY.stab",
+   "text": "that's going to scar"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 20,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 276,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "found",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 470,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "equipped",
+   "shelf": false,
+   "grab": "katana",
+   "objs": {
+    "katana": 1
+   }
+  }
+ ]
+}
