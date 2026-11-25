@@ -10,6 +10,7 @@
 //    (wall-time removal, like the legacy setTimeout)
 //  - the arm is borrowed with hand.borrow() (legacy c.st = 'book') and given back with c.st = 'off' + hand.set('lurk')
 //  - DOM elements are picked with the shared picker (core/lines pick: one draw from Math.random, legacy window.__pick)
+//  - speak(key, text): phrase-say (./say.js) has the raiding hand say a line you picked in the menu, while it is in
 import { TUNE, TIMING } from '../core/tune.js';
 import { clock } from '../core/clock.js';
 import { pick } from '../core/lines.js';
@@ -303,6 +304,8 @@ function raidHand(dt) {
 export const start = raidStart;
 /** legacy raidStop: called when the menu closes */
 export const stop = raidStop;
+/** phrase-say (./say.js): the raiding hand, when it is in the menu (not swatted away), says text now. @returns the bubble element or null */
+export function speak(key, text) { const r = raid; if (!r || !r.c || r.st === 'swat') return null; const s = say(r, key, { as: 'raidHand', floor: 'hand', text }); return s ? s.el : null; }
 /** force the next act: 'throw' | 'eat' | 'help' | 'scroll' (legacy __phrasebook.next) */
 export function next(a) { if (raid) raid.force = a; }
 /** the raid part of legacy __phrasebook.state(), or null */

@@ -363,6 +363,15 @@ export const TUNE = {
   // (a throw flies on), is swallowed in GULP_MS (the box gulps after GULP_AT of it); then its name types itself in, TYPE_MS a
   // letter, and HOLD_MS after the last one the grid has its answer. An old hand is spat back up at SPIT m/s. SAY_DY: px above the box
   feed: { PAD_PX: 24, MAX_SPEED: 9, GULP_MS: 420, GULP_AT: 0.55, TYPE_MS: 75, HOLD_MS: 350, SPIT: 9, SAY_DY: -44 },
+  // phrase-say (phrasebook/say.js): select a line in the open phrasebook and its owner says it beside the menu. SETTLE_MS: the
+  // selection sits still this long first; IN_MS / OUT_MS: the slide in from the edge and back; CARD_W: px wide the card (or
+  // katana) that peeks out; SHOW: the share of it that comes out from behind the menu (or in from the screen's edge when the
+  // margin is too narrow, under GAP_PX to spare); TOP_PX: room kept above it for its bubble; BUBBLE_DY: the bubble's top this far
+  // above it; TILT / SHAKE: degrees it leans and trembles; HAND_IN: px the hand reaches in over the menu's right edge;
+  // HAND_DY: its bubble's top this far above the wrist; OLD_IN: px an old hand's fingers reach in over the left edge; BUBBLE_W: the
+  // widest a bubble gets before it wraps; MAX: lines remembered
+  phraseSay: { SETTLE_MS: 350, IN_MS: 420, OUT_MS: 360, CARD_W: 190, SHOW: 0.62, GAP_PX: 12, TOP_PX: 70, BUBBLE_DY: 46, TILT: -7, SHAKE: 2.5,
+    HAND_IN: 70, HAND_DY: 115, OLD_IN: 46, BUBBLE_W: 340, MAX: 800 },
   speech: {
     TILT: [4, 4],                // every bubble leans right by 4 + up to 4 degrees
     RIDE_DY: -40,                // a body's bubble sits this far above the top of its rotated box

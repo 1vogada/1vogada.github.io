@@ -129,6 +129,7 @@ import * as omikuji from './page/omikuji.js';
 import * as diary from './page/diary.js';
 import * as basement from './page/basement.js';
 import * as bread from './page/bread.js';
+import * as phraseSay from './phrasebook/say.js';
 import * as konsole from './page/console.js';
 import * as feed from './page/feed.js';
 import * as commands from './core/commands.js';
@@ -173,6 +174,7 @@ export const ORDER = [
   ['bread', bread],
   // 10 chains
   ['feed', feed],
+  ['phraseSay', phraseSay],
 ];
 
 /** the app every install(app) receives: each module by name, plus a few flags */

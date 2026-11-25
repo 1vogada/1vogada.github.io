@@ -112,6 +112,7 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 | `scene.ended` | `{ name, killed }` | `scenes/scene.js` `done()` (the scene's finally) | none |
 | `phrasebook.opened` | `{}` | `phrasebook/menu.js` `open`: last (after the raid timer is armed and the DOM `pb-open` event) | none |
 | `phrasebook.closed` | `{}` | `phrasebook/menu.js` `close`: after `raidStop` and the DOM `pb-close` event | none |
+| `phrasebook.spoke` | `{ key, text, who, heard }` | `phrasebook/say.js`: a line chip was selected in the open phrasebook and its owner (`who`: `card`, `katana`, `hand`, `old`) poked in beside the menu; after its bubble went up. `heard` false: it refused, and `text` is the refusal | none |
 
 ## Page and world
 

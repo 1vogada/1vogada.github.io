@@ -51,6 +51,7 @@ public API. Every module exports `install(app)`; `app` holds every module by its
 | Surprise me, the omikuji slip, the secret × | `src/scenes/fortune.js` | `fortune.slip` in `src/lines/page.js` | `styles/omikuji.css` |
 | the coin game; welcome back; scene runner | `src/scenes/coin.js`; `welcome-back.js`; `scene.js` | `hand.*`, `button.hi` | `styles/omikuji.css` |
 | phrasebook menu, its drawings, the raid | `src/phrasebook/menu.js` (`CHAPTERS`), `figures.js`, `raid.js` | `src/lines/phrasebook.js` (`raid.*`) | `styles/phrasebook.css` |
+| phrase-say: select a line in the open phrasebook, its owner says it beside the menu (or refuses a line you never heard) | `src/phrasebook/say.js` (heard via `core/speech.js` `onSaid`) | `card.notyet`, `katana.notyet`, `hand.notyet`, `sev.notyet`, `toast.sayNobody` in `src/lines/phrasebook.js` | inline |
 | every tuning number and timing | `src/core/tune.js` (`TUNE`, `TIMING`) | | |
 | test hooks (`window.__*`), `?debug` | `src/core/debug.js` | | |
 | feed the search box: drop a card, a scrap or an old hand on it and it searches for it | `src/page/feed.js` (`body.dropped` in `reactions.js`; `cards.putBack`, `severed.notThere`) | `card.eaten`, `card.home`, `sev.notthere`, `search.gulp`, `search.spit`, `toast.scrap` | |

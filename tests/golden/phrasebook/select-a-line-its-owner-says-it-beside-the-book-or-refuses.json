@@ -1,0 +1,218 @@
+{
+ "scenario": "phrasebook / select a line: its owner says it beside the book, or refuses",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 32,
+   "ms": 816,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 848,
+   "ms": 1392,
+   "who": "card",
+   "key": "SAY.rip",
+   "text": "put me back!"
+  },
+  {
+   "doc": 1,
+   "t": 1608,
+   "ms": 1320,
+   "who": "hand",
+   "key": "CLAW_SAY.eager",
+   "text": "ooh. snack."
+  },
+  {
+   "doc": 1,
+   "t": 2608,
+   "ms": 1325,
+   "who": "pb-scream",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 2688,
+   "ms": 1312,
+   "who": "card",
+   "key": "SAY.land",
+   "text": "ugh"
+  },
+  {
+   "doc": 1,
+   "t": 5648,
+   "ms": 1315,
+   "who": "pb-hand",
+   "key": "CLAW_SAY.eager",
+   "text": "ooh. snack."
+  },
+  {
+   "doc": 1,
+   "t": 8688,
+   "ms": 2645,
+   "who": "pb-scream",
+   "key": "card.notyet",
+   "text": "それはまだ言わない!"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 16,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 48,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 848,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1308,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1728,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "open",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4348,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4768,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "open",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 7388,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 7808,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "open",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 11778,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 12198,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "open",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 14318,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  }
+ ]
+}

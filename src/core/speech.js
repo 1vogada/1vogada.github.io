@@ -34,6 +34,10 @@
 //
 // A bubble record is self.say = { el, until, ms, key, x?, y?, ax?, w?, h?, lean?, apart? }. self.said is when the last one
 // went up (now()). The arm also keeps self.sayEnd and self.later.
+//
+// The said-hook: onSaid(fn) calls fn({ key, text, as }) every time any bubble goes up (say, its agony and arm paths, sayAt,
+// sayIn), after the element is made: key is the line key, text the bubble's words, as the speaker's name. It draws nothing and
+// changes nothing; the phrasebook (phrasebook/say.js) keeps the lines you have heard with it.
 
 import { TIMING, TUNE } from './tune.js';
 import { clock } from './clock.js';
@@ -44,6 +48,11 @@ const byKind = new Map();     // body kind -> config
 let layoutSource = () => [];  // ordered riders (world.bodies)
 const firsts = [];            // () => self with a first-speaker bubble (the arm)
 const shared = { scream: -1e9 };   // legacy cutSaid: death screams of different bodies share one cooldown
+const hooks = [];             // the said-hook: fn({ key, text, as }) after every bubble
+
+/** the said-hook: fn({ key, text, as }) after any bubble goes up. @returns off */
+export function onSaid(fn) { hooks.push(fn); return () => { const i = hooks.indexOf(fn); if (i >= 0) hooks.splice(i, 1); }; }
+function heard(key, el, sp) { if (hooks.length) { const rec = { key, text: el.textContent, as: (sp && sp.kind) || null }; for (const fn of hooks.slice()) fn(rec); } }
 
 export function defineSpeaker(kind, cfg = {}) {
   const sp = { kind, kinds: [kind], prefix: '', gate: 'plain', cls: 'say', extraCls: '', tag: 'div', tilt: true, layer: null, life: 'game', quiet: 0, layout: true, first: false, anchor: null, onSaid: null, ...cfg };
@@ -83,6 +92,7 @@ function show(sp, self, text, opts, t, key) {
   self.say = { el, until: t + ms, ms, key };
   if (sp.extraCls) el.classList.add(sp.extraCls);
   if (typeof sp.life !== 'function') clock.wake();   // a speaker on its own clock (the phrasebook raid) never restarts the page's frame loop, as legacy raidSay did not
+  heard(key, el, sp);
   return el;
 }
 
@@ -146,6 +156,7 @@ function armSay(sp, self, key, opts, t) {
   if (sp.extraCls) el.classList.add(sp.extraCls);
   self.said = t; self.sayEnd = t + ms; self.say = { el, until: t + ms, ms, key };
   clock.wake();
+  heard(key, el, sp);
   if (sp.onSaid) sp.onSaid(self, key, self.say);
   return self.say;
 }
@@ -166,6 +177,7 @@ export function sayAt(x, y, key, opts = {}) {
   if (opts.scream) scream(el);
   el.style.translate = `calc(${x.toFixed(0)}px - 50%) ${y.toFixed(0)}px`;
   clock.real.after(TIMING.talk(el, floorOf(opts)), () => el.remove());
+  heard(key, el, sp);
   return el;
 }
 /** A bubble inside an element, placed by CSS (the Heads / Tails buttons). opts: { text, floor, extra ms }. @returns the element */
@@ -175,6 +187,7 @@ export function sayIn(target, key, opts = {}) {
   if (sp.tilt) { const [a, b] = TUNE.speech.TILT; el.style.setProperty('--tilt', (a + Math.random() * b).toFixed(1)); }
   target.appendChild(el);
   clock.real.after(TIMING.talk(el, floorOf(opts)) + (opts.extra ?? TUNE.speech.BUTTON_EXTRA_MS), () => el.remove());
+  heard(key, el, sp);
   return el;
 }
 

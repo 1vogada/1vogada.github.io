@@ -94,3 +94,80 @@ scenario(G, 'raid with all four picks (throw, eat, help, scroll) and the swat', 
   await s.run(500);
   assert.equal((await s.eval(pb)).raid, null, 'closing the book ends the raid');
 });
+
+// phrase-say (src/phrasebook/say.js): in the open book, select a line and its owner says it beside the menu; a line you have not
+// heard on this visit, it refuses. The book is closed and opened again between picks, so the raid (five seconds in) never starts.
+const pickChip = (s, sel) => s.eval(({ text, key }) => {
+  const chips = [...document.querySelectorAll('.pb .pb-scroll .pb-chip')];
+  const c = text ? chips.find((x) => x.querySelector('b').textContent === text) : chips.find((x) => x.closest('[data-key]').dataset.key === key);
+  if (!c) return null;
+  const b = c.querySelector('b'); b.scrollIntoView({ block: 'center' });
+  const r = document.createRange(); r.selectNodeContents(b); const g = getSelection(); g.removeAllRanges(); g.addRange(r);
+  return b.textContent;
+}, sel);
+const sayer = () => window.__phrasesay.busy();
+const lastPb = async (s) => (await s.bubbles()).filter((b) => b.who.startsWith('pb-')).pop();
+
+scenario(G, 'select a line: its owner says it beside the book, or refuses', { session: { 'kiripad-ripped': '1' }, legacy: false, timeout: 120000 }, async (s) => {
+  await s.ensurePlanck();
+  // hear a card line (it is torn out) and a hand line
+  await s.rip(0); await s.run(300); await s.up(); await s.run(300);
+  const card = (await s.bubbles()).find((b) => b.who === 'card');
+  assert.ok(card, 'the torn card said something');
+  await s.eval(() => { window.__hand.get(); window.__hand.say('eager'); });
+  await s.run(100);
+  const arm = (await s.bubbles()).find((b) => b.who === 'hand');
+  assert.ok(arm, 'the hand said something');
+  assert.ok(await s.eval((t) => window.__phrasesay.heard().includes(t[0]) && window.__phrasesay.heard().includes(t[1]), [card.text, arm.text]), 'both are heard');
+
+  // 1. a card line: a card peeks out beside the book and shouts it
+  await openBook(s);
+  assert.equal(await pickChip(s, { text: card.text }), card.text);
+  await s.run(300);
+  assert.equal(await s.eval(sayer), null, 'the selection has to sit still a moment first');
+  await s.run(600);
+  assert.equal(await s.eval(sayer), 'card', 'a card comes out');
+  let b = await lastPb(s);
+  assert.deepEqual([b.who, b.text], ['pb-scream', card.text], 'and shouts the very line');
+  await s.runUntil(() => !window.__phrasesay.busy(), null, { max: 6000 });
+  await s.key('Escape'); await s.run(400);
+
+  // 2. a hand line: the hand pokes in over the book's edge and says it
+  await openBook(s);
+  await pickChip(s, { text: arm.text });
+  await s.run(900);
+  assert.equal(await s.eval(sayer), 'hand');
+  assert.ok(await s.eval(() => document.querySelectorAll('.claw.over.pb-raid').length === 1), 'a hand drawn over the book');
+  b = await lastPb(s);
+  assert.deepEqual([b.who, b.text], ['pb-hand', arm.text], 'it says its line');
+  await s.runUntil(() => !window.__phrasesay.busy(), null, { max: 6000 });
+  assert.equal(await s.eval(() => document.querySelectorAll('.claw.over.pb-raid').length), 0, 'and is gone again');
+
+  // 3. a line it has never said to you: it refuses
+  await s.key('Escape'); await s.run(400);
+  await openBook(s);
+  const never = await pickChip(s, { key: 'card.smash' });
+  assert.ok(never && !(await s.eval((t) => window.__phrasesay.heard().includes(t), never)), 'never heard');
+  await s.run(900);
+  b = await lastPb(s);
+  assert.equal(b.who, 'pb-scream');
+  assert.ok(b.key.split('|').includes('card.notyet'), `the card refuses (${b.text})`);
+  await s.runUntil(() => !window.__phrasesay.busy(), null, { max: 6000 });
+
+  // 4. an old hand's line with no old hand about: a toast says nobody is there to say it
+  await s.key('Escape'); await s.run(400);
+  await openBook(s);
+  await pickChip(s, { key: 'sev.cut' });
+  await s.run(500);
+  const toast = await s.eval(() => { const t = document.getElementById('toast'); return t.classList.contains('show') ? t.textContent : null; });
+  assert.ok(toast && (await s.eval((t) => window.__kiri.lines.allLines().find((d) => d.key === 'toast.sayNobody').lines.some((l) => l.text === t), toast)), `nobody to say it (${toast})`);
+  assert.equal(await s.eval(sayer), null);
+
+  // 5. the say-"hand" egg stays out of it: the word "Hand" selected in the book is not snatched
+  await s.eval(() => { const h = document.querySelector('#pb-hand h3'); h.scrollIntoView({ block: 'center' }); const t = h.firstChild, i = t.textContent.indexOf('Hand'); const r = document.createRange(); r.setStart(t, i); r.setEnd(t, i + 4); const g = getSelection(); g.removeAllRanges(); g.addRange(r); });
+  await s.run(1500);
+  assert.notEqual((await s.state()).claw, 'show', 'the hand does not come for the word');
+  assert.equal(await s.said('hand.word'), false);
+  await s.key('Escape'); await s.run(400);
+  assert.equal(await s.eval(sayer), null);
+});
