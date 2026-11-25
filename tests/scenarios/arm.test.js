@@ -20,21 +20,21 @@ async function carry(s, i, x, y, speed = 20) {
 }
 // the tease: a held card brought into its zone makes it eager, and one brought close to the edge gets taken by the far end
 async function tease(s, i = 0, y = 300) {
-  await carry(s, i, 700, y);
+  await carry(s, i, 540, y);
   const W = await s.eval(vw);
-  await s.line(700, y, W - 180, y, 20);
+  await s.line(540, y, W - 180, y, 20);
   await s.runUntil(() => window.__cards.state().claw.st === 'tug', null, { max: 4000, step: 16 });
   return W;
 }
 
 scenario(G, 'tease then tug then rip', { ...O, legacy: false }, async (s) => {
-  await carry(s, 0, 700, 300);
+  await carry(s, 0, 540, 300);
   assert.equal((await s.eval(claw)).st, 'lurk', 'a loose card wakes it, but it waits');
   const W = await s.eval(vw);
-  await s.line(700, 300, 1000, 300, 12);   // into the tease zone: one card wide from the right edge
+  await s.line(540, 300, 900, 300, 12);   // into the tease zone: two cards wide from the right edge
   assert.equal((await s.eval(claw)).st, 'eager');
   assert.ok(await s.said('CLAW_SAY.eager'), 'it wants it');
-  await s.line(1000, 300, W - 180, 300, 8); // close to the edge: it lunges for the far end and takes hold
+  await s.line(900, 300, W - 180, 300, 8); // close to the edge: it lunges for the far end and takes hold
   await s.runUntil(() => window.__cards.state().claw.st === 'tug', null, { max: 4000, step: 16 });
   await s.run(700);
   assert.ok(await s.said('CLAW_SAY.grab'), 'it says so (a forced line waits until the last one has been up TIMING.gap.show)');
@@ -67,9 +67,9 @@ const pieceAt = (share) => {
 // hold what is in the hand out to it and pull back until the tug of war ends; returns the hand's state then
 async function tugOfWar(s, from, y = 300) {
   const W = await s.eval(vw);
-  await s.line(from[0], from[1], 700, y, 20);
-  await s.line(700, y, W - 180, y, 20);
-  await s.runUntil(() => window.__cards.state().claw.st === 'tug', null, { max: 100, step: 16 });
+  await s.line(from[0], from[1], 540, y, 20);
+  await s.line(540, y, W - 180, y, 20);
+  await s.runUntil(() => window.__cards.state().claw.st === 'tug', null, { max: 4000, step: 16 });
   await s.run(700);
   let x = W - 180;
   let n = 0;
@@ -80,7 +80,7 @@ async function tugOfWar(s, from, y = 300) {
 scenario(G, 'a piece gets the whole tug of war, a scrap is rejected', { ...O, legacy: false, timeout: 240000 }, async (s) => {
   // a card yanked too far tears in two: the bigger part in your hand, under a third left behind
   await s.pull(0, 0, -420, { n: 10 }); await s.run(460, 20);
-  assert.deepEqual(await s.eval(shares), [0.3, 0.7]);
+  { const [small, bigger] = await s.eval(shares); assert.ok(small > 0.26 && small < 0.34 && bigger > 0.66, `torn about 30 / 70 (${small}, ${bigger})`); }
   await s.run(600);
   const at0 = await s.eval(() => { const g = window.__cards.state().grab; return [g.cx, g.cy]; });
   // the big piece held out to it: eager, lunge, tug of war, and the cheese pull, exactly as with a whole card

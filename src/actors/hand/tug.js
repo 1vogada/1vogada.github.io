@@ -103,12 +103,19 @@ export function slip(P, H) {
 export function rip(P, H) {
   { const el = get().o.el; el.style.maskImage = el.style.webkitMaskImage = ''; el.style.filter = ''; }   // the pieces are copies of this element: they must not inherit the stretch look
   const c = get(), o = c.o, g = o.tug, W = o.w, Hh = o.h, cf = Math.cos(g.phi), sf = Math.sin(g.phi);
-  const mx = (g.gp[0] + g.gh[0]) / 2 + W / 2, my = (g.gp[1] + g.gh[1]) / 2 + Hh / 2, side = (p) => (p[0] - mx) * cf + (p[1] - my) * sf;
-  const src = outline(o), hs = [], us = [], cut = [];
-  for (let i = 0; i < src.length; i++) {
-    const p = src[i], q = src[(i + 1) % src.length], sp = side(p), sq = side(q);
-    (sp >= 0 ? hs : us).push(p);
-    if ((sp > 0 && sq < 0) || (sp < 0 && sq > 0)) { const f = sp / (sp - sq), x = [p[0] + (q[0] - p[0]) * f, p[1] + (q[1] - p[1]) * f]; hs.push(x); us.push(x); cut.push(x); }
+  // the tear runs across the pull, halfway between the two grips. A piece's outline can put that right on a corner (a sliver, an
+  // edge too short to be a body): then a little to either side, the nearest place that gives two proper halves
+  const src = outline(o); let hs, us, cut, side;
+  for (const off of [0, 12, -12, 24, -24, 36, -36]) {
+    const mx = (g.gp[0] + g.gh[0]) / 2 + W / 2 + cf * off, my = (g.gp[1] + g.gh[1]) / 2 + Hh / 2 + sf * off;
+    side = (p) => (p[0] - mx) * cf + (p[1] - my) * sf; hs = []; us = []; cut = [];
+    for (let i = 0; i < src.length; i++) {
+      const p = src[i], q = src[(i + 1) % src.length], sp = side(p), sq = side(q);
+      (sp >= 0 ? hs : us).push(p);
+      if ((sp > 0 && sq < 0) || (sp < 0 && sq > 0)) { const f = sp / (sp - sq), x = [p[0] + (q[0] - p[0]) * f, p[1] + (q[1] - p[1]) * f]; hs.push(x); us.push(x); cut.push(x); }
+    }
+    if (cut.length === 2 && validPoly(hs) && validPoly(us)) break;
+    if (!o.poly) break;   // a whole card: as it always was
   }
   if (cut.length !== 2 || !validPoly(hs) || !validPoly(us)) return slip(P, H);
   // the tear is ragged: both halves get the same teeth along the cut, in the clip-path only. The bodies keep the straight edge
