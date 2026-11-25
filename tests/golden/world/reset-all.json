@@ -1,0 +1,179 @@
+{
+ "scenario": "world / reset all",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 32,
+   "ms": 800,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "ms": 1024,
+   "who": "card",
+   "key": "SAY.rip",
+   "text": "I was comfy!"
+  },
+  {
+   "doc": 1,
+   "t": 1856,
+   "ms": 16,
+   "who": "card",
+   "key": "SAY.throw|CLAW_SAY.throw",
+   "text": "wheee"
+  },
+  {
+   "doc": 1,
+   "t": 1872,
+   "ms": 1300,
+   "who": "card",
+   "key": "SAY.smash",
+   "text": "NOOOOO!!"
+  },
+  {
+   "doc": 1,
+   "t": 2304,
+   "ms": 800,
+   "who": "card",
+   "key": "SAY.pull|CLAW_SAY.slap",
+   "text": "hands off"
+  },
+  {
+   "doc": 1,
+   "t": 3104,
+   "ms": 1312,
+   "who": "card",
+   "key": "SAY.rip|PB.SWAT_SAY",
+   "text": "ау!"
+  },
+  {
+   "doc": 1,
+   "t": 3696,
+   "ms": 1384,
+   "who": "hand",
+   "key": "CLAW_SAY.loose",
+   "text": "bring it here"
+  },
+  {
+   "doc": 1,
+   "t": 4944,
+   "ms": 136,
+   "who": "card",
+   "key": "SAY.land",
+   "text": "my corner!"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 16,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 48,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1872,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 27,
+    "piece": 8
+   }
+  },
+  {
+   "doc": 1,
+   "t": 2320,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "shard": 27,
+    "piece": 8,
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 3104,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "shard": 27,
+    "piece": 8,
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 3580,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 27,
+    "piece": 8,
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 5100,
+   "claw": "off",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  }
+ ]
+}

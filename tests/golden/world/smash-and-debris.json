@@ -1,0 +1,308 @@
+{
+ "scenario": "world / smash and debris",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 32,
+   "ms": 800,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "ms": 1024,
+   "who": "card",
+   "key": "SAY.rip",
+   "text": "I was comfy!"
+  },
+  {
+   "doc": 1,
+   "t": 1856,
+   "ms": 16,
+   "who": "card",
+   "key": "SAY.throw|CLAW_SAY.throw",
+   "text": "wheee"
+  },
+  {
+   "doc": 1,
+   "t": 1872,
+   "ms": 1300,
+   "who": "card",
+   "key": "SAY.smash",
+   "text": "NOOOOO!!"
+  },
+  {
+   "doc": 1,
+   "t": 3696,
+   "ms": 1312,
+   "who": "hand",
+   "key": "CLAW_SAY.throw",
+   "text": "pass it!"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 16,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 48,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1872,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 27,
+    "piece": 8
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6172,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 24,
+    "piece": 8
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6272,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 19,
+    "piece": 8
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6472,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 18,
+    "piece": 8
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6572,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 16,
+    "piece": 8
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6672,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 15,
+    "piece": 8
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6772,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 14,
+    "piece": 8
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6872,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 13,
+    "piece": 8
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6972,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 12,
+    "piece": 8
+   }
+  },
+  {
+   "doc": 1,
+   "t": 7172,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "piece": 8,
+    "shard": 11
+   }
+  },
+  {
+   "doc": 1,
+   "t": 7272,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "piece": 8,
+    "shard": 8
+   }
+  },
+  {
+   "doc": 1,
+   "t": 7372,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "piece": 8,
+    "shard": 6
+   }
+  },
+  {
+   "doc": 1,
+   "t": 7472,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "piece": 8,
+    "shard": 4
+   }
+  },
+  {
+   "doc": 1,
+   "t": 7672,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "piece": 8,
+    "shard": 3
+   }
+  },
+  {
+   "doc": 1,
+   "t": 7772,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "piece": 8,
+    "shard": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 7872,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "piece": 8
+   }
+  }
+ ]
+}

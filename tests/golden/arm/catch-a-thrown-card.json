@@ -1,0 +1,153 @@
+{
+ "scenario": "arm / catch a thrown card",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 3032,
+   "ms": 808,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 3840,
+   "ms": 1196,
+   "who": "card",
+   "key": "SAY.rip",
+   "text": "put me back!"
+  },
+  {
+   "doc": 1,
+   "t": 5036,
+   "ms": 1316,
+   "who": "card",
+   "key": "SAY.throw",
+   "text": "aaaaaa"
+  },
+  {
+   "doc": 1,
+   "t": 5440,
+   "ms": 1776,
+   "who": "hand",
+   "key": "CLAW_SAY.caught",
+   "text": "ナイスパス!"
+  },
+  {
+   "doc": 1,
+   "t": 7440,
+   "ms": 1488,
+   "who": "hand",
+   "key": "CLAW_SAY.toss",
+   "text": "いらない"
+  },
+  {
+   "doc": 1,
+   "t": 9408,
+   "ms": null,
+   "who": "card",
+   "key": "SAY.land",
+   "text": "my corner!"
+  },
+  {
+   "doc": 1,
+   "t": 9440,
+   "ms": null,
+   "who": "hand",
+   "key": "CLAW_SAY.throw",
+   "text": "nice arm"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 100,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 3048,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 3848,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 5052,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 5420,
+   "claw": "catch",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 5452,
+   "claw": "has",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 7452,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  }
+ ]
+}

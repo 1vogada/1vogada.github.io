@@ -7,7 +7,7 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   // Bump VER, and the ?v= on this file's script tag in index.html, whenever this file or the stylesheet changes. GitHub Pages caches each
   // file for ten minutes on its own, and a new script with an old stylesheet looks broken; the version makes them arrive as a pair
-  const VER = 16;
+  const VER = 17;
   const here = (document.currentScript && document.currentScript.src) || '/scripts/phrasebook.js';
 
   // ---- what this file knows: which occasion each list belongs to. src = which list on window.__lines, key = which entry of it ----
@@ -145,6 +145,8 @@
   const ALONE_SAY = ['fine. alone then.', 'no help? ok.', 'useless.', 'I do everything here', 'сам ще си го…', 'もういい!'];
   const MORE_SAY = ['again!', 'not done', 'one more lap', 'still lost?', 'още!', 'もう一回!'];
   const HIDE_SAY = ['was not me.', 'you saw nothing', 'I was never here', '*hides*', 'не бях аз.', 'かくれんぼ!', '知らないよ'];
+  // English only by default (scripts/lang.js): the hand's own lists in here are thinned the same way as the page's
+  if (window.__lang === 'en' && window.__thin) window.__thin([RAID_SAY, SWAT_SAY, GRUDGE_SAY, ANGRY_SAY, SCROLL_SAY, HELP_SAY, ALONE_SAY, MORE_SAY, HIDE_SAY]);
   // what the Bulgarian and Japanese lines mean. A line that is missing here is simply printed without a gloss
   const GLOSS = {
     'дърпай!': 'pull!', '手伝って!': 'help me!', '引っぱって!': 'pull!', 'сам ще си го…': 'I will do it myself…', 'もういい!': 'forget it!', 'още!': 'more!', 'もう一回!': 'one more time!', 'не бях аз.': 'it was not me.', 'かくれんぼ!': 'hide and seek!', '知らないよ': 'I know nothing',

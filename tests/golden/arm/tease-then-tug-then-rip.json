@@ -1,0 +1,219 @@
+{
+ "scenario": "arm / tease then tug then rip",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 3032,
+   "ms": 792,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 3824,
+   "ms": 1392,
+   "who": "card",
+   "key": "SAY.rip",
+   "text": "I was comfy!"
+  },
+  {
+   "doc": 1,
+   "t": 4720,
+   "ms": 608,
+   "who": "hand",
+   "key": "CLAW_SAY.eager",
+   "text": "ooh. snack."
+  },
+  {
+   "doc": 1,
+   "t": 5328,
+   "ms": 1232,
+   "who": "hand",
+   "key": "CLAW_SAY.grab",
+   "text": "мое!"
+  },
+  {
+   "doc": 1,
+   "t": 5888,
+   "ms": 160,
+   "who": "card",
+   "key": "AGONY.0",
+   "text": "pick a side!"
+  },
+  {
+   "doc": 1,
+   "t": 6048,
+   "ms": 240,
+   "who": "card",
+   "key": "AGONY.1",
+   "text": "БОЛИИИ!",
+   "lvl": "1"
+  },
+  {
+   "doc": 1,
+   "t": 6288,
+   "ms": 272,
+   "who": "card",
+   "key": "SAY.slice|AGONY.2",
+   "text": "ぎゃああああ!!",
+   "lvl": "2"
+  },
+  {
+   "doc": 1,
+   "t": 6560,
+   "ms": null,
+   "who": "card",
+   "key": "SAY.slice",
+   "text": "うわあああ!!",
+   "lvl": "2"
+  },
+  {
+   "doc": 1,
+   "t": 6560,
+   "ms": 1568,
+   "who": "hand",
+   "key": "CLAW_SAY.rip",
+   "text": "CHEESE PULL!!!!"
+  },
+  {
+   "doc": 1,
+   "t": 8128,
+   "ms": null,
+   "who": "hand",
+   "key": "CLAW_SAY.eat",
+   "text": "ммм."
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 100,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 3048,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 3832,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4724,
+   "claw": "eager",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4916,
+   "claw": "lunge",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4980,
+   "claw": "tug",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6560,
+   "claw": "triumph",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "piece",
+   "objs": {
+    "piece": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6576,
+   "claw": "triumph",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "piece": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 7976,
+   "claw": "eat",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "piece": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 8176,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "piece": 1
+   }
+  }
+ ]
+}

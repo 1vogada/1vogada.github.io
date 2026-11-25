@@ -1,0 +1,108 @@
+{
+ "scenario": "scenes / slip opens and own Yes / own No",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 5170,
+   "ms": 4014,
+   "who": "hand",
+   "key": "CLAW_SAY.ask",
+   "text": "go there?"
+  },
+  {
+   "doc": 1,
+   "t": 12170,
+   "ms": null,
+   "who": "hand",
+   "key": "CLAW_SAY.ask",
+   "text": "I picked this for you. go?"
+  },
+  {
+   "doc": 2,
+   "t": 3170,
+   "ms": 950,
+   "who": "hand",
+   "key": "CLAW_SAY.ask",
+   "text": "go there?"
+  },
+  {
+   "doc": 2,
+   "t": 4120,
+   "ms": 1448,
+   "who": "hand",
+   "key": "CLAW_SAY.hello",
+   "text": "picky, are we"
+  },
+  {
+   "doc": 2,
+   "t": 7020,
+   "ms": 1652,
+   "who": "hand",
+   "key": "CLAW_SAY.smashbtn",
+   "text": "I hate these two"
+  },
+  {
+   "doc": 2,
+   "t": 9730,
+   "ms": 1518,
+   "who": "hand",
+   "key": "CLAW_SAY.better",
+   "text": "there. better."
+  },
+  {
+   "doc": 2,
+   "t": 11830,
+   "ms": null,
+   "who": "hand",
+   "key": "CLAW_SAY.flip",
+   "text": "let the coin decide"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 100,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 4620,
+   "claw": "show",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 2,
+   "t": 20,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 2,
+   "t": 2620,
+   "claw": "show",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  }
+ ]
+}

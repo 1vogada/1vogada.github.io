@@ -1,0 +1,95 @@
+{
+  "note": "Test fixture (copy of site.json at 41683e8 plus two posts). The test server serves this as /site.json so the live file can change freely.",
+  "categories": [
+    {
+      "id": "games",
+      "name": "Games"
+    },
+    {
+      "id": "tools",
+      "name": "Tools"
+    },
+    {
+      "id": "experiments",
+      "name": "Experiments"
+    }
+  ],
+  "items": [
+    {
+      "key": "project:driftwall",
+      "category": "tools",
+      "pinned": false
+    },
+    {
+      "key": "project:purrwood",
+      "category": "games",
+      "pinned": false
+    },
+    {
+      "key": "project:porch",
+      "category": "games",
+      "pinned": false
+    },
+    {
+      "key": "project:cybertale",
+      "category": "games",
+      "pinned": false
+    },
+    {
+      "key": "project:gridburst",
+      "category": "games",
+      "pinned": false
+    },
+    {
+      "key": "project:airdrums",
+      "category": "games",
+      "pinned": false
+    },
+    {
+      "key": "project:apiTest",
+      "category": "experiments",
+      "pinned": false
+    },
+    {
+      "key": "project:roomDesign",
+      "category": "experiments",
+      "pinned": false
+    },
+    {
+      "key": "project:hive",
+      "category": "tools",
+      "pinned": true
+    },
+    {
+      "key": "project:max68he-web",
+      "category": "tools",
+      "pinned": true
+    },
+    {
+      "key": "project:palisade",
+      "category": "games",
+      "pinned": true
+    },
+    {
+      "key": "project:minitype",
+      "category": "games",
+      "pinned": true
+    }
+  ],
+  "posts": [
+    {
+      "id": "fog-notes",
+      "title": "Notes from the fog",
+      "date": "2026-11-20",
+      "draft": false,
+      "body": "# Notes from the fog\n\nThe cards are **rooted**, the katana is *sharp* and the hand is `hungry`.\n\n- pull a card\n- rip it\n- throw it\n\nMore at [kiripad.dev](https://kiripad.dev)."
+    },
+    {
+      "id": "secret-draft",
+      "title": "Unfinished draft",
+      "date": "2026-11-21",
+      "draft": true,
+      "body": "not yet"
+    }
+  ]
+}

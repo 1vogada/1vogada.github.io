@@ -1,0 +1,77 @@
+{
+  "updated": "2026-11-23T23:20:00Z",
+  "projects": [
+    {
+      "name": "airdrums",
+      "url": "https://kiripad.dev/airdrums/",
+      "description": "Play a song's real drum part along with Spotify on the Fresh 'n Rebel Air Drums",
+      "code": "https://github.com/1vogada/airdrums"
+    },
+    {
+      "name": "apiTest",
+      "url": "https://kiripad.dev/apiTest/",
+      "description": "League of Legends match history lookup on the Riot API (bring your own API key)",
+      "code": "https://github.com/1vogada/apiTest"
+    },
+    {
+      "name": "cybertale",
+      "url": "https://cybertale.kiripad.dev/",
+      "description": "OOP course game from 2023, made with Damyan, Antani and Ivan",
+      "code": "https://github.com/1vogada/cybertale"
+    },
+    {
+      "name": "driftwall",
+      "url": "https://kiripad.dev/driftwall/",
+      "description": "Animated 3D backgrounds for a spare monitor (three.js, installable)",
+      "code": null
+    },
+    {
+      "name": "gridburst",
+      "url": "https://kiripad.dev/gridburst/",
+      "description": "Gridburst: an endless block-placement puzzle, mobile first",
+      "code": "https://github.com/1vogada/gridburst"
+    },
+    {
+      "name": "hive",
+      "url": "https://hive.kiripad.dev/",
+      "description": "Encrypted chat with servers and channels",
+      "code": null
+    },
+    {
+      "name": "max68he-web",
+      "url": "https://kiripad.dev/max68he-web/",
+      "description": "Configure the Attack Shark MAX68HE / X68MAX magnetic keyboard in your browser (WebHID)",
+      "code": "https://github.com/1vogada/max68he-web"
+    },
+    {
+      "name": "minitype",
+      "url": "https://kiripad.dev/minitype/",
+      "description": "A vibecoded CLI typing game in Python, inspired by keybr and Monkeytype",
+      "code": "https://github.com/1vogada/minitype"
+    },
+    {
+      "name": "palisade",
+      "url": "https://kiripad.dev/palisade/",
+      "description": "Factory + tower defense in the browser: build belts, feed your archers, hold the keep",
+      "code": null
+    },
+    {
+      "name": "porch",
+      "url": "https://kiripad.dev/porch/",
+      "description": "",
+      "code": "https://github.com/1vogada/porch"
+    },
+    {
+      "name": "purrwood",
+      "url": "https://kiripad.dev/purrwood/",
+      "description": "A cozy cat treehouse game for the browser",
+      "code": null
+    },
+    {
+      "name": "roomDesign",
+      "url": "https://kiripad.dev/roomDesign/",
+      "description": "",
+      "code": null
+    }
+  ]
+}

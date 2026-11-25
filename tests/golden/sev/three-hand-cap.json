@@ -1,0 +1,249 @@
+{
+ "scenario": "sev / three-hand cap",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 32,
+   "ms": 800,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "ms": 376,
+   "who": "card",
+   "key": "SAY.rip",
+   "text": "I was comfy!"
+  },
+  {
+   "doc": 1,
+   "t": 2976,
+   "ms": 1312,
+   "who": "hand",
+   "key": "SEV_SAY.cut",
+   "text": "ow. wait."
+  },
+  {
+   "doc": 1,
+   "t": 2976,
+   "ms": 1312,
+   "who": "hand",
+   "key": "SEV_SAY.cut",
+   "text": "*twitch*"
+  },
+  {
+   "doc": 1,
+   "t": 3456,
+   "ms": 1584,
+   "who": "hand",
+   "key": "SEV_SAY.cut",
+   "text": "where is my arm"
+  },
+  {
+   "doc": 1,
+   "t": 4600,
+   "ms": 792,
+   "who": "card",
+   "key": "SAY.pull|CLAW_SAY.slap",
+   "text": "hands off"
+  },
+  {
+   "doc": 1,
+   "t": 5392,
+   "ms": 184,
+   "who": "card",
+   "key": "SAY.rip|CLAW_SAY.sulk|PB.SWAT_SAY",
+   "text": "rude."
+  },
+  {
+   "doc": 1,
+   "t": 5488,
+   "ms": 88,
+   "who": "hand",
+   "key": "SEV_SAY.drag",
+   "text": "just… a bit… further"
+  },
+  {
+   "doc": 1,
+   "t": 5488,
+   "ms": 88,
+   "who": "hand",
+   "key": "SEV_SAY.drag",
+   "text": "ох, ох, ох"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 16,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 48,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1208,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1228,
+   "claw": "off",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 2098,
+   "claw": "off",
+   "sev": "limp,limp,limp",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 3
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4616,
+   "claw": "off",
+   "sev": "limp,limp,limp",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "hand": 3,
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4680,
+   "claw": "off",
+   "sev": "rise,rise,limp",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "hand": 3,
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 5160,
+   "claw": "off",
+   "sev": "rise,rise,rise",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "hand": 3,
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 5400,
+   "claw": "lurk",
+   "sev": "rise,rise,rise",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "hand": 3,
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 5480,
+   "claw": "lurk",
+   "sev": "walk,walk,rise",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "hand": 3,
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 5576,
+   "claw": "lurk",
+   "sev": "walk,walk,rise",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 3,
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 5596,
+   "claw": "off",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  }
+ ]
+}

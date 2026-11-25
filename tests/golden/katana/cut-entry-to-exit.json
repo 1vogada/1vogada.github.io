@@ -1,0 +1,82 @@
+{
+ "scenario": "katana / cut entry to exit",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 420,
+   "ms": 2588,
+   "who": "card",
+   "key": "SAY.khello",
+   "text": "世界一切れる刀です"
+  },
+  {
+   "doc": 1,
+   "t": 1792,
+   "ms": 1315,
+   "who": "card",
+   "key": "SAY.cutting",
+   "text": "IT IS IN ME"
+  },
+  {
+   "doc": 1,
+   "t": 2144,
+   "ms": 1312,
+   "who": "card",
+   "key": "SAY.slice",
+   "text": "HHHHRRRKK—",
+   "lvl": "2"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 20,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 276,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "found",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 470,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "equipped",
+   "shelf": false,
+   "grab": "katana",
+   "objs": {
+    "katana": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 2148,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "equipped",
+   "shelf": false,
+   "grab": "katana",
+   "objs": {
+    "katana": 1,
+    "piece": 2
+   }
+  }
+ ]
+}
