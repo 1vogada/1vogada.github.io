@@ -29,7 +29,7 @@ export const st = { peek: false, found: false, showOff: null };
 let app = { reduced: false, root: null }, FORTUNES = [], askAgain = null;
 
 /** legacy window.__hand: there is a hand unless reduced motion (cardPhysics() returned first) */
-export const H = () => (app.reduced ? null : hand);
+export const H = () => (app.reduced || !hand.awake() ? null : hand);   // and it keeps away until a card has been ripped out of its slot
 /** legacy clearTimeout(showOff) */
 export const keepShow = () => { if (st.showOff) { st.showOff(); st.showOff = null; } };
 /** legacy showOff = setTimeout(() => root.classList.remove('hand-show'), 2000) */

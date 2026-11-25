@@ -95,7 +95,7 @@ scenario(G, 'throw', { legacy: false }, async (s) => {
   assert.equal(await s.eval(() => [...window.__cards.objs][0].hot), 0, 'and it is no longer a throw');
 });
 
-scenario(G, 'smash and debris', async (s) => {
+scenario(G, 'smash and debris', { legacy: false }, async (s) => {
   const [px, py] = await s.rip(0);
   await s.run(800);
   await s.throwTo([px, py], [px - 40 * 4, py], { n: 4 });   // 25 m/s into the left wall
@@ -159,7 +159,7 @@ scenario(G, 'edge autoscroll', async (s) => {
   await s.up();
 });
 
-scenario(G, 'reset all', async (s) => {
+scenario(G, 'reset all', { legacy: false }, async (s) => {
   let [px, py] = await s.rip(0);
   await s.run(800);
   await s.throwTo([px, py], [px - 160, py], { n: 4 });   // smashed

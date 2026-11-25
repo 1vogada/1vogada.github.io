@@ -44,27 +44,35 @@
   },
   {
    "doc": 1,
+   "t": 2560,
+   "ms": 608,
+   "who": "hand",
+   "key": "hand.small",
+   "text": "bring the rest"
+  },
+  {
+   "doc": 1,
    "t": 3104,
    "ms": 1312,
    "who": "card",
-   "key": "SAY.rip|PB.SWAT_SAY",
-   "text": "ау!"
+   "key": "SAY.rip",
+   "text": "nooo!"
   },
   {
    "doc": 1,
-   "t": 3696,
-   "ms": 1384,
+   "t": 3168,
+   "ms": 1312,
    "who": "hand",
-   "key": "CLAW_SAY.loose",
-   "text": "bring it here"
+   "key": "hand.small",
+   "text": "трохи?!"
   },
   {
    "doc": 1,
-   "t": 4944,
-   "ms": 136,
+   "t": 4928,
+   "ms": 152,
    "who": "card",
    "key": "SAY.land",
-   "text": "my corner!"
+   "text": "ох…"
   }
  ],
  "states": [
@@ -136,8 +144,68 @@
   },
   {
    "doc": 1,
+   "t": 2496,
+   "claw": "catch",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "shard": 27,
+    "piece": 8,
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 2560,
+   "claw": "sulk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "shard": 27,
+    "piece": 8,
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 2576,
+   "claw": "catch",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "shard": 27,
+    "piece": 8,
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 2608,
+   "claw": "sulk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "shard": 27,
+    "piece": 8,
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
    "t": 3104,
-   "claw": "lurk",
+   "claw": "sulk",
    "sev": "",
    "pb": "closed",
    "kat": "hidden",
@@ -152,6 +220,21 @@
   {
    "doc": 1,
    "t": 3580,
+   "claw": "sulk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "shard": 27,
+    "piece": 8,
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4280,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",
