@@ -149,6 +149,7 @@ export const TUNE = {
   greeting: { TYPE_MS: 85, HOLD_MS: 2200, ERASE_MS: 40, PAUSE_MS: 260 },
   surprise: { STEPS: 14, STEP_MS: 40, STEP_GROW: 1.6, ASK_DELAY_MS: 700, WELCOME_MS: 900, PAGESHOW_MS: 600 },
   tilt: { DEG: 7, BAND_PX: 26, ROLL: 60 },
+  crazy: { TITLE_MS: 180 },   // ms per character of the scrolling tab title
   speech: {
     TILT: [4, 4],                // every bubble leans right by 4 + up to 4 degrees
     RIDE_DY: -40,                // a body's bubble sits this far above the top of its rotated box

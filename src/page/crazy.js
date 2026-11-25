@@ -5,11 +5,12 @@
 
 import { bus } from '../core/bus.js';
 import { real } from '../core/clock.js';
+import { TUNE } from '../core/tune.js';
 import { isCrazy } from '../world/world.js';
 import { render } from './directory.js';
 import * as fog from './fog.js';
 
-const TITLE_MS = 180;   // TUNE-REQUEST: TUNE.crazy.TITLE_MS (legacy setInterval 180 ms per scrolled character)
+const TITLE_MS = TUNE.crazy.TITLE_MS;
 
 const calmTitle = 'kiripad.dev · Projects';
 let slopTitle = '✨🚀 KIRIPAD.DEV 🚀 Revolutionizing The Future With AI-Powered Synergy 🤖 100% CERTIFIED SLOP 🥣 ';

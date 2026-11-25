@@ -14,7 +14,7 @@ import { regrowMask, refog, alphaAt, rgb } from './fog.js';
 import { show as toast } from './toast.js';
 
 const K = TUNE.kiri;
-const FLOOD_TOAST = '霧が出た · Мъгла падна · The fog rolls in';   // LINE-REQUEST: toast.kiri in src/lines/ (one-line list)
+const FLOOD_TOAST = '霧が出た · Мъгла падна · The fog rolls in';   // fallback only: the line is toast.fog in src/lines/page.js
 
 let kv = null, kctx = null, km = null, kmctx = null, reduced = false;
 let state = null, kW = 0, kH = 0, kdpr = 1, kS = K.MASK_SCALE, kLast = null;
@@ -123,7 +123,7 @@ export function install(app) {
     if (e.key.length !== 1) return;
     typed = (typed + e.key.toLowerCase()).slice(-8);
     if (typed.endsWith('kiri') || typed.endsWith('мъгла')) {
-      if (!isCrazy()) { refog(); flood(); toast(has('toast.kiri') ? line('toast.kiri') : FLOOD_TOAST); }
+      if (!isCrazy()) { refog(); flood(); toast(has('toast.fog') ? line('toast.fog') : FLOOD_TOAST); }
     }
     // 棚 the secret written under the fog in the top right corner of the banner
     if (typed.endsWith('tana') || typed.endsWith('рафт') || typed.endsWith('たな')) { typed = ''; shelf(app); }
