@@ -3,8 +3,6 @@
 
 > For working on the code today, read [`docs/`](docs/README.md) first; these notes are the background on the old code and the test harness.
 
-> For working on the code today, read [`docs/`](docs/README.md) first; these notes are the background on the old code and the test harness.
-
 # Refactor notes
 
 What package N0 ("Safety net") found surprising about the legacy code of kiripad.dev while moving it and writing the scenario suite.
