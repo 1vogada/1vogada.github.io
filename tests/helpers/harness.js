@@ -5,8 +5,8 @@
 //   const { scenario } = require('../helpers/harness');
 //   scenario('world', 'pull and spring back', async (s) => { ... });
 //
-// Env:  NEXT=1           load / (the ES modules under src/, the default); without it /?legacy (the old script) is loaded
-//       UPDATE_GOLDEN=1  write the recorded traces to tests/golden instead of comparing
+// Env:  LEGACY=1         load /?legacy (the old script, until it is deleted) instead of / (the ES modules under src/, the default)
+//       UPDATE_GOLDEN=1  write the recorded traces to tests/golden instead of comparing (from the page that is loaded: the modules)
 //       TRACE_MATCH=strict|kind   how traces are compared (default: strict; see compareTrace)
 //       SHOTS=1          write the screenshots scenarios ask for (s.shot) to tests/shots/
 //       ONLY="name"      run only scenarios whose name contains this text (node --test-name-pattern works too)
@@ -20,7 +20,8 @@ const server = require('./server');
 const pageInit = require('./page-init');
 const { compareTrace, buildTrace } = require('./trace');
 
-const NEXT = process.env.NEXT === '1';
+const LEGACY = process.env.LEGACY === '1';
+const NEXT = !LEGACY;   // the modules are loaded (kept for the old comparison scripts)
 const UPDATE = process.env.UPDATE_GOLDEN === '1';
 const MATCH = process.env.TRACE_MATCH || 'strict';
 const SHOTS = process.env.SHOTS === '1';
@@ -32,8 +33,12 @@ const VIEW = { width: 1280, height: 900 };
 const real = (ms) => new Promise((r) => setTimeout(r, ms));
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
-// what the recorder samples after every step of the clock. Only the published test hooks are read (see REFACTOR-NOTES.md)
+// what the recorder samples after every step of the clock. Only the published test hooks are read (see REFACTOR-NOTES.md).
+// Besides today's fields, anything an actor reports with world report(name, fn) (src/world/world.js; __cards.reported()) is
+// recorded as a field of its own, but only while its value is not null or undefined and only under a name that is not one of
+// today's fields, so a new actor leaves every existing golden as it was
 function sampleState() {
+  const FIELDS = ['doc', 't', 'claw', 'sev', 'pb', 'kat', 'shelf', 'grab', 'objs', 'found', 'katana'];
   const C = window.__cards, st = C && C.state ? C.state() : null, objs = {};
   if (C && C.objs) for (const o of C.objs) objs[o.kind] = (objs[o.kind] || 0) + 1;
   const claw = st && st.claw ? st.claw.st + (st.claw.stump ? '/stump' : '') : null;
@@ -42,7 +47,11 @@ function sampleState() {
   try { const p = window.__phrasebook && window.__phrasebook.state(); if (p) pb = p.isOpen ? (p.raid ? 'raid:' + p.raid.st + (p.raid.act ? ':' + p.raid.act : '') : 'open') : 'closed'; } catch (e) { pb = 'error'; }
   const kat = st ? (st.katana ? (st.katana.root ? 'rooted' : st.grab && st.grab.o === st.katana && st.grab.sticky ? 'equipped' : 'loose') : st.found ? 'found' : 'hidden') : null;
   const grab = st && st.grab ? st.grab.o.kind + (st.grab.o.root ? ':rooted' : '') : null;
-  return { claw, sev, pb, kat, shelf: st ? !!st.shelf : null, grab, objs };
+  const out = { claw, sev, pb, kat, shelf: st ? !!st.shelf : null, grab, objs };
+  let more = null;
+  try { more = C && C.reported ? C.reported() : null; } catch (e) { more = { reportError: String(e && e.message) }; }
+  if (more) for (const [k, v] of Object.entries(more)) if (v != null && !FIELDS.includes(k)) out[k] = typeof v === 'object' ? JSON.parse(JSON.stringify(v)) : v;
+  return out;
 }
 
 let browser = null, srv = null, base = null;
@@ -84,7 +93,7 @@ class Session {
   }
   constructor(group, name, opts) {
     this.group = group; this.name = name; this.opts = opts; this.doc = 0;
-    this.trace = { bubbles: [], states: [] }; this.raw = new Map(); this.lastState = null; this.lines = null;
+    this.trace = { bubbles: [], states: [] }; this.raw = new Map(); this.lastState = null;
     this.errors = [];
   }
   get url() { return base; }
@@ -148,7 +157,7 @@ class Session {
       await this.open(keep.time, keep.session, keep.local, cookies);
     }
     this.doc++;
-    const q = NEXT || /[?&]next\b/.test(query) ? query : !query ? '?legacy' : query[0] === '#' ? '?legacy' + query : query + '&legacy';   // the modules are the default; ?legacy loads the old script
+    const q = !LEGACY || /[?&]next\b/.test(query) ? query : !query ? '?legacy' : query[0] === '#' ? '?legacy' + query : query + '&legacy';   // the modules are the default; ?legacy loads the old script
     await this.page.goto(base + '/' + q, { waitUntil: 'load' });
     await this.settle();
   }
@@ -161,7 +170,8 @@ class Session {
     }
     await real(120);
     await this.finishCss();
-    if (!this.lines) this.lines = await this.page.evaluate(() => window.__lines ? JSON.parse(JSON.stringify(window.__lines)) : null).catch(() => null);
+    // the modules' bus must be strict under the harness (page-init.js sets window.__test.strictBus; src/core/debug.js reads it)
+    if (!LEGACY && await this.page.evaluate(() => !!window.__kiri && window.__kiri.bus.strict !== true)) throw new Error('the bus is not strict under the test harness');
   }
   // CSS entrance animations run on real time; finish them so layout is final (only the finite, non-speech ones)
   async finishCss(names = ['rise', 'regrow', 'unroll', 'stamp', 'poof', 'shelf-in']) {
@@ -224,20 +234,20 @@ class Session {
     }
   }
   // the bubbles seen so far: [{ t, ms, who, key, text }]
-  async bubbles() { await this.collect(); return buildTrace(this.trace, this.lines).bubbles; }
+  async bubbles() { await this.collect(); return buildTrace(this.trace).bubbles; }
   async texts() { return (await this.bubbles()).map((b) => b.text); }
   async said(re) { return (await this.bubbles()).some((b) => (re instanceof RegExp ? re.test(b.key + ' ' + b.text) : b.key.split('|').includes(re))); }
   checkGolden() {
     if (this.errors.length) assert.fail('page errors:\n' + this.errors.join('\n'));
-    const trace = buildTrace(this.trace, this.lines);
+    const trace = buildTrace(this.trace);
     const file = path.join(GOLDEN, this.group, slug(this.name) + '.json');
     const out = { scenario: `${this.group} / ${this.name}`, seed: this.opts.seed == null ? 1 : this.opts.seed, ...trace };
-    if (UPDATE && !NEXT) {
+    if (UPDATE) {
       fs.mkdirSync(path.dirname(file), { recursive: true });
       fs.writeFileSync(file, JSON.stringify(out, null, 1) + '\n');
       return;
     }
-    if (!fs.existsSync(file)) assert.fail(`no golden trace ${path.relative(ROOT, file)}: record it on legacy with UPDATE_GOLDEN=1`);
+    if (!fs.existsSync(file)) assert.fail(`no golden trace ${path.relative(ROOT, file)}: record it with UPDATE_GOLDEN=1 ONLY="${this.name}" npm run test:golden`);
     const want = JSON.parse(fs.readFileSync(file, 'utf8'));
     const diff = compareTrace(want, out, MATCH);
     if (diff) {
@@ -344,4 +354,4 @@ class Session {
   }
 }
 
-module.exports = { scenario, Session, NEXT, MATCH, assert, real, sampleState };
+module.exports = { scenario, Session, NEXT, LEGACY, MATCH, assert, real, sampleState };

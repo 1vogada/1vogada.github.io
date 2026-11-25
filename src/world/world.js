@@ -17,7 +17,8 @@
 //   DBG                             world.dbg (core/debug.js flags().dbg, read at install; a test may switch it on later)
 //   claw, sevs, shelf               the actors (hand, severed, shelf); the world never reads them. remove() emits 'body.removed'
 //                                   (legacy sevGone and katObj = null), buildWalls() emits 'world.resized' (legacy shelfOff/shelfOn)
-//                                   __cards.state() asks the actors through report(name, fn) for found / claw / shelf
+//                                   __cards.state() asks the actors through report(name, fn) for found / claw / shelf;
+//                                   __cards.reported() any other name an actor reports (the test recorder records them)
 //
 // A body record (legacy `o`): { kind: 'card' | 'piece' | 'shard' | 'katana' | 'hand', body (planck Body), el, w, h, ex, ey,
 //   px, py, pa (pose before the last step, for interpolation), key?, root? { x, y } (m), grip?, strained?, hot? (ms), die? (ms),
@@ -224,10 +225,14 @@ export const isCrazy = () => typeof document !== 'undefined' && document.documen
 const reports = new Map();
 /**
  * an actor reports a field of __cards.state(): 'found' (katana uncovered), 'katana' (legacy katObj, rooted or loose; default
- * world.blade), 'claw' (the claw record or null), 'shelf' (the shelf or null)
+ * world.blade), 'claw' (the claw record or null), 'shelf' (the shelf or null). Any other name is a field for the test recorder:
+ * __cards.reported() gives { name: fn() } for those, and the scenario trace records each one while it is not null (keep it small
+ * and plain: a state name, a number, a short object)
  */
 export function report(name, fn) { reports.set(name, fn); }
 const ask = (name, dflt) => { const f = reports.get(name); return f ? f() : dflt; };
+const BUILT_IN = new Set(['found', 'katana', 'claw', 'shelf']);
+const reported = () => { const out = {}; for (const [name, f] of reports) if (!BUILT_IN.has(name)) out[name] = f(); return out; };
 
 export function install(app) {
   world.reduced = !!(app && app.reduced);
@@ -238,5 +243,5 @@ export function install(app) {
   defineSpeaker('page', { layer: () => world.layer });
   setLayoutSource(() => world.bodies);
   hook('__cards', { objs: world.bodies, S, bits: world.bits,
-    state: () => ({ grab: world.grab, press: world.press, loopOn: clock.running(), size: world.size, found: ask('found', false), katana: ask('katana', world.blade), claw: ask('claw', null), shelf: ask('shelf', null) }) });
+    state: () => ({ grab: world.grab, press: world.press, loopOn: clock.running(), size: world.size, found: ask('found', false), katana: ask('katana', world.blade), claw: ask('claw', null), shelf: ask('shelf', null) }), reported });
 }

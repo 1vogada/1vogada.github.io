@@ -1,4 +1,7 @@
-> **Since the flip (wave 4):** the modules under `src/` are the default and the old script loads only with `?legacy`. `npm test` runs the scenarios on the modules, `npm run test:legacy` on the old script, both with strict matching. Where the notes below say `?next`, read "the default".
+> **Since the flip (wave 4):** the modules under `src/` are the default and the old script loads only with `?legacy`. `npm test` runs the scenarios on the modules, `npm run test:legacy` on the old script, both with strict matching. Where the notes below say `?next`, read "the default". Goldens are now recorded from the modules
+> (`UPDATE_GOLDEN=1 npm run test:golden`), and no test reads `scripts/*.js` any more (docs/pitfalls.md item 12).
+
+> For working on the code today, read [`docs/`](docs/README.md) first; these notes are the background on the old code and the test harness.
 
 > For working on the code today, read [`docs/`](docs/README.md) first; these notes are the background on the old code and the test harness.
 

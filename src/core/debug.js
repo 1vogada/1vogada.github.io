@@ -5,13 +5,15 @@
 //   __timing   TIMING (core/tune.js)                     set here
 //   __pick     pick (core/lines.js, shared memory)       set here
 //   __lines    lines.legacy(): { SAY, CLAW_SAY, AGONY, BEG, PANIC, NOTME, SEV_SAY } built from the registered arrays   set here
-//   __cards    { objs, S, bits, state() }                world/world.js calls hook('__cards', ...)
+//   __cards    { objs, S, bits, state(), reported() }    world/world.js calls hook('__cards', ...)
 //   __hand     { get, draw, set, POSES, katanaSvg, come, to, say, grip, leave }   actors/hand/index.js
 //   __sev      { list, SEV, POSES, set, spawn, say, cut }                        actors/severed/index.js
 //   __shelf    () => toggle                                                       actors/shelf.js
 //   __phrasebook { open, close, raid, next, state, el }                           phrasebook/menu.js
 // ?debug           strict bus (unknown event types throw)
 // ?debug=events    strict bus, and every emit is logged to the console
+// window.__test = { strictBus: true }   set by the test harness (tests/helpers/page-init.js) before any module runs: a strict bus
+//                  in every scenario without ?debug in the URL. Visitors never have it, so they get what they always got
 // (?debug=zones and ?dbg are read by their own features through flags() below.)
 
 import { bus } from './bus.js';
@@ -27,7 +29,8 @@ const search = () => (typeof location === 'undefined' ? '' : location.search);
 export function flags() {
   const s = search(), set = new Set();
   for (const m of s.matchAll(/[?&]debug(?:=([^&]*))?/g)) { set.add(''); if (m[1]) for (const v of decodeURIComponent(m[1]).split(',')) set.add(v); }
-  return { debug: set, on: set.size > 0, events: set.has('events'), zones: set.has('zones'), dbg: s === '?dbg' };
+  const test = typeof window !== 'undefined' && window.__test && typeof window.__test === 'object' ? window.__test : {};
+  return { debug: set, on: set.size > 0, events: set.has('events'), zones: set.has('zones'), dbg: s === '?dbg', strict: set.size > 0 || test.strictBus === true };
 }
 
 /** publish a legacy test hook (window.__name). Safe to call before or after install */
@@ -40,7 +43,7 @@ export function hook(name, value) {
 export function install(app = {}) {
   if (typeof window === 'undefined' || published) return;
   const f = flags();
-  if (f.on) bus.strict = true;
+  if (f.strict) bus.strict = true;
   if (f.events) bus.tap((type, payload) => console.log('[bus]', type, payload));   // eslint-disable-line no-console
   published = true;
   const live = (name) => ({ get: () => app[name], enumerable: true });

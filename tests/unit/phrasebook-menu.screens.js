@@ -1,12 +1,14 @@
 'use strict';
+// LEGACY COMPARISON: delete together with scripts/legacy.js, scripts/lang.js and scripts/phrasebook.js. It only compares the
+// old script with the modules; nothing in npm test, tests/unit/*.test.js or CI depends on it.
 // The phrasebook on legacy (scripts/phrasebook.js) and on ?next (src/phrasebook/) side by side, in one browser session: the same
 // page is loaded twice (legacy, then ?next) with the same frozen clock and seeded Math.random, the same steps are taken in both,
 // and what comes out must be identical:
 //   - the menu's HTML, chapter by chapter (with every figure), its head count and its tabs, in mixed mode and in English-only mode
 //   - Tab / Shift+Tab focus order inside the open menu, and the keys that must not reach the page under it
 //   - the end of a raid: with every line already gone, the hand comes in bored, finds nothing and says "all gone."
-// Run WITHOUT NEXT (the second load asks for ?next itself):
-//   node --test tests/unit/phrasebook-menu.screens.js
+// Run with LEGACY=1 (the first load is ?legacy, the second asks for ?next itself):
+//   LEGACY=1 node --test tests/unit/phrasebook-menu.screens.js
 const { scenario, assert } = require('../helpers/harness');
 
 async function openBook(s) {

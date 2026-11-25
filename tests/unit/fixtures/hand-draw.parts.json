@@ -1,0 +1,8 @@
+{
+"undefined keys": ["under","over","thumb","talonT","flesh","talon","crease","vein","eye","pupil"],
+"undefined under": "{\"tag\":\"svg\",\"attrs\":{\"class\":\"claw under\",\"aria-hidden\":\"true\"},\"kids\":[{\"tag\":\"path\",\"attrs\":{\"class\":\"flesh\"},\"kids\":[]},{\"tag\":\"path\",\"attrs\":{\"class\":\"talon\"},\"kids\":[]}]}",
+"undefined over": "sha256:28b0263ecc120ca23ba88a56",
+"sev keys": ["under","over","thumb","talonT","flesh","talon","crease","vein","eye","pupil"],
+"sev under": "{\"tag\":\"svg\",\"attrs\":{\"class\":\"claw under sev\",\"aria-hidden\":\"true\"},\"kids\":[{\"tag\":\"path\",\"attrs\":{\"class\":\"flesh\"},\"kids\":[]},{\"tag\":\"path\",\"attrs\":{\"class\":\"talon\"},\"kids\":[]}]}",
+"sev over": "sha256:ce88fb76b76fd84c3c391d75"
+}

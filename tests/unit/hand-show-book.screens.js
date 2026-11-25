@@ -1,10 +1,12 @@
 'use strict';
+// LEGACY COMPARISON: delete together with scripts/legacy.js, scripts/lang.js and scripts/phrasebook.js. It only compares the
+// old script with the modules; nothing in npm test, tests/unit/*.test.js or CI depends on it.
 // The arm's 'show' (Surprise me drives it: come, to, say, leave) and 'book' (the phrasebook raid writes c.st = 'book', later
 // c.st = 'off' and set('lurk')) states, which no arm scenario reaches while the scenes and the phrasebook are other packages.
 // The same script runs on legacy and on ?next (frozen clock, seeded Math.random) and writes its trace: the states with their
 // times, the hand's lines with their times and texts, and the claw's x, y, a and pose every 100 ms. Compare the two files:
-//   OUT=/tmp/legacy.json node --test tests/unit/hand-show-book.screens.js
-//   OUT=/tmp/next.json NEXT=1 node --test tests/unit/hand-show-book.screens.js
+//   OUT=/tmp/legacy.json LEGACY=1 node --test tests/unit/hand-show-book.screens.js
+//   OUT=/tmp/next.json node --test tests/unit/hand-show-book.screens.js
 //   diff /tmp/legacy.json /tmp/next.json       (no output: the same)
 const fs = require('node:fs');
 const { scenario } = require('../helpers/harness');

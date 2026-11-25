@@ -1,5 +1,5 @@
 'use strict';
-// Phrasebook (scripts/phrasebook.js): the menu that lists every line the page can say, and the raid: stay in it for five seconds
+// Phrasebook (src/phrasebook/): the menu that lists every line the page can say, and the raid: stay in it for five seconds
 // and the hand reaches in, pulls the lines out and throws them, eats them, asks you to help rip one, or yanks the page about.
 const { scenario, assert } = require('../helpers/harness');
 const G = 'phrasebook';

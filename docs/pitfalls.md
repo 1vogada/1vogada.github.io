@@ -114,7 +114,8 @@ of its group; move nothing.
 Also: the physics world is lazy (planck loads on the first `pointerover` of `#grid`; `world.b2` is null until the first pull):
 call `load()` then `init()` before touching it, as `actors/shelf.js` `toggle` does. `world.reset` is emitted before the bodies are
 removed. `card.landed` fires inside the planck contact callback: no body may be created or destroyed there. The bus is strict
-(unknown event types throw) only with `?debug` in the URL, not in the scenario suite.
+(unknown event types throw) with `?debug` in the URL and in every scenario (`window.__test.strictBus` from
+`tests/helpers/page-init.js`, read by `src/core/debug.js`); visitors get a lenient bus, so a typo shows up in the tests only.
 
 ## 12. Tests that pin today's behaviour
 
@@ -122,12 +123,12 @@ These were built to prove the refactor changed nothing; an intended change trips
 
 | check | pins | what happens on an intended change |
 |---|---|---|
-| strict goldens (`tests/golden/`) | every bubble's time, life, list and text; every state change | fails from the first difference. Re-recording works only on the legacy run (`tests/helpers/harness.js` `if (UPDATE && !NEXT)`), so behaviour that legacy lacks cannot get a golden yet; use `golden: false` and assertions. `TRACE_MATCH=kind` is a looser local aid (no times, no texts) |
-| `tests/unit/lines-data.test.js` | every list's text and order against `scripts/legacy.js` and `scripts/phrasebook.js`; no extra multi-line keys; no new triggers or glosses | fails on any line edit or new list |
-| `tests/helpers/trace.js` | names the phrasebook raid's lists (`PB.RAID_SAY` ...) by reading `scripts/phrasebook.js` | deleting that file turns those keys into `?` and fails the raid golden |
-| `tests/unit/styles-split.test.js` | the split CSS against `index.html` at commit `df0dc3b` | needs the git history (fails in a copy without `.git`) |
+| strict goldens (`tests/golden/`) | every bubble's time, life, list and text; every state change | fails from the first difference. Re-record the scenarios the change should touch from the modules: `UPDATE_GOLDEN=1 ONLY="..." npm run test:golden`, then review `git diff tests/golden` (recipes.md 10). `TRACE_MATCH=kind` is a looser local aid (no times, no texts) |
+| `tests/unit/lines.snapshot.json` (`lines-snapshot.test.js`) | every list's key, text, order, language, gloss and trigger | fails on any line edit: `UPDATE_SNAPSHOT=1 node --test tests/unit/lines-snapshot.test.js`, review the diff (recipes.md 1) |
+| `tests/unit/fixtures/cut-geometry.*`, `hand-draw.*`, `sev-gait.*` (`tests/unit/recorded.js`) | the blade's geometry and pieces, every path of the hand's drawing, the cut-off hand's feet and forces, as the legacy code computed them | fails on a change of that code's results: run the test with `UPDATE_SNAPSHOT=1` and commit the fixtures with the reason. Large results are kept as hashes, so the diff names the case, not the detail |
+| `tests/unit/styles-split.test.js` | the split CSS against the inline `<style>` of `df0dc3b` (`tests/unit/fixtures/inline-style-df0dc3b.css`) and the class strings of `index.html` and `src/` | a new rule in `styles/*.css` fails "no rule added": it pins the split, not later styling. Relax it (compare only the rules the reference has) once styles change on purpose |
 
-**Do:** until these are relaxed, say in your commit which goldens or checks changed on purpose and why.
+**Do:** say in your commit which goldens, snapshots or fixtures changed on purpose and why.
 
 ## 13. Legacy bugs deliberately kept
 

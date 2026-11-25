@@ -1,6 +1,6 @@
 // The shelf's toasts (one-line lists, no random draw). The cards' panic and the hand's shelf lines live in cards.js and hand.js.
 // The 棚 toasts are tagged ja by script; in English-only mode page/toast.js drops their non-English parts (legacy lang.js plain()).
-// Generated once from scripts/legacy.js and scripts/phrasebook.js; tests/unit/lines-data.test.js checks every list against them.
+// Generated once from the old scripts; tests/unit/lines.snapshot.json pins every list (edit, UPDATE_SNAPSHOT=1, review the diff).
 // Keep each array's contents and order exactly: line() draws by index, and the array itself is the picker's memory key.
 // lang: one tag per line ('en' | 'bg' | 'ja', by script: Cyrillic = bg, kana/kanji = ja, else en), or one string for all.
 import { defineLines } from '../core/lines.js';

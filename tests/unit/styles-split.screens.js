@@ -12,9 +12,8 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { execFileSync } = require('node:child_process');
 const H = require('../helpers/harness');
-const { ORDER, COMPONENTS, inlineBlock, BASE_COMMIT } = require('./styles-split.test.js');
+const { ORDER, COMPONENTS, inlineBlock, REFERENCE } = require('./styles-split.test.js');
 const { scenario, Session, assert } = H;
 const G = 'styles-split';
 
@@ -29,7 +28,7 @@ if (inlineBlock(own)) {
   other = own.replace(/<style>[\s\S]*?<\/style>/, () => LINKS);
   ownKind = 'inline'; otherKind = 'links';
 } else {
-  const block = inlineBlock(execFileSync('git', ['show', BASE_COMMIT + ':index.html'], { cwd: ROOT, encoding: 'utf8' }));
+  const block = fs.readFileSync(REFERENCE, 'utf8');   // the inline block of index.html at the commit the split was made against
   const re = new RegExp(ORDER.map((f) => `<link rel="stylesheet" href="/?styles/${f}\\.css[^"]*">`).join('\\s*'));
   assert.match(own, re, 'index.html links styles/*.css in the documented order');
   other = own.replace(re, () => `<style>${block}</style>`);

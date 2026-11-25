@@ -98,7 +98,5 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 
 ## Notes
 
-- The catalogue text for `hand.state` says `{ from, to }`; the machine sends `{ self, from, to, data }` (same for `sev.state`).
-- `card.cutting` and `card.stabbed` carry `grid` (not in the catalogue text): the grid element when the card had not been torn out.
 - `card.strained`, `card.hurt`, `hand.reaching` and `blade.moved` fire every step or frame: keep their listeners cheap and free of side effects you do not want 240 times a second.
 - Events with no listener today (`none`) are the free hooks for new reactions.

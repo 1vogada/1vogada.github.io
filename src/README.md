@@ -149,7 +149,7 @@ claim(body, owner, why) -> release; holder(body); holders(body); isFree(body); h
 12. **lines:** `list(key)` and `once(id)`; `legacy` path option so `__lines` holds the very arrays `line()` picks from (the
     raid picks `__lines.CLAW_SAY.rip` through `__pick`, sharing the hand's memory). An emptied language filter falls back
     to the whole list.
-13. **debug:** any `?debug` makes the bus strict; `?debug=events` also logs. `window.__lines` is built at debug install.
+13. **debug:** any `?debug` (or `window.__test.strictBus`, which the test harness sets) makes the bus strict; `?debug=events` also logs. `window.__lines` is built at debug install.
 14. **TIMING is unchanged** (same shape on `window.__timing`); new speech numbers (tilt, ride offset, agony gaps, arm bubble
     offsets, layout paddings) are in `TUNE.speech`.
 15. **Layer 4 is split** into 4 (`page/`, `lines/`) and 4.5 (`scenes/`, `phrasebook/`): legacy Surprise me reads the
