@@ -38,7 +38,7 @@ defineLines('katana.drop', ['oops.', 'I meant to do that', 'gravity wins again',
 | `gloss` | `{ [line]: 'English meaning' }` for Bulgarian and Japanese lines; the phrasebook prints it on the chip (`JP · meaning`) |
 | `trigger` | `{ title, when }`: the phrasebook entry's heading and its "When" text |
 | `who` | who says it (defaults to the key's first part) |
-| `legacy` | `'SAY.x'`, `'CLAW_SAY.x'`, `'SEV_SAY.x'`, ...: where the list sits in `window.__lines`. The test recorder names a bubble's list from `window.__lines` (`CLAW_SAY.bye`); a list without `legacy` is recorded with key `?` |
+| `legacy` | `'SAY.x'`, `'CLAW_SAY.x'`, `'SEV_SAY.x'`, ...: where the list sits in `window.__lines`. Existing lists keep theirs: the scenario trace names a bubble's list by it (`CLAW_SAY.bye`). A list without one is traced under its own key (`hand.wave`). A path under `SAY` / `CLAW_SAY` also makes the phrasebook list it as "New: …" when it is not in `CHAPTERS` |
 
 **How it shows up**
 
@@ -59,9 +59,16 @@ cut-off hand: `say(o, 'x', true)` from `src/actors/severed/index.js`; at a page 
 
 **Check:** `node --test tests/unit/*.test.js`; open the phrasebook; try English only (footer button, or `localStorage['kiripad-lang']='en'`).
 
-> Today `tests/unit/lines-data.test.js` pins every list to the text in `scripts/legacy.js` and allows no new multi-line key,
-> so any deliberate line change fails it; the strict goldens fail too wherever the changed list is picked. See pitfalls.md
-> "Tests that pin today's behaviour".
+**Update the snapshot.** `tests/unit/lines.snapshot.json` holds every list (key, `who`, `legacy`, `trigger`, and one row per line:
+`[text, lang, gloss]`), so the unit tests fail on any line edit until you accept it:
+
+```sh
+UPDATE_SNAPSHOT=1 node --test tests/unit/lines-snapshot.test.js   # rewrite it from src/lines/*.js
+git diff tests/unit/lines.snapshot.json                            # review: exactly the lines you meant to change
+```
+
+Commit the snapshot with the edit. A changed list also changes the strict goldens of every scenario that picks from it (the
+text, and with a different length the random draw): re-record those (recipe 10) and review their diff too.
 
 ---
 
@@ -257,7 +264,7 @@ export function set(v) {
 ```
 
 - Emit after the emitter's own line and own random draws for the same moment (the actor speaks first, then the world reacts); never rename a type.
-- `bus.emit` of a type missing from `EVENTS` throws only on a strict bus: in the page with `?debug`, and in unit tests built with `createBus({ strict: true })`. The scenario suite loads the page without `?debug`, so a typo goes unnoticed there: open the page with `?debug` once.
+- `bus.emit` (or `bus.on`) of a type missing from `EVENTS` throws on a strict bus: in the page with `?debug`, in every scenario (`tests/helpers/page-init.js` sets `window.__test.strictBus`, which `src/core/debug.js` reads; the page error fails the scenario), and in unit tests built with `createBus({ strict: true })`. Visitors get a lenient bus.
 - Listen: `bus.on(type, fn)` (returns `off`; `'magnet.*'` and `'*'` wildcards work), `bus.once`, a scope's `sc.on(type, fn)` (dies with the scope), or `on: { type(self, ev, m) {} }` in a behaviour (only while that state is current).
 - A state change of a machine already emits `<actor>.state` `{ self, from, to, data }` (`hand.state`, `sev.state`).
 
@@ -295,7 +302,8 @@ import { drawOffset } from '../world/loop.js';
 For bubbles left at a page point use `sayAt(x, y, key, { as: '<speaker>' })` (default speaker `'page'`, removed on wall time); for a
 bubble inside an element, `sayIn(el, key, { text, floor })` (speaker `'button'`).
 
-**Check:** a scenario that makes it talk; `s.said(/some text/)` or `s.said('CLAW_SAY.bye')` (needs a `legacy` path, recipe 1).
+**Check:** a scenario that makes it talk; `s.said(/some text/)`, `s.said('CLAW_SAY.bye')` (an existing list, by its `legacy`
+path) or `s.said('hand.wave')` (a new list without one, by its key; recipe 1).
 
 ---
 
@@ -441,8 +449,15 @@ Checklist for an actor:
 | test hook | `hook('__name', value)` from `src/core/debug.js` (name matches `/^__[a-z]+$/`); `window.__kiri` already exposes `bus`, `clock`, `lines` |
 | other actors | never import them: emit an event, wire it in `src/reactions.js` |
 
-`report(name, fn)` (world) only feeds the fixed fields of `__cards.state()` (`found`, `katana`, `claw`, `shelf`): the test recorder
-does not see a new actor's state. Assert on your own hook in scenarios instead (`window.__magnet.isOn()`).
+`report(name, fn)` (world) feeds `__cards.state()` for the fixed names (`found`, `katana`, `claw`, `shelf`); any other name is a field
+of the scenario trace (`__cards.reported()`, read by `sampleState` in `tests/helpers/harness.js`), recorded only while its value is
+not null, so an idle new actor leaves every existing golden alone. Keep the value small and plain (a state name, a number):
+
+```js
+// src/actors/magnet.js, in install(app)
+import { report } from '../world/world.js';
+  report('magnet', () => (on ? 'on' : null));   // the trace shows magnet: "on" while it pulls; s.state().magnet in a scenario
+```
 
 **Check:** lint (an import of another actor fails it), stamp, a scenario (the magnet's: rip a card, let it settle,
 `window.__magnet.set(true)`, run 1.5 s, the card's x went down by more than 50 px).
@@ -477,20 +492,23 @@ Options (third argument): `seed` (default 1), `rand` (a constant `Math.random`),
 
 Session helpers (`tests/helpers/harness.js`): time `run(ms, step)`, `runUntil(fn, arg, { max, step })`, `real(ms)`; input
 `move`, `down`, `up`, `line`, `path`, `pull(i, dx, dy)`, `rip(i)` (button stays down), `throwTo`, `press(sel)`, `key(k)`,
-`type(text)`, `scrollTo(y)`; reads `state()` (`claw`, `sev`, `pb`, `kat`, `shelf`, `grab`, `objs`), `said(key | RegExp)`,
+`type(text)`, `scrollTo(y)`; reads `state()` (`claw`, `sev`, `pb`, `kat`, `shelf`, `grab`, `objs`, and any field an actor
+reports, recipe 9), `said(key | RegExp)`,
 `bubbles()`, `texts()`, `eval(fn, arg)`, `box(sel)`; randomness `rand(v)`, `randQueue(...v)`; `ensurePlanck()`.
 
 **Recording the golden.** After the scenario passes, the harness compares the recorded trace (every bubble with time, life, list
-key and text; every change of `claw`, `sev`, `pb`, `kat`, `shelf`, `grab`, `objs`) with the golden file. `UPDATE_GOLDEN=1` writes
-goldens **only on the legacy run** (`if (UPDATE && !NEXT)` in `tests/helpers/harness.js`):
+key and text; every change of `claw`, `sev`, `pb`, `kat`, `shelf`, `grab`, `objs` and of any reported field) with the golden file.
+Record it from the page as it is now (the modules):
 
-| the scenario covers | do |
-|---|---|
-| behaviour legacy also has | `UPDATE_GOLDEN=1 ONLY="name" npm run test:legacy`, then `ONLY="name" npm test` must pass strictly on the modules |
-| new behaviour (modules only) | `golden: false` and assert what matters (as above). A golden for it needs the harness to record with `NEXT=1` (open item, pitfalls.md) |
+```sh
+UPDATE_GOLDEN=1 ONLY="waves when the shelf goes" npm run test:golden   # writes tests/golden/arm/waves-when-the-shelf-goes.json
+ONLY="waves when the shelf goes" npm test                              # must pass strictly: the scenario is deterministic
+```
 
-Commit the new golden file with the test. `UPDATE_GOLDEN=1 npm test` (modules) does not write anything: it fails with
-"no golden trace ... record it on legacy".
+Drop `golden: false` from the scenario first (with it nothing is recorded or compared). Read the new file before committing it
+with the test: the lines and states in it are what the test now pins. For a deliberate behaviour change that alters existing
+goldens, re-record exactly the scenarios it should touch and review `git diff tests/golden`: any other changed golden is a
+regression. `TRACE_MATCH=kind` helps to see whether only times and texts moved.
 
 **Check:** `ONLY="waves when the shelf goes" npm test` -> 1 pass.
 
@@ -506,4 +524,4 @@ Applied to a copy of this tree (then thrown away; nothing of it is committed):
 | 4: `cheer` behaviour, `shelf.opened` rule, scenario with `__sev.spawn` | scenario passes |
 | 6 + 9: `magnet` actor, `magnet.changed` event, `TUNE.magnet` | lint ok, scenario passes (card drifts left > 50 px) |
 | 8: `peek` scene on `katana.sheathed` | scenario passes (`show` -> `sulk`, `CLAW_SAY.katana` said); the existing strict `sheathe` golden then fails, as expected |
-| 10, recording: an existing-behaviour scenario (`second card pulled and let go`) | recorded with `UPDATE_GOLDEN=1 ... npm run test:legacy`, passes strictly with `npm test`; `UPDATE_GOLDEN=1 npm test` writes nothing |
+| 10, recording: `UPDATE_GOLDEN=1 ONLY=... npm run test:golden` on nine existing scenarios (rip, raid, coin win, shelf, draw, held and crush, reduced motion, kiri flood) | every rewritten golden byte-identical to the committed one (`git status` clean) |

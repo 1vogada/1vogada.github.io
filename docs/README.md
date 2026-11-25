@@ -97,17 +97,18 @@ The phases are fixed in `core/clock.js` (`STEP_PHASES`, `TICK_PHASES`, `DRAW_PHA
 |---|---|
 | `npm test` | the 35 browser scenarios (Playwright, Chromium) on the modules, compared **strictly** with `tests/golden/` (about 9 min: prefer `ONLY`) |
 | `ONLY="part of a name" npm test` | only the scenarios whose name contains the text |
-| `npm run test:legacy` | the same scenarios on `?legacy` (until legacy.js is deleted) |
-| `UPDATE_GOLDEN=1 ONLY="..." npm run test:legacy` (= `npm run test:golden`) | re-record goldens. **Only works on the legacy run** (`tests/helpers/harness.js`: `if (UPDATE && !NEXT)`); see recipes.md "Add a scenario test" |
+| `npm run test:legacy` | the same scenarios on `?legacy` (`LEGACY=1`; until legacy.js is deleted) |
+| `UPDATE_GOLDEN=1 ONLY="..." npm run test:golden` | record (or re-record) the goldens of the matching scenarios from the modules; review `git diff tests/golden` (recipes.md 10) |
 | `TRACE_MATCH=kind ONLY="..." npm test` | looser compare: same order of line lists and state changes, no times or texts |
 | `SHOTS=1`, `HEADED=1` | screenshots to `tests/shots/` / a visible browser |
-| `node --test tests/unit/*.test.js` | unit tests, plain node (core, lines data, hand behaviours, gait, cut geometry, styles split) |
+| `node --test tests/unit/*.test.js` | unit tests, plain node (core, the lines snapshot, hand behaviours, gait, cut geometry, hand drawing, styles split) |
+| `UPDATE_SNAPSHOT=1 node --test tests/unit/<file>.test.js` | rewrite that test's snapshot from the modules: `tests/unit/lines.snapshot.json` (lines-snapshot), `tests/unit/fixtures/*.json` (cut-geometry, hand-draw, sev-gait); review the diff |
 | `node scripts/lint-layers.mjs` | the layer rules, no timers or `performance.now` outside `src/core/`, no `window.__` outside `src/core/debug.js` |
 | `npm run stamp` | regenerate the import map in `index.html`. **After any change under `src/`** (add, remove or edit: the stamp hashes contents) |
 | `npm run stamp:check` | what CI runs: fails if the import map is stale |
 
 A failing scenario writes the actual trace to `tests/shots/<group>--<name>.actual.json` and prints the first difference.
-Open the page with `?debug` for a strict bus (an unknown event type throws) and `?debug=events` to log every emit.
+Open the page with `?debug` for a strict bus (an unknown event type throws; the scenarios always run with a strict bus) and `?debug=events` to log every emit.
 `?debug=zones` draws the hand's trigger zones; `?dbg` (exactly that) logs release and impact speeds.
 
 ## The cache rule

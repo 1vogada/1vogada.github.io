@@ -2,7 +2,7 @@
 // Screenshots the page at rest in two builds and checks they are pixel-identical, in light and dark, viewport and full page.
 //
 //   node tests/helpers/compare-rest.js --ref origin/master            this worktree against a git ref (exported to a temp folder)
-//   node tests/helpers/compare-rest.js --query-b '?next'              this worktree, / against /?next
+//   node tests/helpers/compare-rest.js --query-a '?legacy'            this worktree, /?legacy against / (only until legacy.js is deleted)
 //   options: --dir-a <folder>  --dir-b <folder> (default: this worktree)  --out <folder for the PNGs> (default tests/shots/rest)
 //
 // "At rest": frozen clock (same start time), seeded Math.random, the cards' entrance animation finished, nothing touched.

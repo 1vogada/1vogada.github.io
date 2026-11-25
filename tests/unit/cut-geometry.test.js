@@ -1,12 +1,13 @@
-// Parity of world/cut.js with the legacy blade. The legacy functions (polyArea, validPoly, inside, crossings, edgeOf, slice,
-// bladeCuts, endCut, bleed, and the cloneCard / addBody / fragment / spray / trail they call) are cut out of scripts/legacy.js as
-// text and run next to src/world/cut.js on a tiny fake DOM and a fake planck, with the same seeded Math.random and the same
-// clock. Geometry results, the pieces a slice makes, the particles, the order of lines and hand notices, and the number of
-// Math.random draws must be identical. Plain node, no browser.
+// Parity of world/cut.js with the legacy blade. src/world/cut.js runs on a tiny fake DOM and a fake planck, with a seeded
+// Math.random and a set clock, over random polygons, cut lines, cards and katana strokes. Geometry results, the pieces a slice
+// makes, the particles, the order of lines and hand notices, and the number of Math.random draws must equal what the legacy
+// functions (polyArea, validPoly, inside, crossings, edgeOf, slice, bladeCuts, endCut, bleed, cloneCard, addBody, spray, trail,
+// cut out of the old scripts/legacy.js) gave for the very same cases: recorded in tests/unit/fixtures/cut-geometry.*.json
+// (tests/unit/recorded.js; UPDATE_SNAPSHOT=1 rewrites them for an intended change). Plain node, no browser.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { seeded } from './fake-env.js';
+import { recording } from './recorded.js';
 
 // ---- a fake DOM ----
 let T = 0;
@@ -48,25 +49,6 @@ const { bus } = await import('../../src/core/bus.js');
 const { TUNE } = await import('../../src/core/tune.js');
 const S = TUNE.physics.S;
 
-// ---- legacy, cut out of scripts/legacy.js ----
-const SRC = readFileSync(new URL('../../scripts/legacy.js', import.meta.url), 'utf8');
-const cut = (from, to) => { const i = SRC.indexOf(from), j = SRC.indexOf(to, i); assert.ok(i >= 0 && j > i, `legacy.js: ${from}`); return SRC.slice(i, j); };
-const bladeSrc = cut('const TIP = [15, 146]', '// little drops and paper scraps');
-const spraySrc = cut('function spray(x, y, nx, ny) {', 'function moveBits(dt)');
-const trailSrc = cut('function trail(a, b) {', '// ---- the claw:');
-const cloneSrc = cut('function cloneCard(card) {', 'function addBody(');
-const addSrc = cut('function addBody(o, x, y, angle, shape, opt) {', 'function remove(o) {');
-assert.match(bladeSrc, /function slice\(o, A, B, dir\)/);
-
-/** a fresh legacy closure: env supplies the closure variables the blade reads; returns its functions and a few setters */
-function legacy(env) {
-  const names = Object.keys(env);
-  const body = `let tick = 0, katObj = null, grab = null;\n${cloneSrc}\n${addSrc}\n${bladeSrc}\n${spraySrc}\n${trailSrc}\n` +
-    'return { polyArea, validPoly, inside, crossings, edgeOf, slice, bladeCuts, addBody, setKat: (o) => { katObj = o; }, setGrab: (g) => { grab = g; } };';
-  return new Function('env', ...names, body)(env, ...names.map((n) => env[n]));
-}
-const pure = legacy({ S, objs: new Set(), bits: [], document: globalThis.document, setTimeout: () => 0, pl, world: fakeB2(), SPIN: 0, FALL: 0 });
-
 // ---- random shapes ----
 const R = seeded(424242);
 const rnd = (a, b) => a + R() * (b - a);
@@ -80,41 +62,28 @@ const rect = (w, h) => [[0, 0], [w, 0], [w, h], [0, h]];
 const N = 600;
 
 test(`polyArea, validPoly, inside, crossings, edgeOf equal legacy on ${N} random polygons and lines`, () => {
+  const rec = recording('cut-geometry.polys');
   let crossed = 0, ins = 0, valid = 0;
   for (let i = 0; i < N; i++) {
     const n = 3 + Math.floor(R() * 10), poly = i % 3 === 2 ? anyPoly(n) : convex(n, rnd(-50, 50), rnd(-50, 50), rnd(10, 300));
     if (i % 17 === 0) poly.push([...poly[0]]);   // a zero-length edge
     if (i % 23 === 0) poly.splice(1, 0, [(poly[0][0] + poly[1][0]) / 2, (poly[0][1] + poly[1][1]) / 2]);   // collinear point
-    assert.equal(cutMod.polyArea(poly), pure.polyArea(poly), `polyArea #${i}`);
-    assert.equal(cutMod.validPoly(poly), pure.validPoly(poly), `validPoly #${i}`); valid += pure.validPoly(poly);
+    const area = cutMod.polyArea(poly), ok = cutMod.validPoly(poly), lines = [];
+    valid += ok;
     for (let k = 0; k < 6; k++) {
       const a = [rnd(-400, 400), rnd(-400, 400)], b = k === 5 ? [...a] : k === 4 ? [...poly[0]] : [rnd(-400, 400), rnd(-400, 400)];
-      const x0 = cutMod.crossings(poly, a, b), x1 = pure.crossings(poly, a, b);
-      assert.deepEqual(x0, x1, `crossings #${i}.${k}`); crossed += x1.length > 0;
-      const q = k === 3 ? poly[1] : a;
-      assert.equal(cutMod.inside(poly, q[0], q[1]), pure.inside(poly, q[0], q[1]), `inside #${i}.${k}`); ins += pure.inside(poly, q[0], q[1]);
-      assert.equal(cutMod.edgeOf(poly, q), pure.edgeOf(poly, q), `edgeOf #${i}.${k}`);
+      const x = cutMod.crossings(poly, a, b); crossed += x.length > 0;
+      const q = k === 3 ? poly[1] : a, inn = cutMod.inside(poly, q[0], q[1]); ins += inn;
+      lines.push({ crossings: x, inside: inn, edgeOf: cutMod.edgeOf(poly, q) });
     }
+    rec.check(`#${i}`, { area, valid: ok, lines }, `polygon #${i}`);
   }
+  rec.done();
   assert.ok(crossed > N && ins > N / 2 && valid > N / 4, `coverage: ${crossed} crossing lines, ${ins} inside, ${valid} valid`);
 });
 
-// ---- slice and the stroke: each side on its own fake world, same seed, same clock ----
-const KEY = { cutting: 'card.cutting', stab: 'card.stab', slice: 'card.slice', kcut: 'katana.cut', kbrag: 'katana.brag' };
-/** a fresh legacy blade whose lines, notices and removals go to log; bodies get ids 0, 1, 2 ... in creation order */
-function legacySide(log) {
-  const objs = new Set(), add = objs.add.bind(objs); let n = 0;
-  objs.add = (o) => { if (o.id == null) o.id = n++; return add(o); };
-  const bits = [], layer = el('div');
-  const fns = legacy({ S, SPIN: TUNE.physics.SPIN, FALL: TUNE.physics.FALL, pl, world: fakeB2(), objs, bits, layer, document: globalThis.document,
-    now: () => T, run() {}, setTimeout: () => 0, gridEl: grid, rootOf: new Map(), ripped: new Set(), showReset() {},
-    say: (o, kind, force) => log.push(['say', o.id, KEY[kind], !!force]),
-    sayAt: () => log.push(['sayAt']), pick: () => '', SAY: {},
-    notice: (k) => log.push(['notice', k]),
-    remove: (o) => { log.push(['remove', o.id]); objs.delete(o); o.el.remove(); } });
-  return { fns, objs, bits, add: fns.addBody };
-}
-// the new side: the real world module on a fake b2; lines are recorded by the speakers' gates, which then say no (no draws)
+// ---- slice and the stroke: the real world module on a fake b2, a counted seeded Math.random, a set clock ----
+// lines are recorded by the speakers' gates, which then say no (no draws); bodies get ids 0, 1, 2 ... in creation order
 let nextLog = [], nextIds = 0;
 W.world.pl = pl; W.world.layer = el('div'); W.world.b2 = fakeB2();
 bus.on('body.added', ({ body }) => { if (body.id == null) body.id = nextIds++; });
@@ -141,6 +110,7 @@ function randomCard(x, y) {
 }
 
 test('slice equals legacy on 500 random cards and cut lines (pieces, velocities, life, particles, lines, draws)', () => {
+  const rec = recording('cut-geometry.slice');
   const realRandom = Math.random;
   let cuts = 0;
   try {
@@ -149,26 +119,20 @@ test('slice equals legacy on 500 random cards and cut lines (pieces, velocities,
       const A = [c.x + rnd(-250, 250), c.y + rnd(-250, 250)], B = i % 9 === 0 ? [A[0] + rnd(-3, 3), A[1]] : [c.x + rnd(-250, 250), c.y + rnd(-250, 250)];
       const dir = i % 7 === 0 ? [0, 0] : [B[0] - A[0], B[1] - A[1]];
       T = 1000 * i;
-      const legacyLog = [], L = legacySide(legacyLog);
-      Math.random = counting(i);
-      const lo = makeCard(L.add, c), lp = L.fns.slice(lo, A, B, dir), lDraws = Math.random.count();
       const log = newSide();
       Math.random = counting(i);
       const no = makeCard(W.add, c), np = cutMod.slice(no, A, B, dir), nDraws = Math.random.count();
       Math.random = realRandom;
-      assert.equal(!!np, !!lp, `slice #${i} result`);
-      if (lp) { cuts++; assert.deepEqual(np.map(shape), lp.map(shape), `slice #${i} pieces`); }
-      assert.deepEqual(shape(no), shape(lo), `slice #${i} the card`);
-      assert.equal(W.world.bodies.has(no), L.objs.has(lo));
-      assert.equal(nDraws, lDraws, `slice #${i} draws`);
-      assert.deepEqual(bitsOf(W.world.bits), bitsOf(L.bits), `slice #${i} particles`);
-      assert.deepEqual(log, legacyLog, `slice #${i} lines`);
+      if (np) cuts++;
+      rec.check(`#${i}`, { cut: !!np, pieces: np ? np.map(shape) : null, card: shape(no), alive: W.world.bodies.has(no), draws: nDraws, bits: bitsOf(W.world.bits), log }, `slice #${i}`);
     }
   } finally { Math.random = realRandom; }
+  rec.done();
   assert.ok(cuts > 150, `only ${cuts} of 500 lines cut`);
 });
 
 test('the stroke (bladeCuts, endCut, bleed) equals legacy: cuts, stabs, screams, wounds, notices, draws', () => {
+  const rec = recording('cut-geometry.stroke');
   const realRandom = Math.random;
   const total = { cut: 0, stab: 0, cutting: 0, brag: 0 };
   try {
@@ -195,22 +159,15 @@ test('the stroke (bladeCuts, endCut, bleed) equals legacy: cuts, stabs, screams,
         }
         return bodies;
       };
-      const legacyLog = [], L = legacySide(legacyLog);
-      Math.random = counting(1000 + sim);
-      const lb = run({ add: L.add, setKat: L.fns.setKat, setGrab: L.fns.setGrab, cuts: L.fns.bladeCuts });
-      const lDraws = Math.random.count(), lAll = [...L.objs];
       const log = newSide();
       Math.random = counting(1000 + sim);
       const nb = run({ add: W.add, setKat: W.setBlade, setGrab: (g) => { W.world.grab = g; }, cuts: cutMod.bladeCuts });
       const nDraws = Math.random.count(), nAll = [...W.world.bodies];
       Math.random = realRandom;
-      assert.deepEqual(log, legacyLog, `stroke #${sim}: lines, notices, removals`);
-      assert.equal(nDraws, lDraws, `stroke #${sim}: draws`);
-      assert.deepEqual(nb.map(shape), lb.map(shape), `stroke #${sim}: the cards`);
-      assert.deepEqual(nAll.map(shape), lAll.map(shape), `stroke #${sim}: every body`);
-      assert.deepEqual(bitsOf(W.world.bits), bitsOf(L.bits), `stroke #${sim}: particles`);
-      for (const e of legacyLog) { if (e[1] === 'cut') total.cut++; if (e[1] === 'stab') total.stab++; if (e[2] === 'card.cutting') total.cutting++; if (e[2] === 'katana.brag') total.brag++; }
+      rec.check(`#${sim}`, { log, draws: nDraws, cards: nb.map(shape), all: nAll.map(shape), bits: bitsOf(W.world.bits) }, `stroke #${sim}`);
+      for (const e of log) { if (e[1] === 'cut') total.cut++; if (e[1] === 'stab') total.stab++; if (e[2] === 'card.cutting') total.cutting++; if (e[2] === 'katana.brag') total.brag++; }
     }
   } finally { Math.random = realRandom; }
+  rec.done();
   assert.ok(total.cut > 10 && total.stab > 3 && total.cutting > 10 && total.brag > 0, `coverage: ${JSON.stringify(total)}`);
 });

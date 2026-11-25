@@ -1,11 +1,12 @@
-// Parity of the hand package's drawing and zones with the legacy code. The legacy functions (handParts, handDraw, zones and
-// the hand's geometry tables) are cut out of scripts/legacy.js as text and run next to src/actors/hand/*.js on a tiny fake
-// DOM, with the same seeded Math.random and the same clock. Every SVG path `d` (and the eye's class, c.tip, c.arm2, the number
-// of Math.random draws) must be string-identical. Plain node, no browser.
+// Parity of the hand package's drawing and zones with the legacy code. src/actors/hand/*.js runs on a tiny fake DOM, with a
+// seeded Math.random and a set clock, over some 3000 poses. Every SVG path `d` (and the eye's class, c.tip, c.arm2, the number
+// of Math.random draws), the geometry tables, handParts and zones(vw) must equal what the legacy functions (cut out of the old
+// scripts/legacy.js) gave for the very same cases: recorded in tests/unit/fixtures/hand-draw.*.json (tests/unit/recorded.js;
+// UPDATE_SNAPSHOT=1 rewrites them for an intended change). Plain node, no browser.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { seeded } from './fake-env.js';
+import { recording } from './recorded.js';
 
 // ---- a fake DOM: just what handParts/handDraw touch ----
 let T = 0, VW = 1280;
@@ -19,31 +20,24 @@ const { zones } = await import('../../src/actors/hand/zones.js');
 const poses = await import('../../src/actors/hand/poses.js');
 const { TUNE } = await import('../../src/core/tune.js');
 
-// ---- legacy, cut out of scripts/legacy.js ----
-const SRC = readFileSync(new URL('../../scripts/legacy.js', import.meta.url), 'utf8');
-const cut = (from, to) => { const i = SRC.indexOf(from), j = SRC.indexOf(to, i); assert.ok(i >= 0 && j > i, `legacy.js: ${from}`); return SRC.slice(i, j); };
-const tables = cut('const NS = ', 'let claw = null;');
-const partsSrc = cut('function handParts(extra) {', 'function clawInit()');
-const drawSrc = cut('function handDraw(c, wig, shake, strain) {', '// ---- 棚');
-const zonesSrc = cut('const zones = (vw) => {', 'if (/[?&]debug=zones');
-const L = new Function('document', 'now', 'html',
-  `${tables}\n${partsSrc}\n${drawSrc}\n${zonesSrc}\nreturn { NS, FING, THUMB, BEND, ARCH, GRIP, PALM, POSES, handParts, handDraw, zones };`,
-)(globalThis.document, () => T, globalThis.document.documentElement);
-
 const KEYS = ['thumb', 'talonT', 'flesh', 'talon', 'crease', 'vein', 'eye', 'pupil'];
 
 test('hand geometry tables equal legacy', () => {
-  for (const k of ['FING', 'THUMB', 'BEND', 'ARCH', 'GRIP', 'PALM', 'POSES']) assert.deepEqual(poses[k], L[k], k);
-  assert.deepEqual(Object.keys(poses.POSES), Object.keys(L.POSES));
+  const rec = recording('hand-draw.tables', { full: Infinity });
+  for (const k of ['FING', 'THUMB', 'BEND', 'ARCH', 'GRIP', 'PALM', 'POSES']) rec.check(k, poses[k], k);
+  rec.check('POSES order', Object.keys(poses.POSES));
+  rec.done();
   assert.deepEqual(TUNE.hand.EYE, [36, -2]);
 });
 
 test('handParts builds the same two layers', () => {
+  const rec = recording('hand-draw.parts');
   for (const extra of [undefined, 'sev']) {
-    const a = L.handParts(extra), b = handParts(extra);
-    assert.deepEqual(Object.keys(b), Object.keys(a));
-    for (const k of ['under', 'over']) assert.equal(JSON.stringify(b[k]), JSON.stringify(a[k]), k);
+    const b = handParts(extra);
+    rec.check(`${extra} keys`, Object.keys(b));
+    for (const k of ['under', 'over']) rec.check(`${extra} ${k}`, JSON.stringify(b[k]), k);
   }
+  rec.done();
 });
 
 // a deterministic case list (not from Math.random: that is reserved for the draws under test)
@@ -76,22 +70,26 @@ function render(impl, k, seed) {
 }
 
 test('handDraw: every path d string-identical to legacy, two draws per call', () => {
+  const rec = recording('hand-draw.draw');
   let n = 0, paths = 0;
   for (const vw of [360, 1280, 1920]) {
     VW = vw;
     for (const k of cases()) {
-      const seed = 0x9e37 + n, a = render(L, k, seed), b = render({ handParts, handDraw }, k, seed);
-      assert.equal(a.draws, 2);
-      assert.deepEqual(b, a, `case ${n} ${JSON.stringify(k)}`);
-      n++; paths += a.d.length;
+      const seed = 0x9e37 + n, b = render({ handParts, handDraw }, k, seed);
+      assert.equal(b.draws, 2);
+      rec.check(`${n}`, b, `case ${n} ${JSON.stringify(k)}`);
+      n++; paths += b.d.length;
     }
   }
+  rec.done();
   assert.ok(n > 1000);
   console.log(`# handDraw: ${n} calls, ${paths} path d strings compared`);
 });
 
 test('zones(vw) identical to legacy for 320..2560 step 10', () => {
+  const rec = recording('hand-draw.zones', { full: Infinity });
   let n = 0;
-  for (let vw = 320; vw <= 2560; vw += 10) { assert.deepEqual(zones(vw), L.zones(vw), `vw ${vw}`); n++; }
+  for (let vw = 320; vw <= 2560; vw += 10) { rec.check(`${vw}`, zones(vw), `vw ${vw}`); n++; }
+  rec.done();
   assert.equal(n, 225);
 });

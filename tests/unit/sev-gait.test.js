@@ -1,28 +1,18 @@
-// Parity of the severed hand's gait (src/actors/severed/gait.js) with the legacy code. The legacy GAIT, TURN, NEXT, sevGround,
-// sevFeet and sevStep are cut out of scripts/legacy.js as text and run next to the new ones over a scripted walk on a fake
-// planck world (a floor with a step and a raised block, a sensor and another hand that the ray must ignore). Every foot
-// position (a.feet and o.hand.feet), a.air, and every force and torque sevStep applies must be identical. Plain node.
+// Parity of the severed hand's gait (src/actors/severed/gait.js) with the legacy code, over a scripted walk on a fake planck
+// world (a floor with a step and a raised block, a sensor and another hand that the ray must ignore). Every foot position
+// (a.feet and o.hand.feet), a.air, every force and torque the step applies, the ground found and the gait tables must equal what
+// the legacy GAIT, TURN, NEXT, sevGround, sevFeet and sevStep (cut out of the old scripts/legacy.js) gave for the very same
+// frames: recorded in tests/unit/fixtures/sev-gait.*.json (tests/unit/recorded.js; UPDATE_SNAPSHOT=1 rewrites them for an
+// intended change). Plain node.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { recording } from './recorded.js';
 
 globalThis.scrollX = 0; globalThis.scrollY = 37;
 const gait = await import('../../src/actors/severed/gait.js');
 const { world } = await import('../../src/world/world.js');
 const { TUNE } = await import('../../src/core/tune.js');
 const S = TUNE.physics.S;
-
-// ---- legacy, cut out of scripts/legacy.js ----
-const SRC = readFileSync(new URL('../../scripts/legacy.js', import.meta.url), 'utf8');
-const cut = (from, to) => { const i = SRC.indexOf(from), j = SRC.indexOf(to, i); assert.ok(i >= 0 && j > i, `legacy.js: ${from}`); return SRC.slice(i, j); };
-const gaitSrc = cut('const GAIT = {', 'const sevs = new Set()');
-const stepSrc = cut('function sevStep(o) {', '// once per frame: every cut-off hand thinks');
-const clampSrc = cut('const clamp01 = ', '\n');
-function legacy(fakeWorld, grabRef) {
-  return new Function('S', 'world', 'GRAVITY', 'FALL', 'scrollX', 'scrollY', 'grabRef',
-    `const grab = null; ${clampSrc}\n${gaitSrc}\n${stepSrc}\nreturn { GAIT, TURN, NEXT, sevGround, sevFeet, sevStep };`,
-  )(S, fakeWorld, TUNE.physics.GRAVITY, TUNE.physics.FALL, globalThis.scrollX, globalThis.scrollY, grabRef);
-}
 
 // ---- a fake planck world: horizontal surfaces, a vertical ray cast reports each one it crosses, in list order ----
 const fixture = (kind, opts = {}) => ({ getBody: () => opts.body || { getUserData: () => (kind ? { kind } : null) }, isSensor: () => !!opts.sensor, getFilterMaskBits: () => (opts.mask ?? 0xFFFF) });
@@ -87,27 +77,27 @@ const run = (impl, steps) => {
 };
 
 test('gait tables equal legacy', () => {
-  const L = legacy(fakeWorld(null));
-  assert.deepEqual(gait.GAIT, L.GAIT); assert.equal(gait.TURN, L.TURN); assert.deepEqual(gait.NEXT, L.NEXT);
-  // the leg spring's numbers moved to TUNE.severed.LEG: the legacy sevStep literals
-  assert.match(stepSrc, /Math\.min\(170, GRAVITY \* FALL \+ 520 \* \(a\.hh - h\) \+ 42 \* v\.y\)/);
-  assert.match(stepSrc, /\(g\.drag \? 30 : 14\)/); assert.match(stepSrc, /900 \* wrapA\(want - b\.getAngle\(\)\) - 54 \* b\.getAngularVelocity\(\)/);
+  const rec = recording('sev-gait.tables', { full: Infinity });
+  rec.check('GAIT', gait.GAIT); rec.check('TURN', gait.TURN); rec.check('NEXT', gait.NEXT);
+  rec.done();
+  // the leg spring's numbers moved to TUNE.severed.LEG: the legacy sevStep literals were
+  // Math.min(170, GRAVITY * FALL + 520 * (a.hh - h) + 42 * v.y), (g.drag ? 30 : 14), 900 * wrapA(want - b.getAngle()) - 54 * b.getAngularVelocity()
   assert.deepEqual(TUNE.severed.LEG, { force: 520, damp: 42, cap: 170, walk: 14, drag: 30, torque: 900, torqueDamp: 54 });
 });
 
 test('sevGround finds the same ground', () => {
-  const L = legacy(fakeWorld(null)); world.b2 = fakeWorld(null);
-  for (let x = 150; x < 900; x += 7) for (const y of [880, 905, 940, 960, 1000, 1100]) assert.equal(gait.ground(x, y), L.sevGround(x, y), `${x},${y}`);
+  const rec = recording('sev-gait.ground', { full: Infinity });
+  world.b2 = fakeWorld(null);
+  for (let x = 150; x < 900; x += 7) rec.check(`${x}`, [880, 905, 940, 960, 1000, 1100].map((y) => gait.ground(x, y)), `x ${x}`);
+  rec.done();
 });
 
 test('sevFeet and sevStep: the same feet, forces and torques over a scripted walk', () => {
-  const steps = script();
-  const L = legacy(fakeWorld(null));
-  const a = run({ feet: L.sevFeet, step: L.sevStep }, steps);
+  const steps = script(), rec = recording('sev-gait.walk', { full: 160 });
   world.b2 = fakeWorld(null); world.grab = null;
   const b = run({ feet: gait.feet, step: gait.step }, steps);
-  assert.equal(b.length, a.length);
   let swings = 0;
-  for (let i = 0; i < a.length; i++) { assert.equal(b[i], a[i], `frame ${i}`); if (/"sw":1/.test(a[i])) swings++; }
+  for (let i = 0; i < b.length; i++) { rec.check(`${i}`, b[i], `frame ${i}`); if (/"sw":1/.test(b[i])) swings++; }
+  rec.done();
   assert.ok(swings > 200, `the walk swings feet (${swings} frames with a foot in the air)`);
 });
