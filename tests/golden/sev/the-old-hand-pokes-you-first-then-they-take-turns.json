@@ -101,10 +101,10 @@
   {
    "doc": 1,
    "t": 26192,
-   "ms": 1312,
+   "ms": 1648,
    "who": "hand",
-   "key": "hand.idle|hand.pesterTurn|sev.pesterPoke",
-   "text": "poke."
+   "key": "hand.pesterTurn",
+   "text": "poke. your move."
   },
   {
    "doc": 1,
@@ -112,7 +112,7 @@
    "ms": 912,
    "who": "hand",
    "key": "sev.pesterPoke",
-   "text": "wake up"
+   "text": "you awake?"
   },
   {
    "doc": 1,
@@ -127,8 +127,8 @@
    "t": 29056,
    "ms": null,
    "who": "hand",
-   "key": "hand.unsqueezed|sev.pesterBack",
-   "text": "phew"
+   "key": "sev.pesterBack",
+   "text": "phew. phew phew."
   },
   {
    "doc": 1,
