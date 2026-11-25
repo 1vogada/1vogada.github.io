@@ -180,7 +180,7 @@ export const TIMING = {
   gap: { show: 600, after: 500, card: 1400, katana: 2000, scream: 2000, hand: 2000, handIdle: 2400, handLate: 1200, sev: 2200, sevForce: 900, notme: 2600, raid: 1300, raidAsk: 2900 },
   react: { min: 700, spread: 2100, calm: 0.65, flinch: 1500 },
   wait: {
-    tease: [2000, 2800], teaseAgain: [1200, 2000], teaseMin: 2000,   // teaseMin: Ivo wants teasing to last at least 2 s before it lunges or snatches
+    tease: [2000, 2800], teaseAgain: [1200, 2000], teaseMin: 2000, catchHeld: 1000,   // catchHeld: a card held this long in the catch zone gets grabbed (Ivo 2026-11-25)   // teaseMin: Ivo wants teasing to last at least 2 s before it lunges or snatches
     ask: 7000,
     secret: 350,
     hello: 2200, back: 2500,
