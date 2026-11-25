@@ -1,7 +1,8 @@
 // Say "hand": highlight the word "hand" anywhere on the page (a card's text, a blog post in the reader, the footer) and the
 // hand reaches in from the right edge, eyes the highlighted word, pinches it off the page and drags it out of sight; the
 // selection is gone with it. Nothing hints at it. Only once a card has left its slot (hand.awake()), never in crazy mode,
-// under reduced motion, during another scene, or while the hand is busy with something of its own.
+// under reduced motion, during another scene, or while the hand is busy with something of its own. Never while the phrasebook is
+// open (html.pb-lock): a line selected in there is said by its owner instead (phrasebook/say.js).
 // A scene (scenes/scene.js): wall-time sleeps that reject with GONE when the scene is killed; done() in the finally.
 // Random draws: the two lines it says (hand.word, hand.wordgot), only on this path.
 import { TUNE } from '../core/tune.js';
@@ -20,9 +21,11 @@ function picked() {
   const text = sel.toString().trim();
   if (text.toLowerCase() !== 'hand') return null;
   const a = document.activeElement; if (a && a.matches && a.matches('input, textarea')) return null;   // the search box: not the page's words
+  if (document.documentElement.classList.contains('pb-lock')) return null;   // the phrasebook is open: a pick there is phrase-say's (phrasebook/say.js)
   const range = sel.getRangeAt(0), rect = range.getBoundingClientRect();
   if (!rect.width || rect.bottom < 0 || rect.top > innerHeight || rect.right < 0 || rect.left > document.documentElement.clientWidth) return null;
   const from = range.startContainer.nodeType === 1 ? range.startContainer : range.startContainer.parentElement;
+  if (from && from.closest && from.closest('.pb')) return null;   // a word left selected in the phrasebook as it closes
   return { text, rect, from };
 }
 

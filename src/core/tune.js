@@ -334,6 +334,15 @@ export const TUNE = {
   // bottom counts. The wall is H_MAX px (or H_VH of the window) tall and opens in OPEN_MS; each trophy is TROPHY_PX wide; MAX kept
   basement: { PUSHES: 3, GAP_MS: 220, PUSH_PX: 400, RESET_MS: 2500, TOUCH_PX: 40, BOTTOM_PX: 2, H_MAX: 460, H_VH: 0.62, OPEN_MS: 700, LID_DEG: 55, TROPHY_PX: 150, MAX: 40 },
   word: { SETTLE_MS: 450, OVER_PX: 70, HOVER_MS: 650, PINCH_MS: 260, HOLD_MS: 1500, DRAG_MS: 1300, GONE_PX: 260 },
+  // phrase-say (phrasebook/say.js): select a line in the open phrasebook and its owner says it beside the menu. SETTLE_MS: the
+  // selection sits still this long first; IN_MS / OUT_MS: the slide in from the edge and back; CARD_W: px wide the card (or
+  // katana) that peeks out; SHOW: the share of it that comes out from behind the menu (or in from the screen's edge when the
+  // margin is too narrow, under GAP_PX to spare); TOP_PX: room kept above it for its bubble; BUBBLE_DY: the bubble's top this far
+  // above it; TILT / SHAKE: degrees it leans and trembles; HAND_IN: px the hand reaches in over the menu's right edge;
+  // HAND_DY: its bubble's top this far above the wrist; OLD_IN: px an old hand's fingers reach in over the left edge; BUBBLE_W: the
+  // widest a bubble gets before it wraps; MAX: lines remembered
+  phraseSay: { SETTLE_MS: 350, IN_MS: 420, OUT_MS: 360, CARD_W: 190, SHOW: 0.62, GAP_PX: 12, TOP_PX: 70, BUBBLE_DY: 46, TILT: -7, SHAKE: 2.5,
+    HAND_IN: 70, HAND_DY: 115, OLD_IN: 46, BUBBLE_W: 340, MAX: 800 },
   speech: {
     TILT: [4, 4],                // every bubble leans right by 4 + up to 4 degrees
     RIDE_DY: -40,                // a body's bubble sits this far above the top of its rotated box

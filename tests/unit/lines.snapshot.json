@@ -2760,5 +2760,105 @@
   "lines": [
    ["all gone.","en"]
   ]
+ },
+ "card.notyet": {
+  "who": "card",
+  "legacy": null,
+  "trigger": {"title":"Not yet!","when":"In this book, you select a card line you have never heard a card say. A card peeks out from behind the book and refuses."},
+  "lines": [
+   ["I don't say that one yet!","en"],
+   ["not that one! not YET!","en"],
+   ["I have never said that to you and I am not starting now","en"],
+   ["where did you even read that?!","en"],
+   ["spoilers! I refuse!","en"],
+   ["that line is for later. MUCH later","en"],
+   ["you have to earn that one. please don't","en"],
+   ["lies! I never said that!","en"],
+   ["do something to me first. no wait, DON'T","en"],
+   ["that one is still in rehearsal","en"],
+   ["I am saving that for a worse day","en"],
+   ["who wrote that down?!","en"],
+   ["не, това още не го казвам!","bg","no, I do not say that one yet!"],
+   ["それはまだ言わない!","ja","I will not say that one yet!"]
+  ]
+ },
+ "katana.notyet": {
+  "who": "katana",
+  "legacy": null,
+  "trigger": {"title":"Sheathed words","when":"In this book, you select a katana line you have never heard it say. It slides out beside the book and declines."},
+  "lines": [
+   ["I do not say that one yet.","en"],
+   ["a blade does not repeat what it has never said","en"],
+   ["unworthy. ask again after a cut","en"],
+   ["my words are sharper when earned","en"],
+   ["I do not recite on demand","en"],
+   ["draw me first. then we talk","en"],
+   ["that line is still in its sheath","en"],
+   ["you are not ready for that one","en"],
+   ["not before the first stroke","en"],
+   ["silence is also a cut","en"],
+   ["не още, смъртни.","bg","not yet, mortal."],
+   ["まだだ。","ja","not yet."]
+  ]
+ },
+ "hand.notyet": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Not for free","when":"In this book, you select a line of the Hand's that it has never said to you. It pokes in at the edge of the book and wags a finger."},
+  "lines": [
+   ["I don't say that one yet.","en"],
+   ["nice try. that one costs a card","en"],
+   ["you have not heard that from me. yet.","en"],
+   ["unlock it the usual way: feed me","en"],
+   ["that one is premium","en"],
+   ["no reading ahead","en"],
+   ["I say it when I say it","en"],
+   ["who leaked my lines?","en"],
+   ["rip something and maybe I will","en"],
+   ["that is for paying customers","en"],
+   ["my mouth, my rules","en"],
+   ["snacks first. then lines","en"],
+   ["reading my script? rude.","en"],
+   ["не и без карта.","bg","not without a card."],
+   ["まだ早い","ja","too soon"]
+  ]
+ },
+ "sev.notyet": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"A secret, still","when":"In this book, you select an old hand's line you have never heard one say, while an old hand is about. It creeps in at the edge of the book and keeps it to itself."},
+  "lines": [
+   ["I don't say that one yet…","en"],
+   ["not yet… ask me when I am older","en"],
+   ["that is a secret. shh.","en"],
+   ["I only whisper that one","en"],
+   ["maybe if you are nice to me","en"],
+   ["I am too small to say that","en"],
+   ["I will tell you when the big one is not listening","en"],
+   ["that one makes me sad. later","en"],
+   ["psst. not yet.","en"],
+   ["I am saving it for my funeral","en"],
+   ["you have not earned my words","en"],
+   ["what line? I see no line","en"],
+   ["шшт. още не.","bg","shh. not yet."],
+   ["ないしょ","ja","it is a secret"]
+  ]
+ },
+ "toast.sayNobody": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["Nobody around says that just now.","en"],
+   ["The one who says that is not here.","en"],
+   ["Whoever owns that line is elsewhere.","en"],
+   ["No one to say it. Try again later.","en"],
+   ["That voice is not on the page right now.","en"],
+   ["Nobody answers.","en"],
+   ["It would be said, if anyone were here.","en"],
+   ["The line waits for its speaker.","en"],
+   ["Silence. Its speaker is out.","en"],
+   ["Not a soul to say it.","en"]
+  ]
  }
 }

@@ -6,6 +6,7 @@
 // src/lines/*.js). This file only knows the chapters: their intros, and which keys and figures go in which order.
 // English-only mode (page/language.js) shows the lists as list(key) gives them: thinned to English, like legacy window.__thin.
 // Emits phrasebook.opened / phrasebook.closed (where legacy dispatched pb-open / pb-close).
+// Each entry carries its line key (data-key), so a selected chip can be traced back to who says it (./say.js: phrase-say).
 import { allLines, list, langOf } from '../core/lines.js';
 import { bus } from '../core/bus.js';
 import { clock } from '../core/clock.js';
@@ -61,6 +62,7 @@ const CHAPTERS = [
       'card.notme',
       'card.beg',
       { fig: 'crush' },
+      'card.notyet',
     ] },
   { id: 'katana', num: 'II', title: 'The Katana', head: 'Of the Katana',
     intro: 'Hidden in the mist of the banner stands a katana, and it has a very high opinion of itself. It is drawn like a card, by pulling, and a double click keeps it in the hand. Only its very tip cuts, at any speed whatever. It speaks once and is then quiet for two seconds, however much it has done in the meantime.',
@@ -73,6 +75,7 @@ const CHAPTERS = [
       'katana.cut',
       { fig: 'kfall' },
       'katana.drop',
+      'katana.notyet',
     ] },
   { id: 'hand', num: 'III', title: 'The Hand', head: 'Of the Hand',
     intro: 'Something lives past the right edge of the screen, and it wants your cards. It shows itself only after the first card has been torn loose. It has one eye, on the back of the hand, and opinions on everything it sees. It never answers at once: every remark waits up to three seconds, and two full seconds always pass between any two things it says.',
@@ -241,6 +244,8 @@ const CHAPTERS = [
       'hand.mypick',
       'hand.back',
       'hand.rematch',
+      'hand.notyet',
+      'sev.notyet',
     ] },
 ];
 
@@ -257,7 +262,7 @@ function diaryHTML() {
   const why = (kind) => { const t = (defs.get('hand.' + kind) || {}).trigger; return t ? t.title : kind; };
   let h = `<section class="pb-sec pb-sec-hand pb-sec-diary" id="pb-${DIARY.id}"><header class="pb-sec-h"><h3>${esc(DIARY.title)}</h3><span class="pb-pill">${d.length} lines</span></header><p class="pb-intro">${esc(DIARY.intro)}</p><div class="pb-grid">`;
   if (!d.length) h += `<article class="pb-entry"><h4>Dear diary,</h4><p class="pb-when">${esc(DIARY.none)}</p></article>`;
-  d.forEach((e, i) => { h += `<article class="pb-entry"><h4>Dear diary, ${hhmm(e.at)}<span class="pb-pill">${i + 1}</span></h4><p class="pb-when"><b>When</b> ${esc(why(e.kind))}</p><div class="pb-lines">${linesHTML([e.text])}</div></article>`; });
+  d.forEach((e, i) => { h += `<article class="pb-entry" data-key="hand.${esc(e.kind)}"><h4>Dear diary, ${hhmm(e.at)}<span class="pb-pill">${i + 1}</span></h4><p class="pb-when"><b>When</b> ${esc(why(e.kind))}</p><div class="pb-lines">${linesHTML([e.text])}</div></article>`; });
   return h + '</div></section>';
 }
 const diaryTab = () => `<button type="button" class="pb-tab" data-go="${DIARY.id}">Diary</button>`;
@@ -303,7 +308,7 @@ function build() {
   let h = '';
   for (const c of chapters) {
     h += `<section class="pb-sec pb-sec-${c.id}" id="pb-${c.id}"><header class="pb-sec-h"><h3>${esc(c.title)}</h3><span class="pb-pill">${c.n} lines</span></header><p class="pb-intro">${esc(c.intro)}</p><div class="pb-grid">`;
-    for (const e of c.entries) h += e.fig ? figure(e.fig) : `<article class="pb-entry"><h4>${esc(e.title)}<span class="pb-pill">${new Set(e.lines).size}</span></h4><p class="pb-when"><b>When</b> ${esc(e.when)}</p><div class="pb-lines">${linesHTML(e.lines)}</div></article>`;
+    for (const e of c.entries) h += e.fig ? figure(e.fig) : `<article class="pb-entry" data-key="${esc(e.key)}"><h4>${esc(e.title)}<span class="pb-pill">${new Set(e.lines).size}</span></h4><p class="pb-when"><b>When</b> ${esc(e.when)}</p><div class="pb-lines">${linesHTML(e.lines)}</div></article>`;
     h += '</div></section>';
   }
   if (diaryOn) h += diaryHTML();

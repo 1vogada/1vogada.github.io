@@ -89,6 +89,7 @@ export const EVENTS = {
   // ---- phrasebook ----
   'phrasebook.opened': '{ }',
   'phrasebook.closed': '{ }',
+  'phrasebook.spoke': '{ key, text, who, heard } a line was picked in the open phrasebook and its owner (who: card | katana | hand | old) said it (heard) or refused (text: the refusal); after the bubble went up (phrasebook/say.js)',
   // ---- page ----
   'mode.changed': '{ crazy }',
   'theme.changed': '{ dark }',

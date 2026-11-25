@@ -81,4 +81,41 @@ defineLines('raid.hide', ['was not me.', 'you saw nothing', 'I was never here', 
 // said when the menu is empty: a one-line list
 defineLines('raid.done', ['all gone.'], { who: 'raid', lang: 'en' });
 
+// ---- phrase-say (phrasebook/say.js): select a line in the open phrasebook and its owner says it beside the menu; a line it has
+// never said to you, it refuses with one of these ----
+defineLines('card.notyet', ["I don't say that one yet!", 'not that one! not YET!', 'I have never said that to you and I am not starting now', 'where did you even read that?!', 'spoilers! I refuse!', 'that line is for later. MUCH later', 'you have to earn that one. please don\'t', 'lies! I never said that!', 'do something to me first. no wait, DON\'T', 'that one is still in rehearsal', 'I am saving that for a worse day', 'who wrote that down?!', 'не, това още не го казвам!', 'それはまだ言わない!'], {
+  who: 'card',
+  trigger: { title: 'Not yet!',
+    when: 'In this book, you select a card line you have never heard a card say. A card peeks out from behind the book and refuses.' },
+  gloss: { 'не, това още не го казвам!': 'no, I do not say that one yet!', 'それはまだ言わない!': 'I will not say that one yet!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+defineLines('katana.notyet', ['I do not say that one yet.', 'a blade does not repeat what it has never said', 'unworthy. ask again after a cut', 'my words are sharper when earned', 'I do not recite on demand', 'draw me first. then we talk', 'that line is still in its sheath', 'you are not ready for that one', 'not before the first stroke', 'silence is also a cut', 'не още, смъртни.', 'まだだ。'], {
+  who: 'katana',
+  trigger: { title: 'Sheathed words',
+    when: 'In this book, you select a katana line you have never heard it say. It slides out beside the book and declines.' },
+  gloss: { 'не още, смъртни.': 'not yet, mortal.', 'まだだ。': 'not yet.' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+defineLines('hand.notyet', ["I don't say that one yet.", 'nice try. that one costs a card', 'you have not heard that from me. yet.', 'unlock it the usual way: feed me', 'that one is premium', 'no reading ahead', 'I say it when I say it', 'who leaked my lines?', 'rip something and maybe I will', 'that is for paying customers', 'my mouth, my rules', 'snacks first. then lines', 'reading my script? rude.', 'не и без карта.', 'まだ早い'], {
+  who: 'hand',
+  trigger: { title: 'Not for free',
+    when: 'In this book, you select a line of the Hand\'s that it has never said to you. It pokes in at the edge of the book and wags a finger.' },
+  gloss: { 'не и без карта.': 'not without a card.', 'まだ早い': 'too soon' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+defineLines('sev.notyet', ["I don't say that one yet…", 'not yet… ask me when I am older', 'that is a secret. shh.', 'I only whisper that one', 'maybe if you are nice to me', 'I am too small to say that', 'I will tell you when the big one is not listening', 'that one makes me sad. later', 'psst. not yet.', 'I am saving it for my funeral', 'you have not earned my words', 'what line? I see no line', 'шшт. още не.', 'ないしょ'], {
+  who: 'sev',
+  trigger: { title: 'A secret, still',
+    when: 'In this book, you select an old hand\'s line you have never heard one say, while an old hand is about. It creeps in at the edge of the book and keeps it to itself.' },
+  gloss: { 'шшт. още не.': 'shh. not yet.', 'ないしょ': 'it is a secret' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+// the one whose line you picked is not about (no old hand on the page, or the hand has not shown itself yet): a toast says so
+defineLines('toast.sayNobody', ['Nobody around says that just now.', 'The one who says that is not here.', 'Whoever owns that line is elsewhere.', 'No one to say it. Try again later.', 'That voice is not on the page right now.', 'Nobody answers.', 'It would be said, if anyone were here.', 'The line waits for its speaker.', 'Silence. Its speaker is out.', 'Not a soul to say it.'], { who: 'toast', lang: 'en' });
+
 export function install(app) {}
