@@ -13,8 +13,8 @@ async function world(s) {
   const [px, py] = await s.rip(0);
   await s.run(200);
   await s.up();
-  await s.press('.reset-cards');
   await s.eval(() => { if (window.__hand && window.__hand.reset) window.__hand.reset(); });   // Put the cards back leaves the hand alone: these scenarios want it gone
+  await s.press('.reset-cards');
   await s.run(800);
   const bottom = await s.eval(() => document.documentElement.scrollHeight - innerHeight);
   await s.scrollTo(bottom);
@@ -88,7 +88,7 @@ scenario(G, 'held and crush', { legacy: false }, async (s) => {
   await s.runUntil(() => window.__sev.list.values().next().value.ai.st === 'walk', null, { max: 3000 });
 });
 
-scenario(G, 'three-hand cap', async (s) => {
+scenario(G, 'three-hand cap', { legacy: false }, async (s) => {
   const size = await world(s);
   for (let i = 0; i < 3; i++) await spawn(s, 300 + i * 300, size.H - 300);
   await s.run(500);

@@ -190,7 +190,7 @@ scenario(G, 'reset all', { legacy: false }, async (s) => {
   await s.run(800);
   assert.equal(await s.eval(() => document.querySelectorAll('#grid .card.regrow').length), 0, 'the regrow animation class is swapped for settled');
   await s.run(3000, 100);
-  assert.equal((await s.state()).claw, 'off', 'nothing loose: the hand stays away');
+  assert.equal((await s.state()).claw, 'lurk', 'the hand is as it was: still there, waiting');
 });
 
 scenario(G, 'tab hidden pauses everything', async (s) => {
