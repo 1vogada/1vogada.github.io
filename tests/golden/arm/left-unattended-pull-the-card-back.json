@@ -1,0 +1,166 @@
+{
+ "scenario": "arm / left unattended: pull the card back",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 3032,
+   "ms": 792,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 3824,
+   "ms": 1392,
+   "who": "card",
+   "key": "SAY.rip",
+   "text": "I was comfy!"
+  },
+  {
+   "doc": 1,
+   "t": 6832,
+   "ms": 6304,
+   "who": "card",
+   "key": "SAY.land",
+   "text": "oof"
+  },
+  {
+   "doc": 1,
+   "t": 35148,
+   "ms": 1460,
+   "who": "hand",
+   "key": "hand.unattended",
+   "text": "I got peckish"
+  },
+  {
+   "doc": 1,
+   "t": 35148,
+   "ms": 2132,
+   "who": "card",
+   "key": "card.chewed",
+   "text": "I'm being eaten alive here"
+  },
+  {
+   "doc": 1,
+   "t": 37280,
+   "ms": null,
+   "who": "hand",
+   "key": "hand.unchewed",
+   "text": "ugh. half a snack is no snack"
+  },
+  {
+   "doc": 1,
+   "t": 37280,
+   "ms": null,
+   "who": "card",
+   "key": "card.bitten",
+   "text": "never switch tabs on me again"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 100,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 3048,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 3832,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 5548,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 35198,
+   "claw": "chew",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 37180,
+   "claw": "chew",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 37294,
+   "claw": "sulk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 38386,
+   "claw": "sulk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 2
+   }
+  }
+ ]
+}

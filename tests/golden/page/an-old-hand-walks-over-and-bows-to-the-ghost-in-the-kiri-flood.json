@@ -1,0 +1,190 @@
+{
+ "scenario": "page / an old hand walks over and bows to the ghost in the kiri flood",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 32,
+   "ms": 800,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "ms": 376,
+   "who": "card",
+   "key": "SAY.rip",
+   "text": "I was comfy!"
+  },
+  {
+   "doc": 1,
+   "t": 3968,
+   "ms": 1312,
+   "who": "hand",
+   "key": "SEV_SAY.cut",
+   "text": "…"
+  },
+  {
+   "doc": 1,
+   "t": 6176,
+   "ms": 1648,
+   "who": "hand",
+   "key": "SEV_SAY.rise",
+   "text": "who needs an arm"
+  },
+  {
+   "doc": 1,
+   "t": 7024,
+   "ms": 2030,
+   "who": "card",
+   "key": "ghost.roam",
+   "text": "…the whole page… mine…"
+  },
+  {
+   "doc": 1,
+   "t": 8096,
+   "ms": null,
+   "who": "card",
+   "key": "ghost.bowed",
+   "text": "…don't cry… you'll rust…"
+  },
+  {
+   "doc": 1,
+   "t": 9104,
+   "ms": null,
+   "who": "hand",
+   "key": "sev.ghost",
+   "text": "go gently, little one"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 16,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 48,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1208,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1228,
+   "claw": "off",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 3148,
+   "claw": "off",
+   "sev": "limp",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 5728,
+   "claw": "off",
+   "sev": "rise",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6528,
+   "claw": "off",
+   "sev": "walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 7028,
+   "claw": "off",
+   "sev": "mourn",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 8128,
+   "claw": "off",
+   "sev": "bow",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  }
+ ]
+}

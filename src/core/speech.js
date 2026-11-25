@@ -37,7 +37,11 @@
 //
 // The said-hook: onSaid(fn) calls fn({ key, text, as }) every time any bubble goes up (say, its agony and arm paths, sayAt,
 // sayIn), after the element is made: key is the line key, text the bubble's words, as the speaker's name. It draws nothing and
+// changes nothing; phrasebook/heard.js keeps the lines you have heard on this browser with it (the book blots the rest).
 // changes nothing; the phrasebook (phrasebook/say.js) keeps the lines you have heard with it.
+//
+// setStyle('film') (the 1926 egg, via 'page.film' in src/reactions.js): every bubble is a silent-film title card, a few lists give
+// way to 1926-only ones (FILM); setStyle(null) brings the normal bubbles back. filmDress(el) dresses the toast. See the section below.
 
 import { TIMING, TUNE } from './tune.js';
 import { clock } from './clock.js';
@@ -52,7 +56,8 @@ const hooks = [];             // the said-hook: fn({ key, text, as }) after ever
 
 /** the said-hook: fn({ key, text, as }) after any bubble goes up. @returns off */
 export function onSaid(fn) { hooks.push(fn); return () => { const i = hooks.indexOf(fn); if (i >= 0) hooks.splice(i, 1); }; }
-function heard(key, el, sp) { if (hooks.length) { const rec = { key, text: el.textContent, as: (sp && sp.kind) || null }; for (const fn of hooks.slice()) fn(rec); } }
+function heard(key, el, sp) {
+  key = el._filmKey || key; if (hooks.length) { const rec = { key, text: el.textContent, as: (sp && sp.kind) || null }; for (const fn of hooks.slice()) fn(rec); } }
 
 export function defineSpeaker(kind, cfg = {}) {
   const sp = { kind, kinds: [kind], prefix: '', gate: 'plain', cls: 'say', extraCls: '', tag: 'div', tilt: true, layer: null, life: 'game', quiet: 0, layout: true, first: false, anchor: null, onSaid: null, ...cfg };
@@ -74,8 +79,9 @@ const find = (self, opts) => { const sp = opts.as ? speakers.get(opts.as) : byKi
 function make(sp, text, cls) {
   const el = document.createElement(sp.tag);
   el.className = cls || sp.cls;
-  el.textContent = text;
+  el.textContent = text; el._filmKey = pending; pending = null;
   if (sp.tilt) { const [a, b] = TUNE.speech.TILT; el.style.setProperty('--tilt', (a + Math.random() * b).toFixed(1)); }
+  if (style === 'film') dress(el);
   const layer = sp.layer && sp.layer();
   if (layer) layer.appendChild(el);
   return el;
@@ -125,7 +131,7 @@ export function say(self, key, opts = {}) {
   if (sp.gate === 'arm') return armSay(sp, self, key, opts, t);
   const gate = opts.mode === 'plain' ? GATES.plain : typeof sp.gate === 'function' ? sp.gate : GATES[sp.gate];
   if (!gate(self, key, opts, t, sp)) return null;
-  const el = show(sp, self, opts.text != null ? opts.text : lines.line(key), opts, t, key);
+  const el = show(sp, self, opts.text != null ? opts.text : line(key), opts, t, key);
   if (opts.scream) scream(el);
   if (sp.onSaid) sp.onSaid(self, key, self.say);
   return self.say;
@@ -136,7 +142,7 @@ function agony(sp, self, key, opts, t) {
   const pain = opts.pain, [t1, t2] = TUNE.speech.AGONY_TIERS, [g0, g1] = TUNE.speech.AGONY_GAP;
   const lvl = pain > t2 ? 2 : pain > t1 ? 1 : 0;
   if (self.said && t - self.said < g0 - g1 * pain && lvl <= (self.lvl || 0)) return null;
-  const el = show(sp, self, lines.line(key + '.' + lvl), opts, t, key + '.' + lvl);
+  const el = show(sp, self, line(key + '.' + lvl), opts, t, key + '.' + lvl);
   el.classList.add('agony'); el.style.setProperty('--pain', pain.toFixed(2)); if (lvl) el.dataset.lvl = lvl;
   self.lvl = lvl;
   return self.say;
@@ -150,7 +156,7 @@ function armSay(sp, self, key, opts, t) {
   if (t - self.said < gap.show) { if (force) self.later = { key, opts, at: self.said + gap.show }; return null; }
   self.later = null;
   if (self.say) self.say.el.remove();
-  const text = opts.text != null ? opts.text : opts.first && lines.once(opts.first.id) ? opts.first.text : lines.line(key);
+  const text = opts.text != null ? opts.text : filmed(key) ? line(key) : opts.first && lines.once(opts.first.id) ? opts.first.text : lines.line(key);
   const el = make(sp, text, opts.cls);
   const ms = TIMING.talk(el, opts.floor != null ? floorOf(opts) : TIMING.floor[key.slice(key.indexOf('.') + 1)]);   // legacy TIMING.floor[kind]
   if (sp.extraCls) el.classList.add(sp.extraCls);
@@ -173,7 +179,7 @@ export function flushLater(self) {
  */
 export function sayAt(x, y, key, opts = {}) {
   const sp = speakers.get(opts.as || 'page'); if (!sp) throw new Error('speech: no "page" speaker');
-  const el = make(sp, opts.text != null ? opts.text : lines.line(key), opts.cls);
+  const el = make(sp, opts.text != null ? opts.text : line(key), opts.cls);
   if (opts.scream) scream(el);
   el.style.translate = `calc(${x.toFixed(0)}px - 50%) ${y.toFixed(0)}px`;
   clock.real.after(TIMING.talk(el, floorOf(opts)), () => el.remove());
@@ -183,8 +189,9 @@ export function sayAt(x, y, key, opts = {}) {
 /** A bubble inside an element, placed by CSS (the Heads / Tails buttons). opts: { text, floor, extra ms }. @returns the element */
 export function sayIn(target, key, opts = {}) {
   const sp = speakers.get(opts.as || 'button') || { tag: 'span', cls: 'btn-say', tilt: false };
-  const el = document.createElement(sp.tag); el.className = opts.cls || sp.cls; el.textContent = opts.text != null ? opts.text : lines.line(key);
+  const el = document.createElement(sp.tag); el.className = opts.cls || sp.cls; el.textContent = opts.text != null ? opts.text : line(key); el._filmKey = pending; pending = null;
   if (sp.tilt) { const [a, b] = TUNE.speech.TILT; el.style.setProperty('--tilt', (a + Math.random() * b).toFixed(1)); }
+  if (style === 'film') dress(el);
   target.appendChild(el);
   clock.real.after(TIMING.talk(el, floorOf(opts)) + (opts.extra ?? TUNE.speech.BUTTON_EXTRA_MS), () => el.remove());
   heard(key, el, sp);
@@ -237,6 +244,56 @@ export function layout() {
     if (lean !== s.lean) { s.lean = lean; s.el.style.setProperty('--tail', lean + 'px'); }
   }
 }
+
+// ---- silent film: while the 1926 egg is on (page/eggs.js emits 'page.film', src/reactions.js calls setStyle) ----
+// Every bubble made from here (all speakers: cards, katana, the arm, old hands, the page, buttons, the phrasebook's) is dressed as
+// a silent-film title card: the bubble itself goes see-through (so its CSS tail, which inherits the background, vanishes) and its
+// words sit in a black card with white serif type, a thin double border and a small flourish. Inline styles only (styles/*.css are
+// pinned). Its text stays the bubble's textContent, so reading time, the trace and the phrasebook see the same words.
+// A few lists give way to 1926-only ones (FILM: key -> film list); the logic still sees the original key (the arm's onSaid, the
+// bubble record), the said-hook gets the film key. A substituted line is one draw from the film list instead of one from the
+// original: draws only change while the egg is on. Turning the style off undresses every film card still up.
+let style = null, pending = null;
+const dressed = new Set();
+const FILM = {
+  'card.slice': 'card.filmSlash', 'katana.cut': 'katana.film',
+  'card.rip': 'card.filmAlas', 'card.smash': 'card.filmAlas', 'card.stab': 'card.filmAlas', 'card.agony.2': 'card.filmAlas', 'card.panic.2': 'card.filmAlas',
+  'hand.rip': 'hand.film', 'hand.eat': 'hand.film', 'hand.cut': 'hand.film', 'hand.grab': 'hand.film', 'hand.stab': 'hand.film',
+  'hand.severed': 'hand.filmCurses',
+  'sev.cut': 'sev.film', 'sev.rise': 'sev.film', 'sev.flee': 'sev.film', 'sev.doomed': 'sev.film', 'sev.mourn': 'sev.film',
+};
+const filmed = (key) => style === 'film' && FILM[key] && lines.has(FILM[key]) ? FILM[key] : null;
+/** pick a line for key: from its 1926 list while the film style is on (remembered for the said-hook), else from its own */
+function line(key) { const f = filmed(key); pending = f; return lines.line(f || key); }
+const INK = '#0d0c0b', PAPER = '#f2ecdd';
+const FLOURISH = 'url("data:image/svg+xml,' + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='60' height='8'><g fill='none' stroke='${PAPER}' stroke-width='.8'><path d='M2 4C9 0 15 8 23 4M37 4C45 0 51 8 58 4'/><path d='M26 4h8'/></g><circle cx='30' cy='4' r='1.3' fill='${PAPER}'/></svg>`) + '")';
+const OUTER = { background: 'transparent', padding: '0', boxShadow: 'none', borderRadius: '0', rotate: '0deg' };   // title cards stand straight
+/** dress a bubble as a title card (its words move into an inner card) */
+function dress(el) {
+  if (el._film && el.firstChild && el.firstChild._card) return;   // already a card (an element whose text was set again is re-dressed)
+  const card = document.createElement('span'); card._card = true; card.textContent = el.textContent;
+  Object.assign(card.style, { display: 'inline-block', background: `${INK} ${FLOURISH} no-repeat center bottom 4px / 52px 7px`, color: PAPER,
+    font: '500 1.08em/1.3 "Playfair Display", "Didot", Georgia, "Times New Roman", serif', fontStyle: 'normal', letterSpacing: '.07em',
+    padding: '8px 18px 14px', border: `3px double ${PAPER}`, borderRadius: '1px', boxShadow: `0 0 0 4px ${INK}, 0 8px 20px rgba(0, 0, 0, .45)`, textAlign: 'center' });
+  el.textContent = ''; el.appendChild(card);
+  el._film = true; Object.assign(el.style, OUTER);
+  if (dressed.size > 40) for (const d of dressed) if (!d.isConnected) dressed.delete(d);
+  dressed.add(el);
+}
+function undress(el) {
+  if (!el._film) return;
+  const text = el.textContent; el.textContent = text; el._film = false;
+  for (const k in OUTER) el.style[k] = '';
+}
+/** the bubble style: 'film' (the 1926 egg) or null (normal bubbles). Off undresses the title cards still up */
+export function setStyle(name) {
+  style = name === 'film' ? 'film' : null;
+  if (!style) { for (const el of dressed) undress(el); dressed.clear(); }
+  else for (const el of dressed) if (!el.isConnected) dressed.delete(el);
+}
+export const getStyle = () => style;
+/** dress any element (the toast) as a title card while the film style is on, or back */
+export function filmDress(el, on = style === 'film') { if (on) dress(el); else undress(el); }
 
 let installed = false;
 export function install() {

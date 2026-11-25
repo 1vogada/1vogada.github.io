@@ -13,6 +13,7 @@
 // The uprising (src/page/uprising.js): cheer() has one of them cheer each step (src/reactions.js, uprising.step).
 // Crazy mode (src/reactions.js, mode.changed -> groove): ./dance.js sets them dancing (behaviours dance, jive, freeze) and shows
 // them through crazy mode's hiding rules; danceTick() runs once a frame here.
+// The ghost in the fog (chain fog-ghost): salute(view) sends the old hands in view to bow to it (mourn, bow with a.fun.key 'ghost').
 
 import { TUNE } from '../../core/tune.js';
 import { bus } from '../../core/bus.js';
@@ -172,6 +173,22 @@ export function mourn(x) {
   const fun = { said: false };
   for (const o of list) { const m = brains.get(o); if (!world.bodies.has(o) || !m.is('walk', 'rest', 'limp', 'rise', 'stare', 'gloat')) continue; o.ai.spot = x; o.ai.fun = fun; o.ai.met = true; m.set('mourn'); }
 }
+/**
+ * the ghost of the one it ate roams the kiri flood (page/ghost.js 'ghost.roaming'): every old hand in view (page px box
+ * { l, t, r, b }) that is up to it walks a little way in (TUNE.ghost.SPOT_PX, towards the middle of the view) and bows to it, and
+ * one of them says a few words ('sev.ghost'; mourn, bow). @returns [x, y] page px of the spot and of the first one's height, or null
+ */
+export function salute(view) {
+  let at = null; const fun = { said: false, key: 'ghost', ghost: true };
+  for (const o of list) {
+    const m = brains.get(o); if (!world.bodies.has(o) || !m.is('walk', 'rest', 'limp', 'rise', 'stare', 'gloat')) continue;
+    const p = o.body.getPosition(), x = p.x * S, y = p.y * S;
+    if (x < view.l || x > view.r || y < view.t || y > view.b) continue;
+    if (!at) at = [x + (x < (view.l + view.r) / 2 ? 1 : -1) * TUNE.ghost.SPOT_PX, y];
+    o.ai.spot = at[0]; o.ai.fun = fun; m.set('mourn');
+  }
+  return at;
+}
 /** the shelf came out: old hands that have met the new hand run for it (hide) */
 export function scare() {
   if (!refuge()) return;
@@ -328,5 +345,5 @@ export function install(a) {
   bus.on('body.removed', ({ body }) => { if (body.kind === 'hand') gone(body); });                 // legacy remove(): sevGone(o)
   bus.on('body.thrown', ({ body }) => { if (body.kind === 'hand') say(body, 'thrown', true); });   // legacy drop(): sp > HOT
   // world.reset: nothing of its own to undo (legacy resetAll removed every body, and remove() ran sevGone for each hand)
-  hook('__sev', { list, get SEV() { return table(); }, POSES, set, spawn, say, cut, mourn, scare, brain, riding, pounce, tower });
+  hook('__sev', { list, get SEV() { return table(); }, POSES, set, spawn, say, cut, mourn, scare, brain, riding, pounce, tower, salute });
 }

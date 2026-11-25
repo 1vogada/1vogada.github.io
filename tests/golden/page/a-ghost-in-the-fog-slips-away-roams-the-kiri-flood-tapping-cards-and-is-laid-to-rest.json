@@ -1,0 +1,75 @@
+{
+ "scenario": "page / a ghost in the fog slips away, roams the kiri flood tapping cards, and is laid to rest",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 1520,
+   "ms": 1705,
+   "who": "card",
+   "key": "ghost.drift",
+   "text": "…I live here now…"
+  },
+  {
+   "doc": 1,
+   "t": 3032,
+   "ms": 1315,
+   "who": "card",
+   "key": "ghost.wave",
+   "text": "…wave wave…"
+  },
+  {
+   "doc": 1,
+   "t": 7856,
+   "ms": 2095,
+   "who": "card",
+   "key": "ghost.roam",
+   "text": "…let's visit the cards…"
+  },
+  {
+   "doc": 1,
+   "t": 9376,
+   "ms": 1640,
+   "who": "card",
+   "key": "card.ghost",
+   "text": "who touched me?!"
+  },
+  {
+   "doc": 1,
+   "t": 10092,
+   "ms": 1300,
+   "who": "card",
+   "key": "ghost.wave",
+   "text": "…whoosh…"
+  },
+  {
+   "doc": 1,
+   "t": 12352,
+   "ms": 1300,
+   "who": "card",
+   "key": "ghost.wave",
+   "text": "…boo?…"
+  },
+  {
+   "doc": 1,
+   "t": 14596,
+   "ms": 1835,
+   "who": "card",
+   "key": "ghost.rest",
+   "text": "…I was a good hand…"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 100,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  }
+ ]
+}

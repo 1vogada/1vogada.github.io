@@ -1,6 +1,7 @@
 // The hand's diary: every line the arm's hand says on this visit, in order, with the time it said it (from 'hand.said', which
 // carries the bubble's own words). Kept in sessionStorage, so a reload does not wipe it; at most TUNE.diary.MAX lines.
-// The phrasebook shows it as a secret last chapter when you type "kotoba" (言葉, words) with it open (phrasebook/menu.js).
+// The phrasebook shows it as a secret last chapter when you type "kotoba" (言葉, words) with it open (phrasebook/menu.js); pages
+// written since the book was last open get its red ink dot, and the pages not written yet show as blots (heard lines).
 // Nothing here draws Math.random.
 import { TUNE } from '../core/tune.js';
 import { bus } from '../core/bus.js';

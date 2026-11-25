@@ -1,7 +1,7 @@
 // The basement: at the very bottom of the page, keep scrolling down (TUNE.basement.PUSHES more wheel pushes or swipes) and the
 // footer lifts like a trapdoor onto the hand's trophy wall: every card and piece it ate on this visit ('hand.ate') and every old
 // hand it ate ('hand.devoured'), pinned up in the order it ate them. Scroll up, click, tap or press Escape and the lid drops
-// back. Nothing hints at it. The trophies are kept in sessionStorage (a copy of each card as it went down), so a reload keeps them.
+// back. Nothing hints at it. Opening it emits 'secret.found' { name: 'basement' } (page/stamps.js). The trophies are kept in sessionStorage (a copy of each card as it went down), so a reload keeps them.
 // The toast you fed it (page/bread.js, kind 'toast') is kept as its message and pinned up as a slice of bread (bread.js look()).
 // Styles are set from here (inline), so styles/*.css stay as they were. Random draws: the plaque's line, only when the wall opens.
 import { TUNE } from '../core/tune.js';
@@ -95,6 +95,7 @@ function open() {
   wall.append(plaque, pins);
   document.body.appendChild(wall);
   wall.animate([{ transform: 'translateY(100%)' }, { transform: 'none' }], { duration: B.OPEN_MS, easing: 'cubic-bezier(.2,1.1,.4,1)' });
+  bus.emit('secret.found', { name: 'basement' });
   // the footer is the lid: hinged at its top edge, it swings up and open over the wall
   if (lid) {
     lid.dataset.was = lid.getAttribute('style') || '';

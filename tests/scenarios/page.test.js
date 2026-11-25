@@ -223,3 +223,146 @@ scenario(G, 'an old hand dropped on the search box is not in there', { legacy: f
   assert.equal(st.empty, true, 'and found nothing');
   assert.ok(await s.said('sev.notthere'), 'the old hand: I am not in there');
 });
+
+// ---- the stamp book (src/page/stamps.js): hold the header seal 3 s, a stamp card with one circle per secret slides out ----
+const book = () => {
+  const c = document.querySelector('.stamp-card');
+  if (!c) return null;
+  const cells = [...c.querySelectorAll('[data-stamp]')];
+  return { n: cells.length, found: cells.filter((x) => x.dataset.found).map((x) => x.dataset.stamp), fresh: cells.filter((x) => x.dataset.new).map((x) => x.dataset.stamp),
+    count: c.querySelector('.stp-count').textContent, hints: cells.filter((x) => !x.dataset.found).every((x) => x.title && !x.textContent.match(/[A-Z]{3}/)) };
+};
+// the logo is a link home: note whether the click that ends a press was swallowed, and keep the page here either way
+const watchClicks = () => { window.__clicks = []; window.addEventListener('click', (e) => { if (e.target.closest && e.target.closest('.brand')) { window.__clicks.push(e.defaultPrevented); e.preventDefault(); } }); };
+async function holdSeal(s, ms) {
+  const b = await s.box('.brand .hanko');
+  await s.move(b.x + b.w / 2, b.y + b.h / 2);
+  await s.down();
+  await s.run(ms, 50);
+  await s.up();
+}
+
+scenario(G, 'hold the seal: the stamp book shows what you found, and a new find thumps down', { legacy: false }, async (s) => {
+  await s.eval(watchClicks);
+  // a short click is still the link home; a press of 2 s does nothing
+  await holdSeal(s, 150);
+  await holdSeal(s, 2000);
+  assert.equal(await s.eval(book), null, 'no card for a short press');
+  assert.deepEqual(await s.eval(() => window.__clicks), [false, false], 'both clicks follow the link');
+  // 3 s: the card slides out, sixteen faint outlines with hints, nothing stamped
+  await holdSeal(s, 3100);
+  let k = await s.eval(book);
+  assert.deepEqual([k.n, k.found, k.count, k.hints], [16, [], '0 / 16', true], 'an empty card');
+  assert.deepEqual(await s.eval(() => window.__clicks), [false, false, true], 'the click that ends the hold is swallowed');
+  await s.key('Escape'); await s.run(300);
+  assert.equal(await s.eval(book), null, 'Esc puts it away');
+  // find two secrets: the Konami code, and 1926 (linger on the year in the footer)
+  for (const key of ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a']) await s.key(key);
+  await s.scrollTo(99999);
+  const y = await s.box('#yr');
+  await s.move(y.x + y.w / 2, y.y + y.h / 2);
+  await s.run(4200, 100);
+  assert.equal(await s.eval(() => document.getElementById('yr').textContent), '1926');
+  await s.move(y.x + y.w / 2, y.y - 200); await s.run(900, 100);
+  await s.scrollTo(0);
+  assert.deepEqual(await s.eval(() => window.__stamps.found()), ['1926', 'konami']);
+  // hold again: both thump down
+  await holdSeal(s, 3100);
+  k = await s.eval(book);
+  assert.deepEqual([k.found, k.fresh, k.count], [['1926', 'konami'], ['1926', 'konami'], '2 / 16'], 'the two new stamps thump down');
+  await s.key('Escape'); await s.run(300);
+  // the next visit: still there, nothing new
+  await s.load();
+  await s.eval(watchClicks);
+  await holdSeal(s, 3100);
+  k = await s.eval(book);
+  assert.deepEqual([k.found, k.fresh], [['1926', 'konami'], []], 'kept across visits, already stamped');
+  await s.key('Escape'); await s.run(300);
+  // one more (the moon: seven light switches in a row), and only that one thumps
+  for (let i = 0; i < 7; i++) await s.press('#theme');
+  await holdSeal(s, 3100);
+  k = await s.eval(book);
+  assert.deepEqual([k.found, k.fresh, k.count], [['1926', 'moon', 'konami'], ['moon'], '3 / 16'], 'the moon thumps down');
+  await s.finishWaapi();
+  await s.shot('stamp book');
+});
+
+// ---- a ghost in the fog (chain fog-ghost: src/page/ghost.js) ----
+const ghost = () => { const g = window.__ghost.get(); return g && { st: g.st, x: Math.round(g.x), y: Math.round(g.y), a: g.a, hits: g.hits }; };
+// a quick wipe straight through the ghost (viewport px; the page is at the top)
+async function through(s) {
+  const g = await s.eval(ghost);
+  const sy = await s.scrollY();
+  await s.line(g.x - 160, g.y - sy - 10, g.x + 160, g.y - sy + 10, 10, 16);
+  await s.page.mouse.move(5, 880);
+}
+// the ghost is in the banner again, risen and not slipping
+const settled = () => { const g = window.__ghost.get(), h = document.getElementById('hero').getBoundingClientRect(); return !!g && g.st === 'fog' && g.y - scrollY > h.top + 60 && g.y - scrollY < h.bottom - 60 && g.x > h.left + 120 && g.x < h.right - 120; };
+
+scenario(G, 'a ghost in the fog slips away, roams the kiri flood tapping cards, and is laid to rest', { legacy: false }, async (s) => {
+  assert.equal(await s.eval(ghost), null, 'no ghost before the new hand has eaten an old one');
+  await s.eval(() => window.__kiri.bus.emit('hand.devoured', { hand: null }));
+  await s.run(3000, 100);
+  let g = await s.eval(ghost);
+  assert.equal(g.st, 'fog', 'it lingers in the banner fog');
+  assert.equal(g.a, 1, 'risen');
+  assert.ok(await s.said('ghost.drift'), 'a faint word');
+  // wipe through it: it slips away and waves
+  await through(s);
+  await s.run(100);
+  g = await s.eval(ghost);
+  assert.equal(g.st, 'slip', 'it slips away');
+  assert.equal(g.hits, 1);
+  assert.ok(await s.said('ghost.wave'), 'and waves');
+  await s.runUntil(settled, null, { max: 12000, step: 100 });
+  // kiri: it roams the flooded page and taps the cards
+  await s.type('kiri');
+  await s.runUntil(() => window.__ghost.get().st === 'roam', null, { max: 4000, step: 100 });
+  await s.run(200, 100);
+  assert.ok(await s.said('ghost.roam'), 'out of the banner, all over the page');
+  await s.runUntil(() => document.querySelectorAll('.ghost-layer .say').length > 0 && [...document.querySelectorAll('.ghost-layer .say')].some((e) => window.__kiri.lines.list('card.ghost').includes(e.textContent)), null, { max: 8000, step: 100 });
+  assert.ok(await s.said('card.ghost'), 'a card shivers: did you feel that');
+  // Esc lifts the flood: it drifts back into the banner
+  await s.key('Escape');
+  await s.runUntil(settled, null, { max: 16000, step: 200 });
+  // wiped through again and again: it bows and fades, laid to rest
+  for (let k = 2; k <= 4; k++) {
+    await through(s);
+    await s.run(100);
+    assert.equal((await s.eval(ghost)).hits, k);
+    if (k < 4) await s.runUntil(settled, null, { max: 12000, step: 100 });
+  }
+  assert.equal((await s.eval(ghost)).st, 'bow', 'a small bow');
+  assert.ok(await s.said('ghost.rest'));
+  await s.run(3000, 100);
+  assert.equal(await s.eval(ghost), null, 'gone');
+  assert.equal(await s.eval(() => window.__ghost.laid()), true, 'laid to rest');
+  const toast = await s.eval(() => document.getElementById('toast').textContent);
+  assert.ok(await s.eval((t) => window.__kiri.lines.list('toast.ghost').includes(t), toast), `the toast says so (${toast})`);
+  // it never comes back on this visit
+  await s.eval(() => window.__kiri.bus.emit('hand.devoured', { hand: null }));
+  await s.run(500, 100);
+  assert.equal(await s.eval(ghost), null, 'not even after another meal');
+});
+
+scenario(G, 'an old hand walks over and bows to the ghost in the kiri flood', { legacy: false }, async (s) => {
+  // the world exists once a card has been pulled: rip one, put it back, the arm out of the way
+  await s.rip(0); await s.run(200); await s.up();
+  await s.eval(() => { if (window.__hand && window.__hand.reset) window.__hand.reset(); });
+  await s.press('.reset-cards');
+  await s.run(800);
+  await s.eval(() => window.__ghost.rise());
+  await s.run(1000, 100);
+  const bottom = await s.eval(() => document.documentElement.scrollHeight - innerHeight);
+  await s.scrollTo(bottom);
+  const size = await s.eval(() => window.__cards.state().size);
+  await s.eval(([x, y]) => { const o = window.__sev.spawn(x, y, 0.3, window.__sev.POSES.limp); o.ai.hurt = 0; }, [size.W * 0.35, size.H - 200]);
+  await s.run(1500, 100);
+  await s.type('kiri');
+  await s.runUntil(() => [...window.__sev.list].some((o) => o.ai.st === 'mourn'), null, { max: 6000, step: 100 });
+  assert.equal(await s.eval(() => window.__ghost.get().st), 'roam', 'the ghost roams the flood');
+  await s.runUntil(() => [...window.__sev.list].some((o) => o.ai.st === 'bow'), null, { max: 10000, step: 100 });
+  await s.run(1500, 100);
+  assert.ok(await s.said('sev.ghost'), 'it bows and says a few words');
+  assert.ok(await s.said('ghost.bowed'), 'the ghost bows back');
+});

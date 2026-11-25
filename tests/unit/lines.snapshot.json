@@ -421,6 +421,47 @@
    ["ただいま、スロット!","ja","I am home, slot!"]
   ]
  },
+ "card.chewed": {
+  "who": "card",
+  "legacy": null,
+  "trigger": {"title":"Left unattended: chewed","when":"You come back to the tab and the hand has a grid card in its fist at the edge, taking a bite every second or so."},
+  "lines": [
+   ["WHERE WERE YOU?!","en"],
+   ["it's been chewing me for AGES","en"],
+   ["it took me from my slot!","en"],
+   ["I can see its eye from here","en"],
+   ["you said you'd be right back!","en"],
+   ["pull me OUT!","en"],
+   ["I'm being eaten alive here","en"],
+   ["it bit my description off","en"],
+   ["don't let it finish me!","en"],
+   ["my corner! it ate my corner!","en"],
+   ["is that YouTube more important than me?!","en"],
+   ["I'm 30% teeth marks now","en"],
+   ["спасете ме!","bg","save me!"],
+   ["かまれてるー!","ja","I'm being bitten!"]
+  ]
+ },
+ "card.bitten": {
+  "who": "card",
+  "legacy": null,
+  "trigger": {"title":"Left unattended: saved","when":"You pull the half-eaten card out of the hand's fingers before it finishes. It is yours again, with the bites taken out of its edge."},
+  "lines": [
+   ["look what it DID to me","en"],
+   ["I'm a crescent now","en"],
+   ["I'll never be rectangular again","en"],
+   ["it bit me. it actually BIT me","en"],
+   ["you came back for me!","en"],
+   ["I can feel the draught","en"],
+   ["does it show? it shows.","en"],
+   ["slightly digested, still a card","en"],
+   ["I have tooth marks. TOOTH MARKS.","en"],
+   ["never switch tabs on me again","en"],
+   ["call it a design choice","en"],
+   ["нахапа ме!","bg","it bit me!"],
+   ["かじられた…","ja","I got nibbled…"]
+  ]
+ },
  "toast.ripped": {
   "who": "toast",
   "legacy": null,
@@ -459,6 +500,70 @@
   "trigger": null,
   "lines": [
    ["It keeps its half.","en"]
+  ]
+ },
+ "card.filmSlash": {
+  "who": "card",
+  "legacy": null,
+  "trigger": {"title":"1926: cut in two","when":"While the page is in 1926 (hover the © year in the footer for a few seconds), every bubble is a silent-film title card. The katana cuts a card in two."},
+  "lines": [
+   ["SLASH!","en"],
+   ["SLASH!!","en"],
+   ["Rent asunder!","en"],
+   ["Cleft in twain!","en"],
+   ["Cut down in my prime!","en"],
+   ["Struck by cold steel!","en"],
+   ["O, the blade! The blade!","en"],
+   ["Divided, as by Fate.","en"],
+   ["In twain! IN TWAIN!","en"],
+   ["SNICKT!","en"],
+   ["Thus perish all cards.","en"],
+   ["Посечен!","bg","cut down!"],
+   ["斬られた！","ja","I've been cut!"]
+  ]
+ },
+ "card.filmAlas": {
+  "who": "card",
+  "legacy": null,
+  "trigger": {"title":"1926: alas!","when":"While the page is in 1926 (hover the © year in the footer for a few seconds), every bubble is a silent-film title card. A card is ripped out, smashed, stabbed, or pulled to its very worst."},
+  "lines": [
+   ["Alas!","en"],
+   ["Alas! Alack!","en"],
+   ["Unhand me, you brute!","en"],
+   ["Will no one save me?!","en"],
+   ["Fie upon thee!","en"],
+   ["Oh, the humanity!","en"],
+   ["Mother! Mother, help!","en"],
+   ["I am undone!","en"],
+   ["Ruined! Utterly ruined!","en"],
+   ["Tell Mabel I loved her!","en"],
+   ["A curse upon this grid!","en"],
+   ["Is there no constable?!","en"],
+   ["Горко ми!","bg","woe is me!"],
+   ["ああ、無念！","ja","ah, the pity of it!"]
+  ]
+ },
+ "card.ghost": {
+  "who": "card",
+  "legacy": null,
+  "trigger": {"title":"Tapped by the ghost","when":"A ghost lingers in the fog and you type kiri: it roams the flooded page and taps the cards. They shiver."},
+  "lines": [
+   ["did you feel that","en"],
+   ["who touched me?!","en"],
+   ["something cold just poked me","en"],
+   ["the fog has FINGERS","en"],
+   ["I felt a draft… with knuckles","en"],
+   ["is this page haunted?!","en"],
+   ["don't look now but","en"],
+   ["it went right through my border","en"],
+   ["brrr. BRRR.","en"],
+   ["I'm not scared, YOU'RE scared","en"],
+   ["it said my slug out loud…","en"],
+   ["mum? is that you?","en"],
+   ["I want my slot to be less spooky","en"],
+   ["who turned the fog on","en"],
+   ["кой ме пипна?!","bg","who touched me?!"],
+   ["いま、さわった?","ja","did you just touch me?"]
   ]
  },
  "katana.drop": {
@@ -550,6 +655,25 @@
   "trigger": null,
   "lines": [
    ["The very tip of the blade cuts, however slowly. Double-click the katana to keep it in hand.","en"]
+  ]
+ },
+ "katana.film": {
+  "who": "katana",
+  "legacy": null,
+  "trigger": {"title":"1926: the blade speaks","when":"While the page is in 1926 (hover the © year in the footer for a few seconds), every bubble is a silent-film title card. It has just cut something in two."},
+  "lines": [
+   ["THWICK.","en"],
+   ["And lo, the blade sang.","en"],
+   ["Steel speaks; paper listens.","en"],
+   ["A clean cut, sir.","en"],
+   ["Justice, swift and shiny.","en"],
+   ["Thus ends the scoundrel card.","en"],
+   ["Behold: the fine edge of 1926.","en"],
+   ["The blade bows to no one.","en"],
+   ["Another, if you please.","en"],
+   ["A tragedy, beautifully edged.","en"],
+   ["Чисто, господине.","bg","clean, sir."],
+   ["一刀両断。","ja","cut in two with a single stroke."]
   ]
  },
  "hand.eager": {
@@ -2085,6 +2209,103 @@
    ["あ、明るい","ja","oh, it's bright"]
   ]
  },
+ "hand.film": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"1926: the villain","when":"While the page is in 1926 (hover the © year in the footer for a few seconds), every bubble is a silent-film title card. The hand grabs, rips, eats or cuts a card."},
+  "lines": [
+   ["Mwa-ha-ha!","en"],
+   ["At last, the deed is mine!","en"],
+   ["*twirls moustache*","en"],
+   ["Cannot pay the rent? Then I take the card!","en"],
+   ["Cards! All mine, all MINE!","en"],
+   ["No one shall stop me now!","en"],
+   ["The rent is due, my sweet!","en"],
+   ["Tie it to the railway tracks!","en"],
+   ["Ha! Foiled again, hero!","en"],
+   ["Mine, by the light of the projector!","en"],
+   ["Mark me: the whole grid shall be mine!","en"],
+   ["Мое е, ха-ха!","bg","it's mine, ha-ha!"],
+   ["ふはははは！","ja","mwahahaha!"]
+  ]
+ },
+ "hand.filmCurses": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"1926: curses!","when":"While the page is in 1926 (hover the © year in the footer for a few seconds), every bubble is a silent-film title card. The katana takes its hand off."},
+  "lines": [
+   ["Curses! My hand!","en"],
+   ["Curses! Foiled by a sword!","en"],
+   ["You have not heard the last of me!","en"],
+   ["Dastardly! Simply dastardly!","en"],
+   ["My hand! My beautiful hand!","en"],
+   ["I shall return! With a hand!","en"],
+   ["Confound that blade!","en"],
+   ["Villainy! Against ME!","en"],
+   ["Blast! Blast and bother!","en"],
+   ["Проклятие! Ръката ми!","bg","curses! my hand!"],
+   ["おのれ、刀め！","ja","curse you, sword!"]
+  ]
+ },
+ "hand.unattended": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Left unattended","when":"You tear a card out, then stay on another tab for a while. When you come back one slot in the grid is empty and the hand is at the edge, chewing the card."},
+  "lines": [
+   ["you left it unattended","en"],
+   ["finders keepers, tab-leavers weepers","en"],
+   ["what? it was just lying there","en"],
+   ["you were gone SO long","en"],
+   ["I got peckish","en"],
+   ["oh. you're back. *chews*","en"],
+   ["you snooze, I chew","en"],
+   ["it was asking for it","en"],
+   ["tab-switchers get snacks taken","en"],
+   ["nobody was watching the grid","en"],
+   ["mmf. hi.","en"],
+   ["rule one: never leave a card alone with me","en"],
+   ["оставихте го без надзор","bg","you left it unattended"],
+   ["おるすばんのおやつ","ja","a snack for minding the house"]
+  ]
+ },
+ "hand.unchewed": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Left unattended: taken back","when":"The hand is chewing a grid card at the edge and you pull the card out of its fingers before it is finished."},
+  "lines": [
+   ["I was still chewing that!","en"],
+   ["fine. it's soggy anyway","en"],
+   ["you're welcome for the trim","en"],
+   ["rude. mid-bite.","en"],
+   ["take it. I licked it.","en"],
+   ["next time, pay attention","en"],
+   ["it tastes of README","en"],
+   ["keep your leftovers","en"],
+   ["I'll remember this tab","en"],
+   ["ugh. half a snack is no snack","en"],
+   ["ей, не бях свършил!","bg","hey, I wasn't done!"],
+   ["まだたべてたのに","ja","I was still eating that"]
+  ]
+ },
+ "hand.gulp": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Left unattended: finished","when":"Nobody pulled the card out of its fingers in time. It backs off the edge with it and swallows it; it ends up on the trophy wall in the basement."},
+  "lines": [
+   ["…and down it goes","en"],
+   ["for the wall downstairs","en"],
+   ["should've come back sooner","en"],
+   ["another one for the collection","en"],
+   ["*slurp* gone","en"],
+   ["delicious. leave more often","en"],
+   ["that's what you get","en"],
+   ["the basement thanks you","en"],
+   ["no crumbs, no evidence","en"],
+   ["best part of being ignored","en"],
+   ["и хоп, изчезна","bg","and poof, gone"],
+   ["ごちそうさまでした","ja","thank you for the meal"]
+  ]
+ },
  "sev.cut": {
   "who": "sev",
   "legacy": "SEV_SAY.cut",
@@ -3043,6 +3264,154 @@
    ["なにもしてないよ","ja","I didn't do anything"]
   ]
  },
+ "sev.film": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"1926: the orphan","when":"While the page is in 1926 (hover the © year in the footer for a few seconds), every bubble is a silent-film title card. An old hand is cut off, gets up, flees, mourns, or sees the end coming."},
+  "lines": [
+   ["Cast out, without a wrist to my name.","en"],
+   ["An orphan of the grid.","en"],
+   ["Alone, in a cruel, cruel world.","en"],
+   ["Oh, for a crust of card!","en"],
+   ["Please, sir, I want some more card.","en"],
+   ["Woe! Woe is I, a mere hand!","en"],
+   ["None shall love a hand without an arm.","en"],
+   ["I shall wander, as hands do.","en"],
+   ["Pity the poor severed hand!","en"],
+   ["Five fingers, no fortune.","en"],
+   ["Out into the snow with me, then.","en"],
+   ["Сираче съм…","bg","I am an orphan…"],
+   ["かわいそうな手…","ja","poor little hand…"]
+  ]
+ },
+ "ghost.drift": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"A ghost in the fog","when":"The new hand ate an old hand. Look at the banner: a pale hand drifts inside the fog, only where it is thick."},
+  "lines": [
+   ["…still here…","en"],
+   ["…it is so soft in here…","en"],
+   ["…I used to have a wrist…","en"],
+   ["…don't mind me…","en"],
+   ["…the fog remembers me…","en"],
+   ["…was I tasty?…","en"],
+   ["…I can see my knuckles through my knuckles…","en"],
+   ["…ooo… oooo…","en"],
+   ["…five fingers, no hand…","en"],
+   ["…I live here now…","en"],
+   ["…тук съм…","bg","…I am here…"],
+   ["…まだいるよ…","ja","…I'm still here…"]
+  ]
+ },
+ "ghost.wave": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The ghost slips away","when":"You wipe through the ghost in the banner fog. It slips aside and waves."},
+  "lines": [
+   ["…missed me…","en"],
+   ["…whoosh…","en"],
+   ["…tickles…","en"],
+   ["…you went right through me…","en"],
+   ["…over here…","en"],
+   ["…boo?…","en"],
+   ["…rude…","en"],
+   ["…bye-bye… hi again…","en"],
+   ["…that was my palm…","en"],
+   ["…can't catch fog…","en"],
+   ["…wave wave…","en"],
+   ["…ей-ей…","bg","…hey, hey…"],
+   ["…ばいばい…","ja","…bye-bye…"]
+  ]
+ },
+ "ghost.roam": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The ghost roams","when":"With a ghost in the banner, type kiri. Once the fog has buried the page, the ghost leaves the banner and wanders the whole of it."},
+  "lines": [
+   ["…so much fog… so much room…","en"],
+   ["…the whole page… mine…","en"],
+   ["…let's visit the cards…","en"],
+   ["…haunting hours…","en"],
+   ["…I can go anywhere now…","en"],
+   ["…tap tap tap…","en"],
+   ["…out of the banner at last…","en"],
+   ["…a page full of mist…","en"],
+   ["…who's still awake?…","en"],
+   ["…цялата страница…","bg","…the whole page…"],
+   ["…ひろいなあ…","ja","…so roomy…"]
+  ]
+ },
+ "ghost.bowed": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The ghost bows back","when":"An old hand on the page walks up to the ghost in the kiri flood and bows. The ghost bows back."},
+  "lines": [
+   ["…thank you, friend…","en"],
+   ["…you came…","en"],
+   ["…keep your knuckles warm…","en"],
+   ["…don't cry… you'll rust…","en"],
+   ["…I'm fine… really… mostly mist…","en"],
+   ["…watch out for the arm…","en"],
+   ["…remember me when you point…","en"],
+   ["…you always were the nicer thumb…","en"],
+   ["…go on, run…","en"],
+   ["…благодаря…","bg","…thank you…"],
+   ["…ありがとう…","ja","…thank you…"]
+  ]
+ },
+ "ghost.rest": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The ghost is laid to rest","when":"You wipe the ghost away, again and again, or wipe the banner clear of its fog. It bows and fades, and does not come back."},
+  "lines": [
+   ["…oh… that's nice…","en"],
+   ["…I can let go now…","en"],
+   ["…tell the arm I forgive it…","en"],
+   ["…a clean page at last…","en"],
+   ["…goodbye, little fingers…","en"],
+   ["…I was a good hand…","en"],
+   ["…don't wait up…","en"],
+   ["…finally… some peace and quiet…","en"],
+   ["…lights out…","en"],
+   ["…сбогом…","bg","…farewell…"],
+   ["…さようなら…","ja","…goodbye…"]
+  ]
+ },
+ "sev.ghost": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"An old hand bows to the ghost","when":"The ghost roams the kiri flood while another old hand is on the page. It walks over and bows, and says a few words."},
+  "lines": [
+   ["rest easy, brother","en"],
+   ["you were the best of us","en"],
+   ["I'll keep your knuckles warm","en"],
+   ["you always pointed the way","en"],
+   ["we'll meet again in the fog","en"],
+   ["go gently, little one","en"],
+   ["save me a spot in the mist","en"],
+   ["farewell, thumb-friend","en"],
+   ["he was so brave. and so crunchy.","en"],
+   ["I never got to say sorry about the ring","en"],
+   ["one hand, one soul, no wrist","en"],
+   ["почивай в мир","bg","rest in peace"],
+   ["…安らかに","ja","…rest in peace"]
+  ]
+ },
+ "toast.ghost": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["Laid to rest. The fog is just fog now.","en"],
+   ["The banner is quiet again.","en"],
+   ["Gone for good. It bowed on the way out.","en"],
+   ["One less hand in the fog.","en"],
+   ["It went. Politely.","en"],
+   ["Rest in mist.","en"],
+   ["Нищо в мъглата.","bg","Nothing in the fog."],
+   ["霧はただの霧。","ja","The fog is just fog."]
+  ]
+ },
  "toast.shelfGone": {
   "who": "toast",
   "legacy": null,
@@ -3312,6 +3681,82 @@
    ["mark me as read","en"],
    ["ще ме изяде!","bg","it is going to eat me!"],
    ["食べられる…","ja","I am going to be eaten…"]
+  ]
+ },
+ "stamps.head": {
+  "who": "page",
+  "legacy": null,
+  "trigger": {"title":"The stamp book","when":"You held the red seal of the logo in the header for three seconds. A stamp card slides out: one red stamp for every secret you have found, a faint outline for each one you have not."},
+  "lines": [
+   ["One stamp per secret. No prizes. Just ink.","en"],
+   ["Proof you were here, and poked things.","en"],
+   ["Stamps for things you were not supposed to find.","en"],
+   ["A souvenir of everything you broke.","en"],
+   ["The official record of your curiosity.","en"],
+   ["Every station visited. Some of them screamed.","en"],
+   ["Keep this card. It keeps itself, actually.","en"],
+   ["The fog remembers. So does this card.","en"],
+   ["Please stamp responsibly.","en"],
+   ["Collected on foot, with a mouse.","en"],
+   ["Печат за всяка тайна.","bg","A stamp for every secret."],
+   ["ひみつ一つに、はんこ一つ。","ja","One secret, one stamp."]
+  ]
+ },
+ "stamps.foot": {
+  "who": "page",
+  "legacy": null,
+  "trigger": {"title":"The stamp book, not full yet","when":"You held the red seal of the logo in the header for three seconds. A stamp card slides out: one red stamp for every secret you have found, a faint outline for each one you have not. Under them, how many you have, and a word about the rest."},
+  "lines": [
+   ["The empty circles are not a hint. They are a little bit a hint.","en"],
+   ["More ink in the pad. More secrets on the page.","en"],
+   ["Some circles are still waiting.","en"],
+   ["The rest are out there. Possibly under the fog.","en"],
+   ["A blank circle is a kind of promise.","en"],
+   ["Unstamped does not mean unreachable.","en"],
+   ["Nobody is counting. Except this card.","en"],
+   ["There is more. There is always more.","en"],
+   ["Find another, then come and press the seal again.","en"],
+   ["The ink pad is still wet.","en"],
+   ["Още има.","bg","There is more."],
+   ["まだまだ、これから。","ja","Plenty still to come."]
+  ]
+ },
+ "stamps.full": {
+  "who": "page",
+  "legacy": null,
+  "trigger": {"title":"The stamp book, full","when":"You held the seal in the header with every secret found: every circle on the card is stamped."},
+  "lines": [
+   ["Every circle stamped. The fog has nothing left to hide.","en"],
+   ["Complete. There is no prize. There was never a prize.","en"],
+   ["All stamps collected. Go outside.","en"],
+   ["A full card. The station master bows.","en"],
+   ["You found everything. Everything is a little nervous now.","en"],
+   ["Card complete. Please keep it as a souvenir.","en"],
+   ["Nothing left to find. Probably.","en"],
+   ["Done. The hand would like its secrets back.","en"],
+   ["Full marks, red ink, no refunds.","en"],
+   ["Всичко намери. Браво.","bg","You found everything. Well done."],
+   ["全駅制覇！","ja","Every station conquered!"]
+  ]
+ },
+ "page.filmEnd": {
+  "who": "page",
+  "legacy": null,
+  "trigger": {"title":"1926: the end","when":"You turned the page to 1926 (hover the © year in the footer for a few seconds) and then left the year alone. When the reel runs out, a last title card, and the colour comes back."},
+  "lines": [
+   ["THE END","en"],
+   ["Fin.","en"],
+   ["The End?","en"],
+   ["THE END (for now)","en"],
+   ["End of Reel One.","en"],
+   ["The reel has run out.","en"],
+   ["And they all lived in colour ever after.","en"],
+   ["Please exit through the colour.","en"],
+   ["The projectionist has gone home.","en"],
+   ["Fin. Mind the piano player on your way out.","en"],
+   ["Intermission. Colour resumes shortly.","en"],
+   ["Край.","bg","the end."],
+   ["終","ja","the end"]
   ]
  },
  "raid.bored": {

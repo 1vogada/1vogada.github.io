@@ -103,4 +103,34 @@ defineLines('bread.caught', ['oh no.', 'I was told there would be butter', 'this
   lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
 });
 
+
+// the stamp book (page/stamps.js): hold the seal in the header for three seconds. Its subtitle, and its footer (some circles still
+// empty / every circle stamped). Dry, like the page
+const STAMP_WHEN = 'You held the red seal of the logo in the header for three seconds. A stamp card slides out: one red stamp for every secret you have found, a faint outline for each one you have not.';
+defineLines('stamps.head', ['One stamp per secret. No prizes. Just ink.', 'Proof you were here, and poked things.', 'Stamps for things you were not supposed to find.', 'A souvenir of everything you broke.', 'The official record of your curiosity.', 'Every station visited. Some of them screamed.', 'Keep this card. It keeps itself, actually.', 'The fog remembers. So does this card.', 'Please stamp responsibly.', 'Collected on foot, with a mouse.', 'Печат за всяка тайна.', 'ひみつ一つに、はんこ一つ。'], {
+  who: 'page',
+  trigger: { title: 'The stamp book', when: STAMP_WHEN },
+  gloss: { 'Печат за всяка тайна.': 'A stamp for every secret.', 'ひみつ一つに、はんこ一つ。': 'One secret, one stamp.' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('stamps.foot', ['The empty circles are not a hint. They are a little bit a hint.', 'More ink in the pad. More secrets on the page.', 'Some circles are still waiting.', 'The rest are out there. Possibly under the fog.', 'A blank circle is a kind of promise.', 'Unstamped does not mean unreachable.', 'Nobody is counting. Except this card.', 'There is more. There is always more.', 'Find another, then come and press the seal again.', 'The ink pad is still wet.', 'Още има.', 'まだまだ、これから。'], {
+  who: 'page',
+  trigger: { title: 'The stamp book, not full yet', when: STAMP_WHEN + ' Under them, how many you have, and a word about the rest.' },
+  gloss: { 'Още има.': 'There is more.', 'まだまだ、これから。': 'Plenty still to come.' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('stamps.full', ['Every circle stamped. The fog has nothing left to hide.', 'Complete. There is no prize. There was never a prize.', 'All stamps collected. Go outside.', 'A full card. The station master bows.', 'You found everything. Everything is a little nervous now.', 'Card complete. Please keep it as a souvenir.', 'Nothing left to find. Probably.', 'Done. The hand would like its secrets back.', 'Full marks, red ink, no refunds.', 'Всичко намери. Браво.', '全駅制覇！'], {
+  who: 'page',
+  trigger: { title: 'The stamp book, full', when: 'You held the seal in the header with every secret found: every circle on the card is stamped.' },
+  gloss: { 'Всичко намери. Браво.': 'You found everything. Well done.', '全駅制覇！': 'Every station conquered!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+// ---- silent film (chain silent-film): the reel runs out after you left the © year (page/eggs.js) ----
+defineLines('page.filmEnd', ['THE END', 'Fin.', 'The End?', 'THE END (for now)', 'End of Reel One.', 'The reel has run out.', 'And they all lived in colour ever after.', 'Please exit through the colour.', 'The projectionist has gone home.', 'Fin. Mind the piano player on your way out.', 'Intermission. Colour resumes shortly.', 'Край.', '終'], {
+  who: 'page',
+  trigger: { title: '1926: the end', when: 'You turned the page to 1926 (hover the © year in the footer for a few seconds) and then left the year alone. When the reel runs out, a last title card, and the colour comes back.' },
+  gloss: { 'Край.': 'the end.', '終': 'the end' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
 export function install(app) {}

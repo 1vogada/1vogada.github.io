@@ -5,11 +5,12 @@
 //  - a hand line: the hand (a drawn copy, so the arm on the page is left alone) pokes in over the menu's right edge and says it.
 //    While the hand is raiding the menu (./raid.js), the raiding hand says it instead.
 //  - an old-hand line: an old hand creeps in over the menu's left edge and says it, if one is about on the page.
-//  - a line you have never heard (on this visit): its owner comes out all the same and refuses ('card.notyet', 'katana.notyet',
+//  - a line you have never heard (on this browser): its owner comes out all the same and refuses ('card.notyet', 'katana.notyet',
 //    'hand.notyet', 'sev.notyet'). When the owner is not about (no old hand on the page, or the hand has not shown itself yet):
 //    a toast says nobody is there to say it ('toast.sayNobody').
-// "Heard" is every bubble's text that went up on this visit, through core/speech.js onSaid (the said-hook), kept in
-// sessionStorage 'kiripad-heard' (at most TUNE.phraseSay.MAX texts). One line at a time; closing the menu takes it all away.
+// "Heard" is ./heard.js: every bubble's text that ever went up on this browser (localStorage 'kiripad-heard', through
+// core/speech.js onSaid). In the book a line you have not heard is blotted out (./menu.js): select the blot and its owner refuses.
+// One line at a time; closing the menu takes it all away.
 // The selection must sit still TUNE.phraseSay.SETTLE_MS with no button held (as scenes/word.js; that egg stays off while the
 // menu is open). Never in crazy mode or under reduced motion.
 // Motion: one clock.frames loop on wall time (clock.wall()); bubbles are sayAt on the speakers 'pbsCard' (pb-say scream),
@@ -22,7 +23,7 @@ import { TUNE } from '../core/tune.js';
 import { bus } from '../core/bus.js';
 import { clock } from '../core/clock.js';
 import { allLines, line, pick } from '../core/lines.js';
-import { defineSpeaker, sayAt, onSaid } from '../core/speech.js';
+import { defineSpeaker, sayAt } from '../core/speech.js';
 import { hook } from '../core/debug.js';
 import { world, isCrazy } from '../world/world.js';
 import { handParts, handDraw } from '../actors/hand/draw.js';
@@ -31,24 +32,15 @@ import { list as olds, POSES as OLD_POSES } from '../actors/severed/index.js';
 import { katanaSvg } from '../actors/katana.js';
 import * as menu from './menu.js';
 import * as raid from './raid.js';
+import * as heard from './heard.js';
 
-const P = TUNE.phraseSay, STORE = 'kiripad-heard';
+const P = TUNE.phraseSay;
 // who owns a list (its `who` in src/lines/*.js) -> who comes out to say it
 const OWNER = { card: 'card', button: 'card', katana: 'katana', hand: 'hand', raid: 'hand', sev: 'old' };
 const SPEAKER = { card: 'pbsCard', katana: 'pbsPlain', hand: 'pbsHand', old: 'pbsHand' };
 const REFUSE = { card: 'card.notyet', katana: 'katana.notyet', hand: 'hand.notyet', old: 'sev.notyet' };
 
 let app = { reduced: false }, layer = null, behind = null, cur = null, wait = null, down = false, lastChip = null;
-const heard = new Set();
-try { for (const t of JSON.parse(sessionStorage.getItem(STORE) || '[]')) heard.add(t); } catch (e) {}
-
-/** the said-hook: every bubble's words are a line you have now heard */
-function remember({ text }) {
-  if (!text || heard.has(text)) return;
-  heard.add(text);
-  if (heard.size > P.MAX) heard.delete(heard.values().next().value);
-  try { sessionStorage.setItem(STORE, JSON.stringify([...heard])); } catch (e) {}
-}
 
 const vw = () => document.documentElement.clientWidth;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -228,7 +220,6 @@ function later() {
 export function install(a) {
   app = a || app;
   if (app.reduced) return;
-  onSaid(remember);
   const where = () => layer;
   defineSpeaker('pbsCard', { kinds: [], cls: 'pb-say scream', gate: 'plain', layer: where, life: 'wall', layout: false });
   defineSpeaker('pbsHand', { kinds: [], cls: 'pb-say hand', gate: 'plain', layer: where, life: 'wall', layout: false });
@@ -237,5 +228,5 @@ export function install(a) {
   document.addEventListener('pointerdown', () => { down = true; }, true);
   document.addEventListener('pointerup', () => { down = false; if (menu.isOpen()) later(); }, true);
   bus.on('phrasebook.closed', () => { stop(); lastChip = null; if (wait) { wait(); wait = null; } if (layer) layer.remove(); });
-  hook('__phrasesay', { heard: () => [...heard], busy: () => (cur ? cur.who : null) });
+  hook('__phrasesay', { heard: heard.texts, busy: () => (cur ? cur.who : null) });
 }

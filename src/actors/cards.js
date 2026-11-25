@@ -1,6 +1,7 @@
 // The cards: rooted in the grid, pulled, torn out, thrown; everything a card says (legacy startPull, tear, the card lines of
 // say(), cardSay with the AGONY tiers, BEG, panic with the PANIC tiers and the NOTME bystanders, the cards-rendered listener,
-// the regrow of resetAll, and putBack: one card grown back into its slot after the search box ate it).
+// the regrow of resetAll, putBack: one card grown back into its slot after the search box ate it, and takeOne: the card the
+// hand helped itself to while you were away, chain away-thief).
 //
 // A card speaks only from the world's pull/tear hooks and from its own event listeners (registered in install, so they run
 // before src/reactions.js). Each listener runs where the legacy code said the line, so the line picks and the random draws
@@ -16,6 +17,8 @@
 //   card.begged        'card.beg'                                                 legacy crush pause talkOn(ob, pick(BEG))
 //   card.crushed       'card.slice' scream left standing where the arm crushed it  legacy sayAt(H[0], H[1] - 70, pick(SAY.slice), 'scream')
 //   hand.tossed        'card.throw' when the arm throws it back hard              legacy clawTick has
+//   hand.chewing       'card.chewed' while the arm chews it at the edge (forced on the way in)   chain away-thief
+//   hand.unchewed      'card.bitten' once you pulled it out of its fingers                     chain away-thief
 //   hand.reaching      panic(): reactions.js calls it                             legacy panic(o, fear, dt, t)
 // The blade's own card lines (cutting, the slice of a cut, the stab) stay in world/cut.js: 'card.cut' is emitted after the
 // katana's line and 'card.stabbed' before the wound's random life, so a listener there would change the draw order.
@@ -207,6 +210,26 @@ export function putBack(key) {
   const r = c.getBoundingClientRect();
   if (r.width) sayAt(r.left + scrollX + r.width / 2, r.top + scrollY + TUNE.speech.RIDE_DY, 'card.home');
 }
+/**
+ * the hand helped itself while you were away (page/away.js 'page.returned' via src/reactions.js, chain away-thief): one grid
+ * card leaves its slot unseen and is a loose body from here on (the slot stays empty, "Put the cards back" shows). It takes the
+ * card nearest the right edge among those on screen (top first), else the first one still in the grid. No random draw.
+ * @returns the body, or null (no physics yet, or no card left in the grid)
+ */
+export function takeOne() {
+  if (world.reduced || !world.b2) return null;
+  const vh = innerHeight;
+  let best = null, br = null;
+  for (const c of document.querySelectorAll('#grid .card')) {
+    if (c.classList.contains('held') || world.rootOf.has(c) || world.ripped.has(c.dataset.key)) continue;
+    const r = c.getBoundingClientRect(); if (!r.width) continue;
+    const on = r.bottom > 0 && r.top < vh, bOn = br && br.bottom > 0 && br.top < vh;
+    if (!best || (on && !bOn) || (on === bOn && on && (r.right > br.right + 1 || (Math.abs(r.right - br.right) <= 1 && r.top < br.top)))) { best = c; br = r; }
+  }
+  if (!best) return null;
+  best.style.rotate = ''; world.loose.delete(best.dataset.key); world.tugs.delete(best.dataset.key);
+  return W.freeCard(best);
+}
 /** the grid re-rendered on search or theme changes: keep torn-out cards out of it (legacy cards-rendered listener) */
 function rendered() {
   for (const o of [...world.bodies]) if (o.root && o.kind === 'card') W.remove(o);
@@ -246,4 +269,6 @@ export function install(app) {
   when('card.begged', ({ card }) => { if (live(card)) say(card, 'card.beg', { mode: 'plain' }); });
   when('card.crushed', ({ at }) => sayAt(at[0], at[1] + CRUSH_DY, 'card.slice', { scream: true }));
   when('hand.tossed', ({ card, hard }) => { if (hard && live(card)) say(card, 'card.throw', { force: true }); });
+  when('hand.chewing', ({ card, first }) => { if (live(card)) say(card, 'card.chewed', { force: !!first }); });   // left unattended (away-thief)
+  when('hand.unchewed', ({ card }) => { if (live(card)) say(card, 'card.bitten', { force: true }); });
 }

@@ -352,3 +352,90 @@ scenario(G, 'blind in the fog until it lifts', { ...O, legacy: false }, async (s
   assert.equal((await s.eval(claw)).st, 'lurk', 'it can see again');
   assert.ok(await s.said('hand.light'), 'and says so');
 });
+
+// chain silent-film: while the page is in 1926 ('page.film', the © year egg) every hand is drawn in jerky steps, TUNE.film.FPS a second
+scenario(G, 'silent film: the arm moves in jerky steps', { ...O, legacy: false }, async (s) => {
+  await carry(s, 0, 540, 300);
+  // count how often the arm's drawing changes on the page while it reaches for the card, one sample per 16 ms frame
+  const steps = async () => {
+    const W = await s.eval(vw);
+    const t0 = await s.eval(() => window.__kiri.clock.now());
+    let n = 0, last = await s.eval(() => document.querySelector('svg.claw.over:not(.sev) path.flesh').getAttribute('d'));
+    for (let i = 0; i < 40; i++) {
+      await s.move(900 + (i % 2 ? -1 : 1) * (W - 1100) * (i / 40), 300);
+      await s.run(16, 16);
+      const d = await s.eval(() => document.querySelector('svg.claw.over:not(.sev) path.flesh').getAttribute('d'));
+      if (d !== last) n++;
+      last = d;
+    }
+    return { n, ms: (await s.eval(() => window.__kiri.clock.now())) - t0 };
+  };
+  await s.eval(() => window.__kiri.bus.emit('page.film', { on: true }));
+  const jerky = await steps();
+  await s.eval(() => window.__kiri.bus.emit('page.film', { on: false }));
+  const smooth = await steps();
+  const fps = (r) => r.n / r.ms * 1000;
+  assert.ok(fps(jerky) > 6 && fps(jerky) <= 13, `in 1926 the drawing changes about 12 times a second: ${jerky.n} in ${jerky.ms.toFixed(0)} ms`);
+  assert.ok(smooth.n > 2 * jerky.n, `back in colour it changes on every frame again: ${smooth.n} in ${smooth.ms.toFixed(0)} ms`);
+});
+
+// ---- left unattended (chain away-thief): a card ripped, the tab hidden 20 s, and the hand is chewing a grid card at the edge ----
+const chewed = () => { const c = window.__cards.state().claw, o = c && c.o; if (!o) return null; const r = o.el.getBoundingClientRect(); return { key: o.key, bites: (o.bites || []).length, clip: o.el.style.clipPath.startsWith('polygon('), x: r.left, y: r.top + r.height / 2, w: r.width }; };
+async function leaveFor(s, ms) {
+  await s.eval(() => window.__setHidden(true));
+  await s.run(ms, 500);
+  await s.eval(() => window.__setHidden(false));
+  await s.run(100);
+}
+async function ripAndLeave(s) {
+  const [px, py] = await s.rip(0);
+  await s.run(300);
+  await s.line(px, py, 500, 600, 40); await s.run(600); await s.up();   // put it down gently on the left
+  await s.runUntil(() => window.__cards.state().claw.st === 'lurk', null, { max: 5000 });
+  await s.run(1500);
+  await leaveFor(s, 5000);   // a quick look at another tab: nothing happens
+  assert.equal((await s.eval(claw)).st, 'lurk', 'five seconds away: nothing happens');
+  assert.equal(await s.eval(() => document.querySelectorAll('#grid .card.held').length), 1, 'only the card you ripped is out');
+  await s.run(2000);
+  await leaveFor(s, 21000);
+}
+
+scenario(G, 'left unattended: pull the card back', { ...O, legacy: false }, async (s) => {
+  await ripAndLeave(s);
+  assert.equal(await s.eval(() => document.title), 'oh, there you are', 'the tab says so');
+  assert.equal((await s.eval(claw)).st, 'chew', 'the hand is at the edge, chewing');
+  assert.equal(await s.eval(() => document.querySelectorAll('#grid .card.held').length), 2, 'one more grid slot is empty');
+  let c = await s.eval(chewed);
+  assert.ok(c.bites >= 1 && c.clip, 'the card in its fist is already bitten');
+  await s.shot('left-unattended');
+  await s.run(700);
+  assert.ok(await s.said('hand.unattended'), 'you left it unattended');
+  assert.ok(await s.said('card.chewed'), 'the card squeals');
+  await s.run(1200);
+  c = await s.eval(chewed);
+  // take hold of the card's far end and pull it out of its fingers
+  const gx = c.x + 30, gy = c.y;
+  await s.move(gx, gy); await s.down(); await s.run(50);
+  assert.equal(await s.eval(() => { const g = window.__cards.state().grab; return g && g.o === window.__cards.state().claw.o; }), true, 'you have hold of it');
+  await s.line(gx, gy, gx - 250, gy + 40, 15);
+  await s.run(200);
+  assert.equal((await s.eval(claw)).st, 'sulk', 'it lets go');
+  await s.run(700);
+  assert.ok(await s.said('hand.unchewed'), 'and grumbles');
+  assert.ok(await s.said('card.bitten'), 'the card is back, and says what it went through');
+  const back = await s.eval((key) => { const o = [...window.__cards.objs].find((q) => q.key === key && q.kind === 'card'); return o && { bites: o.bites.length, clip: o.el.style.clipPath.startsWith('polygon('), held: window.__cards.state().grab && window.__cards.state().grab.o === o }; }, c.key);
+  assert.ok(back && back.bites >= 2 && back.clip && back.held, 'yours again, bite marks and all');
+  await s.up();
+});
+
+scenario(G, 'left unattended: it finishes the card', { ...O, legacy: false }, async (s) => {
+  await ripAndLeave(s);
+  assert.equal((await s.eval(claw)).st, 'chew', 'chewing at the edge');
+  const key = (await s.eval(chewed)).key;
+  await s.runUntil(() => window.__cards.state().claw.st === 'lurk', null, { max: 12000 });
+  await s.run(700);
+  assert.ok(await s.said('hand.gulp'), 'down it goes');
+  assert.equal(await s.eval((k) => [...window.__cards.objs].some((q) => q.key === k), key), false, 'the card is gone');
+  const t = await s.eval(() => JSON.parse(sessionStorage.getItem('kiripad-trophies') || '[]').map((q) => [q.kind, (q.clip || '').startsWith('polygon(')]));
+  assert.deepEqual(t, [['card', true]], 'pinned up in the basement, bitten');
+});

@@ -12,7 +12,12 @@ async function openBook(s) {
   await s.run(100);
 }
 
+// Heard lines (src/phrasebook/heard.js): the book writes out only the lines heard on this browser. The scenarios that look at
+// every line (or let the raid loose on them) first hear everything with the test hook, so the book is as full as it ever was.
+const heardAll = (s) => s.eval(() => window.__heard.all());
+
 scenario(G, 'open, every line list shown, close', async (s) => {
+  await heardAll(s);
   await openBook(s);
   const r = await s.eval(() => {
     const chips = new Set([...document.querySelectorAll('.pb .pb-chip > b')].map((b) => b.textContent));
@@ -46,6 +51,7 @@ scenario(G, 'open, every line list shown, close', async (s) => {
 
 scenario(G, 'raid with all four picks (throw, eat, help, scroll) and the swat', { rand: 0.3, timeout: 240000, legacy: false, session: { 'kiripad-ripped': '1' } }, async (s) => {
   await s.ensurePlanck();
+  await heardAll(s);
   await openBook(s);
   await s.run(4800, 100);
   assert.equal((await s.eval(pb)).raid, null, 'not yet');
@@ -96,7 +102,7 @@ scenario(G, 'raid with all four picks (throw, eat, help, scroll) and the swat', 
 });
 
 // phrase-say (src/phrasebook/say.js): in the open book, select a line and its owner says it beside the menu; a line you have not
-// heard on this visit, it refuses. The book is closed and opened again between picks, so the raid (five seconds in) never starts.
+// heard (on this browser: it is blotted out in the book), it refuses. The book is closed and opened again between picks, so the raid (five seconds in) never starts.
 const pickChip = (s, sel) => s.eval(({ text, key }) => {
   const chips = [...document.querySelectorAll('.pb .pb-scroll .pb-chip')];
   const c = text ? chips.find((x) => x.querySelector('b').textContent === text) : chips.find((x) => x.closest('[data-key]').dataset.key === key);
@@ -170,4 +176,84 @@ scenario(G, 'select a line: its owner says it beside the book, or refuses', { se
   assert.equal(await s.said('hand.word'), false);
   await s.key('Escape'); await s.run(400);
   assert.equal(await s.eval(sayer), null);
+});
+
+// heard lines: a fresh browser's book is nearly all blots, each with its When still readable; a line said on the page is written
+// out the next time, with a red ink dot that is gone the time after; it stays heard over a reload; one heard while the book is
+// open inks itself in; and the diary ("kotoba") fills the same way, with the pages it has not written yet blotted.
+const book = () => {
+  const chips = [...document.querySelectorAll('.pb .pb-scroll .pb-chip')];
+  return {
+    chips: chips.length, blots: chips.filter((c) => c.classList.contains('pb-blot')).length,
+    written: chips.filter((c) => !c.classList.contains('pb-blot')).map((c) => c.querySelector('b').textContent),
+    dots: [...document.querySelectorAll('.pb .pb-scroll .pb-chip .pb-ink')].map((d) => d.closest('.pb-chip').querySelector('b').textContent),
+    tabDots: [...document.querySelectorAll('.pb-tab')].filter((t) => t.querySelector('.pb-ink')).map((t) => t.textContent),
+    head: document.querySelector('.pb-count').textContent, foot: (document.querySelector('.pb-foot') || {}).textContent,
+  };
+};
+scenario(G, 'heard lines: blotted until you hear them, then written out with an ink dot', { session: { 'kiripad-ripped': '1' }, legacy: false, timeout: 120000 }, async (s) => {
+  await s.ensurePlanck();
+  await s.eval(() => { window.__hand.get(); window.__heard.forget(); });   // the arm made up front, so its state is the same each run
+  // 1. a fresh browser: blots everywhere, the When of each still there to read
+  await openBook(s);
+  let b = await s.eval(book);
+  assert.ok(b.blots > 300 && b.blots === b.chips, `all blotted (${b.blots} of ${b.chips})`);
+  assert.match(b.head, /^0 of \d+ lines heard, \d+ triggers\.$/);
+  assert.match(b.foot, /^Lines you have not heard yet are blotted out\./);
+  const smash = await s.eval(() => { const e = document.querySelector('.pb-entry[data-key="card.smash"]'); return { when: e.querySelector('.pb-when').textContent, blot: e.querySelector('.pb-chip b').textContent, dashed: e.classList.contains('pb-unheard') }; });
+  assert.match(smash.when, /^When .{10,}/, 'its trigger is readable');
+  assert.match(smash.blot, /^[▒▓░]{3,}$/, `the line is not (${smash.blot})`);
+  assert.ok(smash.dashed);
+  await s.key('Escape'); await s.run(400);
+
+  // 2. go and do it: a card is torn out and says something
+  await s.rip(0); await s.run(300); await s.up(); await s.run(300);
+  const said = (await s.bubbles()).filter((x) => x.who === 'card').map((x) => x.text);
+  assert.ok(said.length, 'the torn card spoke');
+  assert.ok(await s.eval((t) => t.every((x) => window.__heard.has(x)), said), 'and it is heard');
+
+  // 3. open again: written out, with the ink dot, and the Cards tab has one too
+  await openBook(s);
+  b = await s.eval(book);
+  for (const t of said) assert.ok(b.written.includes(t), `"${t}" is written out`);
+  for (const t of said) assert.ok(b.dots.includes(t), `"${t}" has the ink dot`);
+  assert.ok(b.tabDots.includes('The Cards'));
+  const m = b.head.match(/^(\d+) of \d+ lines heard, \d+ triggers; (\d+) new since you last looked\.$/);
+  assert.ok(m && +m[1] >= said.length && m[1] === m[2], `the header counts them, all new (${b.head})`);
+  // a line heard while the book is open inks itself in where it stands
+  await s.eval(() => window.__hand.say('eager'));
+  await s.run(100);
+  const arm = (await s.bubbles()).find((x) => x.who === 'hand');
+  assert.ok(arm, 'the hand said something');
+  b = await s.eval(book);
+  assert.ok(b.written.includes(arm.text) && b.dots.includes(arm.text), `"${arm.text}" inked itself in`);
+  await s.key('Escape'); await s.run(400);
+
+  // 4. the time after: still written out, the dots gone (one heard while the book stood open was seen then); the hand has had
+  // its say once more in between, and that line has the dot now
+  await s.run(2600);
+  await s.eval(() => window.__hand.say('sulk'));
+  await s.run(100);
+  const arm2 = (await s.bubbles()).filter((x) => x.who === 'hand').pop();
+  assert.ok(arm2 && arm2.text !== arm.text, 'the hand said something else');
+  await openBook(s);
+  b = await s.eval(book);
+  assert.ok(said.every((t) => b.written.includes(t)) && b.written.includes(arm.text));
+  assert.ok(![...said, arm.text].some((t) => b.dots.includes(t)), `their dots are gone (dots now only on what the page said since: ${b.dots})`);
+  assert.ok(b.dots.includes(arm2.text) && b.tabDots.includes('The Hand'), `"${arm2.text}" has the dot`);
+
+  // 5. the diary fills the same way: its new page has the dot, the pages it has not written are blotted, When readable
+  await s.type('kotoba'); await s.run(300);
+  const d = await s.eval(() => { const sec = document.getElementById('pb-diary'), arts = [...sec.querySelectorAll('.pb-entry')]; return { pages: arts.length, written: arts.filter((a) => !a.classList.contains('pb-unheard')).map((a) => [a.querySelector('.pb-chip b').textContent, !!a.querySelector('h4 .pb-ink')]), blank: arts.filter((a) => a.classList.contains('pb-unheard')).map((a) => [a.querySelector('.pb-when').textContent, a.querySelector('.pb-chip').classList.contains('pb-blot')]) }; });
+  assert.deepEqual(d.written, [[arm.text, false], [arm2.text, true]], 'what it said, the page written since the last look with a dot');
+  assert.equal(d.blank.length, 3, 'three pages still to write');
+  for (const [when, blotted] of d.blank) assert.ok(/^When .+/.test(when) && blotted, when);
+  await s.key('Escape'); await s.run(400);
+
+  // 6. it is this browser that heard them: a reload keeps them
+  await s.load();
+  await openBook(s);
+  b = await s.eval(book);
+  assert.ok(said.every((t) => b.written.includes(t)) && b.written.includes(arm.text), 'still heard after a reload');
+  assert.ok(b.blots > 300);
 });

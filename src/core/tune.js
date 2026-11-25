@@ -369,9 +369,9 @@ export const TUNE = {
   // margin is too narrow, under GAP_PX to spare); TOP_PX: room kept above it for its bubble; BUBBLE_DY: the bubble's top this far
   // above it; TILT / SHAKE: degrees it leans and trembles; HAND_IN: px the hand reaches in over the menu's right edge;
   // HAND_DY: its bubble's top this far above the wrist; OLD_IN: px an old hand's fingers reach in over the left edge; BUBBLE_W: the
-  // widest a bubble gets before it wraps; MAX: lines remembered
+  // widest a bubble gets before it wraps (the lines heard are TUNE.heard's)
   phraseSay: { SETTLE_MS: 350, IN_MS: 420, OUT_MS: 360, CARD_W: 190, SHOW: 0.62, GAP_PX: 12, TOP_PX: 70, BUBBLE_DY: 46, TILT: -7, SHAKE: 2.5,
-    HAND_IN: 70, HAND_DY: 115, OLD_IN: 46, BUBBLE_W: 340, MAX: 800 },
+    HAND_IN: 70, HAND_DY: 115, OLD_IN: 46, BUBBLE_W: 340 },
   speech: {
     TILT: [4, 4],                // every bubble leans right by 4 + up to 4 degrees
     RIDE_DY: -40,                // a body's bubble sits this far above the top of its rotated box
@@ -423,6 +423,39 @@ export const TUNE = {
     TRUCE_SAY_S: 0.9, TRUCE_S: 3.4, OUT_PX: 70,   // "fine. truce.": said this long after it comes out OUT_PX in from the edge; back to lurking after TRUCE_S
     TEMPT_MS: 7000,                 // after the truce, a card held in its zone gets a remark at most this often (it does not take it)
   },
+  // heard lines (phrasebook/heard.js, menu.js): MAX lines remembered on this browser (the oldest go first). In the book a line heard
+  // since the last look gets a red ink dot that waits DOT_WAIT_MS, then fades over DOT_MS; it inks itself in over INK_MS. A blot is
+  // one ▒ for every BLOT_CHARS letters of the line it hides, BLOT_MIN to BLOT_MAX of them, leaning up to BLOT_TILT degrees. The
+  // diary shows up to DIARY_BLOTS pages it has not written yet
+  heard: { MAX: 2500, DOT_WAIT_MS: 900, DOT_MS: 2600, INK_MS: 700, BLOT_CHARS: 3, BLOT_MIN: 3, BLOT_MAX: 12, BLOT_TILT: 1.6, DIARY_BLOTS: 3 },
+  // the stamp book (page/stamps.js): hold the header seal HOLD_MS (it sinks to PRESS_SCALE meanwhile); the card is W_PX wide with COLS
+  // circles a row and slides out over SLIDE_MS; each new stamp thumps down over THUMP_MS, THUMP_GAP_MS apart (its ink ring RING_MS,
+  // the card jolts JOLT_PX); it goes away over OUT_MS
+  stamps: { HOLD_MS: 3000, PRESS_SCALE: 0.84, W_PX: 400, COLS: 4, SLIDE_MS: 480, THUMP_MS: 420, THUMP_GAP_MS: 380, RING_MS: 500, JOLT_PX: 3, OUT_MS: 220 },
+  // silent film (1926 egg on; core/speech.js setStyle('film'), actors/hand/draw.js setStepping): every bubble is a title card, and
+  // every hand is redrawn only FPS times a second of game time (jerky, hand-cranked). The 1926-only lines (film.*) take the place of
+  // a few lists (core/speech.js FILM)
+  // The film keeps rolling LINGER_MS (wall time) after the pointer leaves the year (back on the year: it holds); then a last title
+  // card (page.filmEnd) and END_MS later the colour comes back (page/eggs.js)
+  film: { FPS: 12, LINGER_MS: 30000, END_MS: 1800 },
+  fogSlash: { SLIT_W: 2.5, HALO_W: 9, HALO_A: 0.35, SLIT_SPEED: 40, SLASH_SPEED: 500, TANA_PAD: 12, ACROSS: 0.7, SPLIT_PX: 7, SPLIT_MS: 1800, COOL_MS: 1500 },  // left unattended (chain away-thief): the tab hidden at least AWAY_MS (wall time) after a card was ripped, and you come back to
+  // the hand at the edge chewing one of the grid cards (actors/hand/behaviours/chew.js). Its wrist OUT_PX in from the right edge
+  // at Y of the window's height, the card sticking IN_PX into its fist; PRE bites already gone, one more every BITE_S, BITE_PX
+  // each (top and bottom edge in turn, from CLEAR_PX left of its fingers on); after CHEW_S it pulls back off the edge and swallows it (to the basement). Pull the card PULL_PX beyond where you took hold and it
+  // lets go; then it leaves cards alone COOL_MS (game ms). CHOMP: chews per second (the fist and the card shake)
+  awayThief: { AWAY_MS: 20000, OUT_PX: 150, Y: 0.42, IN_PX: 18, PRE: 4, BITE_S: 1.1, BITE_PX: 18, CLEAR_PX: 64, CHEW_S: 7, PULL_PX: 70, COOL_MS: 4000, CHOMP: 3.2 },
+  // the ghost in the fog (page/ghost.js, chain fog-ghost): the old hand the new one ate lingers in the banner fog, drawn at SIZE
+  // (1 = an old hand's size) at most ALPHA opaque, and only where the fog is thick (its alpha times the fog's alpha MASK_POW times). It fades in over
+  // RISE_S and drifts DRIFT (share of the banner's width, height) around its middle at DRIFT_RATE. A wipe through it (within HIT_R px,
+  // at least HIT_SPEED px/s; COOL_MS between two) makes it slip away at SLIP_SPEED px/s (DAMP per s) and wave for WAVE_S; WIPES of
+  // them, or the banner's fog wiped down below REST_COVER (checked every COVER_MS once it has risen), and it bows (BOW_S) and is
+  // laid to rest. In the kiri flood (once it has rolled in) it roams at ROAM_SPEED px/s, taps TAPS cards in view (TAP_S at each,
+  // TAP_GAP_S between), asks for an old hand in view every CALL_MS ('ghost.roaming') and hovers HOVER_DY px above the spot it is
+  // called to (ATTEND_S at most); it bows back for DIP_S. WHISPER_DY: its faint words sit this far above it.
+  ghost: { SIZE: 1.15, ALPHA: 0.85, MASK_POW: 2, RISE_S: 2.5, DRIFT: [0.3, 0.22], DRIFT_RATE: [0.11, 0.17], EASE: 1.6, HIT_R: 70, HIT_SPEED: 120, COOL_MS: 900,
+    SLIP_SPEED: 520, DAMP: 2.2, WAVE_S: 2.2, WIPES: 4, REST_COVER: 0.3, COVER_MS: 500, BOW_S: 2.6,
+    ROAM_SPEED: 260, TAPS: 5, TAP_S: 0.7, TAP_GAP_S: 0.9, CALL_MS: 1000, HOVER_DY: 90, SPOT_PX: 130, DIP_S: 2.2, ATTEND_S: 14, WHISPER_DY: -70,
+    SHIVER_MS: 650, SHIVER_PX: 3 },
 };
 
 // ---- timing: how long every speech bubble stays up, how long anyone waits before speaking again, and how long you get to answer ----
