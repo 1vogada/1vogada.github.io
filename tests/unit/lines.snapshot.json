@@ -474,6 +474,27 @@
    ["it was in the way","en"]
   ]
  },
+ "katana.tana": {
+  "who": "katana",
+  "legacy": null,
+  "trigger": {"title":"Slashing the secret open","when":"You swing it fast across the hidden 棚 in the corner of the banner while the shelf is in: the writing splits and the shelf slides out."},
+  "lines": [
+   ["found your shelf. you're welcome.","en"],
+   ["the writing had it coming","en"],
+   ["open sesame. sharply.","en"],
+   ["who needs a password when you have me?","en"],
+   ["I read it. then I cut it.","en"],
+   ["a secret? not any more.","en"],
+   ["one slash, one shelf","en"],
+   ["typing is for people without blades","en"],
+   ["the fog never stood a chance","en"],
+   ["I cut a word in half and a shelf fell out. normal day.","en"],
+   ["shelf delivered. tips accepted.","en"],
+   ["some words you say. this one I slice.","en"],
+   ["棚、開けといた","ja","I opened the shelf for you"],
+   ["рафтът е отворен. моля.","bg","the shelf is open. you're welcome."]
+  ]
+ },
  "toast.katanaFound": {
   "who": "toast",
   "legacy": null,

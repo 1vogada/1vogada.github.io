@@ -1,4 +1,4 @@
-// What the katana says (legacy SAY.kdrop khello kbrag kcut) and its toasts.
+// What the katana says (legacy SAY.kdrop khello kbrag kcut; katana.tana for the chain fog-slash) and its toasts.
 // Generated once from the old scripts; tests/unit/lines.snapshot.json pins every list (edit, UPDATE_SNAPSHOT=1, review the diff).
 // Keep each array's contents and order exactly: line() draws by index, and the array itself is the picker's memory key.
 // lang: one tag per line ('en' | 'bg' | 'ja', by script: Cyrillic = bg, kana/kanji = ja, else en), or one string for all.
@@ -33,6 +33,29 @@ defineLines('katana.cut', ['whoops, sorry', 'slicing on my way down', 'not my fa
   trigger: { title: 'Cutting by accident',
     when: 'It cuts a card with nobody holding it, on its way down the page.' },
   lang: 'en',
+});
+
+defineLines('katana.tana', [
+  'found your shelf. you\'re welcome.',
+  'the writing had it coming',
+  'open sesame. sharply.',
+  'who needs a password when you have me?',
+  'I read it. then I cut it.',
+  'a secret? not any more.',
+  'one slash, one shelf',
+  'typing is for people without blades',
+  'the fog never stood a chance',
+  'I cut a word in half and a shelf fell out. normal day.',
+  'shelf delivered. tips accepted.',
+  'some words you say. this one I slice.',
+  '棚、開けといた',
+  'рафтът е отворен. моля.',
+], {
+  who: 'katana',
+  trigger: { title: 'Slashing the secret open',
+    when: 'You swing it fast across the hidden 棚 in the corner of the banner while the shelf is in: the writing splits and the shelf slides out.' },
+  gloss: { '棚、開けといた': 'I opened the shelf for you', 'рафтът е отворен. моля.': 'the shelf is open. you\'re welcome.' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'ja', 'bg'],
 });
 
 // toasts: one-line lists, no random draw

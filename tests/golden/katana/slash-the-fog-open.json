@@ -1,0 +1,72 @@
+{
+ "scenario": "katana / slash the fog open",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 420,
+   "ms": 2588,
+   "who": "card",
+   "key": "SAY.khello",
+   "text": "世界一切れる刀です"
+  },
+  {
+   "doc": 1,
+   "t": 10592,
+   "ms": null,
+   "who": "card",
+   "key": "katana.tana",
+   "text": "who needs a password when you have me?"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 20,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 276,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "found",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 470,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "equipped",
+   "shelf": false,
+   "grab": "katana",
+   "objs": {
+    "katana": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 10596,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "equipped",
+   "shelf": true,
+   "grab": "katana",
+   "objs": {
+    "katana": 1
+   }
+  }
+ ]
+}

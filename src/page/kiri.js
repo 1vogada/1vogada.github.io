@@ -2,6 +2,8 @@
 // scroll / resize), and the page keys (legacy document keydown: "/" focuses search, kiri / мъгла floods, Escape lifts,
 // tana / рафт / たな opens the shelf) and the tap on the uncovered secret (legacy hero click). 16 blobs, 4 Math.random each,
 // at install (after page/fog.js). Emits 'kiri.flooded'.
+// The katana's tip cuts thin slits in the flood (slit(a, b), from page/slash.js on 'blade.moved'); while it is in your hand the
+// pointer's round wipe is off (fog.js bladeInHand). The flood's regrow closes the slits again.
 // The shelf is reached through its contract name app.shelf.toggle (legacy window.__shelf?.(), which did not exist under
 // reduced motion), never by importing actors/shelf.js.
 
@@ -10,7 +12,7 @@ import { clock } from '../core/clock.js';
 import { bus } from '../core/bus.js';
 import { has, line } from '../core/lines.js';
 import { isCrazy } from '../world/world.js';
-import { regrowMask, refog, alphaAt, rgb } from './fog.js';
+import { regrowMask, refog, alphaAt, rgb, bladeInHand, cutLine } from './fog.js';
 import { show as toast } from './toast.js';
 
 const K = TUNE.kiri;
@@ -49,6 +51,11 @@ function kWipe(x, y) { // page coordinates
   }
   kmctx.globalCompositeOperation = 'source-over';
   kLast = { x, y };
+}
+/** a thin slit through the flood along page points a -> b (the katana's tip), while it is up */
+export function slit(a, b) {
+  if (!state || !km.width) return;
+  cutLine(kmctx, a[0], a[1], b[0], b[1], kS);
 }
 function kFrame(t) {
   const flood = state;
@@ -109,7 +116,7 @@ export function install(app) {
   kv = document.getElementById('kiri'); kctx = kv.getContext('2d');
   km = document.createElement('canvas'); kmctx = km.getContext('2d');
   kBlobs = Array.from({ length: K.BLOBS }, (_, i) => ({ x: Math.random(), y: Math.random(), r: 0.2 + Math.random() * 0.25, s: (0.3 + Math.random()) * (i % 2 ? 1 : -1) }));
-  document.addEventListener('pointermove', (e) => { if (state) kWipe(e.clientX + scrollX, e.clientY + scrollY); }, { passive: true });
+  document.addEventListener('pointermove', (e) => { if (state && bladeInHand()) { kLast = null; return; } if (state) kWipe(e.clientX + scrollX, e.clientY + scrollY); }, { passive: true });
   addEventListener('scroll', () => { kLast = null; }, { passive: true });
   addEventListener('resize', () => { if (state) kSize(); });
 

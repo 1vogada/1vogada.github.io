@@ -39,12 +39,13 @@ public API. Every module exports `install(app)`; `app` holds every module by its
 | katana: reveal, draw, equip, sheathe | `src/actors/katana.js` | `src/lines/katana.js` | `styles/physics.css` |
 | the arm's hand (18 states) | `src/actors/hand/index.js` (tick, speech, sever), `behaviours/<state>.js`, `tug.js` (tug, slip, rip, crush helpers), `draw.js`, `poses.js`, `zones.js` | `src/lines/hand.js` | `styles/hand.css` |
 | cut-off hands (7 states) | `src/actors/severed/index.js`, `behaviours/<state>.js`, `gait.js` (legs, walking forces) | `src/lines/severed.js` | `styles/hand.css` |
-| the secret shelf (棚 tana) | `src/actors/shelf.js`; opened by `src/page/kiri.js` (typed), `src/page/search.js` (Enter) | `src/lines/shelf.js` (toasts) | `styles/physics.css` |
+| the secret shelf (棚 tana) | `src/actors/shelf.js`; opened by `src/page/kiri.js` (typed), `src/page/search.js` (Enter), `src/page/slash.js` (katana across 棚) | `src/lines/shelf.js` (toasts) | `styles/physics.css` |
 | who reacts to whom | `src/reactions.js` (`RULES`, plus `hand.senses(...)` for the shelf) | | |
 | speech bubbles (every one) | `src/core/speech.js`; each actor calls `defineSpeaker` in its `install` | | `styles/physics.css`, `hand.css` |
 | toasts | `src/page/toast.js` (actors emit `ui.toast`) | `toast.*` in each `src/lines/*.js` | `styles/base.css` |
 | greeting typewriter | `src/page/greeting.js` | `greeting.hello` in `src/lines/page.js` | |
 | banner fog; kiri flood and typed secrets | `src/page/fog.js`; `src/page/kiri.js` | `toast.fog` | `styles/fog.css` |
+| the katana slits the fog; slashing 棚 opens the shelf | `src/page/slash.js` (on `blade.moved`, in `reactions.js`); `slit` in `fog.js`, `kiri.js` | `katana.tana` | inline |
 | theme, crazy mode, English only | `src/page/theme.js`, `crazy.js`, `language.js` | | `styles/base.css`, `crazy.css` |
 | Surprise me, the omikuji slip, the secret × | `src/scenes/fortune.js` | `fortune.slip` in `src/lines/page.js` | `styles/omikuji.css` |
 | the coin game; welcome back; scene runner | `src/scenes/coin.js`; `welcome-back.js`; `scene.js` | `hand.*`, `button.hi` | `styles/omikuji.css` |

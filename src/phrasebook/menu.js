@@ -73,6 +73,7 @@ const CHAPTERS = [
       'katana.cut',
       { fig: 'kfall' },
       'katana.drop',
+      'katana.tana',
     ] },
   { id: 'hand', num: 'III', title: 'The Hand', head: 'Of the Hand',
     intro: 'Something lives past the right edge of the screen, and it wants your cards. It shows itself only after the first card has been torn loose. It has one eye, on the back of the hand, and opinions on everything it sees. It never answers at once: every remark waits up to three seconds, and two full seconds always pass between any two things it says.',

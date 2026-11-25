@@ -163,3 +163,61 @@ scenario(G, 'sheathe', async (s) => {
   r = await s.eval(() => ({ kat: !!window.__cards.state().katana, away: document.querySelector('.katana').classList.contains('away'), sheathe: document.querySelector('.sheathe').hidden }));
   assert.deepEqual(r, { kat: false, away: false, sheathe: true }, 'Esc puts a loose katana back');
 });
+
+// chain fog-slash: in hand, the tip leaves thin slits in the kiri flood (and the banner fog) that close up again slowly; slashed
+// fast across the hidden 棚 in the banner's top corner, the writing splits and the shelf slides out
+const kiriAt = ([x, y]) => { const c = document.getElementById('kiri'), r = c.getBoundingClientRect(), k = c.width / r.width; return c.getContext('2d').getImageData(Math.round((x - r.left) * k), Math.round((y - r.top) * k), 1, 1).data[3]; };
+const low = async (s, f, [x, y]) => Math.min(...await Promise.all([-2, -1, 0, 1, 2].map((d) => s.eval(f, [x, y + d]))));   // the darkest of 5 px across the line
+const fogAt = ([x, y]) => { const c = document.getElementById('fog'), r = c.getBoundingClientRect(), k = c.width / r.width; return c.getContext('2d').getImageData(Math.round((x - r.left) * k), Math.round((y - r.top) * k), 1, 1).data[3]; };
+
+scenario(G, 'slash the fog open', { legacy: false }, async (s) => {
+  const [gx, gy] = await equipAt(s, 0);
+  // the banner fog: a swing across the top of the banner slits it; the pointer's round wipe is off while the katana is in hand
+  const h = await s.box('#hero'), by = Math.round(h.y + h.h * 0.3), bx = Math.round(h.x + h.w * 0.5), py = by - TIP[1];
+  await s.line(gx, gy, bx - 150 - TIP[0], py, 16);
+  await s.run(400);
+  const fb = await s.eval(fogAt, [bx, by]);
+  await s.line(bx - 150 - TIP[0], py, bx + 150 - TIP[0], py, 15);
+  await s.run(50);
+  const fs = await low(s, fogAt, [bx, by]), fn = await s.eval(fogAt, [bx, by + 25]), fp = await s.eval(fogAt, [bx - TIP[0], py]);
+  assert.ok(py < h.y + h.h, 'the pointer moved over the banner too');
+  assert.ok(fb > 150 && fs < 40, `the banner fog is slit (${fb} -> ${fs})`);
+  assert.ok(fn > 150, `thinly (${fn})`);
+  assert.ok(fp > 150, `the pointer itself wiped nothing (${fp})`);
+  // the kiri flood
+  await s.type('kiri');
+  await s.run(3000, 100);                          // the flood rolls in (and the katana's hello is long enough ago)
+  assert.equal(await s.eval(() => document.getElementById('kiri').classList.contains('on')), true, 'the page is flooded');
+  // a horizontal swing low on the screen: the tip draws a straight line at y = 600
+  const y = 600 - TIP[1], x0 = 300 - TIP[0], x1 = 800 - TIP[0];
+  await s.line(bx + 150 - TIP[0], py, x0, y, 16);
+  await s.run(400);
+  const before = await s.eval(kiriAt, [550, 600]);
+  assert.ok(before > 200, `under the flood before the swing (${before})`);
+  await s.line(x0, y, x1, y, 25);
+  await s.run(50);
+  const tip = (await s.eval(kat)).tip;
+  assert.ok(Math.abs(tip[1] - 600) < 10, `the tip ran along y = 600 (${tip.map(Math.round)})`);
+  const slit = await low(s, kiriAt, [550, 600]), beside = await s.eval(kiriAt, [550, 625]);
+  assert.ok(slit < 40, `a clean slit where the tip passed (${slit})`);
+  assert.ok(beside > 200, `but only a thin one: 25 px away it is still fog (${beside})`);
+  await s.run(4000, 100);
+  const later = await low(s, kiriAt, [550, 600]);
+  assert.ok(later > slit + 30, `the slit closes up again, slowly (${slit} -> ${later})`);
+  // 棚 (under the flood now): up to it slowly, then one fast stroke down across it
+  const g = await s.box('#secret b'), cx = g.x + g.w / 2, cy = g.y + g.h / 2;
+  assert.equal(await s.eval(() => !!window.__cards.state().shelf), false, 'no shelf yet');
+  await s.line(x1, y, cx - 30 - TIP[0], cy - 45 - TIP[1], 30);
+  await s.run(400);
+  await s.line(cx - 30 - TIP[0], cy - 45 - TIP[1], cx + 30 - TIP[0], cy + 45 - TIP[1], 4);
+  const halves = await s.eval(() => document.querySelectorAll('#secret b span').length);
+  await s.run(200);
+  assert.equal(halves, 2, 'the writing splits in two');
+  assert.equal(await s.eval(() => !!window.__cards.state().shelf && !!document.querySelector('#phys .shelf')), true, 'the shelf slides out');
+  assert.ok(await s.said('katana.tana'), 'and the katana takes the credit');
+  // slashed again while it is out, it stays out
+  await s.run(2000, 100);
+  await s.line(cx + 30 - TIP[0], cy + 45 - TIP[1], cx - 30 - TIP[0], cy - 45 - TIP[1], 4);
+  await s.run(300);
+  assert.equal(await s.eval(() => !!window.__cards.state().shelf), true, 'a second slash does not put it away');
+});

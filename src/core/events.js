@@ -99,6 +99,7 @@ export const EVENTS = {
   'data.loaded': '{ data } projects.json arrived and the grid rendered',
   'cards.rendered': '{ } the grid re-rendered (legacy "cards-rendered" DOM event)',
   'ui.toast': '{ msg } show a toast (actors cannot import page/toast.js)',
+  'tana.slashed': '{ at } the katana\'s tip went across the hidden 棚 writing in the banner while the shelf was in (page/slash.js; at: page px). Reactions: the katana gloats, the shelf opens',
 };
 
 export const EVENT_TYPES = new Set(Object.keys(EVENTS));

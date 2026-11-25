@@ -16,6 +16,7 @@ import * as katana from './actors/katana.js';
 import * as welcome from './scenes/welcome-back.js';
 import * as rps from './scenes/rps.js';
 import * as toast from './page/toast.js';
+import * as slash from './page/slash.js';
 
 const notMine = (o) => o.kind !== 'katana' && o.kind !== 'hand';
 
@@ -64,6 +65,10 @@ export const RULES = [
   // ---- the page ----
   ['data.loaded', () => clock.real.after(TUNE.surprise.WELCOME_MS, welcome.welcomeBack)],   // legacy setTimeout(welcomeBack, 900)
   ['ui.toast', ({ msg }) => toast.show(msg)],
+  // ---- the katana cuts the fog (chain fog-slash) ----
+  ['blade.moved', (m) => slash.cut(m)],                                            // the tip slits the banner fog and the kiri flood; across 棚: tana.slashed
+  ['tana.slashed', () => katana.tana()],                                           // ...the katana is pleased with itself
+  ['tana.slashed', () => { if (!shelf.state()) shelf.toggle(); }],                 // ...and the shelf slides out
 ];
 
 export function install(app) {

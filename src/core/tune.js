@@ -343,6 +343,10 @@ export const TUNE = {
     EDGE: 6, APART: 10, APART_HOLD: 34, APART_TOUCH: 4, STACK: 16, DODGE: 10, DODGE_GAP: 14, TAIL: 14, LEAN_GROW: 0.07,
     BUTTON_EXTRA_MS: 100,
   },
+  // the katana's tip slits the banner fog and the kiri flood (page/slash.js): a hard SLIT_W px line inside a HALO_W px halo of HALO_A,
+  // only while the tip moves at least SLIT_SPEED px/s. Slashing across the 棚 (TANA_PAD px around it) at SLASH_SPEED px/s or more,
+  // in and out over at least ACROSS of its size, splits the writing (SPLIT_PX apart over SPLIT_MS) and opens the shelf; COOL_MS between two
+  fogSlash: { SLIT_W: 2.5, HALO_W: 9, HALO_A: 0.35, SLIT_SPEED: 40, SLASH_SPEED: 500, TANA_PAD: 12, ACROSS: 0.7, SPLIT_PX: 7, SPLIT_MS: 1800, COOL_MS: 1500 },
 };
 
 // ---- timing: how long every speech bubble stays up, how long anyone waits before speaking again, and how long you get to answer ----

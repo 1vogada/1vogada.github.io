@@ -4,11 +4,13 @@
 // install(app): hero pointermove AFTER actors/katana.js registered its own; visibilitychange after the clock's.
 // The fog colour is re-read on 'theme.changed' (legacy syncTheme: rgb = fogRGB()). theme.js calls refog() itself after a
 // click (legacy theme click: syncTheme(); refog()); crazy.js calls setRunning (legacy applyMode).
+// The katana's tip cuts thin slits in it instead (slit(a, b), from page/slash.js on 'blade.moved'): while the katana is in your
+// hand the pointer's round wipe is off (bladeInHand). A slit is cleared all the way, so the regrow takes the full REGROW_S to close it.
 
 import { TUNE } from '../core/tune.js';
 import { clock } from '../core/clock.js';
 import { bus } from '../core/bus.js';
-import { isCrazy } from '../world/world.js';
+import { isCrazy, world } from '../world/world.js';
 import { show as toast } from './toast.js';
 
 const T = TUNE.fog;
@@ -58,6 +60,27 @@ function wipe(x, y) {
   wiped += dist; if (wiped > T.HINT_PX) hint.classList.add('gone');
 }
 
+/** the katana is in your hand (pulled out, held or equipped): its tip slits the fog, the pointer does not wipe it */
+export const bladeInHand = () => { const o = world.blade, g = world.grab; return !!o && !o.root && !!g && g.o === o; };
+
+/** a thin slit cut clean through the mask along page points a -> b (the katana's tip; page/slash.js) */
+export function slit(a, b) {
+  if (!mctx || !W || !H) return;
+  const h = hero.getBoundingClientRect(), ox = h.left + scrollX, oy = h.top + scrollY;
+  const x0 = a[0] - ox, y0 = a[1] - oy, x1 = b[0] - ox, y1 = b[1] - oy, S = TUNE.fogSlash;
+  if (Math.max(x0, x1) < -S.HALO_W || Math.min(x0, x1) > W + S.HALO_W || Math.max(y0, y1) < -S.HALO_W || Math.min(y0, y1) > H + S.HALO_W) return;
+  cutLine(mctx, x0, y0, x1, y1, 1);
+}
+/** destination-out a soft halo and then a hard thin line (also used by page/kiri.js on its own mask, k = its scale) */
+export function cutLine(c, x0, y0, x1, y1, k) {
+  const S = TUNE.fogSlash;
+  c.save(); c.globalCompositeOperation = 'destination-out'; c.lineCap = 'round';
+  c.beginPath(); c.moveTo(x0 * k, y0 * k); c.lineTo(x1 * k, y1 * k);
+  c.strokeStyle = `rgba(0,0,0,${S.HALO_A})`; c.lineWidth = Math.max(1, S.HALO_W * k); c.stroke();
+  c.strokeStyle = '#000'; c.lineWidth = Math.max(2, S.SLIT_W * k); c.stroke();
+  c.restore();
+}
+
 function frame(t) {
   if (!running) return;
   if (!mask.width || !mask.height) { clock.nextFrame(frame); return; }
@@ -98,7 +121,7 @@ export function install(app) {
   blobs = Array.from({ length: T.BLOBS }, (_, i) => ({ x: Math.random(), y: Math.random(), r: 0.18 + Math.random() * 0.25, s: (0.3 + Math.random()) * (i % 2 ? 1 : -1) }));
   fogColour = fogRGB();
   bus.on('theme.changed', () => { fogColour = fogRGB(); });
-  hero.addEventListener('pointermove', (e) => { const r = hero.getBoundingClientRect(); wipe(e.clientX - r.left, e.clientY - r.top); });
+  hero.addEventListener('pointermove', (e) => { if (bladeInHand()) { last = null; return; } const r = hero.getBoundingClientRect(); wipe(e.clientX - r.left, e.clientY - r.top); });
   hero.addEventListener('pointerleave', () => { last = null; });
   new ResizeObserver(resize).observe(hero);
   new IntersectionObserver(([en]) => setRunning(en.isIntersecting && !isCrazy())).observe(hero);
