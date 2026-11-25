@@ -21,6 +21,7 @@ import { world, add, remove, isHeld, isCrazy, worldPoly, fragment } from '../../
 import { drawOffset } from '../../world/loop.js';
 import { gore } from '../../world/fx.js';
 import { turn } from './gait.js';
+import { towerTick, shookOff, tower } from './tower.js';
 
 const S = TUNE.physics.S, P = TUNE.physics, SV = TUNE.severed, B = SV.BODY;
 
@@ -84,7 +85,7 @@ export function gone(o) {
 
 // what it can sense of the other actors (wired in src/reactions.js): the shelf, as a place to hide from the new hand
 let sensed = {};
-/** what the old hands can sense: { shelf() -> { x0, x1, y, w } | null, onShelf(o) -> boolean, arm() -> { pose, x, y, look } | null, armed() -> boolean, pointer() -> [x, y] viewport px | null, moved() -> game ms the pointer last moved } */
+/** what the old hands can sense: { lurks() -> boolean, wrist() -> { st, x, y, grip } | null, shelf() -> { x0, x1, y, w } | null, onShelf(o) -> boolean, arm() -> { pose, x, y, look } | null, armed() -> boolean, pointer() -> [x, y] viewport px | null, moved() -> game ms the pointer last moved } */
 export function senses(s) { sensed = s || {}; }
 /** the arm has a hand of its own to cut off (not a stump, not before a card was ripped) */ export const armed = () => (sensed.armed ? sensed.armed() : false);
 
@@ -100,6 +101,11 @@ function vengeful(o, m) {
   return d < AV.SEE_PX;
 }
 
+/** the arm is out lurking at the right edge with a hand on it, nothing in your hand (the hand tower may start) */
+export const lurks = () => (sensed.lurks ? !!sensed.lurks() : false);
+/** the arm's wrist and grip (viewport px), its state and seconds in it, or null: { st, t, x, y, grip, is(...states) } */
+export const wrist = () => { const r = sensed.wrist ? sensed.wrist() : null; return r && { ...r, is: (...s) => s.includes(r.st) }; };
+export { shookOff, tower };
 /** the new hand, when the arm is out showing it (the mirror game), else null */ export const armOut = () => (sensed.arm ? sensed.arm() : null);
 
 // the mirror game: a walking old hand that has met the new one, in view, with nothing better to do (not hunting, running, hurt,
@@ -259,6 +265,7 @@ export function tick(dt) {
   if (!list.size) return;
   frameT = clock.now();
   hitchhike();
+  towerTick(dt);
   for (const o of [...list]) {
     const a = o.ai, h = o.hand, m = brains.get(o); m.age(dt);
     if (isHeld(o) && m.state !== 'held' && !m.def.tap) m.set('held');   // (a state with tap: true tells a tap from a pick-up itself)
@@ -293,6 +300,5 @@ export function install(a) {
   bus.on('body.removed', ({ body }) => { if (body.kind === 'hand') gone(body); });                 // legacy remove(): sevGone(o)
   bus.on('body.thrown', ({ body }) => { if (body.kind === 'hand') say(body, 'thrown', true); });   // legacy drop(): sp > HOT
   // world.reset: nothing of its own to undo (legacy resetAll removed every body, and remove() ran sevGone for each hand)
-  hook('__sev', { list, get SEV() { return table(); }, POSES, set, spawn, say, cut, mourn, scare, brain, riding });
-  hook('__sev', { list, get SEV() { return table(); }, POSES, set, spawn, say, cut, mourn, scare, riding, pounce });
+  hook('__sev', { list, get SEV() { return table(); }, POSES, set, spawn, say, cut, mourn, scare, brain, riding, pounce, tower });
 }

@@ -350,4 +350,48 @@ defineLines('sev.rpsLost', ['best of three?', 'that was a practice round', 'oh n
   lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
 });
 
+// ---- the hand tower (src/actors/severed/tower.js) ----
+defineLines('sev.towerCall', ['tower time!', 'assemble, fingers!', 'everyone to the edge', 'we have a plan. it is a bad plan.', 'today we reach the arm', 'formation! like we practised', 'кула!', 'たいけつだ、あつまれ!'], {
+  who: 'sev',
+  trigger: { title: 'The hand tower: gathering', when: 'Three old hands that have met the new hand, the arm lurking at the right edge: after a while they all scuttle to the edge.' },
+  gloss: { 'кула!': 'tower!', 'たいけつだ、あつまれ!': 'showdown, gather up!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.towerBrace', ['I am the foundation', 'climb, I am braced', 'mind the knuckles', 'why am I always the bottom one', 'go go go, I can hold it', 'лек си, нали?', 'したはまかせろ'], {
+  who: 'sev',
+  trigger: { title: 'The hand tower: the bottom one braces', when: 'The old hand nearest the edge stands on its wrist, fingers spread wide, for the others to climb on.' },
+  gloss: { 'лек си, нали?': 'you are light, right?', 'したはまかせろ': 'leave the bottom to me' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.towerClimb', ['excuse my fingers', 'do not look up', 'sorry, was that your eye?', 'one more knuckle…', 'hup!', 'ставам, ставам', 'のぼるよ!'], {
+  who: 'sev',
+  trigger: { title: 'The hand tower: climbing up', when: 'Each of the other two climbs up and over the one below and stands on its fingertips.' },
+  gloss: { 'ставам, ставам': 'getting up, getting up', 'のぼるよ!': 'climbing up!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.towerReach', ['almost… almost…', 'come closer, big guy', 'just a little lower', 'we only want to talk', 'I can see the wrist!', 'ела насам…', 'もうちょっと…'], {
+  who: 'sev',
+  trigger: { title: 'The hand tower: the top one reaches', when: 'All three are up. The top one stretches towards the arm at the edge.' },
+  gloss: { 'ела насам…': 'come over here…', 'もうちょっと…': 'a little more…' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.towerPull', ['got it! PULL!', 'heave-ho, team!', 'all together now!', 'out you come!', 'pull like you mean it', 'теглете!', 'せーの!'], {
+  who: 'sev',
+  trigger: { title: 'The hand tower: got it', when: 'The arm leaned in to look and the top one grabbed it by the wrist. They all pull.' },
+  gloss: { 'теглете!': 'pull, all of you!', 'せーの!': 'heave-ho!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.towerFell', ['the tower is down!', 'we were SO close', 'who moved?!', 'I told you I was ticklish', 'whose idea was this', 'рухнахме…', 'くずれた!'], {
+  who: 'sev',
+  trigger: { title: 'The hand tower: it comes down', when: 'You pick one of them off, something knocks it, or the arm does not come: down they all go.' },
+  gloss: { 'рухнахме…': 'we collapsed…', 'くずれた!': 'it fell apart!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.towerHeap', ['worth it', 'did we win?', 'get your thumb out of my palm', 'again tomorrow?', 'I can see my house from here', 'всичко ме боли', 'めがまわる…'], {
+  who: 'sev',
+  trigger: { title: 'The hand tower: in a heap', when: 'The arm shook them off. They land in a heap, seeing stars.' },
+  gloss: { 'всичко ме боли': 'everything hurts', 'めがまわる…': 'my head is spinning…' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
 export function install(app) {}

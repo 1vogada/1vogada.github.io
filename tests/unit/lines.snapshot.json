@@ -1624,6 +1624,91 @@
    ["にげるな!","ja","do not run!"]
   ]
  },
+ "hand.towerPeer": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"The hand tower: it leans in to look","when":"Three old hands stand on each other at the right edge. Curious, the arm leans down to look."},
+  "lines": [
+   ["what are you three up to?","en"],
+   ["is that… a tower?","en"],
+   ["very impressive. now what?","en"],
+   ["I am just looking","en"],
+   ["cute. really cute.","en"],
+   ["какво правите там?","bg","what are you doing there?"],
+   ["なにしてるの?","ja","what are you doing?"]
+  ]
+ },
+ "hand.pulled": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"The hand tower: pulled out","when":"The tower has it by the wrist and drags it out onto the page, stretched far out of its corner."},
+  "lines": [
+   ["hey! HEY! let go!","en"],
+   ["my elbow does not bend that way","en"],
+   ["I am not a rope!","en"],
+   ["unhand me! literally!","en"],
+   ["where are you taking me?!","en"],
+   ["this is NOT how arms work","en"],
+   ["пуснете ме!","bg","let me go!"],
+   ["はなせー!","ja","let gooo!"]
+  ]
+ },
+ "hand.shakeOff": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"The hand tower: shaking them off","when":"Pulled far enough, it shakes the three off."},
+  "lines": [
+   ["OFF. GET OFF.","en"],
+   ["enough!","en"],
+   ["shoo! all of you!","en"],
+   ["I said let go!","en"],
+   ["shake shake SHAKE","en"],
+   ["махайте се!","bg","get lost!"],
+   ["どけー!","ja","out of my way!"]
+  ]
+ },
+ "hand.towerSulk": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"The hand tower: it sulks","when":"It shook them off and snaps back out of sight to sulk for a while."},
+  "lines": [
+   ["I am not talking about this","en"],
+   ["that was humiliating","en"],
+   ["I need to lie down","en"],
+   ["nobody saw that, right?","en"],
+   ["my poor wrist","en"],
+   ["унижение…","bg","humiliation…"],
+   ["もうやだ…","ja","I have had enough…"]
+  ]
+ },
+ "hand.towerSaved": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"The hand tower: you save it","when":"You pick one of the old hands off the tower while they pull the arm: it comes down and the arm snaps back."},
+  "lines": [
+   ["phew. thank you.","en"],
+   ["I owe you one","en"],
+   ["that was far too close","en"],
+   ["my hero","en"],
+   ["I was about to win anyway","en"],
+   ["благодаря ти","bg","thank you"],
+   ["たすかった…","ja","saved…"]
+  ]
+ },
+ "hand.towerLaugh": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"The hand tower: it laughs","when":"The tower comes down while the arm is looking at it."},
+  "lines": [
+   ["ha! timber.","en"],
+   ["nice try, stack of thumbs","en"],
+   ["gravity, my friend","en"],
+   ["that was not even close","en"],
+   ["ten out of ten for effort","en"],
+   ["ха-ха, паднахте","bg","ha-ha, you fell"],
+   ["おしかったね","ja","so close"]
+  ]
+ },
  "sev.cut": {
   "who": "sev",
   "legacy": "SEV_SAY.cut",
@@ -2278,6 +2363,105 @@
    ["I want a lawyer","en"],
    ["загубих…","bg","I lost…"],
    ["まけた…","ja","I lost…"]
+  ]
+ },
+ "sev.towerCall": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The hand tower: gathering","when":"Three old hands that have met the new hand, the arm lurking at the right edge: after a while they all scuttle to the edge."},
+  "lines": [
+   ["tower time!","en"],
+   ["assemble, fingers!","en"],
+   ["everyone to the edge","en"],
+   ["we have a plan. it is a bad plan.","en"],
+   ["today we reach the arm","en"],
+   ["formation! like we practised","en"],
+   ["кула!","bg","tower!"],
+   ["たいけつだ、あつまれ!","ja","showdown, gather up!"]
+  ]
+ },
+ "sev.towerBrace": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The hand tower: the bottom one braces","when":"The old hand nearest the edge stands on its wrist, fingers spread wide, for the others to climb on."},
+  "lines": [
+   ["I am the foundation","en"],
+   ["climb, I am braced","en"],
+   ["mind the knuckles","en"],
+   ["why am I always the bottom one","en"],
+   ["go go go, I can hold it","en"],
+   ["лек си, нали?","bg","you are light, right?"],
+   ["したはまかせろ","ja","leave the bottom to me"]
+  ]
+ },
+ "sev.towerClimb": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The hand tower: climbing up","when":"Each of the other two climbs up and over the one below and stands on its fingertips."},
+  "lines": [
+   ["excuse my fingers","en"],
+   ["do not look up","en"],
+   ["sorry, was that your eye?","en"],
+   ["one more knuckle…","en"],
+   ["hup!","en"],
+   ["ставам, ставам","bg","getting up, getting up"],
+   ["のぼるよ!","ja","climbing up!"]
+  ]
+ },
+ "sev.towerReach": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The hand tower: the top one reaches","when":"All three are up. The top one stretches towards the arm at the edge."},
+  "lines": [
+   ["almost… almost…","en"],
+   ["come closer, big guy","en"],
+   ["just a little lower","en"],
+   ["we only want to talk","en"],
+   ["I can see the wrist!","en"],
+   ["ела насам…","bg","come over here…"],
+   ["もうちょっと…","ja","a little more…"]
+  ]
+ },
+ "sev.towerPull": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The hand tower: got it","when":"The arm leaned in to look and the top one grabbed it by the wrist. They all pull."},
+  "lines": [
+   ["got it! PULL!","en"],
+   ["heave-ho, team!","en"],
+   ["all together now!","en"],
+   ["out you come!","en"],
+   ["pull like you mean it","en"],
+   ["теглете!","bg","pull, all of you!"],
+   ["せーの!","ja","heave-ho!"]
+  ]
+ },
+ "sev.towerFell": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The hand tower: it comes down","when":"You pick one of them off, something knocks it, or the arm does not come: down they all go."},
+  "lines": [
+   ["the tower is down!","en"],
+   ["we were SO close","en"],
+   ["who moved?!","en"],
+   ["I told you I was ticklish","en"],
+   ["whose idea was this","en"],
+   ["рухнахме…","bg","we collapsed…"],
+   ["くずれた!","ja","it fell apart!"]
+  ]
+ },
+ "sev.towerHeap": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The hand tower: in a heap","when":"The arm shook them off. They land in a heap, seeing stars."},
+  "lines": [
+   ["worth it","en"],
+   ["did we win?","en"],
+   ["get your thumb out of my palm","en"],
+   ["again tomorrow?","en"],
+   ["I can see my house from here","en"],
+   ["всичко ме боли","bg","everything hurts"],
+   ["めがまわる…","ja","my head is spinning…"]
   ]
  },
  "toast.shelfGone": {

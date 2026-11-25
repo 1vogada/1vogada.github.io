@@ -118,7 +118,7 @@ export function oldStole(o) { if (claw && !isCrazy()) stole(o, now()); }
  * @returns { pose, x, y, look } (its live pose, its wrist and the circling pointer, viewport px; look null) or null
  */
 export function shown() {
-  const c = claw; if (!c || c.stump || isCrazy() || m.is('off', 'book', 'stump', 'devour', 'prod', 'paper', 'sew', 'cheese', 'wrest')) return null;
+  const c = claw; if (!c || c.stump || isCrazy() || m.is('off', 'book', 'stump', 'devour', 'prod', 'paper', 'sew', 'cheese', 'wrest', 'peer', 'pulled')) return null;
   if (c.x > html().clientWidth + H_.SHOWN_PX) return null;
   return { pose: c.pose, x: c.x, y: c.y, look: circling() };
 }
@@ -141,6 +141,22 @@ export function wrest(old, card) {
   const c = claw; if (!c || !awake() || c.stump || isCrazy() || !m.is('lurk') || c.o) return false;
   if (!wrestable(c, old, card, now())) return false;
   c.old = old; c.prey = card; set('wrest'); return true;
+}
+
+// The hand tower (the old hands' side: src/actors/severed/tower.js, wired in src/reactions.js)
+/** it is out lurking at the right edge with a hand on it, nothing in your hand: the old hands may build their tower */
+export const lurks = () => { const c = claw; return !!c && awake() && !c.stump && !isCrazy() && m.is('lurk') && !world.grab; };
+/** its wrist and grip, viewport px, its state and seconds in it, or null before it exists: { st, t, x, y, grip } */
+export function wrist() { const c = claw; return c ? { st: m.state, t: m.t, x: c.x, y: c.y, grip: gripPt() } : null; }
+/** the tower is up (sev.tower; tip: the top one's fingertips, page px): lurking, it leans in to look ('peer'). @returns true when it did */
+export function peer(x, y) { if (!lurks()) return false; claw.tower = { x, y }; set('peer'); return true; }
+/** the top one has it by the wrist (sev.towerGrab): they pull it out onto the page ('pulled') */
+export function pulled() { if (claw && m.is('peer')) set('pulled'); }
+/** the tower came down before it was done (sev.towerFell): looking, it laughs; being pulled, it snaps back, saved */
+export function towerFell() {
+  const c = claw; if (!c) return;
+  if (m.is('peer')) { c.tower = null; c.cool = now() + H_.COOL.grab; set('lurk'); speak('towerLaugh', true); }
+  else if (m.is('pulled')) { c.tower = null; set('sulk'); speak('towerSaved', true); }
 }
 
 /** it lost at rock, paper, scissors (scenes/rps.js): it sulks off out of sight for ms */

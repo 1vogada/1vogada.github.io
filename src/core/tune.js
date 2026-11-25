@@ -163,6 +163,21 @@ export const TUNE = {
       HIT_PX: 58,                     // a click this close to the arm's hand or forearm (px) makes it slip
       COOL: 6000,                     // after it slipped and lost the card: it leaves cards alone this long (game ms)
     },
+    TOWER: {                          // the hand tower (TUNE.severed.TOWER): the arm leans in to look, is pulled out, shakes them off
+      PEER_DX: 14, PEER_DY: 34,       // it brings its grip this far right of and above the top one's fingertips
+      PEER_AIM: 2.2,                  // pointing down and to the left (rad) as it looks
+      PEER_RATE: 2.4, PEER_MAX_S: 14, // slowly; and gives up looking after this long whatever happens
+      PULL_S: 3.4,                    // they drag it out onto the page over this long
+      TO: [0.38, 240],                // its grip ends up this share of the window's width from the left (at least this many px)
+      DROP_PX: 120,                   // and this much lower
+      FLOOR_PX: 150,                  // never closer than this to the bottom of the window
+      JERK_PX: 34, JERK_W: 5,         // each heave: this many px, this often (rad/s)
+      RATE: 4,                        // how fast its wrist follows being dragged (easing rate)
+      FLAIL: 0.45, FLAIL_W: 9,        // its hand flails this much (rad), this fast
+      SHAKE_S: 1.6, SHAKE_PX: 46, SHAKE_W: 31,   // then it shakes them off: this long, this hard, this fast
+      SULK_MS: 9000,                  // and sulks out of sight this long
+      SAY_MS: 1400,                   // its first line while being dragged, then unforced ones
+    },
   },
   // ---- cut-off hands ----
   severed: {
@@ -242,6 +257,28 @@ export const TUNE = {
       CREASES: 'radial-gradient(circle at 34% 30%, rgba(255,255,255,.45), transparent 42%), radial-gradient(circle at 66% 72%, rgba(0,0,0,.4), transparent 62%), repeating-linear-gradient(37deg, rgba(0,0,0,.13) 0 2px, transparent 2px 7px), repeating-linear-gradient(-58deg, rgba(0,0,0,.1) 0 1px, transparent 1px 6px)',
     },
     LEG: { force: 520, damp: 42, cap: 170, walk: 14, drag: 30, torque: 900, torqueDamp: 54 },
+    TOWER: {                          // the hand tower: three old hands climb on each other at the right edge and pull the arm out by its wrist
+      WAIT_MS: 3000,                  // all three met, awake, walking and in view, the arm lurking: this long before they gather (game ms)
+      COOL_MS: 120000,                // not again for this long after a tower, however it ended
+      EDGE_PX: 120,                   // the bottom one braces this far in from the right edge of the window
+      QUEUE_PX: 125,                  // the others wait their turn this far apart, to its left
+      IN_PX: 16, STUCK_S: 0.8,        // close enough to its spot; or stuck this long near it
+      STEP_PX: 88,                    // each hand stands on the fingertips of the one below: this much higher (its body is 104 px long)
+      CLIMB_S: 1.1, ARC_PX: 70,       // a climb takes this long, up and over in an arc this high
+      BRACE_S: 0.5,                   // the one below settles this long before the next one climbs
+      BUILD_S: 22,                    // gathering and climbing take at most this long, else they give up
+      REACH_S: 9,                     // the top one waits this long for the arm to come down to it
+      ASK_MS: 1000,                   // up, it waves at a lurking arm this often (sev.tower)
+      HEAVE_MS: 1300,                 // pulling, one of them shouts every so often (each in turn, unforced)
+      GRAB_PX: 60, GRAB_AFTER_S: 1.4, // its fingertips this close to the arm's grip, once the arm has looked this long: it has it
+      FOLLOW: 18,                     // how fast a hand in the tower follows its place (easing rate)
+      WOBBLE: 0.05, WOBBLE_W: 3.1,    // the tower sways this much (rad per hand up), this fast (rad/s)
+      KNOCK_PX: 12,                   // pushed this far off its place within a frame (px): it was knocked, and comes down
+      FALL: [2.5, 3],                 // coming down: each falls off sideways up to this fast (m/s x, up)
+      FLING: [[-9, -4], [-6, -7]],    // shaken off: flung left between these speeds (m/s, [x, y] at the least and at the most)
+      SPIN: 12,                       // and spun up to this fast (rad/s)
+      LAND_V: 1, LAND_S: 3,           // landed (slower than this, m/s) or after this long: dizzy
+    },
   },
   // ---- the secret shelf ----
   shelf: { MAX_W: 260, W_FRAC: 0.42, CLEAR_PX: 250, TOP: 140, BOTTOM: 160, CARDS_BELOW: 2, FRICTION: 0.9, NEAR: [120, 60, 380, 80], EYE_MS: 700 },

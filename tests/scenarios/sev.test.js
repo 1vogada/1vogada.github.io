@@ -161,3 +161,53 @@ scenario(G, 'you save the old hand from the new one', { legacy: false }, async (
   await s.run(3000, 100);
   assert.equal(await s.eval(() => window.__sev.list.size), 1, 'saved');
 });
+
+// the hand tower: three old hands that met the new one, the arm lurking: they climb on each other at the right edge, the top
+// one takes the arm by the wrist and they pull it out onto the page; it shakes them off and sulks, they land dizzy. Off while
+// window.__test.idle === false (every other scenario), so this one turns it on. No golden: it is a long stretch of physics
+const tw = () => { const T = window.__sev.tower(); return T && T.phase; };
+const sts = () => [...window.__sev.list].map((o) => o.ai.st).join(' ');
+async function tower(s) {
+  const size = await world(s);
+  await s.eval(() => { window.__test.idle = true; window.__hand.set('lurk'); });
+  for (const fx of [0.3, 0.45, 0.6]) await spawn(s, size.W * fx, size.H - 200);
+  await s.eval(() => { for (const o of window.__sev.list) { o.ai.met = true; o.ai.hurt = 0; } window.__hand.get().fullUntil = 1e12; });   // (and the arm is full: it eats none of them meanwhile)
+  await s.eval(() => { window.__towerLog = []; window.__kiri.bus.on('sev.towerFell', ({ why }) => window.__towerLog.push(why)); window.__kiri.bus.on('sev.state', ({ from, to }) => (from === 'tower' || from === 'gather') && window.__towerLog.push(from + '>' + to)); });
+  const fail = async (e) => { throw new Error(e.message + ' ' + await s.eval(sts) + ' ' + await s.eval(() => JSON.stringify([window.__towerLog, window.__sev.tower() && window.__sev.tower().hands.map((o) => [Math.round(o.body.getPosition().x * 100), o.ai.there, +(o.ai.stuck || 0).toFixed(2)])]))); };
+  await s.runUntil(tw, null, { max: 80000, step: 100 }).catch(fail);
+  assert.ok(await s.said('sev.towerCall'), 'they call each other over');
+  await s.runUntil(() => window.__sev.tower() && window.__sev.tower().phase === 'reach', null, { max: 40000, step: 100 }).catch(fail);
+  const ys = await s.eval(() => window.__sev.tower().hands.map((o) => o.body.getPosition().y * 100));
+  assert.ok(ys[0] > ys[1] && ys[1] > ys[2], `stacked, the bottom one lowest (${ys.map(Math.round)})`);
+  assert.equal(await s.eval(sts), 'tower tower tower');
+  return size;
+}
+
+scenario(G, 'the hand tower pulls the arm out', { legacy: false, golden: false, timeout: 300000 }, async (s) => {
+  await tower(s);
+  await s.runUntil(() => window.__cards.state().claw.st === 'peer', null, { max: 20000, step: 100 });
+  assert.ok(await s.said('hand.towerPeer'), 'the arm leans in to look');
+  await s.runUntil(() => window.__cards.state().claw.st === 'pulled', null, { max: 8000, step: 100 });
+  assert.ok(await s.said('sev.towerPull'), 'the top one has it: they pull');
+  await s.run(2500, 100);
+  const x = await s.eval(() => window.__cards.state().claw.x);
+  const vw = await s.eval(() => document.documentElement.clientWidth);
+  assert.ok(x < vw * 0.75, `dragged out onto the page (wrist at ${Math.round(x)} of ${vw})`);
+  await s.runUntil(() => window.__cards.state().claw.st === 'sulk', null, { max: 8000, step: 100 });
+  assert.ok(await s.said('hand.shakeOff'), 'it shakes them off');
+  assert.equal(await s.eval(tw), null);
+  await s.runUntil(() => [...window.__sev.list].every((o) => o.ai.st === 'dizzy'), null, { max: 6000, step: 100 });
+  assert.ok(await s.said('hand.towerSulk'), 'and sulks');
+});
+
+scenario(G, 'picked off the hand tower, it comes down', { legacy: false, golden: false, timeout: 300000 }, async (s) => {
+  await tower(s);
+  const sy = await s.scrollY();
+  const [x, y] = await s.eval(() => { const p = window.__sev.tower().hands[1].body.getPosition(); return [p.x * 100, p.y * 100]; });
+  await s.move(x, y - sy); await s.down();
+  await s.run(400);
+  assert.equal(await s.eval(tw), null, 'the tower is down');
+  assert.ok((await s.eval(sts)).includes('held'));
+  assert.ok(!(await s.eval(sts)).includes('tower'));
+  await s.up();
+});

@@ -67,6 +67,8 @@ import * as hSew from './actors/hand/behaviours/sew.js';
 import * as hSewn from './actors/hand/behaviours/sewn.js';
 import * as hCheese from './actors/hand/behaviours/cheese.js';
 import * as hWrest from './actors/hand/behaviours/wrest.js';
+import * as hPeer from './actors/hand/behaviours/peer.js';
+import * as hPulled from './actors/hand/behaviours/pulled.js';
 import * as handIdle from './actors/hand/idle.js';
 import * as handOld from './actors/hand/old.js';
 import * as hand from './actors/hand/index.js';
@@ -98,6 +100,10 @@ import * as sCheese from './actors/severed/behaviours/cheese.js';
 import * as sWrest from './actors/severed/behaviours/wrest.js';
 import * as sGift from './actors/severed/behaviours/gift.js';
 import * as sRps from './actors/severed/behaviours/rps.js';
+import * as sGather from './actors/severed/behaviours/gather.js';
+import * as sTower from './actors/severed/behaviours/tower.js';
+import * as sTumble from './actors/severed/behaviours/tumble.js';
+import * as sevTower from './actors/severed/tower.js';
 import * as severed from './actors/severed/index.js';
 import * as shelf from './actors/shelf.js';
 
@@ -144,8 +150,8 @@ export const ORDER = [
   ['handPoses', handPoses], ['handDraw', handDraw], ['handZones', handZones], ['handTug', handTug],
   ['hOff', hOff], ['hLurk', hLurk], ['hReach', hReach], ['hEager', hEager], ['hLunge', hLunge], ['hSnatch', hSnatch], ['hCatch', hCatch],
   ['hCrush', hCrush], ['hGloat', hGloat], ['hTug', hTug], ['hHas', hHas], ['hTriumph', hTriumph], ['hEat', hEat], ['hShow', hShow],
-  ['hStump', hStump], ['hRegrow', hRegrow], ['hSulk', hSulk], ['hBook', hBook], ['hMeet', hMeet], ['hDevour', hDevour], ['handOld', handOld], ['hPoke', hPoke], ['hProd', hProd], ['hPaper', hPaper], ['hSew', hSew], ['hSewn', hSewn], ['hCheese', hCheese], ['hWrest', hWrest], ['handIdle', handIdle], ['hand', hand],
-  ['sevGait', sevGait], ['sLimp', sLimp], ['sRise', sRise], ['sWalk', sWalk], ['sHeld', sHeld], ['sCrush', sCrush], ['sGloat', sGloat], ['sRest', sRest], ['sStare', sStare], ['sCaught', sCaught], ['sMourn', sMourn], ['sBow', sBow], ['sHide', sHide], ['sLeap', sLeap], ['sCower', sCower], ['sPaint', sPaint], ['sAvenge', sAvenge], ['sFive', sFive], ['sMirror', sMirror], ['sDead', sDead], ['sHome', sHome], ['sHitch', sHitch], ['sWhee', sWhee], ['sDizzy', sDizzy], ['sCheese', sCheese], ['sWrest', sWrest], ['sGift', sGift], ['sRps', sRps],
+  ['hStump', hStump], ['hRegrow', hRegrow], ['hSulk', hSulk], ['hBook', hBook], ['hMeet', hMeet], ['hDevour', hDevour], ['handOld', handOld], ['hPoke', hPoke], ['hProd', hProd], ['hPaper', hPaper], ['hSew', hSew], ['hSewn', hSewn], ['hCheese', hCheese], ['hWrest', hWrest], ['hPeer', hPeer], ['hPulled', hPulled], ['handIdle', handIdle], ['hand', hand],
+  ['sevGait', sevGait], ['sLimp', sLimp], ['sRise', sRise], ['sWalk', sWalk], ['sHeld', sHeld], ['sCrush', sCrush], ['sGloat', sGloat], ['sRest', sRest], ['sStare', sStare], ['sCaught', sCaught], ['sMourn', sMourn], ['sBow', sBow], ['sHide', sHide], ['sLeap', sLeap], ['sCower', sCower], ['sPaint', sPaint], ['sAvenge', sAvenge], ['sFive', sFive], ['sMirror', sMirror], ['sDead', sDead], ['sHome', sHome], ['sHitch', sHitch], ['sWhee', sWhee], ['sDizzy', sDizzy], ['sCheese', sCheese], ['sWrest', sWrest], ['sGift', sGift], ['sRps', sRps], ['sGather', sGather], ['sTower', sTower], ['sTumble', sTumble], ['sevTower', sevTower],
   ['severed', severed], ['shelf', shelf],
   // 5 the rules between features (after every actor: own listeners first)
   ['reactions', reactions],
