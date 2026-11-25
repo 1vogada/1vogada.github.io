@@ -138,5 +138,4 @@ export function install(app) {
 
   bus.on('katana.dropped', ({ katana }) => { say(katana, 'katana.drop', { force: true }); });   // legacy drop(): say(o, 'kdrop', true)
   bus.on('body.removed', ({ body: o }) => { if (o === katObj) setKat(null); });             // legacy remove(): if (o === katObj) katObj = null
-  bus.on('world.reset', () => { kat.classList.remove('away'); sheatheBtn.hidden = true; });  // legacy resetAll
 }

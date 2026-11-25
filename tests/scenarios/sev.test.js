@@ -14,6 +14,7 @@ async function world(s) {
   await s.run(200);
   await s.up();
   await s.press('.reset-cards');
+  await s.eval(() => { if (window.__hand && window.__hand.reset) window.__hand.reset(); });   // Put the cards back leaves the hand alone: these scenarios want it gone
   await s.run(800);
   const bottom = await s.eval(() => document.documentElement.scrollHeight - innerHeight);
   await s.scrollTo(bottom);
@@ -102,7 +103,7 @@ scenario(G, 'three-hand cap', async (s) => {
   await s.rip(0);
   await s.up();
   await s.press('.reset-cards');
-  assert.deepEqual(await s.eval(() => ({ n: window.__sev.list.size, svgs: document.querySelectorAll('svg.claw.sev').length })), { n: 0, svgs: 0 }, 'reset clears them');
+  assert.deepEqual(await s.eval(() => ({ n: window.__sev.list.size, svgs: document.querySelectorAll('svg.claw.sev').length })), { n: 3, svgs: 6 }, 'Put the cards back leaves them alone');
 });
 
 // ---- the new hand and the old one (src/actors/hand/old.js) ----

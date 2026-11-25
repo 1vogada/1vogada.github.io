@@ -215,12 +215,13 @@ export function showReset() {
   resetBtn.addEventListener('click', reset); actionsBar().appendChild(resetBtn);
 }
 /**
- * "Put the cards back" (legacy resetAll): emits 'world.reset' first (legacy clawReset; each actor resets itself on it: the
- * cut's wounds, the katana back in the banner, the grid cards regrow), then removes every body, the bits and the queues
+ * "Put the cards back" (legacy resetAll): emits 'world.reset' first (the cut's wounds go, the grid cards regrow), then
+ * removes the cards, pieces and shards, the bits and the queues. Nothing else: the hand keeps its state, mood and timers
  */
 export function reset() {
   bus.emit('world.reset', {});
-  for (const o of [...world.bodies]) remove(o);
+  // only the cards and what is left of them (Ivo 2026-11-25): the hand, a cut-off hand, the katana stay as they are
+  for (const o of [...world.bodies]) if (o.kind === 'card' || o.kind === 'piece' || o.kind === 'shard') remove(o);
   clearBits();
   world.hits.length = 0; world.blasts.length = 0; world.ripped.clear(); world.loose.clear(); world.tugs.clear(); if (resetBtn) resetBtn.hidden = true;
 }

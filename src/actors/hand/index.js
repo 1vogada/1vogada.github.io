@@ -266,7 +266,6 @@ export function install(app) {
   clock.onTick(tick, 'hand');
   clock.hasWork(busy);
   clock.keepAwake(busy);
-  bus.on('world.reset', reset);
   report('claw', () => claw);
-  hook('__hand', { get, draw, set, POSES, katanaSvg: (id) => (app && app.katana && app.katana.katanaSvg ? app.katana.katanaSvg(id) : '')   /* the katana's drawing, read off app (no actor import) */, come, to, say, grip, leave, awake });
+  hook('__hand', { get, draw, set, reset, POSES, katanaSvg: (id) => (app && app.katana && app.katana.katanaSvg ? app.katana.katanaSvg(id) : '')   /* the katana's drawing, read off app (no actor import) */, come, to, say, grip, leave, awake });
 }

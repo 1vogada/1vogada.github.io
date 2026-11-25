@@ -186,7 +186,7 @@ scenario(G, 'reset all', { legacy: false }, async (s) => {
   await s.press('.reset-cards');
   const r = await s.eval(() => ({ objs: window.__cards.objs.size, els: document.querySelectorAll('#phys .phys').length, held: document.querySelectorAll('#grid .card.held').length,
     regrow: document.querySelectorAll('#grid .card.regrow').length, resetHidden: document.querySelector('.reset-cards').hidden, claw: window.__cards.state().claw.st }));
-  assert.deepEqual(r, { objs: 0, els: 0, held: 0, regrow: 2, resetHidden: true, claw: 'off' });
+  assert.deepEqual(r, { objs: 0, els: 0, held: 0, regrow: 2, resetHidden: true, claw: 'lurk' }, 'the cards are back; the hand is not reset');
   await s.run(800);
   assert.equal(await s.eval(() => document.querySelectorAll('#grid .card.regrow').length), 0, 'the regrow animation class is swapped for settled');
   await s.run(3000, 100);
