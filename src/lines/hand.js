@@ -363,7 +363,49 @@ defineLines('hand.rematch', ['wanna play another coin toss?', 'another coin toss
   lang: ['en', 'en', 'en', 'en', 'en', 'en', 'bg', 'bg', 'ja', 'ja'],
 });
 
+// ---- the new hand and the old one (cut off earlier, still walking about) ----
+defineLines('hand.meet', ['…is that my old hand?', 'oh. it is you.', 'hello, former me', 'I see you, leftovers', 'you look… worse', 'старата ми ръка?', 'ふるい手だ'], {
+  who: 'hand',
+  trigger: { title: 'Meeting the old hand',
+    when: 'Its new hand has grown, and the one you cut off earlier comes into view. It leans out and has a look.' },
+  gloss: { 'старата ми ръка?': 'my old hand?', 'ふるい手だ': 'it is the old hand' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+defineLines('hand.stolen', ['that was MY snack', 'the old one still eats?', 'greedy little thing', 'thief.', 'I saw that.', 'крадец!', 'どろぼう!'], {
+  who: 'hand',
+  trigger: { title: 'The old hand ate a card',
+    when: 'The cut-off hand crushes a card while the new one is around. It takes note, and the old hand is fair game for a while.' },
+  gloss: { 'крадец!': 'thief!', 'どろぼう!': 'thief!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+defineLines('hand.devour', ['waste not.', 'come here, old friend', 'nothing personal', 'you look tired. let me help', 'back where you belong', 'ела при мен', 'いただきます'], {
+  who: 'hand',
+  trigger: { title: 'Going for the old hand',
+    when: 'The old hand is near the right edge and cannot get away: asleep, still crawling from the cut, or caught gloating over a card it stole. The new hand has met it and is not full.' },
+  gloss: { 'ела при мен': 'come to me', 'いただきます': 'thanks for the meal (said before eating)' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+defineLines('hand.devoured', ['*burp*', 'tastes like me', 'recycling.', 'we are one again', 'better inside than out', 'хрус.', 'うまい'], {
+  who: 'hand',
+  trigger: { title: 'Ate the old hand',
+    when: 'It drags the old hand off the edge of the screen. Then it is full for twenty seconds.' },
+  gloss: { 'хрус.': 'crunch.', 'うまい': 'tasty' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+defineLines('hand.robbed', ['HEY. that was me', 'give me back… me', 'fine. keep the leftovers', 'you are on ITS side?', 'ей, мое е!', 'ずるい!'], {
+  who: 'hand',
+  trigger: { title: 'You saved the old hand',
+    when: 'You pick the old hand up while the new one is dragging it away.' },
+  gloss: { 'ей, мое е!': 'hey, that is mine!', 'ずるい!': 'not fair!' },
+  lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
 // toast: a one-line list, no random draw
+defineLines('toast.devoured', ['It ate its old hand. Nothing goes to waste here.'], { who: 'toast', lang: 'en' });
 defineLines('toast.severed', ['You cut its hand off. It will grow another. The old one has plans of its own.'], { who: 'toast', lang: 'en' });
 
 export function install(app) {}

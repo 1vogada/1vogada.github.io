@@ -117,6 +117,19 @@ export const TUNE = {
       cardMaxFrac: 0.45, teaseCards: 2, teaseMaxFrac: 0.6 },   // the tease zone is teaseCards cards wide (so it starts left of the catch zone, past the GitHub link), never more than teaseMaxFrac of vw   // Ivo 2026-11-25: tease and catch zones are each one card wide from the right edge (never more than this share of vw: on a phone a card is the whole screen)
     NEAR: [190, 0.28],                // a held card this close to the right edge (px, or this share of vw if less) gets lunged at and pulled
     SNATCH_REACH: [440, 0.36],        // it only snatches a card this close to the right edge (px, or share of vw); further away it just sulks
+    OLD: {                            // the new hand and the old (cut-off) one
+      SEE_BOTTOM: 60,                 // ...and may be this far below the bottom edge (it is 92 px tall: the top of it still shows)
+      SEE: [40, 40],                  // the old hand is "in view" when its palm is this far inside the left and top of the viewport (x, y px)
+      NOTICE_MS: 1500,                // an old hand it has not met must be in view this long before it leans out
+      MEET_S: 2.4,                    // it leans out and looks for this long
+      REACH: [380, 0.4],              // it only goes for an old hand this close to the right edge (px, or share of vw)
+      GRAB_PX: 52, REACH_S: 1.8,      // grip this close = got it; gives up after this long
+      HOLD_S: 1.6, LIFT_PX: 90,       // then it lifts it up and shakes it for this long (your chance to take it back)
+      DRAG_RATE: 1.4,                 // and drags it off the edge this slowly (easing rate; a card it eats goes at 5)
+      DIGEST_MS: 20000,               // full after eating one: no second helping for this long
+      THIEF_MS: 7000,                 // after the old hand crushes a card, it may be eaten while awake for this long
+      COOL: 2500,                     // after it lost its old hand to you
+    },
   },
   // ---- cut-off hands ----
   severed: {
@@ -148,6 +161,7 @@ export const TUNE = {
     TURN_MS: [2500, 4000], TIRED_MS: [14000, 9000], STROLL_TURN_MS: [2500, 5000], STUCK_TURN_MS: [2000, 3000],
     CRUSH_S: 3.2, CRUSH_COOL: 5000, FOOD_COOL: 2500, LOSE_COOL: 1500,
     REST_WAKE_MS: [7000, 7000],
+    STARE_S: 2.6, STARE_SAY_S: 0.9,   // the old hand stares back at the new one, says its line after this long
     LEG: { force: 520, damp: 42, cap: 170, walk: 14, drag: 30, torque: 900, torqueDamp: 54 },
   },
   // ---- the secret shelf ----
@@ -178,11 +192,11 @@ export const TUNE = {
 export const TIMING = {
   read: { base: 600, perChar: 65, cjk: 220, min: 1300, max: 3500 },
   floor: { rip: 1900, eat: 1600, help: 2400, hide: 1900, btn: 2600, hand: 1500, toast: 2400,
-           flip: 4000, rematch: 4000, yourpick: 4000, callit: 3500, ask: 4000, waiting: 2600 },
+           flip: 4000, rematch: 4000, meet: 2200, devour: 1900, yourpick: 4000, callit: 3500, ask: 4000, waiting: 2600 },
   gap: { show: 600, after: 500, card: 1400, katana: 2000, scream: 2000, hand: 2000, handIdle: 2400, handLate: 1200, sev: 2200, sevForce: 900, notme: 2600, raid: 1300, raidAsk: 2900 },
   react: { min: 700, spread: 2100, calm: 0.65, flinch: 1500 },
   wait: {
-    tease: [2000, 2800], teaseAgain: [1200, 2000], teaseMin: 2000,   // teaseMin: Ivo wants teasing to last at least 2 s before it lunges or snatches
+    tease: [2000, 2800], teaseAgain: [1200, 2000], teaseMin: 2000, catchHeld: 1000,   // catchHeld: a card held this long in the catch zone gets grabbed (Ivo 2026-11-25)   // teaseMin: Ivo wants teasing to last at least 2 s before it lunges or snatches
     ask: 7000,
     secret: 350,
     hello: 2200, back: 2500,

@@ -58,6 +58,9 @@ import * as hStump from './actors/hand/behaviours/stump.js';
 import * as hRegrow from './actors/hand/behaviours/regrow.js';
 import * as hSulk from './actors/hand/behaviours/sulk.js';
 import * as hBook from './actors/hand/behaviours/book.js';
+import * as hMeet from './actors/hand/behaviours/meet.js';
+import * as hDevour from './actors/hand/behaviours/devour.js';
+import * as handOld from './actors/hand/old.js';
 import * as hand from './actors/hand/index.js';
 import * as sevGait from './actors/severed/gait.js';
 import * as sLimp from './actors/severed/behaviours/limp.js';
@@ -67,6 +70,8 @@ import * as sHeld from './actors/severed/behaviours/held.js';
 import * as sCrush from './actors/severed/behaviours/crush.js';
 import * as sGloat from './actors/severed/behaviours/gloat.js';
 import * as sRest from './actors/severed/behaviours/rest.js';
+import * as sStare from './actors/severed/behaviours/stare.js';
+import * as sCaught from './actors/severed/behaviours/caught.js';
 import * as severed from './actors/severed/index.js';
 import * as shelf from './actors/shelf.js';
 
@@ -104,8 +109,8 @@ export const ORDER = [
   ['handPoses', handPoses], ['handDraw', handDraw], ['handZones', handZones], ['handTug', handTug],
   ['hOff', hOff], ['hLurk', hLurk], ['hReach', hReach], ['hEager', hEager], ['hLunge', hLunge], ['hSnatch', hSnatch], ['hCatch', hCatch],
   ['hCrush', hCrush], ['hGloat', hGloat], ['hTug', hTug], ['hHas', hHas], ['hTriumph', hTriumph], ['hEat', hEat], ['hShow', hShow],
-  ['hStump', hStump], ['hRegrow', hRegrow], ['hSulk', hSulk], ['hBook', hBook], ['hand', hand],
-  ['sevGait', sevGait], ['sLimp', sLimp], ['sRise', sRise], ['sWalk', sWalk], ['sHeld', sHeld], ['sCrush', sCrush], ['sGloat', sGloat], ['sRest', sRest],
+  ['hStump', hStump], ['hRegrow', hRegrow], ['hSulk', hSulk], ['hBook', hBook], ['hMeet', hMeet], ['hDevour', hDevour], ['handOld', handOld], ['hand', hand],
+  ['sevGait', sevGait], ['sLimp', sLimp], ['sRise', sRise], ['sWalk', sWalk], ['sHeld', sHeld], ['sCrush', sCrush], ['sGloat', sGloat], ['sRest', sRest], ['sStare', sStare], ['sCaught', sCaught],
   ['severed', severed], ['shelf', shelf],
   // 5 the rules between features (after every actor: own listeners first)
   ['reactions', reactions],

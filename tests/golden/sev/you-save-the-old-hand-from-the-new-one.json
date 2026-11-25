@@ -1,0 +1,271 @@
+{
+ "scenario": "sev / you save the old hand from the new one",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 32,
+   "ms": 800,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "ms": 376,
+   "who": "card",
+   "key": "SAY.rip",
+   "text": "I was comfy!"
+  },
+  {
+   "doc": 1,
+   "t": 2976,
+   "ms": 1312,
+   "who": "hand",
+   "key": "SEV_SAY.cut",
+   "text": "…"
+  },
+  {
+   "doc": 1,
+   "t": 3568,
+   "ms": 2208,
+   "who": "hand",
+   "key": "hand.meet",
+   "text": "hello, former me"
+  },
+  {
+   "doc": 1,
+   "t": 4464,
+   "ms": 1312,
+   "who": "hand",
+   "key": "sev.meet",
+   "text": "impostor!"
+  },
+  {
+   "doc": 1,
+   "t": 6576,
+   "ms": 608,
+   "who": "hand",
+   "key": "hand.devour",
+   "text": "waste not."
+  },
+  {
+   "doc": 1,
+   "t": 6576,
+   "ms": 1312,
+   "who": "hand",
+   "key": "sev.doomed",
+   "text": "I AM YOU"
+  },
+  {
+   "doc": 1,
+   "t": 7184,
+   "ms": 1312,
+   "who": "hand",
+   "key": "hand.robbed",
+   "text": "ей, мое е!"
+  },
+  {
+   "doc": 1,
+   "t": 7900,
+   "ms": 1316,
+   "who": "hand",
+   "key": "SEV_SAY.thrown",
+   "text": "not agaaain"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 16,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 48,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1208,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1228,
+   "claw": "off",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 2148,
+   "claw": "lurk",
+   "sev": "limp",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 3648,
+   "claw": "meet",
+   "sev": "stare",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6048,
+   "claw": "lurk",
+   "sev": "stare",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6248,
+   "claw": "lurk",
+   "sev": "walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6648,
+   "claw": "devour",
+   "sev": "caught",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6880,
+   "claw": "sulk",
+   "sev": "held",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "hand",
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 7916,
+   "claw": "sulk",
+   "sev": "limp",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 8516,
+   "claw": "lurk",
+   "sev": "limp",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 8816,
+   "claw": "lurk",
+   "sev": "rise",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 9616,
+   "claw": "lurk",
+   "sev": "walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  }
+ ]
+}
