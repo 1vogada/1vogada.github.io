@@ -1,4 +1,4 @@
-// The entry point of the new code (loaded only behind ?next until the parity suite passes). Imports every module and
+// The entry point of the new code (the default; ?legacy loads the old script instead). Imports every module and
 // installs them in a fixed order. The order is legacy script order, because it decides the order of DOM listeners of the
 // same type on the same target (keydown Escape, pointermove, pointerdown) and of the Math.random draws made at start-up
 // (the fog's blobs before the flood's). See src/README.md "Install order" before moving anything.

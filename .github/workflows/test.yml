@@ -1,5 +1,5 @@
 name: Tests
-# The browser scenario suite (tests/scenarios) on every pull request: legacy against the committed golden traces,
+# The browser scenario suite (tests/scenarios) on every pull request: the page against the committed golden traces (also the old script behind ?legacy),
 # the moved legacy script against the inline script it came from, and the import map stamp.
 on:
   pull_request:
@@ -31,12 +31,11 @@ jobs:
         run: npm run check:legacy
       - name: Import map is current
         run: npm run stamp:check
-      - name: Scenarios (legacy, against tests/golden)
+      - name: Scenarios (the modules under src/, against tests/golden)
         run: npm test
-      - name: Scenarios on /?next (only once src/main.js exists; informational until the default flips)
-        if: ${{ hashFiles('src/main.js') != '' }}
-        continue-on-error: true
-        run: npm run test:next
+      - name: Scenarios on /?legacy (the old script, until it is deleted)
+        if: ${{ hashFiles('scripts/legacy.js') != '' }}
+        run: npm run test:legacy
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

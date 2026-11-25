@@ -82,7 +82,7 @@ function show(sp, self, text, opts, t, key) {
   const ms = TIMING.talk(el, floorOf(opts));
   self.say = { el, until: t + ms, ms, key };
   if (sp.extraCls) el.classList.add(sp.extraCls);
-  clock.wake();
+  if (typeof sp.life !== 'function') clock.wake();   // a speaker on its own clock (the phrasebook raid) never restarts the page's frame loop, as legacy raidSay did not
   return el;
 }
 

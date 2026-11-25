@@ -5,9 +5,9 @@
 //   const { scenario } = require('../helpers/harness');
 //   scenario('world', 'pull and spring back', async (s) => { ... });
 //
-// Env:  NEXT=1           load /?next (the ES module rewrite) instead of / (legacy)
+// Env:  NEXT=1           load / (the ES modules under src/, the default); without it /?legacy (the old script) is loaded
 //       UPDATE_GOLDEN=1  write the recorded traces to tests/golden instead of comparing
-//       TRACE_MATCH=strict|kind   how traces are compared (default: strict on legacy, kind with NEXT=1; see compareTrace)
+//       TRACE_MATCH=strict|kind   how traces are compared (default: strict; see compareTrace)
 //       SHOTS=1          write the screenshots scenarios ask for (s.shot) to tests/shots/
 //       ONLY="name"      run only scenarios whose name contains this text (node --test-name-pattern works too)
 //       HEADED=1         show the browser
@@ -22,7 +22,7 @@ const { compareTrace, buildTrace } = require('./trace');
 
 const NEXT = process.env.NEXT === '1';
 const UPDATE = process.env.UPDATE_GOLDEN === '1';
-const MATCH = process.env.TRACE_MATCH || (NEXT ? 'kind' : 'strict');
+const MATCH = process.env.TRACE_MATCH || 'strict';
 const SHOTS = process.env.SHOTS === '1';
 const ROOT = path.resolve(__dirname, '..');
 const GOLDEN = path.join(ROOT, 'golden');
@@ -148,7 +148,7 @@ class Session {
       await this.open(keep.time, keep.session, keep.local, cookies);
     }
     this.doc++;
-    const q = !NEXT ? query : !query ? '?next' : query[0] === '#' ? '?next' + query : query + '&next';
+    const q = NEXT || /[?&]next\b/.test(query) ? query : !query ? '?legacy' : query[0] === '#' ? '?legacy' + query : query + '&legacy';   // the modules are the default; ?legacy loads the old script
     await this.page.goto(base + '/' + q, { waitUntil: 'load' });
     await this.settle();
   }
