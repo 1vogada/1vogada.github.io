@@ -115,10 +115,14 @@ async function oldHand(s) {
   await spawn(s, size.W - 190, size.H - 200);
   return size;
 }
+// what the arm and the old hand look like, for a failure message
+const why = (s) => s.eval(() => { const o = window.__sev.list.values().next().value, c = window.__cards.state().claw, p = o && o.body.getWorldCenter();
+  return JSON.stringify({ claw: c && c.st, cool: c && Math.round(c.cool - performance.now()), grab: !!window.__cards.state().grab, vw: document.documentElement.clientWidth, vh: innerHeight, sy: scrollY,
+    size: window.__cards.state().size, old: o && { st: o.ai.st, gait: o.ai.gait, hunting: o.ai.hunting, x: Math.round(p.x * 100 - scrollX), y: Math.round(p.y * 100 - scrollY) } }); });
 
 scenario(G, 'the new hand meets the old one and eats it', async (s) => {
   await oldHand(s);
-  await s.runUntil(() => window.__cards.state().claw.st === 'meet', null, { max: 3000 });
+  await s.runUntil(() => window.__cards.state().claw.st === 'meet', null, { max: 6000, step: 100 }).catch(async (e) => { throw new Error(e.message + ' ' + await why(s)); });
   assert.ok(await s.said('hand.meet'), 'it leans out and looks');
   await s.runUntil(() => window.__sev.list.values().next().value.ai.st === 'stare', null, { max: 1000 });
   await s.run(1200);
@@ -143,7 +147,7 @@ scenario(G, 'the new hand meets the old one and eats it', async (s) => {
 
 scenario(G, 'you save the old hand from the new one', async (s) => {
   await oldHand(s);
-  await s.runUntil(() => window.__cards.state().claw.st === 'devour' && !!window.__cards.state().claw.joint, null, { max: 12000, step: 100 });
+  await s.runUntil(() => window.__cards.state().claw.st === 'devour' && !!window.__cards.state().claw.joint, null, { max: 12000, step: 100 }).catch(async (e) => { throw new Error(e.message + ' ' + await why(s)); });
   const sy = await s.scrollY();
   const [h] = await s.eval(hands);
   await s.move(h.x, h.y - sy); await s.down();

@@ -25,7 +25,7 @@ const thieves = new WeakMap();   // old hand -> until when it is fair game for s
 const olds = () => { const f = sense().oldHands; return f ? [...f()].filter((o) => world.bodies.has(o)) : []; };
 /** the palm of an old hand, viewport px */
 export const at = (o) => { const p = o.body.getWorldCenter(); return [p.x * S - scrollX, p.y * S - scrollY]; };
-const inView = (q, vw, vh) => q[0] > OLD.SEE[0] && q[0] < vw - 10 && q[1] > OLD.SEE[1] && q[1] < vh + 10;   // lying on the floor of the page its palm can be at the very bottom
+const inView = (q, vw, vh) => q[0] > OLD.SEE[0] && q[0] < vw - 10 && q[1] > OLD.SEE[1] && q[1] < vh + OLD.SEE_BOTTOM;   // lying on the floor of the page its palm can be at (or just past) the very bottom
 
 /** has the arm met this old hand */
 export const hasMet = (o) => met.has(o);

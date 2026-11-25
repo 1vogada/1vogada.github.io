@@ -76,7 +76,7 @@
   },
   {
    "doc": 1,
-   "t": 10704,
+   "t": 10752,
    "ms": 1312,
    "who": "hand",
    "key": "SEV_SAY.cut",
@@ -88,23 +88,23 @@
    "ms": 2208,
    "who": "hand",
    "key": "hand.meet",
-   "text": "oh. it is you."
+   "text": "…is that my old hand?"
   },
   {
    "doc": 1,
    "t": 13184,
-   "ms": 2176,
+   "ms": 1312,
    "who": "hand",
    "key": "sev.meet",
-   "text": "I was gone eight seconds"
+   "text": "смени ме?!"
   },
   {
    "doc": 1,
    "t": 15392,
-   "ms": 1312,
+   "ms": 1904,
    "who": "hand",
    "key": "SEV_SAY.drag",
-   "text": "…ow"
+   "text": "just… a bit… further"
   }
  ],
  "states": [
@@ -171,7 +171,7 @@
   },
   {
    "doc": 1,
-   "t": 2098,
+   "t": 2148,
    "claw": "lurk",
    "sev": "limp",
    "pb": "closed",
@@ -184,7 +184,7 @@
   },
   {
    "doc": 1,
-   "t": 3598,
+   "t": 3648,
    "claw": "meet",
    "sev": "stare",
    "pb": "closed",
@@ -197,7 +197,7 @@
   },
   {
    "doc": 1,
-   "t": 5998,
+   "t": 6048,
    "claw": "lurk",
    "sev": "stare",
    "pb": "closed",
@@ -210,7 +210,7 @@
   },
   {
    "doc": 1,
-   "t": 6198,
+   "t": 6248,
    "claw": "lurk",
    "sev": "walk",
    "pb": "closed",
@@ -223,7 +223,7 @@
   },
   {
    "doc": 1,
-   "t": 6598,
+   "t": 6648,
    "claw": "devour",
    "sev": "caught",
    "pb": "closed",
@@ -236,7 +236,7 @@
   },
   {
    "doc": 1,
-   "t": 8998,
+   "t": 9048,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",
@@ -247,7 +247,7 @@
   },
   {
    "doc": 1,
-   "t": 9898,
+   "t": 9948,
    "claw": "lurk",
    "sev": "limp",
    "pb": "closed",
@@ -260,7 +260,7 @@
   },
   {
    "doc": 1,
-   "t": 12298,
+   "t": 12348,
    "claw": "meet",
    "sev": "stare",
    "pb": "closed",
@@ -273,7 +273,7 @@
   },
   {
    "doc": 1,
-   "t": 14698,
+   "t": 14748,
    "claw": "lurk",
    "sev": "stare",
    "pb": "closed",
@@ -286,7 +286,7 @@
   },
   {
    "doc": 1,
-   "t": 14898,
+   "t": 14948,
    "claw": "lurk",
    "sev": "walk",
    "pb": "closed",

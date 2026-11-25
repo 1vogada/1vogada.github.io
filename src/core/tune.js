@@ -110,6 +110,7 @@ export const TUNE = {
     NEAR: [190, 0.28],                // a held card this close to the right edge (px, or this share of vw if less) gets lunged at and pulled
     SNATCH_REACH: [440, 0.36],        // it only snatches a card this close to the right edge (px, or share of vw); further away it just sulks
     OLD: {                            // the new hand and the old (cut-off) one
+      SEE_BOTTOM: 60,                 // ...and may be this far below the bottom edge (it is 92 px tall: the top of it still shows)
       SEE: [40, 40],                  // the old hand is "in view" when its palm is this far inside the left and top of the viewport (x, y px)
       NOTICE_MS: 1500,                // an old hand it has not met must be in view this long before it leans out
       MEET_S: 2.4,                    // it leans out and looks for this long
