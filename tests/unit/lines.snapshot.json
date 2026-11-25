@@ -42,7 +42,7 @@
  "card.rip": {
   "who": "card",
   "legacy": "SAY.rip",
-  "trigger": {"title":"Torn out","when":"The third tug. The root gives up and the card comes loose in your hand."},
+  "trigger": {"title":"Torn out","when":"You hold the strain until the root gives up, and the card comes loose in your hand. Most cards take one such tug; one in four takes two."},
   "lines": [
    ["AAAH!","en"],
    ["nooo!","en"],
@@ -55,7 +55,7 @@
  "card.loosen": {
   "who": "card",
   "legacy": null,
-  "trigger": {"title":"A tug, like a tooth","when":"You hold the strain until the root gives a notch. Ease off and tug again: a card comes out on the third tug. Yank it past 350 px before that and it tears in two."},
+  "trigger": {"title":"A tug, like a tooth","when":"A stubborn card, one in four: you hold the strain and the root only gives a notch. Ease off and tug again and it comes out. Yank any card past 350 px while it still has a grip and it tears in two."},
   "lines": [
    ["*crack*","en"],
    ["I felt that!","en"],
@@ -316,7 +316,7 @@
   "legacy": null,
   "trigger": null,
   "lines": [
-   ["Too hard: it tore. Tug a few times instead, like pulling a tooth.","en"]
+   ["Too hard: it tore. Pull and hold instead, like pulling a tooth.","en"]
   ]
  },
  "toast.halved": {

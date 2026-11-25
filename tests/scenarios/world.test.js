@@ -26,6 +26,7 @@ scenario(G, 'pull and spring back', async (s) => {
 
 scenario(G, 'a card comes out like a tooth', { legacy: false }, async (s) => {
   const loosed = () => { const g = window.__cards.state().grab; return g ? g.o.loose || 0 : -1; };
+  await s.eval(() => { window.__cards.drag.ONE_TUG = 0; });   // every card is a stubborn one: two tugs
   // one long hold of the strain is one tug and no more: the root gives a notch and then waits for the pull to ease off
   const [x, y] = await s.pull(0, 0, -260, { n: 12 });
   await s.runUntil(() => window.__cards.state().grab.o.loose === 1, null, { max: 4000, step: 16 });
@@ -41,9 +42,18 @@ scenario(G, 'a card comes out like a tooth', { legacy: false }, async (s) => {
   assert.deepEqual(home, { rot: '1.3deg', held: false }, 'back in its slot, a little crooked');
   await s.shot('crooked');
   await s.tugOut(0);
-  assert.ok(await s.said('SAY.rip'), 'two more tugs and it is out');
+  assert.ok(await s.said('SAY.rip'), 'one more tug and it is out');
   assert.equal(await s.eval(() => document.querySelector('#grid .card').style.rotate), '', 'the empty slot is straight again');
   void x; void y;
+});
+
+scenario(G, 'most cards come out on one held tug', { legacy: false }, async (s) => {
+  await s.eval(() => { window.__cards.drag.ONE_TUG = 1; });
+  await s.pull(0, 0, -260, { n: 12 });   // out to the strain and hold: no yank
+  await s.runUntil(() => !window.__cards.state().grab.o.root, null, { max: 4000, step: 16 });
+  assert.ok(await s.said('SAY.rip'), 'it lets go');
+  assert.ok(!(await s.said('card.loosen')), 'without a notch first');
+  assert.deepEqual(await s.eval(kinds), { card: 1 }, 'whole');
 });
 
 scenario(G, 'a card yanked too far tears in two', { legacy: false }, async (s) => {
@@ -51,7 +61,7 @@ scenario(G, 'a card yanked too far tears in two', { legacy: false }, async (s) =
   const k = await s.eval(kinds);
   assert.deepEqual(k, { piece: 2 }, 'two halves, no whole card');
   const st = await s.eval(() => ({ grab: window.__cards.state().grab.o.kind, held: document.querySelector('#grid .card').classList.contains('held'), toast: document.getElementById('toast').textContent }));
-  assert.deepEqual(st, { grab: 'piece', held: true, toast: 'Too hard: it tore. Tug a few times instead, like pulling a tooth.' }, 'your half stays in your hand, the slot is empty');
+  assert.deepEqual(st, { grab: 'piece', held: true, toast: 'Too hard: it tore. Pull and hold instead, like pulling a tooth.' }, 'your half stays in your hand, the slot is empty');
   assert.ok(await s.said('SAY.slice'), 'your half screams');
   await s.run(120); await s.shot('snapped');
   await s.run(500);

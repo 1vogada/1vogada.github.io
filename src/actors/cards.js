@@ -52,11 +52,25 @@ export function startPull(p, e) {
   card.classList.add('pulling', 'settled'); card.style.transform = 'none';
   const r = card.getBoundingClientRect(), hx = r.left + r.width / 2 + scrollX, hy = r.top + r.height / 2 + scrollY;
   card.style.rotate = '';   // a loosened card sat crooked: the body takes over from here
-  o = W.add({ kind: 'card', el: card, w: r.width, h: r.height, ex: hx, ey: hy, key: card.dataset.key, grip: 1, tugs: D.TUGS, loose: world.loose.get(card.dataset.key) || 0, root: { x: hx / S, y: hy / S } },
+  o = W.add({ kind: 'card', el: card, w: r.width, h: r.height, ex: hx, ey: hy, key: card.dataset.key, grip: 1, tugs: need(card.dataset.key), loose: world.loose.get(card.dataset.key) || 0, root: { x: hx / S, y: hy / S } },
     hx / S, hy / S, 0, new world.pl.Box(r.width / 2 / S, r.height / 2 / S), { filterMaskBits: 0 });
   world.rootOf.set(card, o);
   W.hold(o, p.px, p.py, e); say(o, 'card.pull', { force: true });
   bus.emit('card.pulled', { card: o });
+}
+
+// how many tugs this card takes: one for most, two for the stubborn ones; rolled once per card (until Put the cards back). 0: no teeth.
+// The roll is a hash of the card's key and the time of the first pull, not Math.random: a draw here would shift every later pick
+// on the page (docs/pitfalls.md 1), and a pull is far too common a thing for that
+let salt = 0;
+function need(key) {
+  if (!D.TEETH) return 0;
+  if (!world.tugs.has(key)) {
+    if (!salt) salt = Date.now() % 100000 + 1;
+    let h = salt; for (const ch of String(key)) h = (h * 31 + ch.charCodeAt(0)) % 1000003;
+    world.tugs.set(key, (h * 7919 % 1000) / 1000 < D.ONE_TUG ? 1 : 2);
+  }
+  return world.tugs.get(key);
 }
 
 // out of its slot: the grid card stays behind as an empty place, a copy in the physics layer is the body from here on
@@ -64,7 +78,7 @@ function uproot(o) {
   const card = o.el, el = W.cloneCard(card);
   el.style.width = o.w + 'px'; el.style.height = o.h + 'px'; el._o = o; world.layer.appendChild(el);
   world.rootOf.delete(card); card.classList.remove('pulling'); card.style.transform = ''; card.classList.add('held');
-  o.el = el; o.ex = o.w / 2; o.ey = o.h / 2; o.root = null; W.markRipped(o.key); world.loose.delete(o.key);
+  o.el = el; o.ex = o.w / 2; o.ey = o.h / 2; o.root = null; W.markRipped(o.key); world.loose.delete(o.key); world.tugs.delete(o.key);
   o.body.setGravityScale(TUNE.physics.FALL);
   o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF });
   if (world.grab && world.grab.o === o) { world.grab.joint.setFrequency(TUNE.drag.HAND_HZ); world.grab.joint.setDampingRatio(TUNE.drag.HAND_DAMPING); W.carry(o); }
@@ -79,7 +93,7 @@ export function give(o) {
   b.applyAngularImpulse(b.getInertia() * (Math.random() - 0.5) * 5, true);
   gore(o.root.x * S, o.root.y * S, dx / d, dy / d, 5, 0.6);
   say(o, 'card.loosen', { force: true });
-  bus.emit('card.loosened', { card: o, left: D.TUGS - o.loose });
+  bus.emit('card.loosened', { card: o, left: o.tugs - o.loose });
 }
 
 /**

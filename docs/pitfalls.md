@@ -132,10 +132,13 @@ These were built to prove the refactor changed nothing; an intended change trips
 
 ## 12b. Cards come out like teeth; `s.rip` is a shortcut
 
-A grid card needs `TUNE.drag.TUGS` tugs (hold the strain until the root gives a notch, ease under `EASE`, tug again); pulled past
-`RIP` before the last notch it tears in two (`actors/cards.js` `give`, `snap`; the counting is in `world/loop.js` `bodies`; the
-notches live in `world.loose` by card key until "Put the cards back"). The harness's `s.rip(i)` sets `window.__cards.drag.TUGS = 1`
-for its one pull, so scenarios that only need a loose card keep their recorded timing. Use `s.tugOut(i)` to pull one out the way
+A grid card comes out on its first tug (`TUNE.drag.ONE_TUG` of the cards) or its second. A tug is holding the strain until the
+grip runs out; a stubborn card's root only gives a notch on the first (`give`), and the pull must ease under `EASE` before the
+next one counts. Pulled past `RIP` while it still has grip, any card tears in two (`snap`). The counting is in `world/loop.js`
+`bodies`, `give` and `snap` in `actors/cards.js`; how many tugs a card needs is a hash of its key and the time (`need`, never
+`Math.random`), kept in `world.tugs`, the notches in `world.loose`, both until "Put the cards back". The harness's `s.rip(i)` sets
+`window.__cards.drag.TEETH = false` for its one pull, so scenarios that only need a loose card keep their recorded timing; a
+scenario about the teeth sets `drag.ONE_TUG` to 0 or 1 first. Use `s.tugOut(i)` to pull one out the way
 a visitor does. Do not add an extra `ensurePlanck()` or mouse move before a pull in a helper: it shifts every later time by a frame.
 
 ## 12c. The hand keeps away until a card has left its slot
