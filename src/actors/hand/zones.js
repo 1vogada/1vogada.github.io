@@ -1,7 +1,7 @@
 // Where the hand reacts (legacy zones(vw) and the ?debug=zones overlay). Ivo drew these; change them only here.
 // In viewport x (any scroll, full height): a held card teases it from `tease` rightwards (the last card column of the content),
 // a thrown card is caught from `grab` rightwards (the gutter right of the content; never narrower than a card can get into).
-// Both are one card wide from the right edge (Ivo, 2026-11-25). ?debug=zones draws both. The numbers are TUNE.hand.ZONES.
+// Catch is one card wide from the right edge, tease two (Ivo, 2026-11-25). ?debug=zones draws both. The numbers are TUNE.hand.ZONES.
 
 import { TUNE } from '../../core/tune.js';
 import { flags } from '../../core/debug.js';
@@ -13,7 +13,7 @@ export const zones = (vw) => {
   const W = Math.min(Z.maxW, vw), cr = (vw + W) / 2 - Z.gutter, cw = W - 2 * Z.gutter, cols = Math.max(1, Math.floor((cw + Z.gutter) / Z.col));
   const card = Math.min(cols > 1 ? (cw - Z.gutter * (cols - 1)) / cols : cw, vw * Z.cardMaxFrac);   // one card's width, as the grid lays it out
   // Ivo 2026-11-25: both zones are exactly one card wide, measured from the right edge of the screen
-  return { tease: vw - card, edge: cr, grab: vw - card };
+  return { tease: vw - Math.min(card * Z.teaseCards, vw * Z.teaseMaxFrac), edge: cr, grab: vw - card };   // tease: two cards wide, so it does not sit exactly on the catch zone
 };
 
 /** the ?debug=zones overlay: two fixed boxes (each to the right edge: a card teases or is caught anywhere right of its line), laid out again on resize (legacy: made at the top of cardPhysics, so never under reduced motion) */
