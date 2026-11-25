@@ -191,11 +191,11 @@ function make() {
   const ready = new Promise((res) => { css.onload = css.onerror = res; }); document.head.appendChild(css);
   el = document.createElement('div'); el.className = 'pb'; el.hidden = true; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'pb-title');
   el.innerHTML = `<div class="pb-shade"></div>
-    <div class="pb-card">
-      <header class="pb-top"><div class="pb-top-row"><div><h2 id="pb-title">Phrasebook</h2><p class="pb-sub">Everything the cards, the katana and the hand can say, and what sets it off. <span class="pb-count"></span></p></div>
-        <button class="icon-btn pb-x" type="button" aria-label="Close the phrasebook">✕</button></div><nav class="pb-tabs" aria-label="Sections"></nav></header>
-      <div class="pb-scroll" tabindex="-1"></div>
-    </div>`;
+      <div class="pb-card">
+        <header class="pb-top"><div class="pb-top-row"><div><h2 id="pb-title">Phrasebook</h2><p class="pb-sub">Everything the cards, the katana and the hand can say, and what sets it off. <span class="pb-count"></span></p></div>
+          <button class="icon-btn pb-x" type="button" aria-label="Close the phrasebook">✕</button></div><nav class="pb-tabs" aria-label="Sections"></nav></header>
+        <div class="pb-scroll" tabindex="-1"></div>
+      </div>`;
   document.body.appendChild(el);
   scroller = q('.pb-scroll');
   q('.pb-shade').addEventListener('click', close); q('.pb-x').addEventListener('click', close);
