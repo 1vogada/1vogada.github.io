@@ -404,6 +404,45 @@ defineLines('hand.robbed', ['HEY. that was me', 'give me back… me', 'fine. kee
   lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
 });
 
+// ---- are you still there? (the mouse has been still for 10 s) ----
+defineLines('hand.idle', ['…hello?', 'you there?', 'poke.', 'are you asleep?', 'blink twice if you need help', 'ало?', 'もしもし?'], {
+  who: 'hand',
+  trigger: { title: 'Are you still there?',
+    when: 'After a card has left its slot, leave the mouse still on the page for ten seconds. It creeps out and taps the cursor.' },
+  gloss: { 'ало?': 'hello?', 'もしもし?': 'hello? (on the phone)' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.idleback', ['AH', 'I was not doing anything', 'carry on.', 'nothing to see here'], { who: 'hand', lang: 'en',
+  trigger: { title: 'Caught poking', when: 'You move the mouse while it is tapping the cursor. It whips back out of sight.' } });
+
+// ---- jealous: you have been carrying the old hand around ----
+defineLines('hand.jealous', ['you never carry ME.', 'what does it have that I do not', 'I see how it is', 'и мен носи!', 'えこひいき…'], {
+  who: 'hand',
+  trigger: { title: 'Jealous', when: 'Pick up an old (cut-off) hand and carry it around for five seconds. The new hand leans in, drumming its fingers.' },
+  gloss: { 'и мен носи!': 'carry me too!', 'えこひいき…': 'favouritism…' },
+  lang: ['en', 'en', 'en', 'bg', 'ja'],
+});
+
+// ---- squeezed: the window is too narrow while it is out ----
+defineLines('hand.squeezed', ['too tight', 'mmmf. no room', 'who shrank the page?', 'I am being folded', 'тясно ми е', 'せまい!'], {
+  who: 'hand',
+  trigger: { title: 'Squeezed', when: 'Make the window very narrow while the hand is out. It is pressed flat against the edge.' },
+  gloss: { 'тясно ми е': 'it is tight in here', 'せまい!': 'cramped!' },
+  lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.unsqueezed', ['ahh. better.', 'thank you.', 'phew'], { who: 'hand', lang: 'en',
+  trigger: { title: 'Room again', when: 'You make the window wide again after it was squeezed.' } });
+
+// ---- the coin lands on its edge (one toss in a hundred) ----
+defineLines('hand.edge', ['…that has never happened.', 'it… stood up?', 'on its EDGE?', 'това не се случва', 'ありえない'], {
+  who: 'hand',
+  trigger: { title: 'Coin on its edge', when: 'One coin toss in a hundred lands on its edge and rolls off the slip.' },
+  gloss: { 'това не се случва': 'this does not happen', 'ありえない': 'impossible' },
+  lang: ['en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.edgepick', ['…you pick. I need to lie down.', 'fine. your call.', 'I am not touching that.'], { who: 'hand', lang: 'en',
+  trigger: { title: 'You choose', when: 'After the coin rolls off on its edge, it leaves Yes and No to you.' } });
+
 // toast: a one-line list, no random draw
 defineLines('toast.devoured', ['It ate its old hand. Nothing goes to waste here.'], { who: 'toast', lang: 'en' });
 defineLines('toast.severed', ['You cut its hand off. It will grow another. The old one has plans of its own.'], { who: 'toast', lang: 'en' });

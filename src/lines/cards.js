@@ -169,6 +169,22 @@ defineLines('card.beg', ['please', 'I will be good', 'I have unmerged commits!',
 });
 
 // toasts: one-line lists, no random draw
+// ---- apologise to the card (right-click a card that has been ripped out or torn) ----
+defineLines('card.forgive', ['…fine. I forgive you.', 'apology accepted', 'it is ok. it is not ok.', 'just this once', 'прощавам ти', 'ゆるす…'], {
+  who: 'card',
+  trigger: { title: 'Forgiven', when: 'Right-click a card you ripped out or tore, and pick "apologise". Mostly it forgives you.' },
+  gloss: { 'прощавам ти': 'I forgive you', 'ゆるす…': 'I forgive…' },
+  lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('card.grudge', ['no. just no.', 'never.', 'I will remember your face', 'say it like you mean it', 'не.', 'いやだ'], {
+  who: 'card',
+  trigger: { title: 'Not forgiven', when: 'You apologise to a torn card, and it does not take it.' },
+  gloss: { 'не.': 'no.', 'いやだ': 'no way' },
+  lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('card.again', ['you said that already', 'words are cheap', 'still torn, though'], { who: 'card', lang: 'en',
+  trigger: { title: 'Sorry again', when: 'You apologise to the same card a second time.' } });
+
 defineLines('toast.ripped', ['Ripped it out! Stack them, or throw one hard to smash it.'], { who: 'toast', lang: 'en' });
 defineLines('toast.smashed', ['Smashed!'], { who: 'toast', lang: 'en' });
 defineLines('toast.smashed10', ['10 cards smashed. Feeling better?'], { who: 'toast', lang: 'en' });

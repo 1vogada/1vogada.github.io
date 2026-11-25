@@ -1,0 +1,195 @@
+{
+ "scenario": "arm / are you still there: the mouse still for 10 s",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 3032,
+   "ms": 792,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 3824,
+   "ms": 628,
+   "who": "card",
+   "key": "SAY.rip",
+   "text": "I was comfy!"
+  },
+  {
+   "doc": 1,
+   "t": 4452,
+   "ms": 1452,
+   "who": "card",
+   "key": "SAY.throw",
+   "text": "not the wall!"
+  },
+  {
+   "doc": 1,
+   "t": 4848,
+   "ms": 1312,
+   "who": "hand",
+   "key": "CLAW_SAY.caught",
+   "text": "delivery!"
+  },
+  {
+   "doc": 1,
+   "t": 6848,
+   "ms": 1312,
+   "who": "hand",
+   "key": "CLAW_SAY.toss",
+   "text": "yeet"
+  },
+  {
+   "doc": 1,
+   "t": 8656,
+   "ms": 1312,
+   "who": "card",
+   "key": "SAY.land",
+   "text": "my corner!"
+  },
+  {
+   "doc": 1,
+   "t": 8848,
+   "ms": 1312,
+   "who": "hand",
+   "key": "SAY.throw|CLAW_SAY.throw",
+   "text": "wheee"
+  },
+  {
+   "doc": 1,
+   "t": 17136,
+   "ms": 960,
+   "who": "hand",
+   "key": "hand.idle",
+   "text": "…hello?"
+  },
+  {
+   "doc": 1,
+   "t": 18096,
+   "ms": null,
+   "who": "hand",
+   "key": "hand.idleback",
+   "text": "nothing to see here"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 100,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 3048,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 3832,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4468,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4784,
+   "claw": "catch",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4884,
+   "claw": "has",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6884,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 14584,
+   "claw": "poke",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 18600,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  }
+ ]
+}

@@ -58,11 +58,12 @@ export const EVENTS = {
   'sev.gone': '{ hand } it left the world',
   // ---- shelf ----
   'shelf.opened': '{ y }',
+  'sev.avenged': '{ hand } an old hand threw the katana at the arm (severed avenge); reactions cut the new hand off',
   'shelf.closed': '{ }',
   // ---- scenes ----
   'slip.opened': '{ project, fortune }',
   'slip.closed': '{ how } how: "x" (No or the × pressed, or welcome back, while there is no hand to play the coin game: no __hand (reduced motion) or crazy mode; with a hand they start the game instead) | "secret" (the secret × in the corner) | "escape" | "hand" (the hand closed it, scenes/coin.js) | "backdrop"',
-  'coin.tossed': '{ side, call } side: "heads" | "tails" | null (it did not bother)',
+  'coin.tossed': '{ side, call } side: "heads" | "tails" | "edge" (it landed on its rim, 1 in 100) | null (it did not bother)',
   'scene.started': '{ name }',
   'scene.ended': '{ name, killed }',
   // ---- phrasebook ----

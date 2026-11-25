@@ -117,6 +117,9 @@ export const TUNE = {
       cardMaxFrac: 0.45, teaseCards: 2, teaseMaxFrac: 0.6 },   // the tease zone is teaseCards cards wide (so it starts left of the catch zone, past the GitHub link), never more than teaseMaxFrac of vw   // Ivo 2026-11-25: tease and catch zones are each one card wide from the right edge (never more than this share of vw: on a phone a card is the whole screen)
     NEAR: [190, 0.28],                // a held card this close to the right edge (px, or this share of vw if less) gets lunged at and pulled
     SNATCH_REACH: [440, 0.36],        // it only snatches a card this close to the right edge (px, or share of vw); further away it just sulks
+    JEALOUS: { MS: 5000, LEAN_MS: 2600, LEAN_PX: 150, COOL_MS: 30000 },   // you carry an old hand this long: the arm leans in, drumming its fingers, and says so
+    SQUEEZE: { W: 520, SX: 0.4, RATE: 6, SAY_MS: 6000 },   // window narrower than W px while the hand is out: it is pressed flat (sx), complains every SAY_MS
+    IDLE: { MS: 10000, CREEP_S: 2.6, GIVE_UP_S: 9, COOL_MS: 30000 },   // "are you still there?": mouse still this long (Ivo: 10 s), creep, give up, not again for
     OLD: {                            // the new hand and the old (cut-off) one
       SEE_BOTTOM: 60,                 // ...and may be this far below the bottom edge (it is 92 px tall: the top of it still shows)
       SEE: [40, 40],                  // the old hand is "in view" when its palm is this far inside the left and top of the viewport (x, y px)
@@ -161,6 +164,11 @@ export const TUNE = {
     TURN_MS: [2500, 4000], TIRED_MS: [14000, 9000], STROLL_TURN_MS: [2500, 5000], STUCK_TURN_MS: [2000, 3000],
     CRUSH_S: 3.2, CRUSH_COOL: 5000, FOOD_COOL: 2500, LOSE_COOL: 1500,
     REST_WAKE_MS: [7000, 7000],
+    PAINT: { MS: 120000, DRAW_MS: 4200, FADE_MS: 60000, SIZE_PX: 34 },   // left alone this long, an old hand finger-paints a word in its own gore, writing for DRAW_MS; the word fades after FADE_MS
+    AVENGE: { SEE_PX: 600, GRAB_PX: 40, GRAB_DY: 140, EDGE_PX: 170, HAUL: 0.55, PUFF_S: 2.5, THROW: [9, -26], SPIN: -14, GIVE_UP_S: 25,   // revenge: sees the katana, takes the hilt, hauls it this slow, throws it (m/s) at the arm from EDGE_PX in from the right edge
+      WAIT_MS: 4000, FIVE_AFTER_MS: 1600, FIVE_PX: 95, FIVE_S: 1.4, FIVE_GIVE_UP_S: 10, HOP: 3.5 },   // then: the high-five, after the new old hand has landed
+    MOURN: { EDGE_PX: 150, NEAR_PX: 60, WALK_S: 9, SAY_S: 1, BOW_S: 3.2, RUN_MS: 3000 },   // the funeral: where (px in from the right edge), how close, give up walking, words, bow, run
+    HIDE: { S: 12, LAUNCH_PX: 80, LAND_PX: 70, CLEAR_PX: 40, IN_PX: 30, MAX_DY: 650, UP_PX: 130, LEAP_S: 1.8, TRIES: 3, STUCK_S: 0.6, COWER_S: 14 },   // hiding on the shelf: give up, jump this far over it, at most this far below it
     STARE_S: 2.6, STARE_SAY_S: 0.9,   // the old hand stares back at the new one, says its line after this long
     LEG: { force: 520, damp: 42, cap: 170, walk: 14, drag: 30, torque: 900, torqueDamp: 54 },
   },
@@ -175,7 +183,12 @@ export const TUNE = {
   surprise: { STEPS: 14, STEP_MS: 40, STEP_GROW: 1.6, ASK_DELAY_MS: 700, WELCOME_MS: 900, PAGESHOW_MS: 600 },
   tilt: { DEG: 7, BAND_PX: 26, ROLL: 60 },
   cards: { REGROW_MS: 700, CRUSH_DY: -70 },   // torn-out grid cards regrow (ms, wall time); the crushed card's last scream, px above the fist
-  crazy: { TITLE_MS: 180 },   // ms per character of the scrolling tab title
+  crazy: { TITLE_MS: 180 },
+  away: { BACK_MS: 1600 },   // "there you are" stays in the tab title this long after you come back (page/away.js)
+  toast: { FALL_MS: 900 },   // the toast you clicked five times falls off the screen this fast
+  eggs: { YEAR_MS: 4000, SWITCHES: 7, SWITCH_MS: 4000 },   // 1926: hover the year this long; 7 theme switches within this long: the moon
+  coin: { EDGE: 0.01 },   // share of coin tosses that land on their edge (scenes/coin.js)
+  apology: { YES: 0.7, MENU_MS: 4000 },   // right-click a torn card, "apologise": it forgives you this often; the menu goes away after this long
   speech: {
     TILT: [4, 4],                // every bubble leans right by 4 + up to 4 degrees
     RIDE_DY: -40,                // a body's bubble sits this far above the top of its rotated box

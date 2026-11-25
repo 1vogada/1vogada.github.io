@@ -100,4 +100,69 @@ defineLines('sev.doomed', ['NO NO NO', 'I AM YOU', 'we can share!', 'not like th
   lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
 });
 
+// ---- it writes something (left alone for two minutes): the word it paints on the floor, and what it says after ----
+defineLines('sev.paint', ['HELP', 'ivo was here', '手', 'I WAS HERE FIRST', 'feed me', 'not a glove', 'ПОМОЩ', 'たすけて', 'bring back my arm'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: writes on the floor',
+    when: 'Leave a cut-off hand alone for two minutes. It finger-paints a word on the floor in its own gore.' },
+  gloss: { '手': 'hand', 'ПОМОЩ': 'HELP', 'たすけて': 'help me' },
+  lang: ['en', 'en', 'ja', 'en', 'en', 'en', 'bg', 'ja', 'en'],
+});
+defineLines('sev.painted', ['art.', 'do you like it?', 'my best work', 'it is a self portrait', 'хубаво ли е?', '傑作だ'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: admires its writing', when: 'It steps back from the word it painted.' },
+  gloss: { 'хубаво ли е?': 'is it nice?', '傑作だ': 'a masterpiece' },
+  lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+// ---- revenge with the katana ----
+defineLines('sev.avenge', ['revenge.', 'this is for me', 'the blade. MY blade now.', 'time to return a favour', 'отмъщение.', '復讐だ'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: goes for the katana',
+    when: 'An old hand that has met the new one sees the katana lying loose nearby. It goes for the hilt.' },
+  gloss: { 'отмъщение.': 'revenge.', '復讐だ': 'this is revenge' },
+  lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.haul', ['heavy… heavy…', 'one more step', 'hnnnngh', 'why is it so LONG', 'тежко е…', 'おもい…'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: hauls the katana', when: 'It drags the katana by the hilt towards the right edge of the screen.' },
+  gloss: { 'тежко е…': 'it is heavy…', 'おもい…': 'heavy…' },
+  lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.stab', ['SURPRISE', 'how do YOU like it', 'snip snip', 'eye for a hand', 'на ти!', '天誅!'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: revenge', when: 'At the edge it throws the katana up at the arm, and the new hand comes off.' },
+  gloss: { 'на ти!': 'take that!', '天誅!': 'divine punishment!' },
+  lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.five', ['up top!', 'welcome to the floor, brother', 'hand five!', 'we are free!', 'дай пет!', 'ハイタッチ!'], {
+  who: 'sev',
+  trigger: { title: 'Two old hands: a high-five', when: 'After the revenge, the old hand and the one it just cut off walk up to each other and high-five.' },
+  gloss: { 'дай пет!': 'give me five!', 'ハイタッチ!': 'high five!' },
+  lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+// ---- a small funeral (the new hand ate another old hand) ----
+defineLines('sev.mourn', ['he was a good hand', 'gone. like a pinky in the wind.', 'rest in pieces', 'he had such nice knuckles', 'беше добра ръка', '…合掌'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hands: a small funeral',
+    when: 'The new hand eats an old hand. The other old hands walk to the spot, bow, and then run for it.' },
+  gloss: { 'беше добра ръка': 'he was a good hand', '…合掌': '…palms together (a prayer)' },
+  lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+// ---- hiding on the shelf ----
+defineLines('sev.hide', ['the SHELF', 'up up up!', 'it cannot reach up there', 'към рафта!', 'たなへ!'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: runs for the shelf',
+    when: 'With the secret shelf out, an old hand that has met the new one gets scared and runs to hide on it.' },
+  gloss: { 'към рафта!': 'to the shelf!', 'たなへ!': 'to the shelf!' },
+  lang: ['en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.safe', ['safe here', 'shhh', 'you did not see me', 'тук съм на сигурно', 'ここなら安全'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: safe on the shelf', when: 'It made it onto the shelf. The new hand will not come for it there.' },
+  gloss: { 'тук съм на сигурно': 'I am safe here', 'ここなら安全': 'safe here' },
+  lang: ['en', 'en', 'en', 'bg', 'ja'],
+});
+
 export function install(app) {}

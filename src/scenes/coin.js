@@ -4,9 +4,10 @@
 // Every wait is a scene sleep (wall time); every bubble goes through core/speech (hand.say, sayIn for the new buttons:
 // the two btnhi picks are drawn up front with two Math.random, exactly as legacy, and passed as opts.text).
 // Timers that legacy did not tie to the scene (the snap's, the puffs', the lost coin's removal) are plain wall timers, so a
-// kill does not cancel them. Emits coin.tossed { side, call }.
+// kill does not cancel them. Emits coin.tossed { side, call }. One toss in a hundred (TUNE.coin.EDGE) lands on its edge and
+// rolls off: the hand gives up and you choose (No then only closes the slip).
 
-import { TIMING } from '../core/tune.js';
+import { TIMING, TUNE } from '../core/tune.js';
 import { real, wall, frames } from '../core/clock.js';
 import { bus } from '../core/bus.js';
 import { list } from '../core/lines.js';
@@ -17,6 +18,7 @@ import { dom, st, H, keepShow, endShow, closeFortune } from './fortune.js';
 import { SENT } from './welcome-back.js';
 const GO_THERE = 'Go there?', HEADS = 'Heads', TAILS = 'Tails';   // page labels
 
+let free = false;   // the coin landed on its edge: until the slip closes, No just closes it
 let swatsLeft = 1;   // the first time you go for heads or tails (once per visit) it knocks the buttons away, then snaps
 /** legacy swatsLeft (welcome-back sets it to 0) */ export const setSwats = (n) => { swatsLeft = n; };
 
@@ -168,9 +170,26 @@ export async function handScene(back) {
       clock();
     }).finally(stopClock);
     heads.disabled = tails.disabled = true;
-    const r = Math.random(), side = r < 0.45 ? 'heads' : r < 0.9 ? 'tails' : null;
+    // one toss in a hundred lands on its edge (taken out of the "it did not bother" tenth, so the draw stays the same)
+    const r = Math.random(), side = r < 0.45 ? 'heads' : r < 0.9 ? 'tails' : r >= 1 - TUNE.coin.EDGE ? 'edge' : null;
     bus.emit('coin.tossed', { side, call });
     await sleep(500);
+    if (side === 'edge') {   // it lands on its rim on the slip, wobbles, and rolls off the page. The hand has never seen that: you choose
+      my.coin = null; turn(Math.PI / 2, '');
+      const sb = slip.getBoundingClientRect(), y = Math.round(sb.bottom - 30), x0 = Math.round(cx);
+      coin.style.translate = `${x0}px ${y}px`;
+      coin.animate([{ rotate: '0deg' }, { rotate: '9deg', offset: .2 }, { rotate: '-7deg', offset: .45 }, { rotate: '4deg', offset: .7 }, { rotate: '0deg' }], { duration: 900, easing: 'ease-out' });
+      await sleep(1100);
+      coin.animate([{ translate: `${x0}px ${y}px` }, { translate: `${x0 - 60}px ${y}px`, offset: .3 }, { translate: `-120px ${y + 40}px` }], { duration: 2200, easing: 'ease-in', fill: 'forwards' }).onfinish = () => coin.remove();
+      H_.to({ x: hx, y: hy, pose: 'eager', tip: false, aim: Math.PI + 0.25, rate: 6, bob: false });
+      await sleep(Math.max(TIMING.wait.verdict, H_.say('edge')));
+      H_.to({ pose: 'sulk', aim: Math.PI, rate: 8 });
+      await sleep(Math.max(TIMING.wait.escaped, H_.say('edgepick')));
+      free = true;   // your No closes the slip now, no game
+      actEl.innerHTML = ''; actEl.append(goBtn, noBtn); goBtn.classList.remove('pressed'); qEl.textContent = GO_THERE;
+      H_.leave();
+      return;
+    }
     if (!side) { my.coin = null; coin.remove(); H_.to({ pose: 'clamp' }); H_.say('idgaf'); }
     else {
       my.coin = null; turn(0.55, side === 'heads' ? 'H' : 'T'); coin.style.translate = `${cx.toFixed(0)}px ${(g[1] - 40).toFixed(0)}px`;
@@ -225,6 +244,7 @@ export async function handScene(back) {
 export function install(app) {
   const { noBtn, goBtn } = dom;
   // No and the × do the same thing: the hand comes out
-  noBtn.addEventListener('click', () => { const sc = current(); return sc && sc.pick ? sc.pick('no') : handScene(); });
+  noBtn.addEventListener('click', () => { const sc = current(); if (!sc && free) { free = false; return closeFortune('x'); } return sc && sc.pick ? sc.pick('no') : handScene(); });
+  bus.on('slip.closed', () => { free = false; });
   goBtn.addEventListener('click', () => { const sc = current(); if (sc && sc.pick) sc.kill(); });   // your own Yes: the link takes you there, and the scene is over
 }

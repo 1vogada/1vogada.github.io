@@ -62,6 +62,10 @@ export function spawn(px, py, a, pose, opts = {}) {   // page px of the middle o
   brains.set(o, m);
   clock.wake();
   bus.emit('sev.spawned', { hand: o });
+  if (waiting && list.has(waiting.o) && now < waiting.until && waiting.o !== o) {   // the hand it took off: they high-five
+    const w = waiting.o; waiting = null; w.ai.mate = o; o.ai.mate = w; o.ai.met = true;
+    clock.real.after(TUNE.severed.AVENGE.FIVE_AFTER_MS, () => { for (const q of [w, o]) { const qm = brains.get(q); if (list.has(q) && qm && q.ai.mate && !qm.is('held', 'caught')) qm.set('five'); } });
+  }
   if (opts.v) {   // legacy sever(): o.body.setLinearVelocity(...), setAngularVelocity(random) right after sevSpawn
     const v = opts.v, lim = (x) => Math.max(-7, Math.min(7, x / S * 0.3));
     o.body.setLinearVelocity({ x: lim(v[0]) - 2.5, y: lim(v[1]) - 3 }); o.body.setAngularVelocity((Math.random() - 0.5) * 9);
@@ -76,6 +80,41 @@ export function gone(o) {
   const m = brains.get(o); if (m) m.end();
   o.hand.under.remove(); o.hand.over.remove();
   bus.emit('sev.gone', { hand: o });
+}
+
+// what it can sense of the other actors (wired in src/reactions.js): the shelf, as a place to hide from the new hand
+let sensed = {};
+/** what the old hands can sense: { shelf() -> { x0, x1, y, w } | null, onShelf(o) -> boolean } */
+export function senses(s) { sensed = s || {}; }
+/** the arm has a hand of its own to cut off (not a stump, not before a card was ripped) */ export const armed = () => (sensed.armed ? sensed.armed() : false);
+
+// revenge: the old hand that threw the katana at the arm, waiting for the hand it cut off to drop (spawn), to high-five it
+let waiting = null;
+/** o threw the katana at the arm (avenge): the next hand that is cut off and drops high-fives it */
+export function avenger(o) { waiting = { o, until: clock.now() + TUNE.severed.AVENGE.WAIT_MS }; }
+/** a loose katana lies still within AVENGE.SEE_PX of this walking old hand, which has met the new hand: revenge */
+function vengeful(o, m) {
+  const a = o.ai, k = world.blade, AV = TUNE.severed.AVENGE;
+  if (a.avenged || !a.met || !m.is('walk') || !k || k.root || !world.bodies.has(k) || isHeld(k) || k.body.getLinearVelocity().length() > 1 || !armed()) return false;
+  const d = Math.hypot(k.body.getPosition().x - o.body.getPosition().x, k.body.getPosition().y - o.body.getPosition().y) * S;
+  return d < AV.SEE_PX;
+}
+
+/** the shelf, if it is out (a place to hide) */ export const refuge = () => (sensed.shelf ? sensed.shelf() : null);
+/** o is on the shelf */ export const onRefuge = (o) => (sensed.onShelf ? sensed.onShelf(o) : false);
+
+/**
+ * the new hand ate one of them (hand.devoured): every other old hand that is up to it walks to the spot (page x), bows, one of
+ * them says a few words, and they run (mourn, bow)
+ */
+export function mourn(x) {
+  const fun = { said: false };
+  for (const o of list) { const m = brains.get(o); if (!world.bodies.has(o) || !m.is('walk', 'rest', 'limp', 'rise', 'stare', 'gloat')) continue; o.ai.spot = x; o.ai.fun = fun; o.ai.met = true; m.set('mourn'); }
+}
+/** the shelf came out: old hands that have met the new hand run for it (hide) */
+export function scare() {
+  if (!refuge()) return;
+  for (const o of list) { const m = brains.get(o); if (o.ai.met && m.is('walk', 'rest', 'rise')) m.set('hide'); }
 }
 
 /** legacy sevSet(o, st) */
@@ -106,6 +145,8 @@ export function tick(dt) {
   for (const o of [...list]) {
     const a = o.ai, h = o.hand, m = brains.get(o); m.age(dt);
     if (isHeld(o) && m.state !== 'held') m.set('held');
+    if (vengeful(o, m)) m.set('avenge');
+    if (m.state === 'held') a.alone = frameT; else if (!a.painted && frameT - (a.alone ?? a.born) > SV.PAINT.MS && m.is('walk', 'rest')) { a.painted = true; m.set('paint'); }   // left alone long enough: it writes something
     m.step(dt);
     if (!world.bodies.has(o)) continue;
     const b = o.body, p = b.getPosition(), ang = b.getAngle(), pose = POSES[m.def.pose], kp = 1 - Math.exp(-dt * 10);
@@ -134,5 +175,5 @@ export function install(a) {
   bus.on('body.removed', ({ body }) => { if (body.kind === 'hand') gone(body); });                 // legacy remove(): sevGone(o)
   bus.on('body.thrown', ({ body }) => { if (body.kind === 'hand') say(body, 'thrown', true); });   // legacy drop(): sp > HOT
   // world.reset: nothing of its own to undo (legacy resetAll removed every body, and remove() ran sevGone for each hand)
-  hook('__sev', { list, get SEV() { return table(); }, POSES, set, spawn, say, cut });
+  hook('__sev', { list, get SEV() { return table(); }, POSES, set, spawn, say, cut, mourn, scare });
 }
