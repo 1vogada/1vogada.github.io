@@ -29,7 +29,7 @@ export default defineBehaviour('hand', 'crush', {
     ob.el.style.clipPath = `polygon(${g.pts.map(([px, py, r]) => `${(px + (ob.w / 2 - px) * q * r).toFixed(1)}px ${(py + (ob.h / 2 - py) * q * r).toFixed(1)}px`).join(',')})`;
     ob.el.style.filter = `saturate(${(1 + q).toFixed(2)}) sepia(${(0.4 * q).toFixed(2)}) hue-rotate(-${(30 * q).toFixed(0)}deg) brightness(${(1 - 0.25 * q).toFixed(2)})`;
     if (rest && m.t > 2.5 && m.t < 3.7) {   // in the long pause it begs
-      if (!g.beg) { g.beg = true; bus.emit('card.begged', { card: ob });   // legacy talkOn(ob, pick(BEG)) }
+      if (!g.beg) { g.beg = true; bus.emit('card.begged', { card: ob }); }   // legacy talkOn(ob, pick(BEG))
     } else if (!rest) bus.emit('card.hurt', { card: ob, pain: 0.35 + 0.65 * q });   // legacy cardSay(ob, pain)
     if (t > (g.drip || 0)) { g.drip = t + (rest ? 260 : 70); gore(H[0], H[1], 0, 1, 2 + Math.round(4 * q), 0.3 + 0.4 * q); }
     if (q >= 1) {
