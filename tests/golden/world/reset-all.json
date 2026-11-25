@@ -73,6 +73,14 @@
    "who": "card",
    "key": "SAY.land",
    "text": "ох…"
+  },
+  {
+   "doc": 1,
+   "t": 5168,
+   "ms": 1312,
+   "who": "hand",
+   "key": "CLAW_SAY.throw",
+   "text": "nice arm"
   }
  ],
  "states": [
@@ -250,7 +258,7 @@
   {
    "doc": 1,
    "t": 5100,
-   "claw": "off",
+   "claw": "lurk",
    "sev": "",
    "pb": "closed",
    "kat": "hidden",

@@ -132,10 +132,13 @@ These were built to prove the refactor changed nothing; an intended change trips
 
 ## 12b. Cards come out like teeth; `s.rip` is a shortcut
 
-A grid card needs `TUNE.drag.TUGS` tugs (hold the strain until the root gives a notch, ease under `EASE`, tug again); pulled past
-`RIP` before the last notch it tears in two (`actors/cards.js` `give`, `snap`; the counting is in `world/loop.js` `bodies`; the
-notches live in `world.loose` by card key until "Put the cards back"). The harness's `s.rip(i)` sets `window.__cards.drag.TUGS = 1`
-for its one pull, so scenarios that only need a loose card keep their recorded timing. Use `s.tugOut(i)` to pull one out the way
+A grid card comes out on its first tug (`TUNE.drag.ONE_TUG` of the cards) or its second. A tug is holding the strain until the
+grip runs out; a stubborn card's root only gives a notch on the first (`give`), and the pull must ease under `EASE` before the
+next one counts. Pulled past `RIP` while it still has grip, any card tears in two (`snap`). The counting is in `world/loop.js`
+`bodies`, `give` and `snap` in `actors/cards.js`; how many tugs a card needs is a hash of its key and the time (`need`, never
+`Math.random`), kept in `world.tugs`, the notches in `world.loose`, both until "Put the cards back". The harness's `s.rip(i)` sets
+`window.__cards.drag.TEETH = false` for its one pull, so scenarios that only need a loose card keep their recorded timing; a
+scenario about the teeth sets `drag.ONE_TUG` to 0 or 1 first. Use `s.tugOut(i)` to pull one out the way
 a visitor does. Do not add an extra `ensurePlanck()` or mouse move before a pull in a helper: it shifts every later time by a frame.
 
 ## 12c. The hand keeps away until a card has left its slot
@@ -145,6 +148,23 @@ hand in: `hand.come()`, `H()` in `scenes/fortune.js` (Surprise me, the coin, wel
 wants the hand without ripping a card first passes `session: { 'kiripad-ripped': '1' }`. Pieces: the hand takes `edible()` bodies
 (cards, and pieces that are not fading); `big()` (`TUNE.hand.PIECE_BIG` of the card's area) decides between eating a piece and
 rejecting it (`hand.small`).
+
+## 12d. A piece is a card with an outline
+
+Everything the hand does to a whole card it does to a piece that is `big()`: eager, lunge, the tug of war with the stretch and
+the cheese pull, the crush. The code that used to assume the card's rectangle goes through the body's own outline instead
+(`o.poly`, else the rectangle; in `world/stretch.js` `rim(o, n)` and in `actors/hand/tug.js` `outline(o)`, `middle(o)`,
+`reachOf`). A piece keeps its shape in `o.clip` (`keepClip` / `ownClip`) while the stretch or the crumple draws over its
+clip-path. New code that handles "a card" should take `edible()` bodies and use these, not `o.w` and `o.h`.
+
+## 12e. A yanked card stretches before it tears
+
+`world/stretch.js` holds the stretch look (`stretchLook`: long, thin, necked, see-through, red, trembling). The hand's tug of war
+draws with it (`tugDraw`), and so does a card still rooted in its slot: `rootStretch` (called from the loop's draw) pins the spot
+you hold to the pointer and leaves the far end where the root holds it. It is style only; the body moves as before. `o.pain`
+(loop `bodies`) follows the pull but takes `TUNE.drag.STRETCH_S` to reach 1, and the card only snaps in two once it is 1, so a
+scenario has to wait about half a second after a fast yank. The stretched card is the grid card itself, so `uproot` and
+`world.remove` clear the look (`unstretch`), and `#projects` is raised above the hero for that long (inline style: `styles/` is frozen by a unit test).
 
 ## 13. Legacy bugs deliberately kept
 

@@ -29,10 +29,12 @@ export const TUNE = {
   // ---- rooted cards and the pointer ----
   drag: {
     STRAIN: 1.6, RIP: 3.5,               // m of hand stretch: start losing grip / tear at once
-    TUGS: 3, EASE: 0.9,                  // a card comes out like a tooth: on the TUGS-th tug; ease the pull under EASE m before the next tug counts
+    TEETH: true, ONE_TUG: 0.75, EASE: 0.9, // a card comes out like a tooth: on its first tug (ONE_TUG of the cards) or its second; a tug is holding the strain until
+                                         // the grip runs out, and the pull must ease under EASE m before the next one counts. Past RIP before that it tears in two
     LOOSE_GIVE: 0.2, LOOSE_GRIP: 0.5,    // each tug it has given makes the root spring this much softer; the grip it has left right after giving
     LOOSE_TILT: 1.3,                     // deg a loosened card sits crooked in its slot, per tug
     SNAP_KEEP: 0.3,                      // a card yanked in two: neither half is under this share of its length
+    STRETCH: [0.5, 1.4], STRETCH_S: 0.32, // a rooted card stretches toward your hand from STRETCH[0] m of pull, fully by STRETCH[1]; a yank takes STRETCH_S s to tear it
     ROOT_HZ: 14, ANGLE_HZ: 9,            // root spring, root torque spring
     PULL_HZ: 7, PULL_DAMPING: 0.8,       // hand while rooted
     HAND_HZ: 60, HAND_DAMPING: 1,        // hand once free
@@ -106,7 +108,7 @@ export const TUNE = {
     STUMP_S: 8, REGROW_SAY_S: 0.7, REGROW_S: 2.4,
     AGIT_MAX: 6, AGIT_DECAY: 0.6, REACT_TTL_MS: 6000,
     COOL: { slip: 2500, reach: 800, catch: 600, toss: 1200, gloat: 1200, eat: 1800, regrow: 1500, grab: 1500, small: 4000 },
-    PIECE_BIG: 0.35,     // a piece of a card with at least this share of the card's area is worth eating; smaller ones it rejects
+    PIECE_BIG: 0.25,     // a piece of a card with at least this share of the card's area gets everything a whole card gets; smaller scraps it rejects
     SWAT: [-22, -9],     // m/s it bats a small piece back with
     JOINT_HZ: 30,
     SEVER_PX: [13, 16], SEVER_STEP: 8,

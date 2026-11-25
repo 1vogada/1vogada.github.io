@@ -24,6 +24,7 @@ import { clock } from '../core/clock.js';
 import { ride } from '../core/speech.js';
 import { world, remove } from './world.js';
 import { tear, give, snap } from './drag.js';
+import { rootStretch, unstretch } from './stretch.js';
 
 const S = TUNE.physics.S, DT = TUNE.physics.DT, P = TUNE.physics, D = TUNE.drag;
 
@@ -58,17 +59,20 @@ function bodies() {
     const b = o.body, p = b.getPosition(), d = Math.hypot(p.x - o.root.x, p.y - o.root.y), grab = world.grab;
     if (grab && grab.o === o) {   // the pull is the stretch of the hand spring: how far the pointer is from the spot it holds
       const g = grab.joint.getTarget(), pull = Math.hypot(g.x - grab.hx, g.y - grab.hy);   // how far the hand is from where it took hold
-      // A body with o.tugs comes out like a tooth: each time its grip runs out the root gives one notch (o.loose) and the pull has to
-      // ease off (o.spent) before the next tug counts; the last notch frees it. Yanked past RIP before that, it snaps instead
-      const last = (o.loose || 0) >= (o.tugs || 1) - 1;
+      // A body with o.tugs comes out like a tooth: a tug is holding the strain until the grip runs out. On the o.tugs-th tug it comes
+      // out; before that the root gives one notch (o.loose) and the pull has to ease off (o.spent) before the next tug counts.
+      // Yanked past RIP while it still has grip, it snaps instead. Without o.tugs (the katana): the old rule, one pull
+      const teeth = o.tugs > 0, last = (o.loose || 0) >= (o.tugs || 1) - 1;
       if (o.spent) { if (pull < D.EASE) o.spent = false; o.grip = Math.min(1, o.grip + DT * D.GRIP_RECOVER); }
       else if (pull > D.STRAIN) { o.grip -= DT * (D.GRIP_DRAIN[0] + D.GRIP_DRAIN[1] * (pull - D.STRAIN) / (D.RIP - D.STRAIN)); const first = !o.strained; o.strained = true; bus.emit('card.strained', { card: o, first }); }
       else o.grip = Math.min(1, o.grip + DT * D.GRIP_RECOVER);
-      if (last) { if (pull > D.RIP || o.grip <= 0 || Math.abs(b.getAngle()) > D.TWIST) tear(o); }
-      else if (pull > D.RIP) snap(o);
-      else if (!o.spent && (o.grip <= 0 || Math.abs(b.getAngle()) > D.TWIST)) { o.loose = (o.loose || 0) + 1; o.spent = true; o.grip = D.LOOSE_GRIP; give(o); }
+      // how close to tearing it looks (world/stretch.js): follows the pull, but takes STRETCH_S to get there, so even the fastest yank is seen to stretch
+      if (teeth) { const want = Math.max(0, Math.min(1, (pull - D.STRETCH[1]) / (D.RIP - D.STRETCH[1]))), was = o.pain || 0; o.pain = want > was ? Math.min(want, was + DT / D.STRETCH_S) : Math.max(want, was - DT * 4); }
+      if (!teeth) { if (pull > D.RIP || o.grip <= 0 || Math.abs(b.getAngle()) > D.TWIST) tear(o); }
+      else if (pull > D.RIP) { if (o.pain >= 1) snap(o); }   // it stretches for a moment first (o.pain), then tears
+      else if (!o.spent && (o.grip <= 0 || Math.abs(b.getAngle()) > D.TWIST)) { if (last) tear(o); else { o.loose = (o.loose || 0) + 1; o.spent = true; o.grip = D.LOOSE_GRIP; give(o); } }
     }
-    else if ((o.grip = Math.min(1, o.grip + DT * D.GRIP_RECOVER_FREE)) && d < D.SETTLE.dist && Math.abs(b.getAngle()) < D.SETTLE.angle && b.getLinearVelocity().length() < D.SETTLE.v && Math.abs(b.getAngularVelocity()) < D.SETTLE.w) remove(o);
+    else if ((o.pain = 0, o.grip = Math.min(1, o.grip + DT * D.GRIP_RECOVER_FREE)) && d < D.SETTLE.dist && Math.abs(b.getAngle()) < D.SETTLE.angle && b.getLinearVelocity().length() < D.SETTLE.v && Math.abs(b.getAngularVelocity()) < D.SETTLE.w) remove(o);
   }
 }
 
@@ -93,6 +97,8 @@ function draw(k) {
   for (const o of world.bodies) {
     const p = o.body.getPosition(), a = o.body.getAngle(), held = grab && grab.o === o && !o.root;
     const x = held ? p.x * S + hx - o.ex : (o.px + (p.x - o.px) * k) * S - o.ex, y = held ? p.y * S + hy - o.ey : (o.py + (p.y - o.py) * k) * S - o.ey;
+    if (o.root && o.tugs > 0 && grab && grab.o === o && rootStretch(o, grab, k)) continue;
+    if (o.sg) unstretch(o);
     if (!o.tug) o.el.style.transform = `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px) rotate(${(held ? a : o.pa + (a - o.pa) * k).toFixed(4)}rad)`;
     if (o.die && o.die - t < 900) o.el.style.opacity = Math.max(0, (o.die - t) / 900);
   }

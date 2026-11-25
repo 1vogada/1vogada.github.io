@@ -13,6 +13,7 @@ async function world(s) {
   const [px, py] = await s.rip(0);
   await s.run(200);
   await s.up();
+  await s.eval(() => { if (window.__hand && window.__hand.reset) window.__hand.reset(); });   // Put the cards back leaves the hand alone: these scenarios want it gone
   await s.press('.reset-cards');
   await s.run(800);
   const bottom = await s.eval(() => document.documentElement.scrollHeight - innerHeight);
@@ -87,7 +88,7 @@ scenario(G, 'held and crush', { legacy: false }, async (s) => {
   await s.runUntil(() => window.__sev.list.values().next().value.ai.st === 'walk', null, { max: 3000 });
 });
 
-scenario(G, 'three-hand cap', async (s) => {
+scenario(G, 'three-hand cap', { legacy: false }, async (s) => {
   const size = await world(s);
   for (let i = 0; i < 3; i++) await spawn(s, 300 + i * 300, size.H - 300);
   await s.run(500);
@@ -102,7 +103,7 @@ scenario(G, 'three-hand cap', async (s) => {
   await s.rip(0);
   await s.up();
   await s.press('.reset-cards');
-  assert.deepEqual(await s.eval(() => ({ n: window.__sev.list.size, svgs: document.querySelectorAll('svg.claw.sev').length })), { n: 0, svgs: 0 }, 'reset clears them');
+  assert.deepEqual(await s.eval(() => ({ n: window.__sev.list.size, svgs: document.querySelectorAll('svg.claw.sev').length })), { n: 3, svgs: 6 }, 'Put the cards back leaves them alone');
 });
 
 // ---- the new hand and the old one (src/actors/hand/old.js) ----

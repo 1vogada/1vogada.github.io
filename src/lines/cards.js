@@ -30,7 +30,7 @@ defineLines('card.back', ['ha!', 'told you', 'too weak', 'nice try', 'stubborn >
 defineLines('card.rip', ['AAAH!', 'nooo!', 'rude.', 'ау!', 'I was comfy!', 'put me back!'], {
   who: 'card', legacy: 'SAY.rip',
   trigger: { title: 'Torn out',
-    when: 'The third tug. The root gives up and the card comes loose in your hand.' },
+    when: 'You hold the strain until the root gives up, and the card comes loose in your hand. Most cards take one such tug; one in four takes two.' },
   gloss: { 'ау!': 'ow!' },
   lang: ['en', 'en', 'en', 'bg', 'en', 'en'],
 });
@@ -38,7 +38,7 @@ defineLines('card.rip', ['AAAH!', 'nooo!', 'rude.', 'ау!', 'I was comfy!', 'pu
 defineLines('card.loosen', ['*crack*', 'I felt that!', 'that was a root!', 'wiggle wiggle', 'not again…', 'one more and I go', 'пук!', 'ぐらぐら…'], {
   who: 'card',
   trigger: { title: 'A tug, like a tooth',
-    when: 'You hold the strain until the root gives a notch. Ease off and tug again: a card comes out on the third tug. Yank it past 350 px before that and it tears in two.' },
+    when: 'A stubborn card, one in four: you hold the strain and the root only gives a notch. Ease off and tug again and it comes out. Yank any card past 350 px while it still has a grip and it tears in two.' },
   gloss: { 'пук!': 'crack!', 'ぐらぐら…': 'wobbly…' },
   lang: ['en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
 });
@@ -188,7 +188,7 @@ defineLines('card.again', ['you said that already', 'words are cheap', 'still to
 defineLines('toast.ripped', ['Ripped it out! Stack them, or throw one hard to smash it.'], { who: 'toast', lang: 'en' });
 defineLines('toast.smashed', ['Smashed!'], { who: 'toast', lang: 'en' });
 defineLines('toast.smashed10', ['10 cards smashed. Feeling better?'], { who: 'toast', lang: 'en' });
-defineLines('toast.snapped', ['Too hard: it tore. Tug a few times instead, like pulling a tooth.'], { who: 'toast', lang: 'en' });
+defineLines('toast.snapped', ['Too hard: it tore. Pull and hold instead, like pulling a tooth.'], { who: 'toast', lang: 'en' });
 defineLines('toast.halved', ['It keeps its half.'], { who: 'toast', lang: 'en' });
 
 export function install(app) {}
