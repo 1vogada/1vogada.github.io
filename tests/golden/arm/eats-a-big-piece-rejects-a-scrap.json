@@ -22,14 +22,14 @@
   {
    "doc": 1,
    "t": 4160,
-   "ms": 1328,
+   "ms": 1248,
    "who": "hand",
    "key": "CLAW_SAY.eager",
    "text": "yes yes yes"
   },
   {
    "doc": 1,
-   "t": 6208,
+   "t": 5408,
    "ms": 608,
    "who": "hand",
    "key": "CLAW_SAY.grab|CLAW_SAY.keep",
@@ -37,7 +37,7 @@
   },
   {
    "doc": 1,
-   "t": 6816,
+   "t": 6016,
    "ms": 1616,
    "who": "hand",
    "key": "CLAW_SAY.eat",
@@ -45,27 +45,27 @@
   },
   {
    "doc": 1,
-   "t": 10192,
-   "ms": 1312,
-   "who": "hand",
-   "key": "hand.small",
-   "text": "трохи?!"
-  },
-  {
-   "doc": 1,
-   "t": 18302,
-   "ms": null,
-   "who": "card",
-   "key": "SAY.throw",
-   "text": "NOOO"
-  },
-  {
-   "doc": 1,
-   "t": 18720,
-   "ms": null,
+   "t": 9392,
+   "ms": 1584,
    "who": "hand",
    "key": "hand.small",
    "text": "that is a scrap"
+  },
+  {
+   "doc": 1,
+   "t": 17502,
+   "ms": null,
+   "who": "card",
+   "key": "SAY.throw",
+   "text": "I can fly?!"
+  },
+  {
+   "doc": 1,
+   "t": 17920,
+   "ms": null,
+   "who": "hand",
+   "key": "hand.small",
+   "text": "too small."
   }
  ],
  "states": [
@@ -121,7 +121,7 @@
   },
   {
    "doc": 1,
-   "t": 6160,
+   "t": 5360,
    "claw": "snatch",
    "sev": "",
    "pb": "closed",
@@ -134,7 +134,7 @@
   },
   {
    "doc": 1,
-   "t": 6208,
+   "t": 5408,
    "claw": "eat",
    "sev": "",
    "pb": "closed",
@@ -147,7 +147,7 @@
   },
   {
    "doc": 1,
-   "t": 6408,
+   "t": 5608,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",
@@ -160,7 +160,7 @@
   },
   {
    "doc": 1,
-   "t": 9826,
+   "t": 9026,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",
@@ -173,7 +173,7 @@
   },
   {
    "doc": 1,
-   "t": 10194,
+   "t": 9394,
    "claw": "sulk",
    "sev": "",
    "pb": "closed",
@@ -186,7 +186,7 @@
   },
   {
    "doc": 1,
-   "t": 11816,
+   "t": 11016,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",
@@ -199,7 +199,7 @@
   },
   {
    "doc": 1,
-   "t": 18318,
+   "t": 17518,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",
@@ -212,7 +212,7 @@
   },
   {
    "doc": 1,
-   "t": 18686,
+   "t": 17886,
    "claw": "catch",
    "sev": "",
    "pb": "closed",
@@ -225,7 +225,7 @@
   },
   {
    "doc": 1,
-   "t": 18734,
+   "t": 17934,
    "claw": "sulk",
    "sev": "",
    "pb": "closed",
