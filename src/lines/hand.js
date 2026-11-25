@@ -661,7 +661,7 @@ defineLines('hand.toast', ['toast. finally, real food', 'is that… bread?', 'ca
   gloss: { 'тост! най-сетне!': 'toast! at last!', 'トーストだ!': 'it is toast!', 'やっとまともな飯': 'real food at last' },
   lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja', 'ja'],
 });
-defineLines('hand.toastEat', ['*crunch*', 'tastes like a notification', 'needed jam', 'crumbs everywhere. worth it.', 'that message was delicious', 'mmm. sourdough.', 'better than paper', 'slightly burnt. ten out of ten.', 'I could get used to this', 'more toasts. go poke more toasts.', 'хрупкаво.', 'さくさく'], {
+defineLines('hand.toastEat', ['*crunch* (toasted)', 'tastes like a notification', 'needed jam', 'crumbs everywhere. worth it.', 'that message was delicious', 'mmm. sourdough.', 'better than paper', 'slightly burnt. ten out of ten.', 'I could get used to bread', 'more toasts. go poke more toasts.', 'хрупкаво.', 'さくさく'], {
   who: 'hand',
   trigger: { title: 'Ate the toast', when: 'It caught the toast and dragged it off the edge.' },
   gloss: { 'хрупкаво.': 'crunchy.', 'さくさく': 'crispy-crunchy' },
@@ -692,11 +692,11 @@ defineLines('hand.pesterMine', [
 defineLines('hand.pesterTurn', [
   'my turn',
   'MINE',
-  'poke.',
+  'poke. your move.',
   'beat that',
   'I poke better',
   'faster, slowpoke',
-  'ha!',
+  'ha! my turn',
   'and again',
   'still not waking up?',
   'out of my way',
@@ -716,7 +716,7 @@ defineLines('hand.pesterBack', [
   'it was THIS one',
   'nobody poked anything',
   "it's awake! scatter!",
-  'you saw nothing',
+  'I was never poking anything',
   'not my idea',
   'a team effort. mostly me.',
   'carry on. we were never here',

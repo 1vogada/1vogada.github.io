@@ -84,7 +84,7 @@ defineLines('toast.scrap', ['Nothing left of it.', 'No results. There was not en
 
 // toast for the hand: the toast you knocked off the screen lands on the page as a slice of bread you can throw (page/bread.js).
 // It speaks as the 'bread' speaker (body kind 'toast'), dry, like every toast
-defineLines('bread.pop', ['aaaa—', 'I was in the middle of a sentence', 'well. that was the floor.', 'you knocked a notification off the screen. proud?', 'this is not in my job description', 'I used to be a message.', 'noted: do not poke the toast', 'I have crumbs in places now', 'fine. I live down here now.', 'slightly burnt. thanks to you.', 'ау.', 'あーあ'], {
+defineLines('bread.pop', ['aaaa— (toast noises)', 'I was in the middle of a sentence', 'well. that was the floor.', 'you knocked a notification off the screen. proud?', 'this is not in my job description', 'I used to be a message.', 'noted: do not poke the toast', 'I have crumbs in places now', 'fine. I live down here now.', 'slightly burnt. thanks to you.', 'ау.', 'あーあ'], {
   who: 'toast',
   trigger: { title: 'Knocked off', when: 'You clicked a toast five times. It falls off the bottom of the screen and lands on the page as a slice of slightly burnt bread, the message still on it.' },
   gloss: { 'ау.': 'ow.', 'あーあ': 'oh well' },

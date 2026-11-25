@@ -423,7 +423,7 @@ defineLines('sev.pester', [
 });
 defineLines('sev.pesterPoke', [
   'boop',
-  'poke.',
+  '*poke*',
   'you awake?',
   'wake up',
   'poke poke',
@@ -444,7 +444,7 @@ defineLines('sev.pesterPoke', [
 });
 defineLines('sev.pesterRetort', [
   'I was here first',
-  'finders keepers',
+  'finders keepers, cursor-wise',
   'you snooze, you lose',
   "job's taken",
   'you used to be ME',
@@ -463,14 +463,14 @@ defineLines('sev.pesterRetort', [
   lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
 });
 defineLines('sev.pesterBack', [
-  'eep!',
+  'eep! it moved!',
   "it's alive!",
   'I knew it',
   'it moved! it moved!',
   'we were never here',
   'abort, abort',
   "good. you're fine.",
-  'phew',
+  'phew. phew phew.',
   'told you it was alive',
   'run!',
   'мърда!',
