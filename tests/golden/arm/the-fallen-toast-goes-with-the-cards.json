@@ -45,7 +45,7 @@
   {
    "doc": 1,
    "t": 6752,
-   "ms": null,
+   "ms": 1312,
    "who": "hand",
    "key": "CLAW_SAY.throw",
    "text": "over here!"
@@ -133,7 +133,7 @@
   },
   {
    "doc": 1,
-   "t": 6888,
+   "t": 8408,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",

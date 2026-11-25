@@ -277,12 +277,11 @@ scenario(G, 'toast for the hand', { ...O, legacy: false }, async (s) => {
   await knockToast(s);
   assert.ok(await s.said('bread.pop'), 'the toast says something on its way down');
   assert.equal(await s.eval(() => document.getElementById('toast').classList.contains('show')), false, 'the toast bar is gone');
-  await s.runUntil(() => { const o = [...window.__cards.objs].find((q) => q.kind === 'toast'); return o.body.getLinearVelocity().length() < 0.5 && o.body.getPosition().y * window.__cards.S > 2000; }, null, { max: 6000, step: 50 });
-  const b = await s.eval(slice);
-  assert.equal(b.text, 'Ripped it out! Stack them, or throw one hard to smash it.', 'it landed at the bottom of the page, the message still on it');
-  // down at the bottom of the page: pick it up and throw it at the hand
-  await s.scrollTo(99999);
+  await s.runUntil(() => { const o = [...window.__cards.objs].find((q) => q.kind === 'toast'); return o.body.getLinearVelocity().length() < 0.5 && !o.body.isAwake(); }, null, { max: 6000, step: 50 });
   const at = await s.eval(slice);
+  assert.equal(at.text, 'Ripped it out! Stack them, or throw one hard to smash it.', 'the message is still on it');
+  assert.ok(at.y > 700 && at.y < 900, `it landed on the screen, at its bottom edge (${at.y})`);
+  // pick it up and throw it at the hand
   await s.move(at.x, at.y); await s.down();
   assert.equal(await s.eval(() => window.__cards.state().grab.o.kind), 'toast', 'it can be picked up');
   await s.line(at.x, at.y, 560, 300, 20);
@@ -306,6 +305,10 @@ scenario(G, 'toast for the hand', { ...O, legacy: false }, async (s) => {
 scenario(G, 'the fallen toast goes with the cards', { ...O, legacy: false }, async (s) => {
   await knockToast(s);
   await s.run(1500);
+  assert.ok((await s.eval(slice)).y < 900, 'held on the screen');
+  await s.scrollTo(200);
+  await s.run(1500);
+  assert.ok((await s.eval(slice)).y > 1100, 'scrolled: the ledge is gone and it falls on down the page');
   await s.press('.reset-cards');
   await s.run(100);
   assert.equal(await s.eval(() => [...window.__cards.objs].some((o) => o.kind === 'toast') || !!document.querySelector('#phys .toast-bread')), false, 'Put the cards back clears it');

@@ -300,6 +300,8 @@ export const TUNE = {
     SPIN: 5,                 // rad/s
     DAMPING: 0.4,            // linear damping: bread is light
     DENSITY: 0.6,
+    LEDGE_BIT: 0x8000,       // collision category of the ledge at the bottom of the screen that holds it until you pick it up or scroll
+    LEDGE_SCROLL_PX: 40,     // scrolled this far: the ledge goes
   },
   eggs: { YEAR_MS: 4000, SWITCHES: 7, SWITCH_MS: 4000 },   // 1926: hover the year this long; 7 theme switches within this long: the moon
   rps: {   // rock, paper, scissors between the new hand and an old one (scenes/rps.js)
