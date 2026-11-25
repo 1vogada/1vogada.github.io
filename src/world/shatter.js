@@ -1,11 +1,11 @@
 // Impacts (legacy onContact, shatter, the blast shove).
 // begin-contact queues hits into world.hits and shoves into world.blasts; the 'impacts' step drains hits (shatter) and the
-// 'blasts' step applies the shoves. A soft hit over TUNE.physics.LAND says 'card.land' on each card (gate: card).
+// 'blasts' step applies the shoves. A soft hit over TUNE.physics.LAND emits 'card.landed' for each card (the cards say their own line).
 // shatter(h): pieces, a pass-on to touching cards, sayAt(x, y + TUNE.shatter.SAY_DY, 'card.smash'), emit 'card.smashed'
 // (legacy notice('smash') point), remove(o), shake #projects, toasts at 1 and 10 smashed (via 'ui.toast').
 //
 // Events emitted here:
-//   'card.landed'  { card, at, closing }          after its "land" line, for each card of a contact closing faster than LAND
+//   'card.landed'  { card, at, closing }          for each card of a contact closing faster than LAND
 //                                                (emitted from inside begin-contact, i.e. during b2.step: listeners must not
 //                                                create or destroy bodies)
 //   'card.smashed' { card, at, closing, pieces }  after the smash scream, before remove(card) (legacy notice('smash'))
@@ -15,7 +15,7 @@
 import { TUNE } from '../core/tune.js';
 import { bus } from '../core/bus.js';
 import { clock } from '../core/clock.js';
-import { say, sayAt } from '../core/speech.js';
+import { sayAt } from '../core/speech.js';
 import { line } from '../core/lines.js';
 import { world, remove, rectPoly, fragment } from './world.js';
 import { polyArea, inside } from './cut.js';
@@ -39,8 +39,8 @@ export function onContact(c) {
   if (closing < P.SMASH || (!hot(oa) && !hot(ob))) {
     if (closing > P.LAND) {
       const at = [pt.x * S, pt.y * S];
-      if (card(oa) && oa.kind === 'card') { say(oa, 'card.land'); bus.emit('card.landed', { card: oa, at, closing }); }
-      if (card(ob) && ob.kind === 'card') { say(ob, 'card.land'); bus.emit('card.landed', { card: ob, at, closing }); }
+      if (card(oa) && oa.kind === 'card') { bus.emit('card.landed', { card: oa, at, closing }); }
+      if (card(ob) && ob.kind === 'card') { bus.emit('card.landed', { card: ob, at, closing }); }
     }
     return;
   }

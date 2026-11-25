@@ -16,6 +16,9 @@ export const EVENTS = {
   'card.smashed': '{ card, at, closing, pieces } shattered (after the smash scream, before the body is removed)',
   'card.cutting': '{ card, at } the blade tip entered it (after the "cutting" scream)',
   'card.cut': '{ card, at, pieces, held } cut in two by the blade (after the katana\'s own line)',
+  'card.hurt': '{ card, pain } the arm is hurting it (tug past 24 px, or a squeeze): pain 0..1 picks the agony tier (legacy cardSay)',
+  'card.begged': '{ card } the long pause of a crush, once per crush',
+  'card.crushed': '{ card, at } crushed in the arm\'s fist (after the gore, before the body is removed and the arm\'s own line)',
   'card.stabbed': '{ card, at, held } in and out by the same side. Emitted BEFORE the wound is pushed and before the "stab" line',
   // ---- any body ----
   'body.added': '{ body } a body joined world.bodies',
@@ -32,12 +35,13 @@ export const EVENTS = {
   // ---- the arm's hand ----
   'hand.state': '{ from, to } the arm changed state (legacy clawSet)',
   'hand.said': '{ kind, ms } a hand line went up (kind: the key without "hand.")',
-  'hand.grabbed': '{ card } it closed its fingers on a card (tug, catch, reach)',
+  'hand.grabbed': '{ card, how } (how: tug | catch | reach) it closed its fingers on a card (tug, catch, reach)',
   'hand.slipped': '{ card } its claws slid off',
   'hand.ripped': '{ mine, its } a card torn in half between you and it',
+  'hand.tossed': '{ card, hard } it got bored of the card in its fist and threw it (before its "toss" line)',
   'hand.crushed': '{ at } a card crushed in its fist',
   'hand.ate': '{ card } it dragged a card off screen and ate it',
-  'hand.severed': '{ x, y, a, pose, v, at } the blade went through the arm: spawn the cut-off hand here (page px, rad, pose, tip px/s)',
+  'hand.severed': '{ x, y, a, pose, v, at, crushed } the blade went through the arm: spawn the cut-off hand here (page px, rad, pose, tip px/s)',
   'hand.regrown': '{ } a new hand grew',
   'hand.reaching': '{ card, fear, dt, t, x } every frame of the creep towards a card on the shelf (x: wrist, viewport px)',
   // ---- cut-off hands ----
