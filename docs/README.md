@@ -52,6 +52,7 @@ public API. Every module exports `install(app)`; `app` holds every module by its
 | phrasebook menu, its drawings, the raid | `src/phrasebook/menu.js` (`CHAPTERS`), `figures.js`, `raid.js` | `src/lines/phrasebook.js` (`raid.*`) | `styles/phrasebook.css` |
 | every tuning number and timing | `src/core/tune.js` (`TUNE`, `TIMING`) | | |
 | test hooks (`window.__*`), `?debug` | `src/core/debug.js` | | |
+| feed the search box: drop a card, a scrap or an old hand on it and it searches for it | `src/page/feed.js` (`body.dropped` in `reactions.js`; `cards.putBack`, `severed.notThere`) | `card.eaten`, `card.home`, `sev.notthere`, `search.gulp`, `search.spit`, `toast.scrap` | |
 | install order | `src/main.js` (`ORDER`) | | |
 
 ## How a frame runs

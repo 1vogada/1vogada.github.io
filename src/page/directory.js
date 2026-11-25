@@ -2,6 +2,7 @@
 // site.json / projects.json fetches). After projects.json renders it emits 'data.loaded' (src/reactions.js starts the welcome
 // back 900 ms later, legacy setTimeout(welcomeBack, 900)); a calm render emits 'cards.rendered' and still dispatches the legacy
 // DOM event 'cards-rendered' (legacy dispatched it only from the calm path: crazy and empty renders do not).
+// setQuery(v, nothing): page/feed.js can make a query find nothing whatever it says (a scrap, an old hand fed to the search box).
 
 import { bus } from '../core/bus.js';
 import { isCrazy } from '../world/world.js';
@@ -16,11 +17,11 @@ export const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', 
 /** legacy host(u) */
 export const host = (u) => u.replace(/^https:\/\//, '').replace(/\/$/, '');
 
-let _data = null, _site = { categories: [], items: [], posts: [] }, failed = false, query = '';
+let _data = null, _site = { categories: [], items: [], posts: [] }, failed = false, query = '', none = false;
 /** the loaded projects.json (legacy data) or null */ export const data = () => _data;
 /** the loaded site.json (legacy site) */ export const site = () => _site;
 /** the search query (legacy query) */ export const getQuery = () => query;
-/** set the search query (search.js) */ export const setQuery = (v) => { query = v; };
+/** set the search query (search.js); nothing: find nothing whatever it says (page/feed.js: a scrap, an old hand) */ export const setQuery = (v, nothing = false) => { query = v; none = !!nothing; };
 
 // ---- embroidery band: a symmetric shevitsa-style motif seeded by the project name ----
 export const PALETTES = [['#c8372d', '#22344f'], ['#22344f', '#c8372d'], ['#b5402a', '#3f6b4f'], ['#7a2e46', '#c99a2e'], ['#2f5d7c', '#c8372d'], ['#c8372d', '#c99a2e']];
@@ -68,6 +69,7 @@ export function items() {
 export function visible() {
   const all = items();
   if (isCrazy() || !query) return all;
+  if (none) return [];
   const q = query.toLowerCase();
   return all.filter((p) => (p.name + ' ' + (p.description || '')).toLowerCase().includes(q));
 }

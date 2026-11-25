@@ -32,7 +32,7 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 |---|---|---|---|
 | `body.added` | `{ body }` | `world/world.js` `add`: after the body joined `world.bodies` | none |
 | `body.removed` | `{ body }` | `world/world.js` `remove`: after the grab is dropped and the bubble hushed, before `destroyBody` and before it leaves `world.bodies` | `actors/severed/index.js`: `gone(body)` for a hand (runs the behaviour's `leave`); `actors/katana.js`: forgets the katana body |
-| `body.dropped` | `{ body, speed }` | `world/drag.js` `drop`: a free body let go by the pointer, after its throw velocity is set (any speed) | none |
+| `body.dropped` | `{ body, speed, x, y }` | `world/drag.js` `drop`: a free body let go by the pointer, after its throw velocity is set (any speed; `x`, `y`: the pointer, page px) | `reactions.js`: `feed.dropped` (on the search box: it eats it and searches, `page/feed.js`) |
 | `body.thrown` | `{ body, speed }` | `world/drag.js` `drop`: right after `body.dropped` when `speed > TUNE.physics.HOT`; a card is hot from here (`o.hot`) | `actors/severed/index.js`: forced `sev.thrown` for a hand; `actors/cards.js`: forced `card.throw` (not katana or hand); `reactions.js`: `hand.notice('throw')` (not katana or hand); `page/bread.js`: forced `bread.thrown` for the fallen toast (the cards' `card.throw` is dropped by the `bread.` prefix) |
 
 ## Katana and blade
@@ -124,6 +124,7 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 | `data.loaded` | `{ data }` | `page/directory.js`: `projects.json` arrived, after `render()` | `reactions.js`: `welcomeBack` after `TUNE.surprise.WELCOME_MS` (wall time) |
 | `cards.rendered` | `{}` | `page/directory.js` `render`: after the calm grid is rebuilt (not in crazy mode), before the DOM `cards-rendered` event | `actors/cards.js`: drops rooted bodies, keeps torn-out cards hidden |
 | `ui.toast` | `{ msg }` | `actors/cards.js` (first rip), `world/shatter.js` (1st and 10th smash), `actors/hand/tug.js` (first halving), `actors/hand/index.js` (first sever), `actors/katana.js` (found, drawn), `actors/shelf.js` (open / close) | `reactions.js`: `toast.show(msg)` |
+| `search.fed` | `{ what, body, key, query }` | `page/feed.js`: something dropped on the search box has typed itself in (`query`) and the grid filtered, after the scrap's toast. `what`: `'card'` (`key`: its slot) \| `'scrap'` \| `'hand'` (`body`: the old hand) | `reactions.js`: `cards.putBack(key)` for a card (it grows back into its slot, `card.home`); `severed.notThere(body)` for an old hand (`sev.notthere`) |
 
 ## Notes
 

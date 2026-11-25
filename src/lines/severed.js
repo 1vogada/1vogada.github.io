@@ -393,5 +393,11 @@ defineLines('sev.towerHeap', ['worth it', 'did we win?', 'get your thumb out of 
   gloss: { 'всичко ме боли': 'everything hurts', 'めがまわる…': 'my head is spinning…' },
   lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
 });
+defineLines('sev.notthere', ['I\'m not in there', 'zero results. story of my life', 'searched for "hand". found nothing. accurate.', 'it doesn\'t even know I exist', 'not indexed, not wanted', 'I tasted bad, didn\'t I', 'try "wrist". no, don\'t.', 'I used to be on page one', 'my own kind, and it found nobody', 'fine. I\'ll search for myself.', 'did you mean: "card"? no. NO.', 'няма ме там', '僕はいないよ'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: fed to the search box', when: 'You drop it on the search box. The box spits it back out, types "hand", and finds nothing.' },
+  gloss: { 'няма ме там': 'I\'m not in there', '僕はいないよ': 'I\'m not there' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
 
 export function install(app) {}

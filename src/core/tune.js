@@ -343,6 +343,10 @@ export const TUNE = {
   // bottom counts. The wall is H_MAX px (or H_VH of the window) tall and opens in OPEN_MS; each trophy is TROPHY_PX wide; MAX kept
   basement: { PUSHES: 3, GAP_MS: 220, PUSH_PX: 400, RESET_MS: 2500, TOUCH_PX: 40, BOTTOM_PX: 2, H_MAX: 460, H_VH: 0.62, OPEN_MS: 700, LID_DEG: 55, TROPHY_PX: 150, MAX: 40 },
   word: { SETTLE_MS: 450, OVER_PX: 70, HOVER_MS: 650, PINCH_MS: 260, HOLD_MS: 1500, DRAG_MS: 1300, GONE_PX: 260 },
+  // feed the search box (page/feed.js): a card, a scrap or an old hand let go within PAD_PX of the box, slower than MAX_SPEED m/s
+  // (a throw flies on), is swallowed in GULP_MS (the box gulps after GULP_AT of it); then its name types itself in, TYPE_MS a
+  // letter, and HOLD_MS after the last one the grid has its answer. An old hand is spat back up at SPIT m/s. SAY_DY: px above the box
+  feed: { PAD_PX: 24, MAX_SPEED: 9, GULP_MS: 420, GULP_AT: 0.55, TYPE_MS: 75, HOLD_MS: 350, SPIT: 9, SAY_DY: -44 },
   speech: {
     TILT: [4, 4],                // every bubble leans right by 4 + up to 4 degrees
     RIDE_DY: -40,                // a body's bubble sits this far above the top of its rotated box

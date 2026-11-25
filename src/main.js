@@ -127,6 +127,7 @@ import * as diary from './page/diary.js';
 import * as basement from './page/basement.js';
 import * as bread from './page/bread.js';
 import * as konsole from './page/console.js';
+import * as feed from './page/feed.js';
 import * as commands from './core/commands.js';
 
 import * as menu from './phrasebook/menu.js';
@@ -166,6 +167,8 @@ export const ORDER = [
   // 9 easter eggs (after everything they reach)
   ['commands', commands], ['away', away], ['console', konsole], ['eggs', eggs], ['omikuji', omikuji], ['diary', diary], ['basement', basement],
   ['bread', bread],
+  // 10 chains
+  ['feed', feed],
 ];
 
 /** the app every install(app) receives: each module by name, plus a few flags */

@@ -1,0 +1,96 @@
+{
+ "scenario": "page / a scrap dropped on the search box finds nothing",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 32,
+   "ms": 352,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 384,
+   "ms": 1180,
+   "who": "card",
+   "key": "SAY.slice",
+   "text": "НЕЕЕЕЕЕЕ!",
+   "lvl": "2"
+  },
+  {
+   "doc": 1,
+   "t": 1984,
+   "ms": null,
+   "who": "card",
+   "key": "search.gulp",
+   "text": "crunchy"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 16,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 48,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 384,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "piece",
+   "objs": {
+    "piece": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 434,
+   "claw": "eager",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "piece",
+   "objs": {
+    "piece": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1580,
+   "claw": "sulk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "piece": 1
+   }
+  }
+ ]
+}

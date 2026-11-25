@@ -1,0 +1,161 @@
+{
+ "scenario": "page / an old hand dropped on the search box is not in there",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 32,
+   "ms": 800,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "ms": 376,
+   "who": "card",
+   "key": "SAY.rip",
+   "text": "I was comfy!"
+  },
+  {
+   "doc": 1,
+   "t": 2064,
+   "ms": 1312,
+   "who": "hand",
+   "key": "SEV_SAY.held",
+   "text": "пусни ме!"
+  },
+  {
+   "doc": 1,
+   "t": 2856,
+   "ms": null,
+   "who": "card",
+   "key": "search.spit",
+   "text": "returned to sender"
+  },
+  {
+   "doc": 1,
+   "t": 3926,
+   "ms": null,
+   "who": "hand",
+   "key": "sev.notthere",
+   "text": "it doesn't even know I exist"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 16,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 48,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1208,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1228,
+   "claw": "off",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 2044,
+   "claw": "off",
+   "sev": "limp",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 2076,
+   "claw": "off",
+   "sev": "held",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "hand",
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 2872,
+   "claw": "off",
+   "sev": "limp",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4047,
+   "claw": "off",
+   "sev": "rise",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  }
+ ]
+}
