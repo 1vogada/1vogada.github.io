@@ -23,7 +23,7 @@ async function tease(s, i = 0, y = 300) {
   await carry(s, i, 700, y);
   const W = await s.eval(vw);
   await s.line(700, y, W - 180, y, 20);
-  await s.runUntil(() => window.__cards.state().claw.st === 'tug', null, { max: 2000, step: 16 });
+  await s.runUntil(() => window.__cards.state().claw.st === 'tug', null, { max: 4000, step: 16 });
   return W;
 }
 
@@ -31,11 +31,11 @@ scenario(G, 'tease then tug then rip', { ...O, legacy: false }, async (s) => {
   await carry(s, 0, 700, 300);
   assert.equal((await s.eval(claw)).st, 'lurk', 'a loose card wakes it, but it waits');
   const W = await s.eval(vw);
-  await s.line(700, 300, 1000, 300, 12);   // into the tease zone: the last 300 px of the screen at most
+  await s.line(700, 300, 1000, 300, 12);   // into the tease zone: one card wide from the right edge
   assert.equal((await s.eval(claw)).st, 'eager');
   assert.ok(await s.said('CLAW_SAY.eager'), 'it wants it');
   await s.line(1000, 300, W - 180, 300, 8); // close to the edge: it lunges for the far end and takes hold
-  await s.runUntil(() => window.__cards.state().claw.st === 'tug', null, { max: 2000, step: 16 });
+  await s.runUntil(() => window.__cards.state().claw.st === 'tug', null, { max: 4000, step: 16 });
   await s.run(700);
   assert.ok(await s.said('CLAW_SAY.grab'), 'it says so (a forced line waits until the last one has been up TIMING.gap.show)');
   // pull it back to the left, slowly (a sharp yank in the first 0.45 s makes its claws slip): the card stretches, then tears
