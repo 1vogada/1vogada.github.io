@@ -42,7 +42,7 @@ scenario(G, 'rip', async (s) => {
   assert.ok(Math.abs(d.y + d.h / 2 - floor) < 3, `it lies on the floor (${(d.y + d.h / 2).toFixed(1)} vs ${floor})`);
 });
 
-scenario(G, 'throw', async (s) => {
+scenario(G, 'throw', { legacy: false }, async (s) => {
   const [px, py] = await s.rip(1);   // the middle column
   await s.run(800);
   // down near the floor first: a thrown card stays "hot" for 1.5 s, and one that falls the whole page in that time shatters on the floor
@@ -77,7 +77,7 @@ scenario(G, 'smash and debris', async (s) => {
   assert.equal(await s.eval(() => document.querySelectorAll('#phys .phys.shard').length), 0);
 });
 
-scenario(G, 'stacking at the page bottom', async (s) => {
+scenario(G, 'stacking at the page bottom', { legacy: false }, async (s) => {
   const H = await s.eval(() => Math.round(document.querySelector('footer.bottom').getBoundingClientRect().bottom + scrollY));
   const vh = 900, X = 640;
   for (let i = 0; i < 3; i++) {
@@ -85,7 +85,9 @@ scenario(G, 'stacking at the page bottom', async (s) => {
     const [px, py] = await s.rip(0);   // the first card still in the grid
     await s.run(400);
     // carry it over to X, then down to the bottom of the page by scrolling while holding it (the hand keeps it under the pointer)
+    await s.rand(0.99);   // a card ripped from the last column is in the hand's zone: carried away, it sulks instead of snatching
     await s.line(px, py, X, 300, 8);
+    await s.rand(null);
     let y = 0;
     while (y < H - vh) { y = Math.min(H - vh, y + 60); await s.scrollTo(y, 16); }
     // lower it to just above the stack and let go slowly

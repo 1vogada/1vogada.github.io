@@ -23,16 +23,16 @@
    "t": 3424,
    "ms": 1312,
    "who": "card",
-   "key": "SAY.throw|CLAW_SAY.throw",
-   "text": "wheee"
+   "key": "SAY.throw",
+   "text": "NOOO"
   },
   {
    "doc": 1,
-   "t": 4560,
+   "t": 5056,
    "ms": 1312,
    "who": "hand",
-   "key": "CLAW_SAY.throw",
-   "text": "over here!"
+   "key": "SAY.throw|CLAW_SAY.throw",
+   "text": "wheee"
   }
  ],
  "states": [
@@ -75,33 +75,7 @@
   },
   {
    "doc": 1,
-   "t": 1904,
-   "claw": "eager",
-   "sev": "",
-   "pb": "closed",
-   "kat": "hidden",
-   "shelf": false,
-   "grab": "card",
-   "objs": {
-    "card": 1
-   }
-  },
-  {
-   "doc": 1,
    "t": 3440,
-   "claw": "sulk",
-   "sev": "",
-   "pb": "closed",
-   "kat": "hidden",
-   "shelf": false,
-   "grab": null,
-   "objs": {
-    "card": 1
-   }
-  },
-  {
-   "doc": 1,
-   "t": 5040,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",

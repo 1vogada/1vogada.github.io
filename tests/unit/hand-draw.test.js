@@ -86,7 +86,7 @@ test('handDraw: every path d string-identical to legacy, two draws per call', ()
   console.log(`# handDraw: ${n} calls, ${paths} path d strings compared`);
 });
 
-test('zones(vw) identical to legacy for 320..2560 step 10', () => {
+test('zones(vw) as recorded for 320..2560 step 10 (smaller than legacy since 2026-11-25)', () => {
   const rec = recording('hand-draw.zones', { full: Infinity });
   let n = 0;
   for (let vw = 320; vw <= 2560; vw += 10) { rec.check(`${vw}`, zones(vw), `vw ${vw}`); n++; }

@@ -4,6 +4,7 @@
 const { scenario, assert } = require('../helpers/harness');
 const G = 'arm';
 const O = { idle: 3000 };   // a few seconds after load, as a person would
+// legacy: false = the hand's zones changed on 2026-11-25 (smaller), so the frozen /?legacy script no longer matches these goldens
 
 const claw = () => { const c = window.__cards.state().claw; return c && { st: c.st, x: c.x, y: c.y, o: !!c.o, stump: !!c.stump, arm2: c.arm2 && c.arm2.map((p) => [p[0], p[1]]) }; };
 const kinds = () => { const k = {}; for (const o of window.__cards.objs) k[o.kind] = (k[o.kind] || 0) + 1; return k; };
@@ -26,14 +27,14 @@ async function tease(s, i = 0, y = 300) {
   return W;
 }
 
-scenario(G, 'tease then tug then rip', O, async (s) => {
+scenario(G, 'tease then tug then rip', { ...O, legacy: false }, async (s) => {
   await carry(s, 0, 700, 300);
   assert.equal((await s.eval(claw)).st, 'lurk', 'a loose card wakes it, but it waits');
   const W = await s.eval(vw);
-  await s.line(700, 300, 860, 300, 8);     // into the tease zone: from the last card column rightwards
+  await s.line(700, 300, 1000, 300, 12);   // into the tease zone: the last 300 px of the screen at most
   assert.equal((await s.eval(claw)).st, 'eager');
   assert.ok(await s.said('CLAW_SAY.eager'), 'it wants it');
-  await s.line(860, 300, W - 180, 300, 12); // close to the edge: it lunges for the far end and takes hold
+  await s.line(1000, 300, W - 180, 300, 8); // close to the edge: it lunges for the far end and takes hold
   await s.runUntil(() => window.__cards.state().claw.st === 'tug', null, { max: 2000, step: 16 });
   await s.run(700);
   assert.ok(await s.said('CLAW_SAY.grab'), 'it says so (a forced line waits until the last one has been up TIMING.gap.show)');
@@ -56,7 +57,7 @@ scenario(G, 'tease then tug then rip', O, async (s) => {
   assert.equal((await s.eval(kinds)).piece, 1, 'only your half is left');
 });
 
-scenario(G, 'catch a thrown card', O, async (s) => {
+scenario(G, 'catch a thrown card', { ...O, legacy: false }, async (s) => {
   const [px, py] = await carry(s, 1, 560, 300);
   await s.run(600);
   await s.rand(0.99);   // it does not feel like crushing this one, and it tosses it back gently
@@ -74,9 +75,9 @@ scenario(G, 'catch a thrown card', O, async (s) => {
   assert.deepEqual(await s.eval(kinds), { card: 1 }, 'still whole');
 });
 
-scenario(G, 'crush and eat', O, async (s) => {
+scenario(G, 'crush and eat', { ...O, legacy: false }, async (s) => {
   // held in its zone for too long, out of reach: it loses patience and snatches it
-  await carry(s, 0, 900, 300);
+  await carry(s, 0, 1000, 300);
   assert.equal((await s.eval(claw)).st, 'eager');
   await s.rand(0.1);    // snatch, not another "gimme"
   await s.runUntil(() => window.__cards.state().claw.st === 'crush', null, { max: 5000, step: 16 });

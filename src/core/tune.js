@@ -105,7 +105,10 @@ export const TUNE = {
     JOINT_HZ: 30,
     SEVER_PX: [13, 16], SEVER_STEP: 8,
     CATCH_CHANCE_CRUSH: 0.3, REACH_CHANCE_CRUSH: 0.4, SNATCH_CHANCE: 0.5, SNATCH_AGAIN: 0.6, TOSS_HARD: 0.3,
-    ZONES: { maxW: 1080, gutter: 16, col: 306, narrow: 0.4, grabMin: 220, grabFrac: 0.4 },
+    ZONES: { maxW: 1080, gutter: 16, col: 306, narrow: 0.4, grabMin: 220, grabFrac: 0.4,
+      teaseMax: 300, teaseFrac: 0.25, grabMax: 200, grabMaxFrac: 0.22 },   // Ivo 2026-11-25: zones reached half the screen; tease/catch never wider than these from the right edge
+    NEAR: [190, 0.28],                // a held card this close to the right edge (px, or this share of vw if less) gets lunged at and pulled
+    SNATCH_REACH: [440, 0.36],        // it only snatches a card this close to the right edge (px, or share of vw); further away it just sulks
   },
   // ---- cut-off hands ----
   severed: {
