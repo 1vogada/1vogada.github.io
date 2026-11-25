@@ -112,7 +112,9 @@ Read this before porting anything from `scripts/legacy.js` into `src/`.
   each pointermove before it moves the clock), it updates `:hover` and sends pointerover / pointerout under a pointer that stands
   still while the page scrolls (the harness waits for that after every scroll: a grid card under the pointer is lifted 3 px by its
   hover style, and a pull that starts then measures the card 3 px off), and it plays the screen shake `#projects.shake` (turned off in
-  tests; a pull that starts during it measures its card up to 5 px off). Code that measures rectangles must expect all three.
+  tests; a pull that starts during it measures its card up to 5 px off). The phrasebook has the same trap twice: the raid hand aims
+  at a line's `getBoundingClientRect()` every frame while `.pb-tug` (infinite 0.09 s shiver) or `.pb-card.pb-jolt` (0.28 s, after a
+  smash or a rip) moves it on real time; both are off in tests. Code that measures rectangles must expect all of this.
 - Requests to other hosts never leave the machine; a navigation of the page itself to another host (the hand sends you to a project)
   is recorded (`s.leftTo()`) and dropped.
 - A Bulgarian keyboard cannot be simulated with Playwright's keyboard (US layout only): `рафт` is sent as synthetic keydown events.
