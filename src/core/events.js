@@ -43,6 +43,11 @@ export const EVENTS = {
   'hand.ate': '{ card } it dragged a card off screen and ate it',
   'hand.severed': '{ x, y, a, pose, v, at, crushed } the blade went through the arm: spawn the cut-off hand here (page px, rad, pose, tip px/s)',
   'hand.regrown': '{ } a new hand grew',
+  'hand.met': '{ hand } the new hand leaned out to look at an old one (hand: the cut-off hand body), after its "meet" line',
+  'hand.thief': '{ hand } it saw an old hand crush a card (that old hand may be eaten while awake for TUNE.hand.OLD.THIEF_MS)',
+  'hand.devouring': '{ hand } it goes for an old hand (after its "devour" line)',
+  'hand.dropped': '{ hand } it let go of an old hand before eating it (you took it, or it gave up)',
+  'hand.devoured': '{ hand } it dragged an old hand off the screen and ate it (before the body is removed)',
   'hand.reaching': '{ card, fear, dt, t, x } every frame of the creep towards a card on the shelf (x: wrist, viewport px)',
   // ---- cut-off hands ----
   'sev.spawned': '{ hand } a cut-off hand body exists',

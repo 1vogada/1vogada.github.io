@@ -84,4 +84,20 @@ defineLines('sev.flee', ['NOT AGAIN', 'keep that thing away!', 'nope nope nope',
   lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
 });
 
+defineLines('sev.meet', ['you replaced me?!', 'already?!', 'I was gone eight seconds', 'who is THAT', 'impostor!', 'смени ме?!', 'にせもの!'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: meets the new one',
+    when: 'The arm has grown a new hand and leans out to look at the old one. It gets up, turns and stares back.' },
+  gloss: { 'смени ме?!': 'you replaced me?!', 'にせもの!': 'fake!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+defineLines('sev.doomed', ['NO NO NO', 'I AM YOU', 'we can share!', 'not like this', 'help!!', 'пусни ме, аз съм ти!', 'たすけて!'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: being eaten',
+    when: 'The new hand has hold of it and drags it to the edge. Pick it up to save it.' },
+  gloss: { 'пусни ме, аз съм ти!': 'let go, I am you!', 'たすけて!': 'help!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
 export function install(app) {}

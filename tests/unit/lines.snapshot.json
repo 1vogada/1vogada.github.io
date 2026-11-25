@@ -978,6 +978,83 @@
    ["もう一度、表か裏か?","ja","once more: heads or tails?"]
   ]
  },
+ "hand.meet": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Meeting the old hand","when":"Its new hand has grown, and the one you cut off earlier comes into view. It leans out and has a look."},
+  "lines": [
+   ["…is that my old hand?","en"],
+   ["oh. it is you.","en"],
+   ["hello, former me","en"],
+   ["I see you, leftovers","en"],
+   ["you look… worse","en"],
+   ["старата ми ръка?","bg","my old hand?"],
+   ["ふるい手だ","ja","it is the old hand"]
+  ]
+ },
+ "hand.stolen": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"The old hand ate a card","when":"The cut-off hand crushes a card while the new one is around. It takes note, and the old hand is fair game for a while."},
+  "lines": [
+   ["that was MY snack","en"],
+   ["the old one still eats?","en"],
+   ["greedy little thing","en"],
+   ["thief.","en"],
+   ["I saw that.","en"],
+   ["крадец!","bg","thief!"],
+   ["どろぼう!","ja","thief!"]
+  ]
+ },
+ "hand.devour": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Going for the old hand","when":"The old hand is near the right edge and cannot get away: asleep, still crawling from the cut, or caught gloating over a card it stole. The new hand has met it and is not full."},
+  "lines": [
+   ["waste not.","en"],
+   ["come here, old friend","en"],
+   ["nothing personal","en"],
+   ["you look tired. let me help","en"],
+   ["back where you belong","en"],
+   ["ела при мен","bg","come to me"],
+   ["いただきます","ja","thanks for the meal (said before eating)"]
+  ]
+ },
+ "hand.devoured": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Ate the old hand","when":"It drags the old hand off the edge of the screen. Then it is full for twenty seconds."},
+  "lines": [
+   ["*burp*","en"],
+   ["tastes like me","en"],
+   ["recycling.","en"],
+   ["we are one again","en"],
+   ["better inside than out","en"],
+   ["хрус.","bg","crunch."],
+   ["うまい","ja","tasty"]
+  ]
+ },
+ "hand.robbed": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"You saved the old hand","when":"You pick the old hand up while the new one is dragging it away."},
+  "lines": [
+   ["HEY. that was me","en"],
+   ["give me back… me","en"],
+   ["fine. keep the leftovers","en"],
+   ["you are on ITS side?","en"],
+   ["ей, мое е!","bg","hey, that is mine!"],
+   ["ずるい!","ja","not fair!"]
+  ]
+ },
+ "toast.devoured": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["It ate its old hand. Nothing goes to waste here.","en"]
+  ]
+ },
  "toast.severed": {
   "who": "toast",
   "legacy": null,
@@ -1106,6 +1183,34 @@
    ["I have seen what it does","en"],
    ["не, не пак!","bg","no, not again!"],
    ["やだやだやだ!","ja","no no no!"]
+  ]
+ },
+ "sev.meet": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: meets the new one","when":"The arm has grown a new hand and leans out to look at the old one. It gets up, turns and stares back."},
+  "lines": [
+   ["you replaced me?!","en"],
+   ["already?!","en"],
+   ["I was gone eight seconds","en"],
+   ["who is THAT","en"],
+   ["impostor!","en"],
+   ["смени ме?!","bg","you replaced me?!"],
+   ["にせもの!","ja","fake!"]
+  ]
+ },
+ "sev.doomed": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: being eaten","when":"The new hand has hold of it and drags it to the edge. Pick it up to save it."},
+  "lines": [
+   ["NO NO NO","en"],
+   ["I AM YOU","en"],
+   ["we can share!","en"],
+   ["not like this","en"],
+   ["help!!","en"],
+   ["пусни ме, аз съм ти!","bg","let go, I am you!"],
+   ["たすけて!","ja","help!"]
   ]
  },
  "toast.shelfGone": {

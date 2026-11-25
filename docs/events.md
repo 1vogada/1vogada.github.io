@@ -58,6 +58,11 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 | `hand.ate` | `{ card }` | `behaviours/eat.js`: after `remove(card)`, the gore and the forced `hand.eat` | none |
 | `hand.severed` | `{ x, y, a, pose, v, at, crushed }` | `index.js` `sever` (the blade crossed the arm, tick phase `hand`): after `letGo()`, **before** the gore, `set('stump')` and the forced `hand.severed` line. `crushed`: the card it was crushing, or null | `actors/cards.js`: forced `card.stab` on `crushed`; `reactions.js`: `severed.spawn(x, y, a, pose, { v })` (random facing and spin) |
 | `hand.regrown` | `{}` | `behaviours/stump.js`: after `TUNE.hand.STUMP_S`, after `set('regrow')` | none |
+| `hand.met` | `{ hand }` | `behaviours/meet.js` enter, after its "meet" line (rules in `actors/hand/old.js`) | `reactions.js`: the old hand stares back (`stare`) |
+| `hand.thief` | `{ hand }` | `old.js` `stole()`: an old hand it has met crushed a card | none |
+| `hand.devouring` | `{ hand }` | `behaviours/devour.js` enter, after its "devour" line | `reactions.js`: the old hand goes `caught` |
+| `hand.dropped` | `{ hand }` | `behaviours/devour.js`: let go (you took it, or it gave up) | `reactions.js`: `caught` -> `limp` |
+| `hand.devoured` | `{ hand }` | `behaviours/devour.js`: dragged off the edge, before the body is removed | none |
 | `hand.reaching` | `{ card, fear, dt, t, x }` | `behaviours/reach.js`: every frame of the creep to a card on the shelf, before the grab check | `reactions.js`: `cards.panic(card, fear, dt, t, x)` (several random draws) |
 
 ## Cut-off hands
