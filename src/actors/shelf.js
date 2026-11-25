@@ -1,7 +1,7 @@
 // 棚 the shelf: a secret (legacy shelfOn, shelfOff, onShelf, nearShelf, shelfSnack, window.__shelf).
 // The code is written in the top right corner of the banner, under the fog. Type it (tana, рафт, たな), Enter it in the
 // search box, or tap the uncovered writing (page/kiri.js and page/search.js call toggle()) and a shelf comes out of the
-// left edge, where you are looking; do it again and it goes. It is part of the ground, like the floor. A card left lying on
+// left edge, at a random height under the banner (spot()); do it again and it goes. It is part of the ground, like the floor. A card left lying on
 // it is a card nobody is holding: the hand comes for it, slowly, with its whole arm out across the screen (the hand reads
 // it through hand.senses(), wired in src/reactions.js).
 // install(app): world.resized -> rebuilt at the same y (legacy buildWalls did shelfOff + shelfOn); it survives world.reset
@@ -21,14 +21,20 @@ let shelf = null;
 
 function on(at) {
   const W = world.size.W, w = Math.min(T.MAX_W, W * T.W_FRAC), x0 = 0, x1 = w;   // on the very left: the hand has to come all the way across the screen for it
-  const hero = document.getElementById('hero');
-  const clear = hero.getBoundingClientRect().bottom + scrollY + T.CLEAR_PX;   // low enough that a card lying on it does not cover the katana in the banner
-  const y = Math.round(Math.max(T.TOP, Math.min(world.size.H - T.BOTTOM, at ?? Math.min(Math.max(scrollY + innerHeight * T.VIEW, clear), scrollY + innerHeight - T.VIEW_BOTTOM))));
+  const y = Math.round(at ?? spot());
   const fx = world.ground.createFixture({ shape: new world.pl.Box(w / 2 / S, 0.07, { x: (x0 + w / 2) / S, y: (y + 7) / S }, 0), friction: T.FRICTION, filterCategoryBits: 3 });
   const el = document.createElement('div'); el.className = 'shelf'; el.style.left = x0 + 'px'; el.style.top = y + 'px'; el.style.width = w + 'px'; world.layer.prepend(el);
   shelf = { fx, el, x0, x1, y, w, want: false };
   for (const o of world.bodies) o.body.setAwake(true);
   clock.wake();
+}
+/** a random height anywhere under the banner (one Math.random draw): high enough that a card lying on it does not cover the
+ * katana in the banner, low enough to leave T.CARDS_BELOW grid cards of room under it before the bottom of the page */
+function spot() {
+  const top = document.getElementById('hero').getBoundingClientRect().bottom + scrollY + T.CLEAR_PX;
+  const card = document.querySelector('#grid .card'), ch = card ? card.getBoundingClientRect().height : 200;
+  const low = Math.max(top, world.size.H - T.CARDS_BELOW * ch);
+  return Math.max(T.TOP, Math.min(world.size.H - T.BOTTOM, top + Math.random() * (low - top)));
 }
 function off() { world.ground.destroyFixture(shelf.fx); shelf.el.remove(); shelf = null; for (const o of world.bodies) o.body.setAwake(true); clock.wake(); }
 

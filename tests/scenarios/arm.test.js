@@ -168,6 +168,7 @@ scenario(G, 'sever with the katana tip, stump, regrow', O, async (s) => {
   const r = await s.box('.katana'), cx = r.x + r.w / 2, ky = r.y + r.h - 70;
   for (let k = 0; k < 4; k++) await s.line(k % 2 ? cx + 90 : cx - 90, ky, k % 2 ? cx - 90 : cx + 90, ky + 8, 6);
   assert.equal(await s.eval(() => window.__cards.state().found), true);
+  await s.randQueue(0, 0);   // the shelf at the top of its random range (just under the banner) and the first toast
   await s.type('tana');
   await s.run(300);
   assert.ok(await s.eval(() => !!window.__cards.state().shelf));
