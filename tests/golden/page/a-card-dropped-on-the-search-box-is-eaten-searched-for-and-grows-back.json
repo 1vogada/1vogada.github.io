@@ -1,0 +1,110 @@
+{
+ "scenario": "page / a card dropped on the search box is eaten, searched for and grows back",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 32,
+   "ms": 800,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "ms": 1240,
+   "who": "card",
+   "key": "SAY.rip",
+   "text": "I was comfy!"
+  },
+  {
+   "doc": 1,
+   "t": 2072,
+   "ms": null,
+   "who": "card",
+   "key": "card.eaten",
+   "text": "ctrl+Z! CTRL+Z!",
+   "lvl": "2"
+  },
+  {
+   "doc": 1,
+   "t": 2492,
+   "ms": null,
+   "who": "card",
+   "key": "search.gulp",
+   "text": "indexed."
+  },
+  {
+   "doc": 1,
+   "t": 3142,
+   "ms": null,
+   "who": "card",
+   "key": "card.home",
+   "text": "it spat me out by NAME"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 16,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 48,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1516,
+   "claw": "eager",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 2088,
+   "claw": "sulk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  }
+ ]
+}

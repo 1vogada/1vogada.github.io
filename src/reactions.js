@@ -16,6 +16,7 @@ import * as katana from './actors/katana.js';
 import * as welcome from './scenes/welcome-back.js';
 import * as rps from './scenes/rps.js';
 import * as toast from './page/toast.js';
+import * as feed from './page/feed.js';
 
 const notMine = (o) => o.kind !== 'katana' && o.kind !== 'hand';
 
@@ -64,6 +65,10 @@ export const RULES = [
   // ---- the page ----
   ['data.loaded', () => clock.real.after(TUNE.surprise.WELCOME_MS, welcome.welcomeBack)],   // legacy setTimeout(welcomeBack, 900)
   ['ui.toast', ({ msg }) => toast.show(msg)],
+  // ---- feed the search box (page/feed.js) ----
+  ['body.dropped', (ev) => feed.dropped(ev)],                                      // let go on the search box: it eats it and searches
+  ['search.fed', ({ what, key }) => what === 'card' && cards.putBack(key)],         // ...found its project: the card grows back into its slot
+  ['search.fed', ({ what, body }) => what === 'hand' && severed.notThere(body)],    // ...searched for "hand": the old hand is not in there
 ];
 
 export function install(app) {

@@ -165,6 +165,8 @@ export function poked(o, twitch) {
 export function mistaken(o) { const m = brains.get(o); if (!m) return; o.ai.why = 'notcard'; m.set('caught'); }
 /** ...and gave it back (hand.returned): it drops, and says something about it */
 export function returned(o) { const m = brains.get(o); if (!m || !m.is('caught')) return; m.set('limp'); say(o, 'returned', true); }
+/** dropped on the search box, spat back out, and the box searched for "hand" (page/feed.js 'search.fed'): it is not in there */
+export function notThere(o) { if (o && list.has(o) && world.bodies.has(o) && !isCrazy()) say(o, 'notthere', true); }
 
 /**
  * the cheese pull: the arm is dragging card q off the shelf (its grip at page px `from`). The nearest old hand in view close to

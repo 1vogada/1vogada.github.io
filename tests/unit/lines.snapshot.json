@@ -380,6 +380,47 @@
    ["ばちが当たるよ","ja","you will be punished for that"]
   ]
  },
+ "card.eaten": {
+  "who": "card",
+  "legacy": null,
+  "trigger": {"title":"Fed to the search box","when":"You drop a whole card on the search box. It swallows the card in one gulp."},
+  "lines": [
+   ["not the search box!!","en"],
+   ["it has TEETH","en"],
+   ["I was only browsing!","en"],
+   ["tell my slot I loved it","en"],
+   ["nooo, not indexed!","en"],
+   ["I don't want to be a query!","en"],
+   ["it's so dark in here","en"],
+   ["ctrl+Z! CTRL+Z!","en"],
+   ["wait, I can explain my description","en"],
+   ["mind the cursor!","en"],
+   ["I am not a keyword!","en"],
+   ["this is NOT how SEO works","en"],
+   ["изяде ме!","bg","it ate me!"],
+   ["検索されるー!","ja","I'm being searched!"]
+  ]
+ },
+ "card.home": {
+  "who": "card",
+  "legacy": null,
+  "trigger": {"title":"Found, and home again","when":"The search box swallowed it and typed its name; the grid finds its project and the card grows back into its slot."},
+  "lines": [
+   ["I'm home!","en"],
+   ["never feed me to that thing again","en"],
+   ["it spat me out by NAME","en"],
+   ["1 result. me. I'm the result.","en"],
+   ["it knew my name…","en"],
+   ["I have seen the inside of a search box","en"],
+   ["I'm still sticky","en"],
+   ["home sweet slot","en"],
+   ["they found me!","en"],
+   ["top result, baby","en"],
+   ["I am back and I am traumatised","en"],
+   ["обратно у дома!","bg","back home!"],
+   ["ただいま、スロット!","ja","I am home, slot!"]
+  ]
+ },
  "toast.ripped": {
   "who": "toast",
   "legacy": null,
@@ -2464,6 +2505,26 @@
    ["めがまわる…","ja","my head is spinning…"]
   ]
  },
+ "sev.notthere": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: fed to the search box","when":"You drop it on the search box. The box spits it back out, types \"hand\", and finds nothing."},
+  "lines": [
+   ["I'm not in there","en"],
+   ["zero results. story of my life","en"],
+   ["searched for \"hand\". found nothing. accurate.","en"],
+   ["it doesn't even know I exist","en"],
+   ["not indexed, not wanted","en"],
+   ["I tasted bad, didn't I","en"],
+   ["try \"wrist\". no, don't.","en"],
+   ["I used to be on page one","en"],
+   ["my own kind, and it found nobody","en"],
+   ["fine. I'll search for myself.","en"],
+   ["did you mean: \"card\"? no. NO.","en"],
+   ["няма ме там","bg","I'm not in there"],
+   ["僕はいないよ","ja","I'm not there"]
+  ]
+ },
  "toast.shelfGone": {
   "who": "toast",
   "legacy": null,
@@ -2619,6 +2680,63 @@
    ["the fog hides more than the banner.","en"],
    ["the old hand remembers you.","en"],
    ["some slips land on their edge.","en"]
+  ]
+ },
+ "search.gulp": {
+  "who": "page",
+  "legacy": null,
+  "trigger": {"title":"The search box eats","when":"You drop a card or a scrap of one on the search box. It swallows it, and looks for what it was."},
+  "lines": [
+   ["*gulp*","en"],
+   ["nom nom. indexing.","en"],
+   ["mm. paper.","en"],
+   ["crunchy","en"],
+   ["indexed.","en"],
+   ["searching…","en"],
+   ["tastes like a README","en"],
+   ["chewing…","en"],
+   ["more please","en"],
+   ["a bit dry","en"],
+   ["hmm, ad-free","en"],
+   ["*burp* sorry","en"],
+   ["ам.","bg","nom."],
+   ["もぐもぐ","ja","munch munch"]
+  ]
+ },
+ "search.spit": {
+  "who": "page",
+  "legacy": null,
+  "trigger": {"title":"The search box spits","when":"You drop a cut-off hand on the search box. It will not swallow that, but it searches for it anyway."},
+  "lines": [
+   ["ptui!","en"],
+   ["hairy. no.","en"],
+   ["not food","en"],
+   ["that one has fingers","en"],
+   ["I only eat paper","en"],
+   ["it waved at me","en"],
+   ["too many knuckles","en"],
+   ["blech. knuckles.","en"],
+   ["ew, it's warm","en"],
+   ["returned to sender","en"],
+   ["пфу!","bg","ptui!"],
+   ["ぺっ!","ja","ptui!"]
+  ]
+ },
+ "toast.scrap": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": {"title":"A scrap in the search box","when":"You drop a piece or a crumpled ball on the search box. It types \"…\" and finds nothing."},
+  "lines": [
+   ["Nothing left of it.","en"],
+   ["No results. There was not enough of it to search for.","en"],
+   ["It searched for a scrap and found a scrap-shaped hole.","en"],
+   ["Too little left to go on.","en"],
+   ["Whatever that was, it is not in the index.","en"],
+   ["0 results. It was mostly crumbs.","en"],
+   ["A scrap has no name.","en"],
+   ["The search box is still hungry.","en"],
+   ["Нищо не остана от нея.","bg","Nothing is left of it."],
+   ["何も残っていない。","ja","Nothing is left."]
   ]
  },
  "raid.bored": {
