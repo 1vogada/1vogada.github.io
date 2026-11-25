@@ -57,6 +57,54 @@ scenario(G, 'tease then tug then rip', { ...O, legacy: false }, async (s) => {
   assert.equal((await s.eval(kinds)).piece, 1, 'only your half is left');
 });
 
+scenario(G, 'eats a big piece, rejects a scrap', { ...O, legacy: false }, async (s) => {
+  // a card yanked too far tears in two: the bigger part in your hand, under a third left behind
+  await s.pull(0, 0, -420, { n: 10 });
+  const share = () => [...window.__cards.objs].map((o) => { const p = o.poly, a = Math.abs(p.reduce((t, q, i) => { const n = p[(i + 1) % p.length]; return t + q[0] * n[1] - n[0] * q[1]; }, 0)) / 2; return +(a / (o.w * o.h)).toFixed(2); }).sort();
+  assert.deepEqual(await s.eval(share), [0.3, 0.7]);
+  await s.run(600);
+  const [x0, y0] = await s.eval(() => { const g = window.__cards.state().grab; return [g.cx, g.cy]; });
+  const W = await s.eval(vw);
+  // the big piece, held out to it: no tug of war, it takes it and eats it
+  await s.line(x0, y0, 700, 300, 20);
+  await s.line(700, 300, W - 180, 300, 20);
+  assert.equal((await s.eval(claw)).st, 'eager', 'a big piece is worth wanting');
+  await s.runUntil(() => window.__cards.state().claw.st === 'eat', null, { max: 6000, step: 16 });
+  assert.equal(await s.eval(() => window.__cards.state().grab), null, 'out of your hand');
+  await s.run(250, 50); await s.shot('eating');
+  await s.up();
+  await s.runUntil(() => window.__cards.state().claw.st === 'lurk', null, { max: 8000 });
+  await s.run(800);   // so close to the edge that the eat line waits for the grab line to have been up TIMING.gap.show
+  assert.ok(await s.said('CLAW_SAY.eat'), 'eaten');
+  assert.deepEqual(await s.eval(share), [0.3], 'only the scrap is left');
+  // the scrap, held out the same way: it turns away
+  await s.run(2500);
+  const where = () => { const o = [...window.__cards.objs][0], p = o.body.getWorldPoint(o.body.getLocalCenter()); return [p.x * 100 - scrollX, p.y * 100 - scrollY]; };
+  await s.runUntil(() => ![...window.__cards.objs][0].body.isAwake(), null, { max: 12000, step: 100 });   // it has dropped to the floor of the page
+  await s.scrollTo((await s.eval(where))[1] + (await s.scrollY()) - 600);
+  const at = await s.eval(where);
+  await s.move(at[0], at[1]); await s.down();
+  assert.equal(await s.eval(() => window.__cards.state().grab && window.__cards.state().grab.o.kind), 'piece', 'picked the scrap up');
+  await s.line(at[0], at[1], 700, 300, 20);
+  await s.line(700, 300, W - 180, 300, 20);
+  await s.run(300);
+  assert.ok(await s.said('hand.small'), 'it says what it thinks of scraps');
+  assert.equal((await s.eval(claw)).st, 'sulk', 'and turns away');
+  await s.shot('rejected');
+  await s.run(3000);
+  assert.notEqual((await s.eval(claw)).st, 'eager', 'holding it there does not change its mind');
+  // thrown at it, the scrap is batted straight back
+  await s.line(W - 180, 300, 560, 300, 16);
+  await s.run(4200);
+  const before = (await s.bubbles()).filter((b) => b.key === 'hand.small').length;
+  await s.throwTo([560, 300], [560 + 18 * 5, 300], { n: 5 });   // 11 m/s to the right
+  await s.runUntil(() => [...window.__cards.objs][0].body.getLinearVelocity().x < -5, null, { max: 2500, step: 16 });
+  await s.run(700);
+  assert.equal((await s.bubbles()).filter((b) => b.key === 'hand.small').length, before + 1, 'it says so again');
+  assert.notEqual((await s.eval(claw)).st, 'eat');
+  assert.deepEqual(await s.eval(share), [0.3], 'the scrap is still there');
+});
+
 scenario(G, 'catch a thrown card', { ...O, legacy: false }, async (s) => {
   const [px, py] = await carry(s, 1, 560, 300);
   await s.run(600);

@@ -39,6 +39,7 @@ export const EVENTS = {
   'hand.said': '{ kind, ms } a hand line went up (kind: the key without "hand.")',
   'hand.grabbed': '{ card, how } (how: tug | catch | reach | snatch) it closed its fingers on a card (tug, catch, reach)',
   'hand.slipped': '{ card } its claws slid off',
+  'hand.rejected': '{ card } it batted a thrown scrap (a piece under TUNE.hand.PIECE_BIG of a card) straight back',
   'hand.ripped': '{ mine, its } a card torn in half between you and it',
   'hand.tossed': '{ card, hard } it got bored of the card in its fist and threw it (before its "toss" line)',
   'hand.crushed': '{ at } a card crushed in its fist',

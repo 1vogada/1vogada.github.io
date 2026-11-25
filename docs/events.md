@@ -54,6 +54,7 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 | `hand.said` | `{ kind, ms }` | the `arm` speaker's `onSaid`: a hand line went up (`kind` = key without `hand.`) | `reactions.js`: on `severed`, if the katana is loose, `katana.brag()` |
 | `hand.grabbed` | `{ card, how }` | `tug.js` `tug` (`how: 'tug'`): after `set('tug')` and the forced `hand.grab`. `behaviours/catch.js` (`'catch'`): **before** the `hand.caught` line and the 0.3 crush draw. `behaviours/reach.js` (`'reach'`): before the 0.4 crush draw. `behaviours/snatch.js` (`'snatch'`): after `set('crush')` and `hand.snatch` | `actors/cards.js`: forced `card.pull` for `catch` / `reach` |
 | `hand.slipped` | `{ card }` | `tug.js` `slip` (a sharp yank): after `set('sulk')` and `hand.slip`; `behaviours/triumph.js`: you took its half back, after `hand.slip` | none |
+| `hand.rejected` | `{ card }` | `actors/hand/behaviours/catch.js`: it batted a thrown scrap (a piece under `TUNE.hand.PIECE_BIG` of a card) back | nobody yet |
 | `hand.ripped` | `{ mine, its }` | `tug.js` `rip`: after the strands and gore, before `set('triumph')`, the `hand.rip` line and the shake | `actors/cards.js`: forced `card.slice` scream on your half |
 | `hand.tossed` | `{ card, hard }` | `behaviours/has.js`: bored after 2 s; after the 0.3 hard draw and the toss velocity, before `set('lurk')` and `hand.toss` | `actors/cards.js`: forced `card.throw` when `hard` |
 | `hand.crushed` | `{ at }` | `behaviours/crush.js` `hold`: last, after `card.crushed`, `set('gloat')` and `hand.crush` | none |

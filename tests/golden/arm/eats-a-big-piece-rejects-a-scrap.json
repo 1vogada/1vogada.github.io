@@ -1,0 +1,240 @@
+{
+ "scenario": "arm / eats a big piece, rejects a scrap",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 3032,
+   "ms": 136,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 3168,
+   "ms": 1520,
+   "who": "card",
+   "key": "SAY.slice",
+   "text": "AAAAAAAAAAA!!!",
+   "lvl": "2"
+  },
+  {
+   "doc": 1,
+   "t": 4320,
+   "ms": 1312,
+   "who": "hand",
+   "key": "CLAW_SAY.eager",
+   "text": "gimme"
+  },
+  {
+   "doc": 1,
+   "t": 6368,
+   "ms": 608,
+   "who": "hand",
+   "key": "CLAW_SAY.grab",
+   "text": "GOT IT"
+  },
+  {
+   "doc": 1,
+   "t": 6976,
+   "ms": 1616,
+   "who": "hand",
+   "key": "CLAW_SAY.eat",
+   "text": "ммм."
+  },
+  {
+   "doc": 1,
+   "t": 10512,
+   "ms": 1712,
+   "who": "hand",
+   "key": "hand.small",
+   "text": "not worth chewing"
+  },
+  {
+   "doc": 1,
+   "t": 18462,
+   "ms": null,
+   "who": "card",
+   "key": "SAY.throw",
+   "text": "NOOO"
+  },
+  {
+   "doc": 1,
+   "t": 18768,
+   "ms": null,
+   "who": "hand",
+   "key": "hand.small",
+   "text": "I said a CARD"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 100,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 3048,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 3176,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "piece",
+   "objs": {
+    "piece": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4320,
+   "claw": "eager",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "piece",
+   "objs": {
+    "piece": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6320,
+   "claw": "snatch",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "piece",
+   "objs": {
+    "piece": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6368,
+   "claw": "eat",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "piece": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6568,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "piece": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 9986,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "piece",
+   "objs": {
+    "piece": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 10514,
+   "claw": "sulk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "piece",
+   "objs": {
+    "piece": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 12126,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "piece",
+   "objs": {
+    "piece": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 18478,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "piece": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 18734,
+   "claw": "catch",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "piece": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 18782,
+   "claw": "sulk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "piece": 1
+   }
+  }
+ ]
+}
