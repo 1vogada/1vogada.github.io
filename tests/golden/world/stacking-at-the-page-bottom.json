@@ -21,26 +21,26 @@
   {
    "doc": 1,
    "t": 3628,
-   "ms": 788,
+   "ms": 804,
    "who": "card",
    "key": "SAY.pull",
    "text": "hey!"
   },
   {
    "doc": 1,
-   "t": 4416,
+   "t": 4432,
    "ms": 1312,
    "who": "card",
-   "key": "SAY.rip|CLAW_SAY.sulk|PB.SWAT_SAY",
-   "text": "rude."
+   "key": "SAY.rip",
+   "text": "nooo!"
   },
   {
    "doc": 1,
-   "t": 6400,
-   "ms": 1904,
+   "t": 6688,
+   "ms": 1312,
    "who": "hand",
    "key": "CLAW_SAY.loose",
-   "text": "that one looks tasty"
+   "text": "fresh one!"
   },
   {
    "doc": 1,
@@ -48,15 +48,15 @@
    "ms": 792,
    "who": "card",
    "key": "SAY.pull",
-   "text": "не!"
+   "text": "nope."
   },
   {
    "doc": 1,
    "t": 8096,
-   "ms": 1392,
+   "ms": 1312,
    "who": "card",
-   "key": "SAY.rip",
-   "text": "put me back!"
+   "key": "SAY.rip|CLAW_SAY.sulk|PB.SWAT_SAY",
+   "text": "rude."
   },
   {
    "doc": 1,
@@ -72,7 +72,7 @@
    "ms": null,
    "who": "hand",
    "key": "CLAW_SAY.loose",
-   "text": "bring it here"
+   "text": "that one looks tasty"
   }
  ],
  "states": [
@@ -141,7 +141,7 @@
   },
   {
    "doc": 1,
-   "t": 4428,
+   "t": 4444,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",

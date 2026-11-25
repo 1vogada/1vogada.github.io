@@ -117,10 +117,11 @@ class Session {
     await this.ctx.addInitScript(pageInit, { seed: o.seed == null ? 1 : o.seed, rand: o.rand == null ? null : o.rand });
     // test-only style, for determinism across machines and runs:
     //  - one font everywhere (DejaVu Sans, IPAGothic for Japanese): card heights come from text wrapping, and card size is body size
-    //  - no CSS transitions on the cards, the planted katana and the secret ×: they run on real time, and rectangles read by the page
-    //    (or clicked by the test) while one runs would depend on the machine
+    //  - no CSS transitions on the cards, the planted katana and the secret ×, and no screen shake (#projects.shake, a 0.28 s CSS
+    //    animation that moves the whole grid by up to 5 px after a hard landing, a crush or a smash): they run on real time, and
+    //    rectangles read by the page (a pull measures its card) or by the test while one runs would depend on the machine
     await this.ctx.addInitScript(() => { document.addEventListener('DOMContentLoaded', () => { const st = document.createElement('style'); st.dataset.test = 'harness';
-      st.textContent = '*, *::before, *::after { font-family: "DejaVu Sans", "IPAGothic", sans-serif !important; } .grid .card, .katana-in, .omi-secret { transition: none !important; }'; document.head.appendChild(st); }); });
+      st.textContent = '*, *::before, *::after { font-family: "DejaVu Sans", "IPAGothic", sans-serif !important; } .grid .card, .katana-in, .omi-secret { transition: none !important; } #projects.shake { animation: none !important; }'; document.head.appendChild(st); }); });
     const has = (x) => x && Object.keys(x).length;
     if (has(session) || has(local)) {
       await this.page.goto(base + '/__blank');
@@ -260,7 +261,16 @@ class Session {
   }
   async cardBox(i) { return this.box('#grid .card:not(.held)', i); }
   scrollY() { return this.page.evaluate(() => scrollY); }
-  async scrollTo(y) { await this.page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), y); await this.run(20, 20); }
+  // scroll the page to y at once, then let dt ms pass
+  async scrollTo(y, dt = 20) { await this.page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), y); await this.syncHover(); if (dt) await this.run(dt, dt); }
+  // Chrome updates what is under a pointer that stands still (:hover, pointerover / pointerout) on its next real frame after a scroll,
+  // not at once. Wait (real time, the page clock stands still) until it has, so it happens at the same page time on every run:
+  // otherwise a card under the pointer is lifted by its :hover style a frame early or late, and a pull measures it there
+  async syncHover() {
+    const done = () => { if (window.__px == null) return true; const at = document.elementFromPoint(window.__px, window.__py), hov = document.querySelectorAll(':hover');
+      return (hov.length ? hov[hov.length - 1] : null) === at; };
+    for (let i = 0; i < 60; i++) { if (await this.page.evaluate(done)) break; await real(5); }
+  }
   // planck is fetched on the first hover over the grid; a pull does not start without it
   async ensurePlanck() {
     const c = await this.cardBox(0);
@@ -273,6 +283,7 @@ class Session {
     let b = await this.box(sel, i);
     if (b.y < 0 || b.y + b.h > (this.opts.viewport || VIEW).height) {
       await this.page.evaluate(([sel, i]) => document.querySelectorAll(sel)[i].scrollIntoView({ block: 'center', behavior: 'instant' }), [sel, i]);
+      await this.syncHover();
       await this.run(20, 20);
       b = await this.box(sel, i);
     }
@@ -283,7 +294,14 @@ class Session {
   async type(text) { for (const ch of text) { await this.page.keyboard.type(ch); await this.run(20, 20); } }
 
   // ---- the pointer: every move is followed by dt ms of frozen time, so drag speeds are exact ----
-  async move(x, y, dt = 16) { await this.page.mouse.move(x, y); if (dt) await this.run(dt, dt); }
+  // Chrome delivers mouse moves to the page on its next real frame, not when mouse.move returns: wait (real time) until the page has
+  // seen the pointermove, so that it lands at the same page time on every run, however busy the machine is
+  async move(x, y, dt = 16) {
+    const n = await this.page.evaluate(() => window.__pm);
+    await this.page.mouse.move(x, y);
+    for (let i = 0; i < 100; i++) { if (await this.page.evaluate((n) => window.__pm > n, n)) break; await real(2); }
+    if (dt) await this.run(dt, dt);
+  }
   async down(dt = 16) { await this.page.mouse.down(); if (dt) await this.run(dt, dt); }
   async up(dt = 16) { await this.page.mouse.up(); if (dt) await this.run(dt, dt); }
   // move along a straight line in n steps of dt ms each
@@ -313,7 +331,7 @@ class Session {
   async scrollHolding(y = null, step = 60) {
     const to = y == null ? await this.page.evaluate(() => document.documentElement.scrollHeight - innerHeight) : y;
     let cur = await this.scrollY();
-    while (cur !== to) { cur = cur < to ? Math.min(to, cur + step) : Math.max(to, cur - step); await this.page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), cur); await this.run(16, 16); }
+    while (cur !== to) { cur = cur < to ? Math.min(to, cur + step) : Math.max(to, cur - step); await this.scrollTo(cur, 16); }
     return cur;
   }
   // carry what is held along a path at a steady speed (px per 16 ms frame), then let go: fast enough and it is a throw

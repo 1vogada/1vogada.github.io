@@ -8,6 +8,8 @@
 //    that same time. Playwright's fake clock is paused from the first line of the page, but its performance.now() carries a 1 to 25 ms
 //    offset that changes from run to run, and its animation frames sit on a grid of that offset: frames and timers would drift apart
 //  - document.hidden / visibilityState can be switched by the test                                        -> window.__setHidden(bool)
+//  - pointermove events that reached the page are counted (window.__pm): Chrome hands mouse moves to the page on its next real
+//    frame, so the harness waits for each one before it moves the clock (see Session.move)
 //  - every speech bubble that is added to or removed from the page is logged with the page time          -> window.__bub
 module.exports = function pageInit(opts) {
   // ---- language ----
@@ -36,6 +38,11 @@ module.exports = function pageInit(opts) {
   Object.defineProperty(Document.prototype, 'hidden', { configurable: true, get() { return hidden; } });
   Object.defineProperty(Document.prototype, 'visibilityState', { configurable: true, get() { return hidden ? 'hidden' : 'visible'; } });
   window.__setHidden = (h) => { hidden = !!h; document.dispatchEvent(new Event('visibilitychange')); };
+
+  // ---- pointer moves ----
+  window.__pm = 0;
+  window.__px = null; window.__py = null;   // where the pointer is (viewport px), for Session.syncHover
+  window.addEventListener('pointermove', (e) => { window.__pm++; window.__px = e.clientX; window.__py = e.clientY; }, { capture: true, passive: true });
 
   // ---- speech bubbles ----
   const SEL = '.say, .btn-say, .pb-say';

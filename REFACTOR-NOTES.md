@@ -108,6 +108,11 @@ Read this before porting anything from `scripts/legacy.js` into `src/`.
   The goldens were recorded on Ubuntu 24.04 with Playwright 1.63.0's Chromium; CI uses the same.
 - Finite CSS entrance animations and Web Animations are finished explicitly (`finishCss`, `finishWaapi`); waits for network, the
   phrasebook stylesheet and WAAPI frames use small real-time waits.
+- Chrome does three things on its own real frames, not on the page clock: it hands mouse moves to the page (the harness waits for
+  each pointermove before it moves the clock), it updates `:hover` and sends pointerover / pointerout under a pointer that stands
+  still while the page scrolls (the harness waits for that after every scroll: a grid card under the pointer is lifted 3 px by its
+  hover style, and a pull that starts then measures the card 3 px off), and it plays the screen shake `#projects.shake` (turned off in
+  tests; a pull that starts during it measures its card up to 5 px off). Code that measures rectangles must expect all three.
 - Requests to other hosts never leave the machine; a navigation of the page itself to another host (the hand sends you to a project)
   is recorded (`s.leftTo()`) and dropped.
 - A Bulgarian keyboard cannot be simulated with Playwright's keyboard (US layout only): `рафт` is sent as synthetic keydown events.

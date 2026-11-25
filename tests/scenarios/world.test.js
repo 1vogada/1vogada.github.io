@@ -87,7 +87,7 @@ scenario(G, 'stacking at the page bottom', async (s) => {
     // carry it over to X, then down to the bottom of the page by scrolling while holding it (the hand keeps it under the pointer)
     await s.line(px, py, X, 300, 8);
     let y = 0;
-    while (y < H - vh) { y = Math.min(H - vh, y + 60); await s.eval((y) => window.scrollTo({ top: y, behavior: 'instant' }), y); await s.run(16, 16); }
+    while (y < H - vh) { y = Math.min(H - vh, y + 60); await s.scrollTo(y, 16); }
     // lower it to just above the stack and let go slowly
     const h = (await s.eval(loose)).find((c) => !c.awake === false && c.y < H).h;
     const top = vh - 6 - h * i - h / 2 - 30;
