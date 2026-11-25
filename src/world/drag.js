@@ -23,11 +23,17 @@ const S = TUNE.physics.S, P = TUNE.physics, D = TUNE.drag;
 const html = () => document.documentElement;
 
 let pullFn = null;
-const tearFns = new Map();
+const tearFns = new Map(), giveFns = new Map(), snapFns = new Map();
 /** the cards actor registers startPull(press, e) here */
 export function onPull(fn) { pullFn = fn; }
 /** a body kind registers what happens when its root tears: fn(o) (legacy tear(o) / freeKatana(o)) */
 export function onTear(kind, fn) { tearFns.set(kind, fn); }
+/** a kind whose root comes out like a tooth (o.tugs > 1) registers what happens each time the root gives a notch: fn(o) */
+export function onGive(kind, fn) { giveFns.set(kind, fn); }
+/** ... and what happens when it is yanked past RIP before the root is loose: fn(o) (the cards tear in two) */
+export function onSnap(kind, fn) { snapFns.set(kind, fn); }
+export function give(o) { const f = giveFns.get(o.kind); if (f) f(o); }
+export function snap(o) { const f = snapFns.get(o.kind); if (f) f(o); else tear(o); }
 /** legacy tear(o): hand the torn body to its kind's handler */
 export function tear(o) { const f = tearFns.get(o.kind); if (f) f(o); }
 

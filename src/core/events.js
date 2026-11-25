@@ -12,6 +12,8 @@ export const EVENTS = {
   'card.strained': '{ card, first } the pull passed STRAIN (first: the first time in this pull)',
   'card.sprangBack': '{ card } let go before the tear: the root pulls it home (after its "back" line)',
   'card.ripped': '{ card } torn out of the grid (legacy tear, after its "rip" line, before the toast)',
+  'card.loosened': '{ card, left } a tug used up the root\'s grip and it gave one notch (after its "loosen" line); left: tugs still needed',
+  'card.snapped': '{ mine, rest } yanked too far before the root was loose: torn in two (after your half\'s scream, before the toast)',
   'card.landed': '{ card, at, closing } a hard landing that did not break it',
   'card.smashed': '{ card, at, closing, pieces } shattered (after the smash scream, before the body is removed)',
   'card.cutting': '{ card, grid, at } the blade tip entered it (after the "cutting" scream). card: the body, or null for a card still in the grid; grid: that grid element, else null; at: the tip, page px',

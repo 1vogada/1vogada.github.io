@@ -1,0 +1,130 @@
+{
+ "scenario": "world / a card comes out like a tooth",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 32,
+   "ms": 832,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 864,
+   "ms": 1392,
+   "who": "card",
+   "key": "card.loosen",
+   "text": "I felt that!"
+  },
+  {
+   "doc": 1,
+   "t": 3364,
+   "ms": 204,
+   "who": "card",
+   "key": "SAY.back",
+   "text": "nice try"
+  },
+  {
+   "doc": 1,
+   "t": 3612,
+   "ms": 868,
+   "who": "card",
+   "key": "SAY.pull|CLAW_SAY.slap",
+   "text": "hands off"
+  },
+  {
+   "doc": 1,
+   "t": 4480,
+   "ms": 1168,
+   "who": "card",
+   "key": "card.loosen",
+   "text": "not again…"
+  },
+  {
+   "doc": 1,
+   "t": 5648,
+   "ms": null,
+   "who": "card",
+   "key": "SAY.rip",
+   "text": "AAAH!"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 16,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 48,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 3380,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 3580,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 3628,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 5660,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  }
+ ]
+}

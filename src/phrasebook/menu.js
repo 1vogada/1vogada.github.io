@@ -29,6 +29,7 @@ const CHAPTERS = [
       { fig: 'strain' },
       'card.back',
       { fig: 'back' },
+      'card.loosen',
       'card.rip',
       { fig: 'pull' },
       'card.throw',

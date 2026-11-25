@@ -31,11 +31,14 @@ import { TUNE, TIMING } from '../core/tune.js';
 import { clock } from '../core/clock.js';
 import * as W from '../world/world.js';
 import { drawOffset } from '../world/loop.js';
+import { validPoly } from '../world/cut.js';
+import { gore, shake } from '../world/fx.js';
 
 const { world } = W;
 const S = TUNE.physics.S;
 const REGROW_MS = TUNE.cards.REGROW_MS;
 const CRUSH_DY = TUNE.cards.CRUSH_DY;
+const D = TUNE.drag;
 const notMine = (o) => o.kind !== 'katana' && o.kind !== 'hand';   // the katana and the cut-off hands have their own lines
 
 // ---- pull and tear (the world calls them through onPull / onTear('card')) ----
@@ -48,23 +51,88 @@ export function startPull(p, e) {
   if (o) return W.hold(o, e.clientX + scrollX, e.clientY + scrollY, e);   // caught again while springing back
   card.classList.add('pulling', 'settled'); card.style.transform = 'none';
   const r = card.getBoundingClientRect(), hx = r.left + r.width / 2 + scrollX, hy = r.top + r.height / 2 + scrollY;
-  o = W.add({ kind: 'card', el: card, w: r.width, h: r.height, ex: hx, ey: hy, key: card.dataset.key, grip: 1, root: { x: hx / S, y: hy / S } },
+  card.style.rotate = '';   // a loosened card sat crooked: the body takes over from here
+  o = W.add({ kind: 'card', el: card, w: r.width, h: r.height, ex: hx, ey: hy, key: card.dataset.key, grip: 1, tugs: D.TUGS, loose: world.loose.get(card.dataset.key) || 0, root: { x: hx / S, y: hy / S } },
     hx / S, hy / S, 0, new world.pl.Box(r.width / 2 / S, r.height / 2 / S), { filterMaskBits: 0 });
   world.rootOf.set(card, o);
   W.hold(o, p.px, p.py, e); say(o, 'card.pull', { force: true });
   bus.emit('card.pulled', { card: o });
 }
 
-/** the root tore: clone into the layer, full collisions, say 'card.rip', emit 'card.ripped', first-rip toast (legacy tear) */
-export function tear(o) {
+// out of its slot: the grid card stays behind as an empty place, a copy in the physics layer is the body from here on
+function uproot(o) {
   const card = o.el, el = W.cloneCard(card);
   el.style.width = o.w + 'px'; el.style.height = o.h + 'px'; el._o = o; world.layer.appendChild(el);
   world.rootOf.delete(card); card.classList.remove('pulling'); card.style.transform = ''; card.classList.add('held');
-  o.el = el; o.ex = o.w / 2; o.ey = o.h / 2; o.root = null; world.ripped.add(o.key);
+  o.el = el; o.ex = o.w / 2; o.ey = o.h / 2; o.root = null; world.ripped.add(o.key); world.loose.delete(o.key);
   o.body.setGravityScale(TUNE.physics.FALL);
   o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF });
   if (world.grab && world.grab.o === o) { world.grab.joint.setFrequency(TUNE.drag.HAND_HZ); world.grab.joint.setDampingRatio(TUNE.drag.HAND_DAMPING); W.carry(o); }
-  W.showReset(); say(o, 'card.rip', { force: true });
+  W.showReset();
+}
+
+/** the root gave one notch (world/loop.js, a tug that used up its grip): it lurches, bleeds a little at the root and says so */
+export function give(o) {
+  world.loose.set(o.key, o.loose);
+  const b = o.body, g = world.grab, t = g.joint.getTarget(), p = b.getPosition(), dx = t.x - p.x, dy = t.y - p.y, d = Math.hypot(dx, dy) || 1, m = b.getMass();
+  b.applyLinearImpulse({ x: m * 2.2 * dx / d, y: m * 2.2 * dy / d }, b.getWorldCenter(), true);
+  b.applyAngularImpulse(b.getInertia() * (Math.random() - 0.5) * 5, true);
+  gore(o.root.x * S, o.root.y * S, dx / d, dy / d, 5, 0.6);
+  say(o, 'card.loosen', { force: true });
+  bus.emit('card.loosened', { card: o, left: D.TUGS - o.loose });
+}
+
+/**
+ * yanked past RIP before the root was loose (world/loop.js): the card tears in two across the pull. The half you hold flies to
+ * your hand, the other half drops out of the slot. Falls back to an ordinary tear when the halves would not be valid pieces
+ */
+export function snap(o) {
+  const gr = world.grab, b = o.body, W_ = o.w, H_ = o.h;
+  const q = b.getLocalPoint(gr.joint.getAnchorB()), t = gr.joint.getTarget(), a0 = gr.joint.getAnchorB(), v = b.getLocalVector({ x: t.x - a0.x, y: t.y - a0.y });
+  const vl = Math.hypot(v.x, v.y) || 1, ux = v.x / vl, uy = v.y / vl, gp = [q.x * S + W_ / 2, q.y * S + H_ / 2];
+  const src = W.rectPoly(o), pr = (p) => p[0] * ux + p[1] * uy, lo = Math.min(...src.map(pr)), hi = Math.max(...src.map(pr)), L = hi - lo;
+  // the tear runs across the pull, halfway between where you hold it and the end that stays behind
+  const c = Math.max(lo + D.SNAP_KEEP * L, Math.min(hi - D.SNAP_KEEP * L, (lo + pr(gp)) / 2)), side = (p) => pr(p) - c;
+  const mineP = [], restP = [], cut = [];
+  for (let i = 0; i < src.length; i++) {
+    const p = src[i], n = src[(i + 1) % src.length], sp = side(p), sn = side(n);
+    (sp >= 0 ? mineP : restP).push(p);
+    if ((sp > 0 && sn < 0) || (sp < 0 && sn > 0)) { const f = sp / (sp - sn), x = [p[0] + (n[0] - p[0]) * f, p[1] + (n[1] - p[1]) * f]; mineP.push(x); restP.push(x); cut.push(x); }
+  }
+  if (cut.length !== 2 || !validPoly(mineP) || !validPoly(restP)) return tear(o);
+  uproot(o);
+  // ragged: both halves get the same teeth along the tear, in the clip-path only (the bodies keep the straight edge)
+  const n = Math.max(6, Math.round(Math.hypot(cut[1][0] - cut[0][0], cut[1][1] - cut[0][1]) / 15)), teeth = [];
+  for (let k = 1; k < n; k++) teeth.push([(k + (Math.random() - 0.5) * 0.5) / n, (k % 2 ? 1 : -1) * (4 + Math.random() * 9) * (Math.random() < 0.18 ? 2.2 : 1)]);
+  const jag = (poly) => {
+    const out = [];
+    poly.forEach((p, i) => {
+      out.push(p); const z = poly[(i + 1) % poly.length];
+      if (cut.includes(p) && cut.includes(z)) for (const [f, off] of (p === cut[0] ? teeth : [...teeth].reverse())) out.push([cut[0][0] + (cut[1][0] - cut[0][0]) * f + ux * off, cut[0][1] + (cut[1][1] - cut[0][1]) * f + uy * off]);
+    });
+    return `polygon(${out.map(([x, y]) => `${x.toFixed(1)}px ${y.toFixed(1)}px`).join(',')})`;
+  };
+  const mine = W.fragment(o, mineP, 'piece', {}, {}), rest = W.fragment(o, restP, 'piece', {}, {});
+  mine.el.style.clipPath = jag(mineP); rest.el.style.clipPath = jag(restP);
+  const at = b.getWorldPoint(q), wu = b.getWorldVector({ x: ux, y: uy }), vel = b.getLinearVelocity();
+  world.b2.destroyJoint(gr.joint); world.grab = null; W.remove(o);
+  W.hold(mine, at.x * S, at.y * S, { pointerId: gr.id, clientX: gr.cx, clientY: gr.cy }); world.grab.moved = true; world.grab.h = gr.h; world.grab.sticky = gr.sticky;
+  mine.body.setLinearVelocity({ x: vel.x + wu.x * 6, y: vel.y + wu.y * 6 });
+  rest.body.setLinearVelocity({ x: -wu.x * 2.5, y: -wu.y * 2.5 }); rest.body.setAngularVelocity((Math.random() - 0.5) * 5);
+  for (let k = 0; k <= 8; k++) {
+    const f = k / 8, l = { x: (cut[0][0] + (cut[1][0] - cut[0][0]) * f - W_ / 2) / S, y: (cut[0][1] + (cut[1][1] - cut[0][1]) * f - H_ / 2) / S }, A = rest.body.getWorldPoint(l);
+    gore(A.x * S, A.y * S, wu.x, wu.y, 5, 1); gore(A.x * S, A.y * S, -wu.x, -wu.y, 4, 0.8);
+  }
+  shake();
+  say(mine, 'card.slice', { force: true, scream: true });
+  bus.emit('card.snapped', { mine, rest });
+  if (!snapped) { snapped = true; bus.emit('ui.toast', { msg: line('toast.snapped') }); }
+}
+let snapped = false;
+
+/** the root tore: clone into the layer, full collisions, say 'card.rip', emit 'card.ripped', first-rip toast (legacy tear) */
+export function tear(o) {
+  uproot(o); say(o, 'card.rip', { force: true });
   bus.emit('card.ripped', { card: o });   // legacy notice('loose')
   if (world.ripped.size === 1) bus.emit('ui.toast', { msg: line('toast.ripped') });
 }
@@ -105,13 +173,17 @@ export function panic(o, fear, dt, t, handX) {
 
 /** "Put the cards back": the torn-out grid cards grow back (legacy resetAll, on wall time) */
 function regrow() {
+  document.querySelectorAll('#grid .card').forEach((c) => { c.style.rotate = ''; });
   document.querySelectorAll('#grid .card.held').forEach((c) => { c.classList.remove('held'); c.classList.add('regrow'); clock.real.after(REGROW_MS, () => c.classList.replace('regrow', 'settled')); });
 }
 /** the grid re-rendered on search or theme changes: keep torn-out cards out of it (legacy cards-rendered listener) */
 function rendered() {
   for (const o of [...world.bodies]) if (o.root && o.kind === 'card') W.remove(o);
-  document.querySelectorAll('#grid .card').forEach((c) => { if (world.ripped.has(c.dataset.key)) c.classList.add('held'); });
+  document.querySelectorAll('#grid .card').forEach((c) => { if (world.ripped.has(c.dataset.key)) c.classList.add('held'); crook(c); });
 }
+
+// a card whose root has given sits a little crooked in its slot, one way then the other, more with every tug
+const crook = (c) => { const n = world.loose.get(c.dataset.key) || 0; c.style.rotate = n ? `${((n % 2 ? 1 : -1) * D.LOOSE_TILT * n).toFixed(1)}deg` : ''; };
 
 const live = (o) => !!o && world.bodies.has(o);
 const when = (type, fn) => { if (isEvent(type)) bus.on(type, fn); };
@@ -126,6 +198,9 @@ export function install(app) {
     } });
   W.onPull(startPull);
   W.onTear('card', tear);
+  W.onGive('card', give);
+  W.onSnap('card', snap);
+  bus.on('body.removed', ({ body }) => { if (body.root && body.kind === 'card') crook(body.el); });   // sprang home: world.remove clears its transform right after
   bus.on('card.strained', ({ card, first }) => { if (card.kind !== 'katana') say(card, 'card.strain', { force: first }); });
   bus.on('card.sprangBack', ({ card }) => { if (card.kind !== 'katana') say(card, 'card.back', { force: true }); });
   bus.on('body.thrown', ({ body }) => { if (notMine(body)) say(body, 'card.throw', { force: true }); });
