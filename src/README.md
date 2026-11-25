@@ -1,5 +1,7 @@
 # src/: the new kiripad.dev code
 
+> Start with [`docs/`](../docs/README.md): the map, recipes for changes, the event catalogue and the pitfalls. This file is the core contract reference.
+
 Native ES modules, no build step. Loaded through `/src/main.js` by default since the parity suite passed (all 35 scenarios, strict); `?legacy` loads the old script. Was behind `?next` until the parity suite passes on old
 and new; then the default flips. **Nothing here may change behaviour**: same lines, same timings, same random draws in the
 same order (a seeded `Math.random` gives identical runs old vs new), same order of effects within a frame.
