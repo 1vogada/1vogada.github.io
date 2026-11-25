@@ -8,7 +8,11 @@
 //            down (limp), still dragging itself on its belly from the cut (crawl), or caught gloating over a card it just
 //            stole (crush -> gloat, then 'thief' for THIEF_MS). Not while you hold it, not while it is busy crushing, not
 //            while the arm holds a card, not for DIGEST_MS after the last one it ate, never in crazy mode or a scene (the arm
-//            only looks from lurk).
+//            only looks from lurk). Also an old hand it beat at rock, paper, scissors (scenes/rps.js), for TUNE.rps.FAIR_MS.
+//   prod     an old hand it has met, walking about on its feet near the right edge (awake, not weak): now and then it goes for
+//            it anyway (OLD.AWAKE, rolled once per old hand per OLD.ROLL_MS, never while full). That one plays dead (prod.js).
+//   wrest    an old hand it has met starts crushing a card near the right edge while it lurks with nothing in its hand (not
+//            full, not cooling off): now and then (TUNE.hand.WREST.CHANCE, rolled once per crush) it grabs the other end (wrest.js).
 import { TUNE } from '../../core/tune.js';
 import { bus } from '../../core/bus.js';
 import { now } from '../../core/clock.js';
@@ -20,6 +24,7 @@ const S = TUNE.physics.S, OLD = TUNE.hand.OLD;
 const met = new WeakSet();       // old hands it has looked at
 const seen = new WeakMap();      // old hand -> since when it has been in view, not yet met
 const thieves = new WeakMap();   // old hand -> until when it is fair game for stealing a card
+const rolled = new WeakMap();    // old hand -> when it may next be rolled for (prod)
 
 /** the cut-off hands there are (none wired: none) */
 const olds = () => { const f = sense().oldHands; return f ? [...f()].filter((o) => world.bodies.has(o)) : []; };
@@ -39,6 +44,22 @@ export function stole(o, t) {
   notice('stolen');
   bus.emit('hand.thief', { hand: o });
 }
+
+/**
+ * old hand o just started crushing card q (reactions: sev.state -> crush): may the arm, lurking, go for the card? The checks
+ * draw nothing; the one random draw (TUNE.hand.WREST.CHANCE) happens only when it could. @returns true when it goes for it
+ */
+export function wrestable(c, o, q, t) {
+  if (t <= c.cool || t <= (c.fullUntil || 0) || world.grab || !met.has(o) || isHeld(o) || !q || !world.bodies.has(q) || q.wrested) return false;
+  const vw = document.documentElement.clientWidth, vh = innerHeight, reach = Math.min(OLD.REACH[0], vw * OLD.REACH[1]), p = at(o);
+  const w = q.body.getWorldCenter(), qx = w.x * S - scrollX, qy = w.y * S - scrollY;
+  if (!inView(p, vw, vh) || qx <= vw - reach || qx >= vw - 10 || qy < OLD.SEE[1] || qy > vh + OLD.SEE_BOTTOM) return false;
+  q.wrested = true;   // rolled for: once per crush
+  return Math.random() < TUNE.hand.WREST.CHANCE;
+}
+
+/** it beat this old hand at rock, paper, scissors: fair game until `until` (game ms), as a thief is (no remark) */
+export function lost(o, until) { met.add(o); thieves.set(o, Math.max(thieves.get(o) || 0, until)); }
 
 /** it cannot get away (see the rules at the top) */
 function weak(o, t) {
@@ -66,7 +87,7 @@ export function wants(c) {
 export function look(c, x) {
   const { t, vw, vh } = x;
   if (t <= c.cool) return false;
-  let prey = null, best = -1;
+  let prey = null, best = -1, awake = null;
   const reach = Math.min(OLD.REACH[0], vw * OLD.REACH[1]);
   for (const o of olds()) {
     if (isHeld(o) || !isFree(o) || o.ai.st === 'held' || o.ai.st === 'caught') continue;
@@ -77,10 +98,28 @@ export function look(c, x) {
       if (t - seen.get(o) > OLD.NOTICE_MS) { seen.delete(o); c.old = o; set('meet'); return true; }
       continue;
     }
-    if (t > (c.fullUntil || 0) && q[0] > vw - reach && weak(o, t) && q[0] > best) { best = q[0]; prey = o; }
+    if (t <= (c.fullUntil || 0) || q[0] <= vw - reach) continue;
+    if (weak(o, t)) { if (q[0] > best) { best = q[0]; prey = o; } continue; }
+    // awake and on its feet: once in a while it tries anyway (one draw per old hand per ROLL_MS)
+    const f = sense().onShelf;
+    if (!awake && o.ai.st === 'walk' && o.ai.gait !== 'crawl' && !(f && f(o)) && t >= (rolled.get(o) || 0)) { rolled.set(o, t + OLD.ROLL_MS); if (Math.random() < OLD.AWAKE) awake = o; }
   }
   if (prey) { c.o = prey; set('devour'); return true; }
+  if (awake) { c.o = awake; set('prod'); return true; }
   return false;
+}
+
+/**
+ * not paper: you hold an old hand out in the tease zone like a card (not near the shelf) for PAPER.MS. The arm takes it for
+ * one (paper.js). Called from lurk. @returns true when it switched state (c.o = the old hand)
+ */
+export function mistake(c, x) {
+  const g = world.grab, f = sense().nearShelf, PA = OLD.PAPER;
+  if (!g || g.o.kind !== 'hand' || !g.moved || g.cx <= x.Z.tease || (f && f([g.cx, g.cy]))) { c.paperAt = null; return false; }
+  if (c.paperAt == null) c.paperAt = x.t;
+  if (x.t - c.paperAt < PA.MS || x.t <= c.cool) return false;
+  c.paperAt = null; c.o = g.o; set('paper');
+  return true;
 }
 
 /**

@@ -1,7 +1,8 @@
-// hand state "sulk": pulls back for 1.6 s, then lurk.
+// hand state "sulk": pulls back for 1.6 s, then lurk (or further back, out of sight, until c.sulkUntil: sulkFor()).
 // Legacy clawTick branch `c.st === 'sulk'`, moved verbatim. tick(c, m, dt) sets the motion target on the frame's ctx m.x.
 import { defineBehaviour } from '../../../core/machine.js';
 import { POSES } from '../poses.js';
+import { now } from '../../../core/clock.js';
 import { set } from '../index.js';
 
 export default defineBehaviour('hand', 'sulk', {
@@ -10,8 +11,8 @@ export default defineBehaviour('hand', 'sulk', {
   idle: true,      // remarks are said, and the flinch leans in
   tick(c, m, dt) {
     const x = m.x;
-    x.pose = POSES.sulk; x.rate = 4; x.aim = Math.PI - 0.5; x.T = [x.vw + 120, c.ly + 30]; x.wig = 0.02;
-    if (m.t > 1.6) set('lurk');
+    x.pose = POSES.sulk; x.rate = 4; x.aim = Math.PI - 0.5; x.T = [x.vw + (now() < (c.sulkUntil || 0) ? 320 : 120), c.ly + 30]; x.wig = 0.02;
+    if (m.t > 1.6 && now() >= (c.sulkUntil || 0)) set('lurk');   // (lost at rock, paper, scissors: it stays sulking, out of sight, until c.sulkUntil)
   },
 });
 export function install(app) {}

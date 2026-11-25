@@ -9,8 +9,9 @@ import { claim } from '../../../core/claims.js';
 import { say as speak, sayAt } from '../../../core/speech.js';
 import { world, remove, rectPoly, isHeld } from '../../../world/world.js';
 import { gore } from '../../../world/fx.js';
+import { pickUp } from './gift.js';
 import { clamp01, wrapA } from '../gait.js';
-import { set, say, unsquash, tickNow, POSES } from '../index.js';
+import { set, say, unsquash, tickNow, POSES, giving, crumple } from '../index.js';
 
 const S = TUNE.physics.S, SV = TUNE.severed;
 
@@ -40,6 +41,7 @@ export default defineBehaviour('sev', 'crush', {
     if (u >= 1) {
       gore(w.x * S, w.y * S, -1, 0, 30, 1); gore(w.x * S, w.y * S, 1, 0, 30, 1); gore(w.x * S, w.y * S, 0, -1, 20, 0.8);
       sayAt(w.x * S, w.y * S - 110, 'card.slice', { scream: true });
+      a.ball = giving() ? crumple(q, q.sq.cx, SV.GIFT.R + 4, o) : null; if (a.ball) pickUp(o);   // your pointer rests on the page: it keeps a ball of it for you (gift)
       q.sq.free(); q.sq = null; remove(q); a.prey = null; a.cool = t + SV.CRUSH_COOL; say(o, 'crush', true); set(o, 'gloat');
     }
   },

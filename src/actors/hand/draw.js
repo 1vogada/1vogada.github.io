@@ -77,7 +77,7 @@ export function handDraw(c, wig, shake, strain) {
   let ex = (A[0] + Wp[0]) / 2 + ay / al * bend, ey = (A[1] + Wp[1]) / 2 - ax / al * bend; if (ax > 0) { ex = (A[0] + Wp[0]) / 2; ey = (A[1] + Wp[1]) / 2; }
   const arm = [A, [ex, ey], Wp], noArm = c.arm === false, armD = noArm ? limb([tf(-17, 1), tf(8, 0)], [18, 22]) : limb(arm, [44, 30, 21]);
   if (!noArm) c.arm2 = arm;
-  if (c.stump && c.st === 'stump') {   // the hand is gone: the arm ends in a raw ring
+  if (c.stump && (c.st === 'stump' || c.st === 'sew')) {   // the hand is gone: the arm ends in a raw ring (and while the old one is put back on)
     c.flesh.setAttribute('d', armD); for (const key of ['thumb', 'talonT', 'talon', 'crease', 'eye', 'pupil']) c[key].setAttribute('d', '');
     c.vein.setAttribute('d', `M${f1(ox - 8)} ${f1(oy)}a8 8 0 1 0 16 0a8 8 0 1 0 -16 0M${f1(ox - 3)} ${f1(oy)}a3 3 0 1 0 6 0a3 3 0 1 0 -6 0`); return;
   }
@@ -91,10 +91,17 @@ export function handDraw(c, wig, shake, strain) {
   c.vein.setAttribute('d', fs.map((f, i) => line([tf(FING[i].b[0] - 30, FING[i].b[1] * 0.45), ...f.pts.slice(0, 3)])).join('') + (noArm ? '' : line([tf(18, 6), Wp, [ex + 3, ey + 4], [A[0], A[1] + 6]]) + line([tf(-2, -6), [ex - 2, ey - 6]])));
   // one eye on the back of the hand
   const E = EYE, hh = 8.5 * Math.max(0.08, p.eye), happy = p.happy > 0.5, q = (x, y) => { const v = tf(E[0] + x, E[1] + y); return `${f1(v[0])} ${f1(v[1])}`; };
+  if (p.dead > 0.5) {   // playing dead: two crossed strokes for an eye
+    c.eye.setAttribute('class', 'eye happy'); c.eye.setAttribute('d', `M${q(-9, -7)}L${q(9, 7)}M${q(-9, 7)}L${q(9, -7)}`); c.pupil.setAttribute('d', ''); return;
+  }
   c.eye.setAttribute('class', happy ? 'eye happy' : 'eye');
   c.eye.setAttribute('d', happy ? `M${q(-12, 4)}Q${q(0, -13)} ${q(12, 4)}` : `M${q(-14, 0)}Q${q(0, -2 * hh)} ${q(14, 0)}Q${q(0, 2 * hh)} ${q(-14, 0)}Z`);
-  const pw = 2.2 + 2.6 * p.pupil, ph = hh * 0.82;
-  c.pupil.setAttribute('d', happy ? '' : `M${q(3, -ph)}Q${q(3 + pw, 0)} ${q(3, ph)}Q${q(3 - pw, 0)} ${q(3, -ph)}Z`);
+  const pw = 2.2 + 2.6 * p.pupil; let ph = hh * 0.82, lx = 0, ly = 0;
+  if (c.lookAt) {   // it watches a point (viewport px): the pupil slides towards it, a little smaller so it stays in the eye
+    const e = tf(E[0] + 3, E[1]), dx = c.lookAt[0] - e[0], dy = c.lookAt[1] - e[1], ux = dx * ca + dy * sa, uy = mr * (dx * sa - dy * ca), l = Math.hypot(ux, uy) || 1, k = c.lookPx || 5;
+    ph *= 0.7; lx = ux / l * k; ly = uy / l * Math.min(k, hh * 0.3);
+  }
+  c.pupil.setAttribute('d', happy ? '' : `M${q(3 + lx, ly - ph)}Q${q(3 + lx + pw, ly)} ${q(3 + lx, ly + ph)}Q${q(3 + lx - pw, ly)} ${q(3 + lx, ly - ph)}Z`);
 }
 
 export function install(app) {}

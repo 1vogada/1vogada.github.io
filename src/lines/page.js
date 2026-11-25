@@ -43,6 +43,20 @@ defineLines('page.back', ['oh, there you are', 'welcome back', 'oh. hi.'], { who
 // click a toast: it answers, in turn; the fifth click knocks it off the screen (page/toast.js)
 defineLines('page.toastPoke', ['stop poking me', 'I am just a message', 'I said stop.', 'fine. FINE.'], { who: 'toast', lang: 'en' });
 defineLines('page.toastFall', ['aaaa—'], { who: 'toast', lang: 'en' });
+// the Konami code: the cards fold themselves into omikuji slips (page/omikuji.js; a toast, one draw)
+defineLines('page.konami', ['The cards have folded themselves into fortunes.', 'Up, up, down, down… and every card is a fortune now.', 'Omikuji everywhere. Pull a card, read your luck.', 'Cheat code accepted. The cards are omikuji now.', 'Картите станаха късметчета.', 'カードがおみくじになった。'], {
+  who: 'toast', lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+  gloss: { 'Картите станаха късметчета.': 'The cards turned into fortunes.', 'カードがおみくじになった。': 'The cards became fortune slips.' },
+});
+// the basement: the hand's trophy wall under the footer (page/basement.js): the plaque over it, and what it says when it is bare
+defineLines('page.trophy', ['The trophy wall', 'Everything it ate', 'Do not touch the exhibits', 'My collection. Look, do not touch.', 'Delicious, every one', 'Трофеите ми', '戦利品'], {
+  who: 'page', lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+  gloss: { 'Трофеите ми': 'My trophies', '戦利品': 'spoils of war' },
+});
+defineLines('page.trophyEmpty', ['Nothing here yet. Bring me something.', 'Empty. For now.', 'Room for one more. Or twelve.', 'The nails are waiting', 'Още е празно.', 'まだ空っぽ'], {
+  who: 'page', lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+  gloss: { 'Още е празно.': 'Still empty.', 'まだ空っぽ': 'still empty' },
+});
 // kiri.hint() in the console (page/console.js)
 defineLines('console.hint', ['type a word for a thing that holds things.', 'everything here can be pulled. most things can be torn.', 'the fog hides more than the banner.', 'the old hand remembers you.', 'some slips land on their edge.'], {
   who: 'console', lang: 'en',

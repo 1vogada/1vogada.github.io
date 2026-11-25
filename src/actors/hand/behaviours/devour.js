@@ -23,7 +23,7 @@ function letGo(c, o) {
 
 export default defineBehaviour('hand', 'devour', {
   pose: 'lunge',
-  enter(c, m) { speak('devour', true); bus.emit('hand.devouring', { hand: c.o }); },
+  enter(c, m) { if (c.gotcha) c.gotcha = false; else speak('devour', true); bus.emit('hand.devouring', { hand: c.o }); },   // (from prod it has said its line already)
   tick(c, m, dt) {
     const x = m.x, o = c.o, vw = x.vw;
     if (!o) { set('lurk'); return; }

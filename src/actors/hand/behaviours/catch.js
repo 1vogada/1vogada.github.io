@@ -23,7 +23,7 @@ export default defineBehaviour('hand', 'catch', {
       if (dist < 70) {
         o.body.setLinearVelocity({ x: 0, y: 0 }); o.body.setAngularVelocity(o.body.getAngularVelocity() * 0.2); o.hot = 0; o.body.setBullet(false);
         if (o.kind !== 'card') {   // a piece of a card: a big one is eaten on the spot, a scrap is batted straight back
-          if (big(o)) {
+          if (big(o) || o.ball) {   // (a ball of paper an old hand brought you is always a treat)
             bus.emit('hand.grabbed', { card: o, how: 'catch' }); speak('caught', true);
             o.body.setAngularDamping(TUNE.physics.HELD_SPIN); o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 }); o.el.style.pointerEvents = 'none';
             c.joint = world.b2.createJoint(new world.pl.MouseJoint({ maxForce: TUNE.physics.MAX_FORCE * o.body.getMass(), frequencyHz: H_.JOINT_HZ, dampingRatio: 1 }, world.ground, o.body, { x: w.x, y: w.y }));

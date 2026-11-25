@@ -12,6 +12,7 @@ import { clock } from '../core/clock.js';
 import { hook } from '../core/debug.js';
 import { figure, resetPlates, esc } from './figures.js';
 import * as raid from './raid.js';
+import { entries } from '../page/diary.js';
 
 let app = null;
 // Bump VER, and the ?v= on scripts/phrasebook.js's tag in index.html, whenever the stylesheet changes: GitHub Pages caches each
@@ -38,6 +39,9 @@ const CHAPTERS = [
       'card.forgive',
       'card.grudge',
       'card.again',
+      'card.omikuji',
+      'card.cursed',
+      'card.tornslip',
       { fig: 'land' },
       'card.smash',
       { fig: 'smash' },
@@ -118,11 +122,65 @@ const CHAPTERS = [
       'sev.five',
       'sev.hide',
       'sev.safe',
+      'sev.mirror',
+      'hand.mirror',
+      'hand.prod',
+      'sev.dead',
+      'sev.twitch',
+      'hand.gotcha',
+      'hand.fooled',
+      'sev.phew',
+      'sev.spring',
+      'hand.tricked',
+      'hand.paper',
+      'sev.notcard',
+      'hand.notpaper',
+      'hand.giveback',
+      'sev.returned',
+      'sev.home',
+      'hand.sewn',
+      'sev.latch',
+      'sev.ride',
+      'sev.cling',
+      'sev.whee',
+      'sev.dizzy',
+      'sev.alight',
+      'sev.pounce',
+      'hand.cheese',
+      'sev.cheese',
+      'hand.cheeseEnd',
+      'sev.cheeseEnd',
+      'hand.cheeseWon',
+      'hand.wrest',
+      'card.wrest',
+      'sev.wrest',
+      'hand.wrestWon',
+      'sev.wrestSlip',
+      'hand.wrestSlip',
+      'sev.wrestWon',
+      'hand.wrestEnd',
+      'sev.wrestEnd',
+      'sev.fetch',
+      'sev.gift',
+      'hand.burp',
+      'sev.regift',
+      'hand.rps',
+      'sev.rpsYes',
+      'sev.coached',
+      'hand.rpsShoot',
+      'hand.rpsDraw',
+      'hand.rpsWon',
+      'sev.rpsLost',
+      'hand.rpsLost',
+      'sev.rpsWon',
+      'hand.rpsQuit',
       'hand.jealous',
       'hand.idle',
       'hand.idleback',
       'hand.squeezed',
       'hand.unsqueezed',
+      'hand.word',
+      'hand.wordgot',
       'hand.caught',
       { fig: 'catch' },
       'hand.slip',
@@ -173,6 +231,37 @@ const CHAPTERS = [
     ] },
 ];
 
+// ---- the secret last chapter: type "kotoba" (言葉, words) with the phrasebook open and the hand's diary appears below the
+// others: every line it said to you on this visit, in order (page/diary.js). Found once, it stays for the visit ----
+const DIARY = { id: 'diary', title: 'The Hand’s Diary', word: 'kotoba', key: 'kiripad-kotoba',
+  intro: 'Not for you. Kept by the hand, in its own words: everything it has said to you on this visit, in the order it said it, and what made it say so. It writes in it every time it opens its mouth. It did not expect anyone to read this.',
+  none: 'Not a word yet. Tear a card out of its slot and it will start talking soon enough.' };
+let diaryOn = false, typed = '';
+try { diaryOn = sessionStorage.getItem(DIARY.key) === '1'; } catch (e) {}
+const hhmm = (ms) => { const t = new Date(ms), p = (n) => String(n).padStart(2, '0'); return `${p(t.getHours())}:${p(t.getMinutes())}:${p(t.getSeconds())}`; };
+function diaryHTML() {
+  const d = entries(), defs = new Map(allLines().map((x) => [x.key, x]));
+  const why = (kind) => { const t = (defs.get('hand.' + kind) || {}).trigger; return t ? t.title : kind; };
+  let h = `<section class="pb-sec pb-sec-hand pb-sec-diary" id="pb-${DIARY.id}"><header class="pb-sec-h"><h3>${esc(DIARY.title)}</h3><span class="pb-pill">${d.length} lines</span></header><p class="pb-intro">${esc(DIARY.intro)}</p><div class="pb-grid">`;
+  if (!d.length) h += `<article class="pb-entry"><h4>Dear diary,</h4><p class="pb-when">${esc(DIARY.none)}</p></article>`;
+  d.forEach((e, i) => { h += `<article class="pb-entry"><h4>Dear diary, ${hhmm(e.at)}<span class="pb-pill">${i + 1}</span></h4><p class="pb-when"><b>When</b> ${esc(why(e.kind))}</p><div class="pb-lines">${linesHTML([e.text])}</div></article>`; });
+  return h + '</div></section>';
+}
+const diaryTab = () => `<button type="button" class="pb-tab" data-go="${DIARY.id}">Diary</button>`;
+/** the diary goes in under the last chapter, and the menu scrolls to it */
+function reveal() {
+  if (!opened || !scroller || app.reduced) return;
+  diaryOn = true; try { sessionStorage.setItem(DIARY.key, '1'); } catch (e) {}
+  let sec = document.getElementById('pb-' + DIARY.id);
+  if (!sec) {
+    const end = scroller.querySelector('.pb-end'), box = document.createElement('div'); box.innerHTML = diaryHTML(); sec = box.firstChild;
+    if (end) end.before(sec); else scroller.appendChild(sec);
+    q('.pb-tabs').insertAdjacentHTML('beforeend', diaryTab());
+    sec.animate([{ opacity: 0, transform: 'translateY(24px)' }, { opacity: 1, transform: 'none' }], { duration: 600, easing: 'cubic-bezier(.2,1.2,.4,1)' });
+  }
+  scroller.scrollTo({ top: sec.offsetTop - 8, behavior: 'smooth' });
+}
+
 // what the Bulgarian and Japanese lines mean (legacy GLOSS: one table for every list; the glosses now sit next to their lines)
 let GLOSS = null;
 const gloss = () => { if (!GLOSS) { GLOSS = new Map(); for (const d of allLines()) for (const l of d.lines) if (l.gloss) GLOSS.set(l.text, l.gloss); } return GLOSS; };
@@ -204,8 +293,9 @@ function build() {
     for (const e of c.entries) h += e.fig ? figure(e.fig) : `<article class="pb-entry"><h4>${esc(e.title)}<span class="pb-pill">${new Set(e.lines).size}</span></h4><p class="pb-when"><b>When</b> ${esc(e.when)}</p><div class="pb-lines">${linesHTML(e.lines)}</div></article>`;
     h += '</div></section>';
   }
+  if (diaryOn) h += diaryHTML();
   h += '<p class="pb-end">That is all of them. Go and make them say it.</p>';
-  return { head: `${nLines} lines, ${nOcc} triggers`, nav: chapters.map((c) => `<button type="button" class="pb-tab" data-go="${c.id}">${esc(c.title)}</button>`).join(''), body: h };
+  return { head: `${nLines} lines, ${nOcc} triggers`, nav: chapters.map((c) => `<button type="button" class="pb-tab" data-go="${c.id}">${esc(c.title)}</button>`).join('') + (diaryOn ? diaryTab() : ''), body: h };
 }
 
 // ---- the menu: one big card over a tinted page, scrolling top to bottom ----
@@ -234,6 +324,7 @@ function make() {
 function onKey(e) {
   if (!opened) return;
   if (e.key === 'Escape') { e.preventDefault(); close(); }
+  else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) { typed = (typed + e.key.toLowerCase()).slice(-DIARY.word.length); if (typed === DIARY.word) { typed = ''; reveal(); } }
   else if (e.key === 'Tab') { const f = [...el.querySelectorAll('button:not(:disabled)')], k = f.indexOf(document.activeElement); e.preventDefault(); (f[(k + (e.shiftKey ? -1 : 1) + f.length) % f.length] || f[0]).focus(); }
   e.stopPropagation();   // nothing typed in the menu reaches the page under it
 }

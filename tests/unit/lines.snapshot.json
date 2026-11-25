@@ -287,6 +287,20 @@
    ["tell me what you want","en"]
   ]
  },
+ "card.wrest": {
+  "who": "card",
+  "legacy": null,
+  "trigger": {"title":"Pulled two ways","when":"An old hand is crushing it near the right edge when the arm grabs its other end. Both pull; it stretches."},
+  "lines": [
+   ["I am not a wishbone!","en"],
+   ["pick ONE hand!","en"],
+   ["this is not how hands work!","en"],
+   ["I can feel my staples!","en"],
+   ["somebody call a referee!","en"],
+   ["ще ме разкъсате!","bg","you will tear me apart!"],
+   ["さけるー!","ja","I'm tearing!"]
+  ]
+ },
  "card.forgive": {
   "who": "card",
   "legacy": null,
@@ -321,6 +335,49 @@
    ["you said that already","en"],
    ["words are cheap","en"],
    ["still torn, though","en"]
+  ]
+ },
+ "card.omikuji": {
+  "who": "card",
+  "legacy": null,
+  "trigger": {"title":"Its fortune","when":"After the Konami code every card is a folded omikuji slip. Rip one out of its slot: it unfolds and reads you its fortune."},
+  "lines": [
+   ["let me read it…","en"],
+   ["it says:","en"],
+   ["unrolling… it says","en"],
+   ["the slip says:","en"],
+   ["my fortune:","en"],
+   ["drum roll…","en"],
+   ["гласи:","bg","it reads:"],
+   ["おみくじによると","ja","according to the fortune slip"]
+  ]
+ },
+ "card.cursed": {
+  "who": "card",
+  "legacy": null,
+  "trigger": {"title":"A curse","when":"The slip you ripped out unfolds to 凶, the curse."},
+  "lines": [
+   ["bad luck. tie me to a tree.","en"],
+   ["of course I got the curse","en"],
+   ["this is your fault","en"],
+   ["can I draw again?","en"],
+   ["cursed. lovely.","en"],
+   ["проклет съм.","bg","I am cursed."],
+   ["凶だって…","ja","it says \"curse\"…"]
+  ]
+ },
+ "card.tornslip": {
+  "who": "card",
+  "legacy": null,
+  "trigger": {"title":"A torn fortune","when":"You yank an omikuji slip so hard it tears in two. Both halves read 凶."},
+  "lines": [
+   ["you tore my fortune!","en"],
+   ["that is seven years of bad luck","en"],
+   ["torn fortunes come true backwards","en"],
+   ["now nobody gets to know","en"],
+   ["the gods saw that","en"],
+   ["скъса ми късмета!","bg","you tore my luck!"],
+   ["ばちが当たるよ","ja","you will be punished for that"]
   ]
  },
  "toast.ripped": {
@@ -1121,6 +1178,132 @@
    ["ずるい!","ja","not fair!"]
   ]
  },
+ "hand.mirror": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Copied","when":"An old hand starts the mirror game while the arm is out. It notices, a moment later."},
+  "lines": [
+   ["…is it copying me?","en"],
+   ["stop that.","en"],
+   ["I do it better","en"],
+   ["copycat.","en"],
+   ["that is MY move","en"],
+   ["спри да ме имитираш","bg","stop imitating me"],
+   ["まねするな","ja","do not copy me"]
+  ]
+ },
+ "hand.prod": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Going for an awake old hand","when":"Now and then it goes for an old hand it has met even though it is walking about near the right edge. The old hand plays dead."},
+  "lines": [
+   ["you look slow today","en"],
+   ["dinner is walking","en"],
+   ["fresh. well, fresh-ish.","en"],
+   ["hold still, old friend","en"],
+   ["is that a limp I see?","en"],
+   ["стой мирно","bg","hold still"],
+   ["じっとして","ja","stay still"]
+  ]
+ },
+ "hand.gotcha": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Caught playing dead","when":"It pokes the old hand that plays dead, and the old hand twitches. Then it takes it."},
+  "lines": [
+   ["AHA. it moved.","en"],
+   ["dead things do not twitch","en"],
+   ["nice try.","en"],
+   ["I saw that finger","en"],
+   ["gotcha.","en"],
+   ["мръдна!","bg","it moved!"],
+   ["うごいた!","ja","it moved!"]
+  ]
+ },
+ "hand.fooled": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Fooled","when":"The old hand plays dead and holds still through both pokes. It gives up and leaves it alone."},
+  "lines": [
+   ["huh. broken.","en"],
+   ["never mind. it is off.","en"],
+   ["I do not eat the dead. I have standards.","en"],
+   ["poor thing.","en"],
+   ["it was like that when I got here","en"],
+   ["жалко.","bg","what a pity."],
+   ["かわいそうに","ja","poor thing"]
+  ]
+ },
+ "hand.tricked": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Tricked","when":"You tap the old hand while it plays dead. It springs up and runs, and the new hand is left poking the floor."},
+  "lines": [
+   ["…it was ALIVE?","en"],
+   ["it LIED to me","en"],
+   ["come back here!","en"],
+   ["I was SO close","en"],
+   ["you woke it up. thanks.","en"],
+   ["измамник!","bg","cheat!"],
+   ["だまされた!","ja","I was fooled!"]
+  ]
+ },
+ "hand.paper": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Not paper","when":"Pick up an old (cut-off) hand and hold it out at the right edge, where you tease it with cards, for two seconds. It takes it for a card."},
+  "lines": [
+   ["ooh. a card?","en"],
+   ["for me?","en"],
+   ["gimme gimme","en"],
+   ["is that a new one?","en"],
+   ["a fresh one!","en"],
+   ["карта? за мен?","bg","a card? for me?"],
+   ["カードだ!","ja","a card!"]
+  ]
+ },
+ "hand.notpaper": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Not paper: the penny drops","when":"It has taken the old hand out of your hand and has a good look at it."},
+  "lines": [
+   ["wait. this is not paper.","en"],
+   ["this card has… knuckles.","en"],
+   ["why is it warm","en"],
+   ["cards do not have fingernails","en"],
+   ["hold on. this one blinked.","en"],
+   ["това не е хартия.","bg","this is not paper."],
+   ["これ、紙じゃない","ja","this is not paper"]
+  ]
+ },
+ "hand.giveback": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Not paper: handed back","when":"Half the time it decides against eating the old hand it took for a card, and puts it down again."},
+  "lines": [
+   ["here. yours, I think.","en"],
+   ["no thanks. not in the mood for… that.","en"],
+   ["returning this.","en"],
+   ["I will pass.","en"],
+   ["too bony.","en"],
+   ["вземи си го","bg","take it back"],
+   ["おかえしします","ja","I am giving this back"]
+  ]
+ },
+ "hand.sewn": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Sewn back on","when":"While the arm is a stump, carry the cut-off hand to it and let go of it right at the end. It goes back on, and no new hand grows."},
+  "lines": [
+   ["good as old.","en"],
+   ["it still fits!","en"],
+   ["hello again, me","en"],
+   ["who needs a new one","en"],
+   ["stitched. mostly.","en"],
+   ["като ново… почти","bg","good as new… almost"],
+   ["おかえり、わたし","ja","welcome back, me"]
+  ]
+ },
  "hand.idle": {
   "who": "hand",
   "legacy": null,
@@ -1203,6 +1386,36 @@
    ["I am not touching that.","en"]
   ]
  },
+ "hand.word": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Say \"hand\"","when":"Once a card has left its slot, highlight the word \"hand\" anywhere on the page. It reaches in for it."},
+  "lines": [
+   ["you said my name?","en"],
+   ["did someone say hand?","en"],
+   ["HAND. that is me.","en"],
+   ["say it again. I dare you","en"],
+   ["oh, a word for me","en"],
+   ["that is MY word","en"],
+   ["ръка? викаш ли ме?","bg","hand? are you calling me?"],
+   ["手? よんだ?","ja","hand? did you call me?"]
+  ]
+ },
+ "hand.wordgot": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"The word is gone","when":"It pinched the highlighted word off the page and is dragging it out past the right edge."},
+  "lines": [
+   ["no more hand for you","en"],
+   ["that word is taken","en"],
+   ["I collect those","en"],
+   ["*folds it into a pocket*","en"],
+   ["write your own","en"],
+   ["highlighted. delicious.","en"],
+   ["думата е моя.","bg","the word is mine."],
+   ["この言葉、もらった","ja","this word is mine now"]
+  ]
+ },
  "toast.devoured": {
   "who": "toast",
   "legacy": null,
@@ -1217,6 +1430,198 @@
   "trigger": null,
   "lines": [
    ["You cut its hand off. It will grow another. The old one has plans of its own.","en"]
+  ]
+ },
+ "hand.cheese": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"The cheese pull","when":"It is dragging a card off the shelf when an old hand jumps on the other end. Both pull."},
+  "lines": [
+   ["it is MINE","en"],
+   ["you are me. let go.","en"],
+   ["heave!","en"],
+   ["unhand it. literally.","en"],
+   ["I grew back for THIS?","en"],
+   ["пусни го!","bg","let go of it!"],
+   ["よこせ!","ja","hand it over!"]
+  ]
+ },
+ "hand.cheeseEnd": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Half each","when":"The card tears in two in the cheese pull. It drags its half off to eat."},
+  "lines": [
+   ["fine. half each.","en"],
+   ["a draw. for now.","en"],
+   ["like cheese on a pizza","en"],
+   ["stringy.","en"],
+   ["we split the bill","en"],
+   ["по половинка","bg","half each"],
+   ["はんぶんこ","ja","half and half"]
+  ]
+ },
+ "hand.cheeseWon": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Won the cheese pull","when":"The old hand lets go of its end (you picked it up, say). The arm keeps the card whole and flicks the old hand away."},
+  "lines": [
+   ["let go, leftovers","en"],
+   ["stronger with an arm","en"],
+   ["shoo.","en"],
+   ["nice try, old me","en"],
+   ["my snack, my rules","en"],
+   ["махай се!","bg","get lost!"],
+   ["ざんねんでした","ja","too bad for you"]
+  ]
+ },
+ "hand.wrest": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Tug of war","when":"An old hand is crushing a card near the right edge while the arm lurks there. Now and then the arm grabs the other end, and both pull. Said again while they pull."},
+  "lines": [
+   ["that one is spoken for","en"],
+   ["drop it, old me","en"],
+   ["I called dibs from the edge","en"],
+   ["two hands, one card. I like these odds.","en"],
+   ["it was going to waste","en"],
+   ["on three. THREE.","en"],
+   ["дай насам!","bg","give it here!"],
+   ["ひっぱれー!","ja","pull!"]
+  ]
+ },
+ "hand.wrestWon": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Won the tug of war","when":"In the tug of war, you click the old hand: its fingers slip and it flies off (or you pick it up). The arm drags the whole card away and eats it."},
+  "lines": [
+   ["butterfingers!","en"],
+   ["all mine, every pixel","en"],
+   ["should have kept your grip, stumpy","en"],
+   ["the house always wins","en"],
+   ["thank you, kind clicker","en"],
+   ["ха! цялата!","bg","ha! the whole of it!"],
+   ["いただきまーす","ja","let's eat!"]
+  ]
+ },
+ "hand.wrestSlip": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Lost the tug of war","when":"In the tug of war, you click the arm: its claws slip and the old hand keeps the whole card. The arm sulks off."},
+  "lines": [
+   ["HEY. whose side are you on?","en"],
+   ["my claws! you tickled my claws!","en"],
+   ["that was a foul","en"],
+   ["I demand a rematch","en"],
+   ["traitor.","en"],
+   ["мръсна игра!","bg","dirty play!"],
+   ["はんそくだ!","ja","that is a foul!"]
+  ]
+ },
+ "hand.wrestEnd": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Torn in the tug of war","when":"Nobody clicks either hand in the tug of war: the card tears in two. The arm drags its half away to eat; the old hand crushes the other."},
+  "lines": [
+   ["well. that went both ways.","en"],
+   ["tear along the dotted line","en"],
+   ["my half has the good corner","en"],
+   ["a fair split, I suppose","en"],
+   ["one card, two dinners","en"],
+   ["то се скъса","bg","it tore"],
+   ["ちぎれた","ja","it ripped apart"]
+  ]
+ },
+ "hand.burp": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Burp","when":"An old hand brought you a crumpled ball of a card it crushed. Throw it at the new hand: it catches it, eats it and burps."},
+  "lines": [
+   ["*BUUURP*","en"],
+   ["pardon me.","en"],
+   ["oh, that was a good one","en"],
+   ["my compliments to the old me","en"],
+   ["crunchy. papery. burpy.","en"],
+   ["оригнах се","bg","I burped"],
+   ["げっぷ","ja","burp"]
+  ]
+ },
+ "hand.rps": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Rock, paper, scissors","when":"Now and then, when the new hand meets an old one, it comes out over it and challenges it. Type r, p or s during the count to shout a pick for the old hand."},
+  "lines": [
+   ["rock, paper, scissors. loser gets eaten.","en"],
+   ["settle this like hands?","en"],
+   ["best of one. go.","en"],
+   ["you and me. rock paper scissors.","en"],
+   ["I know all your moves","en"],
+   ["камък, ножица, хартия?","bg","rock, scissors, paper?"],
+   ["じゃんけんで勝負だ","ja","let us settle it with janken"]
+  ]
+ },
+ "hand.rpsShoot": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Rock, paper, scissors: shoot","when":"Three pumps of the fist, and both show."},
+  "lines": [
+   ["SHOOT!","en"],
+   ["and… now!","en"],
+   ["rock! paper! scissors!","en"],
+   ["show!","en"],
+   ["камък-ножица-хартия!","bg","rock-scissors-paper!"],
+   ["じゃんけんぽん!","ja","rock, paper, scissors!"]
+  ]
+ },
+ "hand.rpsDraw": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Rock, paper, scissors: a draw","when":"Both show the same. They go again (three rounds at most)."},
+  "lines": [
+   ["again.","en"],
+   ["stop copying me","en"],
+   ["great minds…","en"],
+   ["we ARE the same hand","en"],
+   ["пак същото!","bg","the same again!"],
+   ["あいこでしょ!","ja","a tie, again!"]
+  ]
+ },
+ "hand.rpsWon": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Rock, paper, scissors: it won","when":"The old hand lost. It is fair game for the new one for a while."},
+  "lines": [
+   ["ha! dinner.","en"],
+   ["I always win","en"],
+   ["you know what this means","en"],
+   ["rules are rules","en"],
+   ["сега си мой","bg","now you are mine"],
+   ["かった!","ja","I won!"]
+  ]
+ },
+ "hand.rpsLost": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Rock, paper, scissors: it lost","when":"The old hand beat it. It sulks off out of sight for ten seconds."},
+  "lines": [
+   ["…fine. you win.","en"],
+   ["I was not even trying","en"],
+   ["I need a minute","en"],
+   ["nobody saw that","en"],
+   ["не е честно","bg","that is not fair"],
+   ["くやしい…","ja","so frustrating…"]
+  ]
+ },
+ "hand.rpsQuit": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Rock, paper, scissors: called off","when":"You pick the old hand up in the middle of the game."},
+  "lines": [
+   ["coward.","en"],
+   ["where are you going?","en"],
+   ["forfeit!","en"],
+   ["we were PLAYING","en"],
+   ["бягаш ли?","bg","running away?"],
+   ["にげるな!","ja","do not run!"]
   ]
  },
  "sev.cut": {
@@ -1487,6 +1892,394 @@
    ["ここなら安全","ja","safe here"]
   ]
  },
+ "sev.mirror": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: the mirror game","when":"An old hand that has met the new one is walking about in view while the arm is out. It sits up and copies every pose a beat late. Move the mouse round in circles and both their eyes follow it."},
+  "lines": [
+   ["anything you can do…","en"],
+   ["like this?","en"],
+   ["copy that.","en"],
+   ["I was doing this first","en"],
+   ["same. same.","en"],
+   ["и аз така!","bg","me too, like this!"],
+   ["まねっこ!","ja","copycat!"]
+  ]
+ },
+ "sev.dead": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: plays dead","when":"The new hand goes for it while it is walking about. It flops onto its back, fingers in the air, X for an eye."},
+  "lines": [
+   ["*dies dramatically*","en"],
+   ["I am just a glove now","en"],
+   ["(definitely not alive)","en"],
+   ["nobody home","en"],
+   ["x_x","en"],
+   ["умрях.","bg","I died."],
+   ["しーん…","ja","(dead silence)"]
+  ]
+ },
+ "sev.twitch": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: twitches","when":"Playing dead, it is poked, and it twitches. The new hand saw."},
+  "lines": [
+   ["eep!","en"],
+   ["ticklish!","en"],
+   ["hnnk","en"],
+   ["not the knuckle","en"],
+   ["that was a reflex","en"],
+   ["ой!","bg","ow!"],
+   ["ひっ!","ja","eek!"]
+  ]
+ },
+ "sev.spring": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: springs up","when":"Tap it while it plays dead, before the new hand has made up its mind. It jumps up and runs off to the left."},
+  "lines": [
+   ["ALIVE! bye!","en"],
+   ["BOO! run!","en"],
+   ["cover blown!","en"],
+   ["you ruined it!","en"],
+   ["resurrection!","en"],
+   ["жив съм!","bg","I am alive!"],
+   ["いきかえった!","ja","back to life!"]
+  ]
+ },
+ "sev.phew": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: it worked","when":"It played dead through both pokes and the new hand went away. It gets up and runs."},
+  "lines": [
+   ["and… scene.","en"],
+   ["Oscar-worthy, if I say so","en"],
+   ["and the award goes to…","en"],
+   ["it worked?!","en"],
+   ["best role of my life","en"],
+   ["фу, отървах се","bg","phew, I got away"],
+   ["あぶなかった","ja","that was close"]
+  ]
+ },
+ "sev.notcard": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: taken for a card","when":"You held it out at the right edge like a card, and the new hand took it."},
+  "lines": [
+   ["I am NOT a card","en"],
+   ["do I look rectangular?!","en"],
+   ["wrong snack!","en"],
+   ["put me down, I am a HAND","en"],
+   ["no barcode, no deal","en"],
+   ["аз не съм карта!","bg","I am not a card!"],
+   ["カードじゃない!","ja","I am not a card!"]
+  ]
+ },
+ "sev.returned": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: handed back","when":"The new hand decided it is not paper after all and put it down."},
+  "lines": [
+   ["…thanks?","en"],
+   ["rude, but thanks","en"],
+   ["I will take that as a compliment","en"],
+   ["ok that was weird","en"],
+   ["never do that again","en"],
+   ["благодаря… май","bg","thanks… I guess"],
+   ["た、たすかった","ja","th-that was a close one"]
+  ]
+ },
+ "sev.home": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: back on","when":"You let go of it right at the stump before the new hand has grown. The arm pulls it back on."},
+  "lines": [
+   ["home!","en"],
+   ["reunited!","en"],
+   ["scoot over, wrist","en"],
+   ["I knew you would take me back","en"],
+   ["back where I belong","en"],
+   ["у дома!","bg","home!"],
+   ["ただいま!","ja","I am home!"]
+  ]
+ },
+ "sev.latch": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: hitches a ride","when":"You pick up a card or a piece of one near an old hand. Now and then (one time in ten) it jumps on and hangs from the edge."},
+  "lines": [
+   ["room for one more?","en"],
+   ["going my way?","en"],
+   ["hold the card!","en"],
+   ["free ride!","en"],
+   ["*boing*","en"],
+   ["mind if I hang around?","en"],
+   ["ще се повозя","bg","I will take a ride"],
+   ["のせてー!","ja","give me a ride!"]
+  ]
+ },
+ "sev.ride": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: along for the ride","when":"It dangles from the card while you carry it about gently."},
+  "lines": [
+   ["this is the life","en"],
+   ["left a bit. no, your left","en"],
+   ["nice view from down here","en"],
+   ["are we there yet?","en"],
+   ["I could get used to this","en"],
+   ["carry on, driver","en"],
+   ["хубаво возене","bg","a nice ride"],
+   ["らくちん","ja","comfy, no effort at all"]
+  ]
+ },
+ "sev.cling": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: hanging on","when":"You swing the card it hangs from about too hard. Its grip is giving."},
+  "lines": [
+   ["easy! EASY!","en"],
+   ["not so fast!","en"],
+   ["my fingers are slipping","en"],
+   ["I am going to be sick","en"],
+   ["hold… on…","en"],
+   ["стига си клатил!","bg","stop shaking it!"],
+   ["ゆらさないで!","ja","do not shake it!"]
+  ]
+ },
+ "sev.whee": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: lets go","when":"Swung once too often, its grip gives out and it flies off the card."},
+  "lines": [
+   ["WHEEEEE!","en"],
+   ["I can FLYYY","en"],
+   ["worth it!","en"],
+   ["tell my fingers I loved them","en"],
+   ["wheeeee—oof","en"],
+   ["аааа-ха-ха!","bg","aaaa-ha-ha!"],
+   ["わーい!","ja","wheee!"]
+  ]
+ },
+ "sev.dizzy": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: dizzy","when":"It has landed after flying off a card, and lies there with its eye rolling."},
+  "lines": [
+   ["I am dizzy","en"],
+   ["five of you. hello, all five","en"],
+   ["the floor is moving","en"],
+   ["which way is up","en"],
+   ["again! …no. later.","en"],
+   ["вие ми се свят","bg","my head is spinning"],
+   ["くらくら…","ja","so dizzy…"]
+  ]
+ },
+ "sev.alight": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: gets off","when":"You put the card it hangs from down. Once the card lies still it lets go."},
+  "lines": [
+   ["thanks for the lift","en"],
+   ["my stop","en"],
+   ["I will walk from here","en"],
+   ["five stars","en"],
+   ["благодаря за возенето","bg","thanks for the ride"],
+   ["ここでおります","ja","I will get off here"]
+  ]
+ },
+ "sev.pounce": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: pounces","when":"The arm drags a card off the shelf while an old hand is about. Sometimes it jumps on the other end."},
+  "lines": [
+   ["MINE!","en"],
+   ["not so fast, new guy","en"],
+   ["drop it!","en"],
+   ["I saw it first","en"],
+   ["share!","en"],
+   ["моя е!","bg","it is mine!"],
+   ["まてー!","ja","wait!"]
+  ]
+ },
+ "sev.cheese": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: the cheese pull","when":"It hangs on to its end of the card and pulls against the arm. The card stretches like hot cheese."},
+  "lines": [
+   ["pull! PULL!","en"],
+   ["it is stretching!","en"],
+   ["I had it first!","en"],
+   ["you let go!","en"],
+   ["my fingers are slipping!","en"],
+   ["дърпай, де!","bg","come on, pull!"],
+   ["はなしてよ!","ja","let go of it!"]
+  ]
+ },
+ "sev.cheeseEnd": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: its half","when":"The card tears in two in the cheese pull. It falls with its half and crushes it where it lands."},
+  "lines": [
+   ["half is mine!","en"],
+   ["ha! my half","en"],
+   ["fair and square","en"],
+   ["stretchy!","en"],
+   ["половината е моя","bg","half of it is mine"],
+   ["はんぶんゲット","ja","got half!"]
+  ]
+ },
+ "sev.wrest": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: tug of war","when":"It is crushing a card near the right edge when the arm grabs the other end. It hangs on to its end and pulls."},
+  "lines": [
+   ["get your own!","en"],
+   ["I was in the middle of something!","en"],
+   ["you have a whole ARM, cheater","en"],
+   ["hnnngh… mine…","en"],
+   ["help! anyone with fingers!","en"],
+   ["няма да го пусна!","bg","I won't let it go!"],
+   ["ぜったい はなさない!","ja","I will never let go!"]
+  ]
+ },
+ "sev.wrestSlip": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: slips","when":"In the tug of war, you click the old hand. Its fingers slip and it flies off; the arm keeps the card."},
+  "lines": [
+   ["you clicked me?! YOU?!","en"],
+   ["my grip! nooo—","en"],
+   ["traitor pointerrr","en"],
+   ["I was WINNING","en"],
+   ["whose cursor is that?!","en"],
+   ["изплъзна ми се!","bg","it slipped out of my hand!"],
+   ["すべったー!","ja","I slipped!"]
+  ]
+ },
+ "sev.wrestWon": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: wins the tug of war","when":"In the tug of war, you click the arm and its claws slip (or its hand is cut off). The old hand has the whole card and crushes it after all."},
+  "lines": [
+   ["ha! weak wrist!","en"],
+   ["finders keepers, arm","en"],
+   ["all of it. ALL OF IT.","en"],
+   ["thank you, kind stranger","en"],
+   ["now, where was I…","en"],
+   ["победа!","bg","victory!"],
+   ["しょうりー!","ja","I won!"]
+  ]
+ },
+ "sev.wrestEnd": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: half a card","when":"The card tears in two in the tug of war. The old hand crushes its half where it is."},
+  "lines": [
+   ["I got the end with the words","en"],
+   ["half a card is still a card","en"],
+   ["next time I keep both halves","en"],
+   ["it screamed in two directions","en"],
+   ["good enough to squeeze","en"],
+   ["и това е нещо","bg","that is something, at least"],
+   ["まあいいか","ja","oh well, good enough"]
+  ]
+ },
+ "sev.fetch": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: brings you something","when":"It crushes a card while your mouse pointer rests on the page. It keeps a ball of it and carries it over to you."},
+  "lines": [
+   ["coming, coming","en"],
+   ["look what I made","en"],
+   ["wait till you see this","en"],
+   ["hold still, it is for you","en"],
+   ["nobody touch it","en"],
+   ["идвам, идвам","bg","coming, coming"],
+   ["まっててね","ja","wait for me"]
+  ]
+ },
+ "sev.gift": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: a gift","when":"It puts the crumpled ball down at your feet, below the cursor, like a cat with a mouse, and waits."},
+  "lines": [
+   ["for you.","en"],
+   ["I made you this","en"],
+   ["a present!","en"],
+   ["do not say I never gave you anything","en"],
+   ["it was a card. now it is art.","en"],
+   ["за теб","bg","for you"],
+   ["どうぞ","ja","here you are"]
+  ]
+ },
+ "sev.regift": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: its gift was eaten","when":"You throw the ball it brought you at the new hand, and the new hand eats it."},
+  "lines": [
+   ["that was for THEM","en"],
+   ["I worked hard on that","en"],
+   ["ungrateful thing","en"],
+   ["you could have said thanks","en"],
+   ["това беше подарък!","bg","that was a present!"],
+   ["せっかくのプレゼントが…","ja","and it was a present…"]
+  ]
+ },
+ "sev.rpsYes": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: takes the challenge","when":"The new hand challenges it to rock, paper, scissors. It stands up on its wrist."},
+  "lines": [
+   ["you are ON","en"],
+   ["I invented this game","en"],
+   ["fine. no cheating.","en"],
+   ["I have five fingers too","en"],
+   ["давай!","bg","come on!"],
+   ["のぞむところだ","ja","bring it on"]
+  ]
+ },
+ "sev.coached": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: you coach it","when":"Type r, p or s while they count: it plays your pick."},
+  "lines": [
+   ["got it, boss","en"],
+   ["ok ok ok","en"],
+   ["trust me","en"],
+   ["are you sure?","en"],
+   ["shh, it will hear you","en"],
+   ["разбрах","bg","got it"],
+   ["りょうかい","ja","roger"]
+  ]
+ },
+ "sev.rpsWon": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: wins","when":"It beats the new hand at rock, paper, scissors, and dances. The new hand sulks off."},
+  "lines": [
+   ["HA! still got it","en"],
+   ["the original is the best","en"],
+   ["the old ways are best","en"],
+   ["bow to me","en"],
+   ["спечелих!","bg","I won!"],
+   ["かったー!","ja","I wooon!"]
+  ]
+ },
+ "sev.rpsLost": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The cut-off hand: loses","when":"The new hand beats it at rock, paper, scissors. Now it is fair game."},
+  "lines": [
+   ["best of three?","en"],
+   ["that was a practice round","en"],
+   ["oh no","en"],
+   ["I want a lawyer","en"],
+   ["загубих…","bg","I lost…"],
+   ["まけた…","ja","I lost…"]
+  ]
+ },
  "toast.shelfGone": {
   "who": "toast",
   "legacy": null,
@@ -1584,6 +2377,46 @@
   "trigger": null,
   "lines": [
    ["aaaa—","en"]
+  ]
+ },
+ "page.konami": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["The cards have folded themselves into fortunes.","en"],
+   ["Up, up, down, down… and every card is a fortune now.","en"],
+   ["Omikuji everywhere. Pull a card, read your luck.","en"],
+   ["Cheat code accepted. The cards are omikuji now.","en"],
+   ["Картите станаха късметчета.","bg","The cards turned into fortunes."],
+   ["カードがおみくじになった。","ja","The cards became fortune slips."]
+  ]
+ },
+ "page.trophy": {
+  "who": "page",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["The trophy wall","en"],
+   ["Everything it ate","en"],
+   ["Do not touch the exhibits","en"],
+   ["My collection. Look, do not touch.","en"],
+   ["Delicious, every one","en"],
+   ["Трофеите ми","bg","My trophies"],
+   ["戦利品","ja","spoils of war"]
+  ]
+ },
+ "page.trophyEmpty": {
+  "who": "page",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["Nothing here yet. Bring me something.","en"],
+   ["Empty. For now.","en"],
+   ["Room for one more. Or twelve.","en"],
+   ["The nails are waiting","en"],
+   ["Още е празно.","bg","Still empty."],
+   ["まだ空っぽ","ja","still empty"]
   ]
  },
  "console.hint": {

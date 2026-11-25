@@ -61,6 +61,12 @@ import * as hBook from './actors/hand/behaviours/book.js';
 import * as hMeet from './actors/hand/behaviours/meet.js';
 import * as hDevour from './actors/hand/behaviours/devour.js';
 import * as hPoke from './actors/hand/behaviours/poke.js';
+import * as hProd from './actors/hand/behaviours/prod.js';
+import * as hPaper from './actors/hand/behaviours/paper.js';
+import * as hSew from './actors/hand/behaviours/sew.js';
+import * as hSewn from './actors/hand/behaviours/sewn.js';
+import * as hCheese from './actors/hand/behaviours/cheese.js';
+import * as hWrest from './actors/hand/behaviours/wrest.js';
 import * as handIdle from './actors/hand/idle.js';
 import * as handOld from './actors/hand/old.js';
 import * as hand from './actors/hand/index.js';
@@ -82,6 +88,16 @@ import * as sCower from './actors/severed/behaviours/cower.js';
 import * as sPaint from './actors/severed/behaviours/paint.js';
 import * as sAvenge from './actors/severed/behaviours/avenge.js';
 import * as sFive from './actors/severed/behaviours/five.js';
+import * as sMirror from './actors/severed/behaviours/mirror.js';
+import * as sDead from './actors/severed/behaviours/dead.js';
+import * as sHome from './actors/severed/behaviours/home.js';
+import * as sHitch from './actors/severed/behaviours/hitch.js';
+import * as sWhee from './actors/severed/behaviours/whee.js';
+import * as sDizzy from './actors/severed/behaviours/dizzy.js';
+import * as sCheese from './actors/severed/behaviours/cheese.js';
+import * as sWrest from './actors/severed/behaviours/wrest.js';
+import * as sGift from './actors/severed/behaviours/gift.js';
+import * as sRps from './actors/severed/behaviours/rps.js';
 import * as severed from './actors/severed/index.js';
 import * as shelf from './actors/shelf.js';
 
@@ -92,12 +108,17 @@ import * as scene from './scenes/scene.js';
 import * as fortune from './scenes/fortune.js';
 import * as coin from './scenes/coin.js';
 import * as welcomeBack from './scenes/welcome-back.js';
+import * as word from './scenes/word.js';
+import * as rpsScene from './scenes/rps.js';
 import * as fog from './page/fog.js';
 import * as kiri from './page/kiri.js';
 import * as theme from './page/theme.js';
 import * as crazy from './page/crazy.js';
 import * as away from './page/away.js';
 import * as eggs from './page/eggs.js';
+import * as omikuji from './page/omikuji.js';
+import * as diary from './page/diary.js';
+import * as basement from './page/basement.js';
 import * as konsole from './page/console.js';
 import * as commands from './core/commands.js';
 
@@ -123,20 +144,20 @@ export const ORDER = [
   ['handPoses', handPoses], ['handDraw', handDraw], ['handZones', handZones], ['handTug', handTug],
   ['hOff', hOff], ['hLurk', hLurk], ['hReach', hReach], ['hEager', hEager], ['hLunge', hLunge], ['hSnatch', hSnatch], ['hCatch', hCatch],
   ['hCrush', hCrush], ['hGloat', hGloat], ['hTug', hTug], ['hHas', hHas], ['hTriumph', hTriumph], ['hEat', hEat], ['hShow', hShow],
-  ['hStump', hStump], ['hRegrow', hRegrow], ['hSulk', hSulk], ['hBook', hBook], ['hMeet', hMeet], ['hDevour', hDevour], ['handOld', handOld], ['hPoke', hPoke], ['handIdle', handIdle], ['hand', hand],
-  ['sevGait', sevGait], ['sLimp', sLimp], ['sRise', sRise], ['sWalk', sWalk], ['sHeld', sHeld], ['sCrush', sCrush], ['sGloat', sGloat], ['sRest', sRest], ['sStare', sStare], ['sCaught', sCaught], ['sMourn', sMourn], ['sBow', sBow], ['sHide', sHide], ['sLeap', sLeap], ['sCower', sCower], ['sPaint', sPaint], ['sAvenge', sAvenge], ['sFive', sFive],
+  ['hStump', hStump], ['hRegrow', hRegrow], ['hSulk', hSulk], ['hBook', hBook], ['hMeet', hMeet], ['hDevour', hDevour], ['handOld', handOld], ['hPoke', hPoke], ['hProd', hProd], ['hPaper', hPaper], ['hSew', hSew], ['hSewn', hSewn], ['hCheese', hCheese], ['hWrest', hWrest], ['handIdle', handIdle], ['hand', hand],
+  ['sevGait', sevGait], ['sLimp', sLimp], ['sRise', sRise], ['sWalk', sWalk], ['sHeld', sHeld], ['sCrush', sCrush], ['sGloat', sGloat], ['sRest', sRest], ['sStare', sStare], ['sCaught', sCaught], ['sMourn', sMourn], ['sBow', sBow], ['sHide', sHide], ['sLeap', sLeap], ['sCower', sCower], ['sPaint', sPaint], ['sAvenge', sAvenge], ['sFive', sFive], ['sMirror', sMirror], ['sDead', sDead], ['sHome', sHome], ['sHitch', sHitch], ['sWhee', sWhee], ['sDizzy', sDizzy], ['sCheese', sCheese], ['sWrest', sWrest], ['sGift', sGift], ['sRps', sRps],
   ['severed', severed], ['shelf', shelf],
   // 5 the rules between features (after every actor: own listeners first)
   ['reactions', reactions],
   // 6 the page below the physics in legacy script order
-  ['greeting', greeting], ['scene', scene], ['fortune', fortune], ['coin', coin], ['welcomeBack', welcomeBack],
+  ['greeting', greeting], ['scene', scene], ['fortune', fortune], ['coin', coin], ['welcomeBack', welcomeBack], ['word', word], ['rps', rpsScene],
   ['fog', fog], ['kiri', kiri], ['theme', theme], ['crazy', crazy],
   // 7 the phrasebook (legacy: a deferred script, after the inline one)
   ['phrasebook', menu], ['figures', figures], ['raid', raid],
   // 8 new
   ['language', language],
   // 9 easter eggs (after everything they reach)
-  ['commands', commands], ['away', away], ['console', konsole], ['eggs', eggs],
+  ['commands', commands], ['away', away], ['console', konsole], ['eggs', eggs], ['omikuji', omikuji], ['diary', diary], ['basement', basement],
 ];
 
 /** the app every install(app) receives: each module by name, plus a few flags */

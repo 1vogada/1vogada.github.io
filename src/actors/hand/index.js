@@ -40,7 +40,8 @@ import { handParts, handDraw } from './draw.js';
 import { POSES } from './poses.js';
 import { zones } from './zones.js';
 import { gripPt, untug } from './tug.js';
-import { stole, wants } from './old.js';
+import { stole, wants, lost, wrestable } from './old.js';
+import { circling } from './idle.js';
 
 export { POSES };
 
@@ -111,6 +112,41 @@ export function notice(kind) {
 
 /** an old (cut-off) hand just crushed a card (src/reactions.js): the arm takes note (./old.js) */
 export function oldStole(o) { if (claw && !isCrazy()) stole(o, now()); }
+
+/**
+ * the arm is out with a hand on it, doing nothing to an old hand (the mirror game: the old hands copy it, src/reactions.js).
+ * @returns { pose, x, y, look } (its live pose, its wrist and the circling pointer, viewport px; look null) or null
+ */
+export function shown() {
+  const c = claw; if (!c || c.stump || isCrazy() || m.is('off', 'book', 'stump', 'devour', 'prod', 'paper', 'sew', 'cheese', 'wrest')) return null;
+  if (c.x > html().clientWidth + H_.SHOWN_PX) return null;
+  return { pose: c.pose, x: c.x, y: c.y, look: circling() };
+}
+
+/**
+ * the cheese pull (src/reactions.js, sev.cheese): an old hand jumped on the card it is dragging off the shelf. If it still is
+ * (eat), it takes up the fight (behaviours/cheese.js). @returns true when it did
+ */
+export function cheese(old, card) {
+  const c = claw; if (!c || isCrazy() || !m.is('eat') || c.o !== card || card.tug || !world.bodies.has(card)) return false;
+  c.old = old; set('cheese'); return true;
+}
+
+/**
+ * tug of war over a card (src/reactions.js, sev.state -> crush): old hand `old` just started crushing `card`. Lurking with nothing
+ * in its hand, after a card has been ripped, it may grab the other end (rules in ./old.js wrestable; behaviours/wrest.js).
+ * @returns true when it goes for it
+ */
+export function wrest(old, card) {
+  const c = claw; if (!c || !awake() || c.stump || isCrazy() || !m.is('lurk') || c.o) return false;
+  if (!wrestable(c, old, card, now())) return false;
+  c.old = old; c.prey = card; set('wrest'); return true;
+}
+
+/** it lost at rock, paper, scissors (scenes/rps.js): it sulks off out of sight for ms */
+export function sulkFor(ms) { if (!claw) return; claw.sulkUntil = now() + ms; claw.show = null; set('sulk'); }
+/** it won at rock, paper, scissors: the old hand o is fair game for TUNE.rps.FAIR_MS (./old.js) */
+export function oldLost(o) { if (claw && !isCrazy()) lost(o, now() + TUNE.rps.FAIR_MS); }
 
 /** out of patience: it takes the held card (legacy snatch(o)) */
 export function snatch(o) { claw.o = o; set('snatch'); }
@@ -183,6 +219,7 @@ function tick(dt) {
   }
   if (expire(c, t)) place(c, Math.min(c.x, Hv[0], vw - 80) - 30 + scrollX, Math.max(70, Math.min(c.y, Hv[1]) - 115) + scrollY, c.x + scrollX);   // put on the page in the layout pass
   squeeze(c, vw, t, dt);
+  c.lookAt = circling(); c.lookPx = H_.CIRCLE.EYE_PX;   // you move the mouse round in circles: its eye follows the pointer
   draw(x.wig, x.shake, x.strain);
   // the katana's tip through the arm, anywhere along it: the hand comes off
   const kt = world.blade;
@@ -271,7 +308,7 @@ export function borrow() { const c = get(); rawSet('book'); return c; }
 export function install(app) {
   if (app && app.reduced) return;   // legacy cardPhysics() returned first: no claw, no __hand
   defineSpeaker('arm', { gate: 'arm', extraCls: 'claw-say', layer: () => world.layer, first: true,
-    onSaid: (c, key, rec) => bus.emit('hand.said', { kind: key.slice(key.indexOf('.') + 1), ms: rec.ms }) });
+    onSaid: (c, key, rec) => bus.emit('hand.said', { kind: key.slice(key.indexOf('.') + 1), ms: rec.ms, text: rec.el.textContent }) });
   addFirst(() => claw);
   clock.onTick(tick, 'hand');
   clock.hasWork(busy);

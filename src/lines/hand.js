@@ -404,6 +404,69 @@ defineLines('hand.robbed', ['HEY. that was me', 'give me back… me', 'fine. kee
   lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
 });
 
+// ---- the mirror game: an old hand copies it from the floor ----
+defineLines('hand.mirror', ['…is it copying me?', 'stop that.', 'I do it better', 'copycat.', 'that is MY move', 'спри да ме имитираш', 'まねするな'], {
+  who: 'hand',
+  trigger: { title: 'Copied', when: 'An old hand starts the mirror game while the arm is out. It notices, a moment later.' },
+  gloss: { 'спри да ме имитираш': 'stop imitating me', 'まねするな': 'do not copy me' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+// ---- plays dead: it goes for an old hand that is awake ----
+defineLines('hand.prod', ['you look slow today', 'dinner is walking', 'fresh. well, fresh-ish.', 'hold still, old friend', 'is that a limp I see?', 'стой мирно', 'じっとして'], {
+  who: 'hand',
+  trigger: { title: 'Going for an awake old hand',
+    when: 'Now and then it goes for an old hand it has met even though it is walking about near the right edge. The old hand plays dead.' },
+  gloss: { 'стой мирно': 'hold still', 'じっとして': 'stay still' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.gotcha', ['AHA. it moved.', 'dead things do not twitch', 'nice try.', 'I saw that finger', 'gotcha.', 'мръдна!', 'うごいた!'], {
+  who: 'hand',
+  trigger: { title: 'Caught playing dead', when: 'It pokes the old hand that plays dead, and the old hand twitches. Then it takes it.' },
+  gloss: { 'мръдна!': 'it moved!', 'うごいた!': 'it moved!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.fooled', ['huh. broken.', 'never mind. it is off.', 'I do not eat the dead. I have standards.', 'poor thing.', 'it was like that when I got here', 'жалко.', 'かわいそうに'], {
+  who: 'hand',
+  trigger: { title: 'Fooled', when: 'The old hand plays dead and holds still through both pokes. It gives up and leaves it alone.' },
+  gloss: { 'жалко.': 'what a pity.', 'かわいそうに': 'poor thing' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.tricked', ['…it was ALIVE?', 'it LIED to me', 'come back here!', 'I was SO close', 'you woke it up. thanks.', 'измамник!', 'だまされた!'], {
+  who: 'hand',
+  trigger: { title: 'Tricked', when: 'You tap the old hand while it plays dead. It springs up and runs, and the new hand is left poking the floor.' },
+  gloss: { 'измамник!': 'cheat!', 'だまされた!': 'I was fooled!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+// ---- not paper: you hold an old hand out to it like a card ----
+defineLines('hand.paper', ['ooh. a card?', 'for me?', 'gimme gimme', 'is that a new one?', 'a fresh one!', 'карта? за мен?', 'カードだ!'], {
+  who: 'hand',
+  trigger: { title: 'Not paper', when: 'Pick up an old (cut-off) hand and hold it out at the right edge, where you tease it with cards, for two seconds. It takes it for a card.' },
+  gloss: { 'карта? за мен?': 'a card? for me?', 'カードだ!': 'a card!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.notpaper', ['wait. this is not paper.', 'this card has… knuckles.', 'why is it warm', 'cards do not have fingernails', 'hold on. this one blinked.', 'това не е хартия.', 'これ、紙じゃない'], {
+  who: 'hand',
+  trigger: { title: 'Not paper: the penny drops', when: 'It has taken the old hand out of your hand and has a good look at it.' },
+  gloss: { 'това не е хартия.': 'this is not paper.', 'これ、紙じゃない': 'this is not paper' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.giveback', ['here. yours, I think.', 'no thanks. not in the mood for… that.', 'returning this.', 'I will pass.', 'too bony.', 'вземи си го', 'おかえしします'], {
+  who: 'hand',
+  trigger: { title: 'Not paper: handed back', when: 'Half the time it decides against eating the old hand it took for a card, and puts it down again.' },
+  gloss: { 'вземи си го': 'take it back', 'おかえしします': 'I am giving this back' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+// ---- sewn back on: you gave it its old hand back while it was a stump ----
+defineLines('hand.sewn', ['good as old.', 'it still fits!', 'hello again, me', 'who needs a new one', 'stitched. mostly.', 'като ново… почти', 'おかえり、わたし'], {
+  who: 'hand',
+  trigger: { title: 'Sewn back on', when: 'While the arm is a stump, carry the cut-off hand to it and let go of it right at the end. It goes back on, and no new hand grows.' },
+  gloss: { 'като ново… почти': 'good as new… almost', 'おかえり、わたし': 'welcome back, me' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
 // ---- are you still there? (the mouse has been still for 10 s) ----
 defineLines('hand.idle', ['…hello?', 'you there?', 'poke.', 'are you asleep?', 'blink twice if you need help', 'ало?', 'もしもし?'], {
   who: 'hand',
@@ -443,8 +506,114 @@ defineLines('hand.edge', ['…that has never happened.', 'it… stood up?', 'on 
 defineLines('hand.edgepick', ['…you pick. I need to lie down.', 'fine. your call.', 'I am not touching that.'], { who: 'hand', lang: 'en',
   trigger: { title: 'You choose', when: 'After the coin rolls off on its edge, it leaves Yes and No to you.' } });
 
+// ---- say "hand": you highlight the word and it comes for it (scenes/word.js) ----
+defineLines('hand.word', ['you said my name?', 'did someone say hand?', 'HAND. that is me.', 'say it again. I dare you', 'oh, a word for me', 'that is MY word', 'ръка? викаш ли ме?', '手? よんだ?'], {
+  who: 'hand',
+  trigger: { title: 'Say "hand"', when: 'Once a card has left its slot, highlight the word "hand" anywhere on the page. It reaches in for it.' },
+  gloss: { 'ръка? викаш ли ме?': 'hand? are you calling me?', '手? よんだ?': 'hand? did you call me?' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.wordgot', ['no more hand for you', 'that word is taken', 'I collect those', '*folds it into a pocket*', 'write your own', 'highlighted. delicious.', 'думата е моя.', 'この言葉、もらった'], {
+  who: 'hand',
+  trigger: { title: 'The word is gone', when: 'It pinched the highlighted word off the page and is dragging it out past the right edge.' },
+  gloss: { 'думата е моя.': 'the word is mine.', 'この言葉、もらった': 'this word is mine now' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
 // toast: a one-line list, no random draw
 defineLines('toast.devoured', ['It ate its old hand. Nothing goes to waste here.'], { who: 'toast', lang: 'en' });
 defineLines('toast.severed', ['You cut its hand off. It will grow another. The old one has plans of its own.'], { who: 'toast', lang: 'en' });
+
+// ---- the cheese pull: an old hand jumped on the card it drags off the shelf ----
+defineLines('hand.cheese', ['it is MINE', 'you are me. let go.', 'heave!', 'unhand it. literally.', 'I grew back for THIS?', 'пусни го!', 'よこせ!'], {
+  who: 'hand',
+  trigger: { title: 'The cheese pull', when: 'It is dragging a card off the shelf when an old hand jumps on the other end. Both pull.' },
+  gloss: { 'пусни го!': 'let go of it!', 'よこせ!': 'hand it over!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.cheeseEnd', ['fine. half each.', 'a draw. for now.', 'like cheese on a pizza', 'stringy.', 'we split the bill', 'по половинка', 'はんぶんこ'], {
+  who: 'hand',
+  trigger: { title: 'Half each', when: 'The card tears in two in the cheese pull. It drags its half off to eat.' },
+  gloss: { 'по половинка': 'half each', 'はんぶんこ': 'half and half' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.cheeseWon', ['let go, leftovers', 'stronger with an arm', 'shoo.', 'nice try, old me', 'my snack, my rules', 'махай се!', 'ざんねんでした'], {
+  who: 'hand',
+  trigger: { title: 'Won the cheese pull', when: 'The old hand lets go of its end (you picked it up, say). The arm keeps the card whole and flicks the old hand away.' },
+  gloss: { 'махай се!': 'get lost!', 'ざんねんでした': 'too bad for you' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+// ---- tug of war: it grabs the other end of a card an old hand is crushing ----
+defineLines('hand.wrest', ['that one is spoken for', 'drop it, old me', 'I called dibs from the edge', 'two hands, one card. I like these odds.', 'it was going to waste', 'on three. THREE.', 'дай насам!', 'ひっぱれー!'], {
+  who: 'hand',
+  trigger: { title: 'Tug of war', when: 'An old hand is crushing a card near the right edge while the arm lurks there. Now and then the arm grabs the other end, and both pull. Said again while they pull.' },
+  gloss: { 'дай насам!': 'give it here!', 'ひっぱれー!': 'pull!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.wrestWon', ['butterfingers!', 'all mine, every pixel', 'should have kept your grip, stumpy', 'the house always wins', 'thank you, kind clicker', 'ха! цялата!', 'いただきまーす'], {
+  who: 'hand',
+  trigger: { title: 'Won the tug of war', when: 'In the tug of war, you click the old hand: its fingers slip and it flies off (or you pick it up). The arm drags the whole card away and eats it.' },
+  gloss: { 'ха! цялата!': 'ha! the whole of it!', 'いただきまーす': 'let\'s eat!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.wrestSlip', ['HEY. whose side are you on?', 'my claws! you tickled my claws!', 'that was a foul', 'I demand a rematch', 'traitor.', 'мръсна игра!', 'はんそくだ!'], {
+  who: 'hand',
+  trigger: { title: 'Lost the tug of war', when: 'In the tug of war, you click the arm: its claws slip and the old hand keeps the whole card. The arm sulks off.' },
+  gloss: { 'мръсна игра!': 'dirty play!', 'はんそくだ!': 'that is a foul!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.wrestEnd', ['well. that went both ways.', 'tear along the dotted line', 'my half has the good corner', 'a fair split, I suppose', 'one card, two dinners', 'то се скъса', 'ちぎれた'], {
+  who: 'hand',
+  trigger: { title: 'Torn in the tug of war', when: 'Nobody clicks either hand in the tug of war: the card tears in two. The arm drags its half away to eat; the old hand crushes the other.' },
+  gloss: { 'то се скъса': 'it tore', 'ちぎれた': 'it ripped apart' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+// ---- the gift: you throw the ball an old hand brought you at it ----
+defineLines('hand.burp', ['*BUUURP*', 'pardon me.', 'oh, that was a good one', 'my compliments to the old me', 'crunchy. papery. burpy.', 'оригнах се', 'げっぷ'], {
+  who: 'hand',
+  trigger: { title: 'Burp', when: 'An old hand brought you a crumpled ball of a card it crushed. Throw it at the new hand: it catches it, eats it and burps.' },
+  gloss: { 'оригнах се': 'I burped', 'げっぷ': 'burp' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+// ---- rock, paper, scissors with an old hand (scenes/rps.js) ----
+defineLines('hand.rps', ['rock, paper, scissors. loser gets eaten.', 'settle this like hands?', 'best of one. go.', 'you and me. rock paper scissors.', 'I know all your moves', 'камък, ножица, хартия?', 'じゃんけんで勝負だ'], {
+  who: 'hand',
+  trigger: { title: 'Rock, paper, scissors', when: 'Now and then, when the new hand meets an old one, it comes out over it and challenges it. Type r, p or s during the count to shout a pick for the old hand.' },
+  gloss: { 'камък, ножица, хартия?': 'rock, scissors, paper?', 'じゃんけんで勝負だ': 'let us settle it with janken' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.rpsShoot', ['SHOOT!', 'and… now!', 'rock! paper! scissors!', 'show!', 'камък-ножица-хартия!', 'じゃんけんぽん!'], {
+  who: 'hand',
+  trigger: { title: 'Rock, paper, scissors: shoot', when: 'Three pumps of the fist, and both show.' },
+  gloss: { 'камък-ножица-хартия!': 'rock-scissors-paper!', 'じゃんけんぽん!': 'rock, paper, scissors!' },
+  lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.rpsDraw', ['again.', 'stop copying me', 'great minds…', 'we ARE the same hand', 'пак същото!', 'あいこでしょ!'], {
+  who: 'hand',
+  trigger: { title: 'Rock, paper, scissors: a draw', when: 'Both show the same. They go again (three rounds at most).' },
+  gloss: { 'пак същото!': 'the same again!', 'あいこでしょ!': 'a tie, again!' },
+  lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.rpsWon', ['ha! dinner.', 'I always win', 'you know what this means', 'rules are rules', 'сега си мой', 'かった!'], {
+  who: 'hand',
+  trigger: { title: 'Rock, paper, scissors: it won', when: 'The old hand lost. It is fair game for the new one for a while.' },
+  gloss: { 'сега си мой': 'now you are mine', 'かった!': 'I won!' },
+  lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.rpsLost', ['…fine. you win.', 'I was not even trying', 'I need a minute', 'nobody saw that', 'не е честно', 'くやしい…'], {
+  who: 'hand',
+  trigger: { title: 'Rock, paper, scissors: it lost', when: 'The old hand beat it. It sulks off out of sight for ten seconds.' },
+  gloss: { 'не е честно': 'that is not fair', 'くやしい…': 'so frustrating…' },
+  lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.rpsQuit', ['coward.', 'where are you going?', 'forfeit!', 'we were PLAYING', 'бягаш ли?', 'にげるな!'], {
+  who: 'hand',
+  trigger: { title: 'Rock, paper, scissors: called off', when: 'You pick the old hand up in the middle of the game.' },
+  gloss: { 'бягаш ли?': 'running away?', 'にげるな!': 'do not run!' },
+  lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+});
 
 export function install(app) {}
