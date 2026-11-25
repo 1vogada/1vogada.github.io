@@ -31,6 +31,11 @@ export const RULES = [
   // ---- the blade and the arm ----
   ['hand.severed', ({ x, y, a, pose, v }) => severed.spawn(x, y, a, pose, { v })],  // sever(): the cut-off hand drops where the hand was
   ['hand.said', ({ kind }) => kind === 'severed' && katana.loose() && katana.brag()], // sever(): after "MY HAND!!" the katana brags
+  // ---- the new hand and the old (cut-off) one: rules in src/actors/hand/old.js ----
+  ['hand.met', ({ hand: o }) => { const b = severed.brain(o); if (b && b.is('walk', 'rest', 'limp', 'rise', 'gloat')) severed.set(o, 'stare'); }],   // it stares back
+  ['hand.devouring', ({ hand: o }) => severed.set(o, 'caught')],                                                // it flails and begs
+  ['hand.dropped', ({ hand: o }) => { const b = severed.brain(o); if (b && b.is('caught')) severed.set(o, 'limp'); }],   // let go: it drops
+  ['sev.state', ({ self, from, to }) => from === 'crush' && to === 'gloat' && hand.oldStole(self)],             // it ate a card: the arm saw that
   // ---- the shelf ----
   ['hand.reaching', ({ card, fear, dt, t, x }) => cards.panic(card, fear, dt, t, x)], // reach: the card on the shelf panics, bystanders point
   // ---- the page ----
@@ -41,5 +46,5 @@ export const RULES = [
 export function install(app) {
   for (const [type, fn] of RULES) bus.on(type, fn);
   // what the hand can sense of the shelf (legacy: clawTick read shelfSnack / nearShelf / onShelf / shelf.want directly)
-  hand.senses({ shelfSnack: () => shelf.snack(), nearShelf: (P) => shelf.near(P), onShelf: (o) => shelf.holds(o), want: (v) => shelf.want(v), shelf: () => shelf.state() });
+  hand.senses({ shelfSnack: () => shelf.snack(), nearShelf: (P) => shelf.near(P), onShelf: (o) => shelf.holds(o), want: (v) => shelf.want(v), shelf: () => shelf.state(), oldHands: () => severed.list });
 }

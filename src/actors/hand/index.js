@@ -40,6 +40,7 @@ import { handParts, handDraw } from './draw.js';
 import { POSES } from './poses.js';
 import { zones } from './zones.js';
 import { gripPt, untug } from './tug.js';
+import { stole, wants } from './old.js';
 
 export { POSES };
 
@@ -108,11 +109,14 @@ export function notice(kind) {
   clock.wake();
 }
 
+/** an old (cut-off) hand just crushed a card (src/reactions.js): the arm takes note (./old.js) */
+export function oldStole(o) { if (claw && !isCrazy()) stole(o, now()); }
+
 /** out of patience: it takes the held card (legacy snatch(o)) */
 export function snatch(o) { claw.o = o; set('snatch'); }
 
 // what it can sense of other actors, injected by src/reactions.js:
-// { shelfSnack() -> body|null, nearShelf(P) -> bool, onShelf(o) -> bool, want(v), shelf() -> state|null }
+// { shelfSnack() -> body|null, nearShelf(P) -> bool, onShelf(o) -> bool, want(v), shelf() -> state|null, oldHands() -> Set of cut-off hand bodies }
 let sensed = {};
 /** what senses() was given */ export const sense = () => sensed;
 export function senses(s) { sensed = s || {}; }
@@ -129,7 +133,7 @@ export const shelf = {
 export const busy = () => {
   const c = claw; if (!c) return false;
   const sh = shelf.state();
-  return (!!sh && sh.want) || !!c.react || !!c.later || now() < (c.flinch || 0) || c.strands.length > 0 || !!c.say || m.busy || (!!m.def.busyUntil && now() < c.until);
+  return (!!sh && sh.want) || !!c.react || !!c.later || now() < (c.flinch || 0) || c.strands.length > 0 || !!c.say || m.busy || (!!m.def.busyUntil && now() < c.until) || (m.is('lurk') && wants(c));
 };
 
 // legacy clawTick(dt)
