@@ -37,18 +37,10 @@
   {
    "doc": 1,
    "t": 4480,
-   "ms": 1168,
-   "who": "card",
-   "key": "card.loosen",
-   "text": "not again…"
-  },
-  {
-   "doc": 1,
-   "t": 5648,
    "ms": null,
    "who": "card",
    "key": "SAY.rip",
-   "text": "AAAH!"
+   "text": "I was comfy!"
   }
  ],
  "states": [
@@ -115,7 +107,7 @@
   },
   {
    "doc": 1,
-   "t": 5660,
+   "t": 4492,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",

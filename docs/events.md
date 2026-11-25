@@ -113,7 +113,7 @@ Re-check after a change: `grep -rn "emit('" src` and `grep -rnE "bus\.on\(|when\
 | `mode.changed` | `{ crazy }` | `page/crazy.js` `applyMode`: after the title timer and the fog loop switch, before `render()` | none |
 | `theme.changed` | `{ dark }` | `page/theme.js` `syncTheme`: at install, on the theme button (before `refog()`), on a system scheme change | `page/fog.js`: recomputes the fog colour |
 | `language.changed` | `{ languages }` | `page/language.js` `set`: after storing the choice, just before `location.reload()` (`null` = all) | none |
-| `world.reset` | `{}` | `world/world.js` `reset` ("Put the cards back"): **first**, before any body is removed | `actors/cards.js` (grid cards regrow), `actors/hand/index.js` (`reset`), `actors/katana.js` (back in the banner), `world/cut.js` (wounds cleared) |
+| `world.reset` | `{}` | `world/world.js` `reset` ("Put the cards back"): **first**, before the cards, pieces and shards are removed. Only those are removed: the hand, a cut-off hand and the katana are left exactly as they are (Ivo 2026-11-25) | `actors/cards.js` (grid cards regrow), `world/cut.js` (wounds) |
 | `world.resized` | `{ W, H }` | `world/world.js` `buildWalls`: walls rebuilt and bodies pulled inside, before `clock.wake()` | `actors/shelf.js`: rebuilt at the same y |
 | `kiri.flooded` | `{}` | `page/kiri.js` `flood`: after the flood starts (not when already flooded) | none |
 | `data.loaded` | `{ data }` | `page/directory.js`: `projects.json` arrived, after `render()` | `reactions.js`: `welcomeBack` after `TUNE.surprise.WELCOME_MS` (wall time) |

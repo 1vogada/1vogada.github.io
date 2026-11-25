@@ -26,7 +26,7 @@ export default defineBehaviour('hand', 'reach', {
       bus.emit('hand.reaching', { card: o, fear, dt, t, x: c.x });   // legacy panic(o, fear, dt, t)
       if (dist < 36 && m.t > 2.4) {   // it hovers over it for a moment, then: got it. A whole card may get crushed on the spot; otherwise it is dragged off and eaten
         o.hot = 0; bus.emit('hand.grabbed', { card: o, how: 'reach' }); c.cool = t + H_.COOL.grab; c.d0 = null;
-        if (o.kind === 'card' && Math.random() < H_.REACH_CHANCE_CRUSH) { crushStart(o); set('crush'); speak('snatch', true); }
+        if (Math.random() < H_.REACH_CHANCE_CRUSH) { crushStart(o); set('crush'); speak('snatch', true); }
         else {
           o.body.setAngularDamping(TUNE.physics.HELD_SPIN); o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 }); o.el.style.pointerEvents = 'none';
           c.joint = world.b2.createJoint(new world.pl.MouseJoint({ maxForce: TUNE.physics.MAX_FORCE * o.body.getMass(), frequencyHz: H_.JOINT_HZ, dampingRatio: 1 }, world.ground, o.body, { x: w.x, y: w.y }));

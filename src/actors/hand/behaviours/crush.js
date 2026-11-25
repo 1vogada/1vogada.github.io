@@ -24,9 +24,11 @@ export default defineBehaviour('hand', 'crush', {
   hold(c, m, x, H) {
     if (!c.o) return false;
     const t = x.t, ob = c.o, g = ob.tug, q = crushQ(m.t), rest = crushPause(m.t), a = g.a + g.spin * q + Math.sin(m.t * (rest ? 55 : 40)) * (rest ? 0.02 : 0.05 * q), sc = 1 - 0.6 * q;
-    ob.body.setTransform({ x: H[0] / S, y: H[1] / S }, a); ob.body.setLinearVelocity({ x: 0, y: 0 }); ob.body.setAngularVelocity(0);
-    ob.el.style.transform = `translate(${(H[0] - ob.ex).toFixed(2)}px, ${(H[1] - ob.ey).toFixed(2)}px) rotate(${a.toFixed(4)}rad) scale(${sc.toFixed(3)})`;
-    ob.el.style.clipPath = `polygon(${g.pts.map(([px, py, r]) => `${(px + (ob.w / 2 - px) * q * r).toFixed(1)}px ${(py + (ob.h / 2 - py) * q * r).toFixed(1)}px`).join(',')})`;
+    // a piece is held by its own middle, not by the middle of the card it came from (g.cen is [0, 0] for a whole card)
+    const ca = Math.cos(a), sa = Math.sin(a), ox = (g.cen[0] * ca - g.cen[1] * sa) * sc, oy = (g.cen[0] * sa + g.cen[1] * ca) * sc, cx = ob.w / 2 + g.cen[0], cy = ob.h / 2 + g.cen[1];
+    ob.body.setTransform({ x: (H[0] - ox) / S, y: (H[1] - oy) / S }, a); ob.body.setLinearVelocity({ x: 0, y: 0 }); ob.body.setAngularVelocity(0);
+    ob.el.style.transform = `translate(${(H[0] - ox - ob.ex).toFixed(2)}px, ${(H[1] - oy - ob.ey).toFixed(2)}px) rotate(${a.toFixed(4)}rad) scale(${sc.toFixed(3)})`;
+    ob.el.style.clipPath = `polygon(${g.pts.map(([px, py, r]) => `${(px + (cx - px) * q * r).toFixed(1)}px ${(py + (cy - py) * q * r).toFixed(1)}px`).join(',')})`;
     ob.el.style.filter = `saturate(${(1 + q).toFixed(2)}) sepia(${(0.4 * q).toFixed(2)}) hue-rotate(-${(30 * q).toFixed(0)}deg) brightness(${(1 - 0.25 * q).toFixed(2)})`;
     if (rest && m.t > 2.5 && m.t < 3.7) {   // in the long pause it begs
       if (!g.beg) { g.beg = true; bus.emit('card.begged', { card: ob }); }   // legacy talkOn(ob, pick(BEG))

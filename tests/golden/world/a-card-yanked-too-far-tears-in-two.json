@@ -5,18 +5,18 @@
   {
    "doc": 1,
    "t": 32,
-   "ms": 144,
+   "ms": 368,
    "who": "card",
    "key": "SAY.pull",
    "text": "やめて!"
   },
   {
    "doc": 1,
-   "t": 176,
+   "t": 400,
    "ms": null,
    "who": "card",
    "key": "SAY.slice",
-   "text": "AAAAAAAAAAA!!!",
+   "text": "НЕЕЕЕЕЕЕ!",
    "lvl": "2"
   }
  ],
@@ -47,7 +47,7 @@
   },
   {
    "doc": 1,
-   "t": 176,
+   "t": 412,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",

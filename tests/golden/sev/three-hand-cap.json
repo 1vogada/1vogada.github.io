@@ -61,7 +61,7 @@
   {
    "doc": 1,
    "t": 5488,
-   "ms": 88,
+   "ms": null,
    "who": "hand",
    "key": "SEV_SAY.drag",
    "text": "just… a bit… further"
@@ -69,7 +69,7 @@
   {
    "doc": 1,
    "t": 5488,
-   "ms": 88,
+   "ms": null,
    "who": "hand",
    "key": "SEV_SAY.drag",
    "text": "ох, ох, ох"
@@ -237,13 +237,15 @@
   {
    "doc": 1,
    "t": 5596,
-   "claw": "off",
-   "sev": "",
+   "claw": "lurk",
+   "sev": "walk,walk,rise",
    "pb": "closed",
    "kat": "hidden",
    "shelf": false,
    "grab": null,
-   "objs": {}
+   "objs": {
+    "hand": 3
+   }
   }
  ]
 }

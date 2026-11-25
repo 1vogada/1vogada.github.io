@@ -65,7 +65,7 @@ defineLines('hand.toss', ['bored.', 'catch.', 'yeet', 'tastes like JavaScript', 
 defineLines('hand.small', ['too small.', 'crumbs?!', 'that is a scrap', 'I said a CARD', 'not worth chewing', 'bring the rest', 'трохи?!', 'ちっちゃい…'], {
   who: 'hand',
   trigger: { title: 'A scrap',
-    when: 'You offer it, or throw it, a piece that is less than about a third of a card. It will not have it: held out, it turns away; thrown, it bats it back. Bigger pieces it eats.' },
+    when: 'You offer it, or throw it, a scrap: a piece under a quarter of a card. It will not have it: held out, it turns away; thrown, it bats it back. With a bigger piece it does all it does with a whole card.' },
   gloss: { 'трохи?!': 'crumbs?!', 'ちっちゃい…': 'so tiny…' },
   lang: ['en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
 });
