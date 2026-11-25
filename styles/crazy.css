@@ -1,0 +1,78 @@
+/* Crazy mode: .slop-only / .calm-only, the flashing-lights warning, every html.crazy rule (including the ones that hide the katana, the secret, the claw, #phys and the kiri flood), and crazy mode's reduced-motion rule.
+   Moved unchanged from the inline <style> of index.html. Link order and why: styles/README.md */
+
+/* crazy mode hides the calm page's toys (these rules sat next to their feature in the inline block) */
+html.crazy #kiri { display: none; }
+
+html.crazy .katana, html.crazy .phys-actions { display: none; }
+
+html.crazy .secret { display: none; }
+
+html.crazy .claw { display: none; }
+
+html.crazy #phys, html.crazy .reset-cards { display: none; }
+
+.slop-only { display: none; }
+
+/* flashing-lights warning before crazy mode */
+.warn { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px;
+        background: color-mix(in srgb, #000 55%, transparent); }
+.warn[hidden], .reader[hidden] { display: none; }
+.warn-box { max-width: 420px; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 16px;
+            padding: 24px; box-shadow: 0 20px 60px rgba(0,0,0,.35); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; text-shadow: none; }
+.warn-box .sign { width: 44px; height: 44px; border-radius: 12px; background: #f4b400; color: #1d1b19; display: grid; place-items: center; font-size: 1.4rem; font-weight: 800; }
+.warn-box h2 { margin: 14px 0 6px; font-size: 1.3rem; }
+.warn-box p { margin: 0; color: var(--muted); }
+.warn-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; flex-wrap: wrap; }
+.warn-actions .btn.primary { min-width: 0; }
+
+
+/* ---------- crazy mode (opt-in) ---------- */
+html.crazy .calm-only { display: none; }
+html.crazy .slop-only { display: block; }
+html.crazy .stats.slop-only { display: flex; }
+html.crazy body {
+  padding: 16px;
+  font-family: "Comic Sans MS", "Comic Neue", "Papyrus", cursive;
+  color: #fff;
+  background: linear-gradient(127deg, #ff00cc, #3333ff, #00ffcc, #ffcc00, #ff00cc);
+  background-size: 600% 600%;
+  animation: slop 8s ease infinite;
+  min-height: 100vh;
+  text-shadow: 2px 2px 0 #000, -1px -1px 0 #f0f;
+}
+@keyframes slop { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+@keyframes wobble { 0%,100%{transform:rotate(-2deg) scale(1)} 50%{transform:rotate(2deg) scale(1.04)} }
+@keyframes blink { 50% { opacity: 0.2; } }
+html.crazy h1.slop { font-size: clamp(2.2rem, 9vw, 5.5rem); text-align: center; margin: 10px 0; animation: wobble 2.3s infinite;
+     background: linear-gradient(90deg, gold, hotpink, cyan, lime); -webkit-background-clip: text; background-clip: text;
+     -webkit-text-fill-color: transparent; text-shadow: none; filter: drop-shadow(4px 4px 0 #000); }
+html.crazy .tag { text-align: center; font-size: 1.3rem; font-style: italic; }
+html.crazy .marq { background: yellow; color: red; font-weight: 900; padding: 6px; border: 4px dashed lime; overflow: hidden; white-space: nowrap; text-shadow: none; margin: 14px 0; }
+html.crazy .marq span { display: inline-block; padding-left: 100%; animation: run 14s linear infinite; }
+@keyframes run { to { transform: translateX(-100%); } }
+html.crazy .wrap { max-width: none; padding: 0; }
+html.crazy .grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 22px; max-width: 1100px; margin: 26px auto; }
+html.crazy .card { background: rgba(255,255,255,0.18); backdrop-filter: blur(9px); border: 5px ridge gold; border-radius: 30px 4px 30px 4px;
+        padding: 20px; box-shadow: 0 0 30px #0ff, 10px 10px 0 #f0f; transition: transform .2s; color: #fff; display: block; }
+html.crazy .card:hover { transform: rotate(-3deg) scale(1.08); box-shadow: 0 0 60px #ff0, -10px 10px 0 #0f0; }
+html.crazy .card h2 { margin: 0 0 6px; font-size: 2rem; }
+html.crazy .card a, html.crazy .card h2 a { color: #fff; }
+html.crazy .card p { color: #fff; font-size: 1rem; margin: 1em 0; }
+html.crazy .src { display: block; margin-top: 10px; color: yellow !important; font-weight: 900; }
+html.crazy .card .u { font-family: "Courier New", monospace; background: #000; color: #0f0; padding: 2px 6px; display: inline-block; text-shadow: none; word-break: break-all; }
+html.crazy .badge { display: inline-block; background: red; color: #fff; font-size: .75rem; padding: 2px 8px; border-radius: 99px; animation: blink 1s infinite; margin-left: 6px; vertical-align: middle; }
+html.crazy .stats { flex-wrap: wrap; justify-content: center; gap: 14px; margin: 20px 0; }
+html.crazy .stat { background: #000a; border: 3px solid cyan; padding: 10px 16px; border-radius: 14px; text-align: center; }
+html.crazy .stat b { display: block; font-size: 1.8rem; color: gold; }
+html.crazy .reviews { max-width: 800px; margin: 30px auto; }
+html.crazy .rev { background: #fff; color: #222; text-shadow: none; border-radius: 16px; padding: 12px 16px; margin: 10px 0; border-left: 10px solid hotpink; }
+html.crazy footer.bottom { border: 0; text-align: center; font-size: .8rem; margin-top: 40px; opacity: .9; color: #fff; }
+html.crazy footer.bottom .wrap { justify-content: center; flex-direction: column; }
+html.crazy .cta { display: block; margin: 20px auto; padding: 18px 26px; font-size: 1.4rem; font-family: inherit; font-weight: 900; color: #fff;
+       background: linear-gradient(45deg, #f0f, #f80); border: 4px outset gold; border-radius: 999px; cursor: pointer; animation: wobble 1.4s infinite; }
+html.crazy .toggle { font-family: inherit; font-size: 1rem; color: #000; background: lime; border: 4px dashed hotpink; text-shadow: none; font-weight: 900; }
+html.crazy .shout { text-align: center; font-size: 1.2rem; }
+html.crazy .slop-h2 { text-align: center; }
+@media (prefers-reduced-motion: reduce) { html.crazy * { animation: none !important; } }
+html.crazy .hanko, html.crazy .toolbar, html.crazy .band, html.crazy .hint { display: none; }
