@@ -104,3 +104,59 @@ scenario(G, 'three-hand cap', async (s) => {
   await s.press('.reset-cards');
   assert.deepEqual(await s.eval(() => ({ n: window.__sev.list.size, svgs: document.querySelectorAll('svg.claw.sev').length })), { n: 0, svgs: 0 }, 'reset clears them');
 });
+
+// ---- the new hand and the old one (src/actors/hand/old.js) ----
+const claw = () => window.__cards.state().claw.st;
+const sevSt = () => { const o = window.__sev.list.values().next().value; return o ? o.ai.st : null; };
+// an old hand lying near the right edge, the arm lurking with a new hand of its own
+async function oldHand(s) {
+  const size = await world(s);
+  await s.eval(() => window.__hand.set('lurk'));
+  await spawn(s, size.W - 190, size.H - 200);
+  return size;
+}
+// what the arm and the old hand look like, for a failure message
+const why = (s) => s.eval(() => { const o = window.__sev.list.values().next().value, c = window.__cards.state().claw, p = o && o.body.getWorldCenter();
+  return JSON.stringify({ claw: c && c.st, cool: c && Math.round(c.cool - performance.now()), grab: !!window.__cards.state().grab, vw: document.documentElement.clientWidth, vh: innerHeight, sy: scrollY,
+    size: window.__cards.state().size, old: o && { st: o.ai.st, gait: o.ai.gait, hunting: o.ai.hunting, x: Math.round(p.x * 100 - scrollX), y: Math.round(p.y * 100 - scrollY) } }); });
+
+scenario(G, 'the new hand meets the old one and eats it', { legacy: false }, async (s) => {
+  await oldHand(s);
+  await s.runUntil(() => window.__cards.state().claw.st === 'meet', null, { max: 6000, step: 100 }).catch(async (e) => { throw new Error(e.message + ' ' + await why(s)); });
+  assert.ok(await s.said('hand.meet'), 'it leans out and looks');
+  await s.runUntil(() => window.__sev.list.values().next().value.ai.st === 'stare', null, { max: 1000 });
+  await s.run(1200);
+  assert.ok(await s.said('sev.meet'), 'the old one stares back');
+  // still hurt from the cut, it can only crawl: the new hand goes for it
+  await s.runUntil(() => window.__cards.state().claw.st === 'devour', null, { max: 6000, step: 100 });
+  assert.ok(await s.said('hand.devour'));
+  assert.equal(await s.eval(sevSt), 'caught', 'it flails');
+  assert.ok(await s.said('sev.doomed'));
+  await s.runUntil(() => window.__sev.list.size === 0, null, { max: 8000, step: 100 });
+  await s.run(800);
+  assert.ok(await s.said('hand.devoured'), 'and eats it');
+  assert.equal(await s.eval(() => document.getElementById('toast').textContent), 'It ate its old hand. Nothing goes to waste here.');
+  assert.equal(await s.eval(claw), 'lurk');
+  // full: a second old hand is met but left alone for a while
+  const size = await s.eval(() => window.__cards.state().size);
+  await spawn(s, size.W - 190, size.H - 200);
+  await s.runUntil(() => window.__cards.state().claw.st === 'meet', null, { max: 5000, step: 100 });
+  await s.run(5000, 100);
+  assert.notEqual(await s.eval(claw), 'devour', 'still digesting');
+});
+
+scenario(G, 'you save the old hand from the new one', { legacy: false }, async (s) => {
+  await oldHand(s);
+  await s.runUntil(() => window.__cards.state().claw.st === 'devour' && !!window.__cards.state().claw.joint, null, { max: 12000, step: 100 }).catch(async (e) => { throw new Error(e.message + ' ' + await why(s)); });
+  const sy = await s.scrollY();
+  const [h] = await s.eval(hands);
+  await s.move(h.x, h.y - sy); await s.down();
+  await s.run(700);
+  assert.equal(await s.eval(claw), 'sulk', 'it lets go');
+  assert.ok(await s.said('hand.robbed'));
+  assert.equal(await s.eval(sevSt), 'held');
+  await s.line(h.x, h.y - sy, h.x - 500, h.y - sy - 100, 20);
+  await s.up();
+  await s.run(3000, 100);
+  assert.equal(await s.eval(() => window.__sev.list.size), 1, 'saved');
+});

@@ -1,0 +1,301 @@
+{
+ "scenario": "sev / the new hand meets the old one and eats it",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 32,
+   "ms": 800,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "ms": 376,
+   "who": "card",
+   "key": "SAY.rip",
+   "text": "I was comfy!"
+  },
+  {
+   "doc": 1,
+   "t": 2976,
+   "ms": 1312,
+   "who": "hand",
+   "key": "SEV_SAY.cut",
+   "text": "…"
+  },
+  {
+   "doc": 1,
+   "t": 3568,
+   "ms": 2208,
+   "who": "hand",
+   "key": "hand.meet",
+   "text": "hello, former me"
+  },
+  {
+   "doc": 1,
+   "t": 4464,
+   "ms": 1312,
+   "who": "hand",
+   "key": "sev.meet",
+   "text": "impostor!"
+  },
+  {
+   "doc": 1,
+   "t": 6576,
+   "ms": 1904,
+   "who": "hand",
+   "key": "hand.devour",
+   "text": "waste not."
+  },
+  {
+   "doc": 1,
+   "t": 6576,
+   "ms": 1312,
+   "who": "hand",
+   "key": "sev.doomed",
+   "text": "I AM YOU"
+  },
+  {
+   "doc": 1,
+   "t": 8784,
+   "ms": 192,
+   "who": "hand",
+   "key": "sev.doomed",
+   "text": "NO NO NO"
+  },
+  {
+   "doc": 1,
+   "t": 8976,
+   "ms": 2032,
+   "who": "hand",
+   "key": "hand.devoured",
+   "text": "better inside than out"
+  },
+  {
+   "doc": 1,
+   "t": 10752,
+   "ms": 1312,
+   "who": "hand",
+   "key": "SEV_SAY.cut",
+   "text": "ъъ?"
+  },
+  {
+   "doc": 1,
+   "t": 12288,
+   "ms": 2208,
+   "who": "hand",
+   "key": "hand.meet",
+   "text": "…is that my old hand?"
+  },
+  {
+   "doc": 1,
+   "t": 13184,
+   "ms": 1312,
+   "who": "hand",
+   "key": "sev.meet",
+   "text": "смени ме?!"
+  },
+  {
+   "doc": 1,
+   "t": 15392,
+   "ms": 1904,
+   "who": "hand",
+   "key": "SEV_SAY.drag",
+   "text": "just… a bit… further"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 16,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 48,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1208,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1228,
+   "claw": "off",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 2148,
+   "claw": "lurk",
+   "sev": "limp",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 3648,
+   "claw": "meet",
+   "sev": "stare",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6048,
+   "claw": "lurk",
+   "sev": "stare",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6248,
+   "claw": "lurk",
+   "sev": "walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6648,
+   "claw": "devour",
+   "sev": "caught",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 9048,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 9948,
+   "claw": "lurk",
+   "sev": "limp",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 12348,
+   "claw": "meet",
+   "sev": "stare",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 14748,
+   "claw": "lurk",
+   "sev": "stare",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 14948,
+   "claw": "lurk",
+   "sev": "walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  }
+ ]
+}
