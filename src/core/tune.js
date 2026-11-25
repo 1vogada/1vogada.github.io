@@ -106,6 +106,7 @@ export const TUNE = {
     CRUSH_Q: [[0, 0], [0.8, 0.28], [1.7, 0.32], [2.5, 0.56], [3.7, 0.6], [4.3, 0.84], [5.0, 0.87], [5.18, 1]], CRUSH: 5.18,
     CRUSH_PAUSES: [[0.8, 1.7], [2.5, 3.7], [4.3, 5.0]],
     STUMP_S: 8, REGROW_SAY_S: 0.7, REGROW_S: 2.4,
+    SEW: { AFTER_S: 1.2, OUT_PX: 90, RATE: 4, PX: 80, PALM_PX: 35, HZ: 6, S: 1.4, SAY_S: 0.5, SHOW_S: 2.6 },   // sew it back on: carry an old hand while it is a stump and the stump comes out (after AFTER_S, its wrist OUT_PX in from the edge); drop the old hand's palm within PX of where its palm belongs (PALM_PX past the wrist) and it is pulled on (joint HZ) for S; then it shows it off, says so after SAY_S, lurks after SHOW_S
     AGIT_MAX: 6, AGIT_DECAY: 0.6, REACT_TTL_MS: 6000,
     COOL: { slip: 2500, reach: 800, catch: 600, toss: 1200, gloat: 1200, eat: 1800, regrow: 1500, grab: 1500, small: 4000 },
     PIECE_BIG: 0.25,     // a piece of a card with at least this share of the card's area gets everything a whole card gets; smaller scraps it rejects
@@ -120,6 +121,8 @@ export const TUNE = {
     JEALOUS: { MS: 5000, LEAN_MS: 2600, LEAN_PX: 150, COOL_MS: 30000 },   // you carry an old hand this long: the arm leans in, drumming its fingers, and says so
     SQUEEZE: { W: 520, SX: 0.4, RATE: 6, SAY_MS: 6000 },   // window narrower than W px while the hand is out: it is pressed flat (sx), complains every SAY_MS
     IDLE: { MS: 10000, CREEP_S: 2.6, GIVE_UP_S: 9, COOL_MS: 30000 },   // "are you still there?": mouse still this long (Ivo: 10 s), creep, give up, not again for
+    CIRCLE: { WINDOW_MS: 1000, TURNS: 0.75, R_MIN: 20, R_MAX: 420, HOLD_MS: 700, EYE_PX: 5 },   // the mouse going round in circles: the last WINDOW_MS of it winds TURNS times round its middle, R_MIN..R_MAX px out; eyes follow it for HOLD_MS after, the pupil up to EYE_PX off centre
+    SHOWN_PX: 40,                     // the arm counts as out (the old hands may play the mirror game) while its wrist is within this many px past the right edge
     OLD: {                            // the new hand and the old (cut-off) one
       SEE_BOTTOM: 60,                 // ...and may be this far below the bottom edge (it is 92 px tall: the top of it still shows)
       SEE: [40, 40],                  // the old hand is "in view" when its palm is this far inside the left and top of the viewport (x, y px)
@@ -132,6 +135,33 @@ export const TUNE = {
       DIGEST_MS: 20000,               // full after eating one: no second helping for this long
       THIEF_MS: 7000,                 // after the old hand crushes a card, it may be eaten while awake for this long
       COOL: 2500,                     // after it lost its old hand to you
+      AWAKE: 0.35, ROLL_MS: 8000,     // a walking old hand it has met, in reach: it goes for it anyway with this chance, rolled once per old hand per ROLL_MS (it plays dead)
+      PAPER: { MS: 2000, GRAB_PX: 44, REACH_S: 1.4, RATE: 9, PAUSE_S: 0.9, THINK_S: 1.8, EAT: 0.5, BACK_PX: 340, BACK_S: 1.2, COOL_MS: 8000 },   // not paper: an old hand held in the tease zone this long is taken for a card; got it this close, gives up after REACH_S; looks, says so after PAUSE_S, decides at THINK_S (eats it with chance EAT), else carries it BACK_PX in from the edge and lets go after BACK_S; leaves you alone for COOL_MS
+      PROD: { HOVER_PX: 60, RATE: 6, POKE_S: [1.6, 2.5], POKE_LEN: 0.28, TWITCH: 0.4, CAUGHT_S: 0.5, DONE_S: 3.6, COOL_MS: 9000 },   // poking the one playing dead: hovers this far off it, pokes at these times (s) for POKE_LEN each, a poke makes it twitch with this chance; caught out: grabs it after CAUGHT_S; no twitch: gives up after DONE_S, leaves it alone for COOL_MS
+    },
+    CHEESE: {                         // the cheese pull: an old hand jumps on the card it drags off the shelf, and both pull
+      TEAR_PX: 230,                   // the card tears once it is stretched this far past its own length
+      OVER: 1.3, PULL_S: 3.2,         // how far they pull apart (times TEAR_PX), over how long (it tears on the way)
+      JERK_PX: 26, JERK_W: 6,         // the pulling comes in surges: this many px, this fast (rad/s)
+      ARM_SHARE: 0.6,                 // the arm's share of the pulling (the old hand gets the rest)
+      SAG_PX: 40,                     // both sag this much while they strain
+      EDGE_PX: 40,                    // the old hand cannot be pulled further left than this (page px from the left edge)
+      MAX_S: 5,                       // it tears by now whatever happens
+    },
+    WREST: {                          // tug of war over a card: an old hand crushes a card near the right edge, the arm grabs the other end
+      CHANCE: 0.35,                   // share of crushes it goes for (rolled once per crush, only when it could: lurking, met, in reach)
+      WAIT_S: 0.35,                   // it eyes the crush this long before it lunges
+      RATE: 9, GRAB_PX: 40, REACH_S: 1.4,   // how fast it reaches; grip this close to the card's end = got it; gives up after this long
+      END_PX: 22,                     // it takes the card this far in from its end (and the old hand moves to this far in from the other)
+      TEAR_PX: 210,                   // the card tears once it is stretched this far past its own length
+      OVER: 1.3, PULL_S: 4.2,         // how far they pull apart (times TEAR_PX), over how long (it tears on the way)
+      JERK_PX: 34, JERK_W: 5,         // the pulling comes in surges: this many px, this fast (rad/s)
+      ARM_SHARE: 0.55,                // the arm's share of the pulling (the old hand gets the rest)
+      SAG_PX: 26,                     // both sag this much while they strain
+      EDGE_PX: 40,                    // the old hand cannot be pulled further left than this (page px from the left edge)
+      MAX_S: 6.5,                     // it tears by now whatever happens
+      HIT_PX: 58,                     // a click this close to the arm's hand or forearm (px) makes it slip
+      COOL: 6000,                     // after it slipped and lost the card: it leaves cards alone this long (game ms)
     },
   },
   // ---- cut-off hands ----
@@ -169,7 +199,48 @@ export const TUNE = {
       WAIT_MS: 4000, FIVE_AFTER_MS: 1600, FIVE_PX: 95, FIVE_S: 1.4, FIVE_GIVE_UP_S: 10, HOP: 3.5 },   // then: the high-five, after the new old hand has landed
     MOURN: { EDGE_PX: 150, NEAR_PX: 60, WALK_S: 9, SAY_S: 1, BOW_S: 3.2, RUN_MS: 3000 },   // the funeral: where (px in from the right edge), how close, give up walking, words, bow, run
     HIDE: { S: 12, LAUNCH_PX: 80, LAND_PX: 70, CLEAR_PX: 40, IN_PX: 30, MAX_DY: 650, UP_PX: 130, LEAP_S: 1.8, TRIES: 3, STUCK_S: 0.6, COWER_S: 14 },   // hiding on the shelf: give up, jump this far over it, at most this far below it
+    MIRROR: { DELAY_MS: 450, POSE_RATE: 9, SIT_RATE: 4, SAY_S: 1.1, LINGER_S: 1.2, MAX_S: 14, COOL_MS: 12000, KNOCK: 1.5 },   // the mirror game: copies the arm's pose this late, eases to it, sits up; says its line; gives up when the arm has gone this long, after MAX_S, or when knocked; not again for COOL_MS
+    DEAD: { FLOP_VY: -3.2, ANGLE: -1.4, ROLL_S: 1.2, ROLL_RATE: 6, TWITCH_MS: 260, TAP_S: 0.35, UP_S: 2.5, RUN_MS: 3500, HOP: [-1.6, -4.5],
+      POSE: { curl: 0.75, th: 0.7, spread: 1.15, eye: 1, pupil: 0.5, happy: 0, point: 0, legs: 0, dead: 1 } },   // (its pose is kept out of POSES: X eyes in draw.js, fingers in the air)   // playing dead: the hop as it flops, the angle it rolls to (fingers up) over ROLL_S; a twitch shows this long; a press shorter than TAP_S is a tap; up again UP_S after the arm left; then it runs this long (the spring: m/s)
     STARE_S: 2.6, STARE_SAY_S: 0.9,   // the old hand stares back at the new one, says its line after this long
+    HITCH: {                          // the hitchhiker: you pick up a card or a piece near an old hand, and it jumps on and dangles from it
+      CHANCE: 0.1,                    // share of pick-ups near an old hand that it latches on to (Ivo: 10%)
+      NEAR_PX: 170,                   // "near": the old hand's middle this close to the card's edge when you pick it up
+      FROM: ['walk', 'rest', 'rise', 'gloat', 'stare', 'cower'],   // what it may be doing when it decides to come along
+      LEAP_S: 0.45, ARC_PX: 70,       // the jump onto the card: how long, how high the arc goes
+      IN: 0.18,                       // it grips this share of the way in from the card's lowest corner towards its middle
+      TIP_PX: 46,                     // its fingertips, px ahead of the middle of its body (where the joint goes)
+      SPEED: 14,                      // m/s: swung faster than this, its grip starts to give
+      ACC: 700,                       // m/s²: jerked harder than this, likewise (a calm wave of the card stays under ~600)
+      DRAIN: 0.9, REGAIN: 0.35,       // grip lost per second of hard swinging (times how far past the limit), won back per calm second
+      RIDE_SAY_MS: 3200,              // how often it chats while carried calmly
+      FLING: 1.25, LIFT: 3, SPIN: 10, // when it lets go: its speed is boosted this much, plus this much upwards (m/s), a random spin up to this (rad/s)
+      REST_V: 0.6, REST_S: 0.8,       // the card lies still (m/s) this long, nobody holding it: it gets off
+      WHEE_S: 4, LAND_V: 1.2,         // flying: it has landed when slower than this (m/s), or after this long anyway
+      DIZZY_S: 2.6,                   // and lies there seeing stars this long
+    },
+    CHEESE: {                         // the cheese pull: the arm drags a card off the shelf and an old hand jumps on the other end
+      CHANCE: 0.5,                    // share of shelf snacks it goes for, when an old hand is about
+      NEAR_PX: 480,                   // "about": its middle this close to the card's edge (page px), on screen
+      BELOW_PX: 60,                   // ...or this far below the bottom of the screen (lying on the floor)
+      FROM: ['walk', 'rest', 'rise', 'gloat', 'stare', 'cower', 'hide'],   // what it may be doing
+      FLICK: [-9, -7], FLICK_SPIN: 8, // lost the pull: flicked off at this speed (m/s), spinning (rad/s)
+    },
+    WREST: {                          // tug of war over a card it was crushing (the arm's TUNE.hand.WREST)
+      TAP_S: 0.25,                    // a click on it shorter than this makes it slip; held longer, you have picked it up
+      EASE_S: 0.3,                    // it shuffles from the middle of the card to its end this fast
+      FLICK: [-6, -6], FLICK_SPIN: 7, // slipped: it flies off at this speed (m/s), spinning (rad/s)
+    },
+    GIFT: {                           // a gift for you: after a crush, with your pointer resting on the page, it brings you the ball
+      STILL_MS: 1200,                 // the pointer has not moved for this long (game ms)
+      R: 30,                          // the ball's radius (px)
+      ON_TOP_PX: 84,                  // carried this far above the middle of its body (over its knuckles)
+      AT_PX: 40, FAR_PX: 260,         // it puts it down this close below your cursor (px across); further than FAR_PX it scuttles
+      PUSH: [1.4, 2.2],               // and gives it this little push forwards and up (m/s)
+      WAIT_S: 2.4, MAX_S: 16,         // it waits this long, pleased with itself; gives up carrying after this long
+      FILTER: 'saturate(1.8) sepia(.25) hue-rotate(-15deg) brightness(.9) contrast(1.25)',
+      CREASES: 'radial-gradient(circle at 34% 30%, rgba(255,255,255,.45), transparent 42%), radial-gradient(circle at 66% 72%, rgba(0,0,0,.4), transparent 62%), repeating-linear-gradient(37deg, rgba(0,0,0,.13) 0 2px, transparent 2px 7px), repeating-linear-gradient(-58deg, rgba(0,0,0,.1) 0 1px, transparent 1px 6px)',
+    },
     LEG: { force: 520, damp: 42, cap: 170, walk: 14, drag: 30, torque: 900, torqueDamp: 54 },
   },
   // ---- the secret shelf ----
@@ -187,8 +258,45 @@ export const TUNE = {
   away: { BACK_MS: 1600 },   // "there you are" stays in the tab title this long after you come back (page/away.js)
   toast: { FALL_MS: 900 },   // the toast you clicked five times falls off the screen this fast
   eggs: { YEAR_MS: 4000, SWITCHES: 7, SWITCH_MS: 4000 },   // 1926: hover the year this long; 7 theme switches within this long: the moon
+  rps: {   // rock, paper, scissors between the new hand and an old one (scenes/rps.js)
+    CHANCE: 0.5,                      // share of meetings (hand.met) that end in a game
+    WAIT_MS: 1800,                    // they stare at each other this long first
+    IN_PX: 190, ABOVE_PX: 170, TOP_PX: 130,   // the arm's grip: this far in from the right edge, this far above the old hand (kept this far inside the window)
+    YES_MS: 1000,                     // the old hand's answer stays up this long before the count
+    PUMPS: 3, PUMP_MS: 440, PUMP_PX: 34,   // three pumps of the fist, each this long, this high
+    SHOW_MS: 1300, DRAW_MS: 1300, SAY_GAP_MS: 700, END_MS: 1600,   // the picks stay up; a draw; between the two lines; the end
+    ROUNDS: 3,                        // draws: at most this many rounds
+    SULK_MS: 10000,                   // the new hand lost: it sulks off out of sight this long (Ivo: 10 s)
+    FAIR_MS: 15000,                   // the old hand lost: it is fair game this long
+    STAND_PX: 18, STAND_S: 0.35,      // the old hand stands on its wrist: lifted this much, this fast
+    HAND: {                           // the arm's three shapes (rock, paper; scissors is its pointing finger)
+      rock: { curl: 1, th: 0.95, spread: 0.3, eye: 1.1, pupil: 0.8, happy: 0, point: 0, pinch: 0 },
+      paper: { curl: -0.05, th: -0.1, spread: 1.5, eye: 1.2, pupil: 1, happy: 0, point: 0, pinch: 0 },
+      scissors: { curl: 0.95, th: 0.9, spread: 0.6, eye: 1.2, pupil: 0.7, happy: 0, point: 1, pinch: 0 },
+    },
+    OLD: {                            // the old hand's
+      rock: { curl: 1.1, th: 1.05, spread: 0.3, eye: 0.9, pupil: 0.6, happy: 0, point: 0, legs: 0 },
+      paper: { curl: 0.05, th: 0.1, spread: 1.4, eye: 1.2, pupil: 0.9, happy: 0, point: 0, legs: 0 },
+      scissors: { curl: 0.95, th: 0.9, spread: 0.6, eye: 1.2, pupil: 0.7, happy: 0, point: 1, legs: 0 },
+    },
+  },
   coin: { EDGE: 0.01 },   // share of coin tosses that land on their edge (scenes/coin.js)
   apology: { YES: 0.7, MENU_MS: 4000 },   // right-click a torn card, "apologise": it forgives you this often; the menu goes away after this long
+  // say "hand": select the word anywhere and it reaches in for it (scenes/word.js). SETTLE_MS: the selection must sit still this long;
+  // OVER_PX: it first hovers this far right of the word; HOVER_MS, PINCH_MS: how long it eyes the word, then pinches it;
+  // HOLD_MS: at least this long with the word in its fingers before it pulls it away; DRAG_MS: the pull off the right edge
+  // the Konami code (page/omikuji.js): a ripped-out slip unfolds over UNFOLD_MS and reads its fortune READ_MS after the tear (after its
+  // own "rip" line); a 凶 says so CURSE_MS later; a slip torn in two complains TORN_MS after its scream
+  omikuji: { UNFOLD_MS: 500, READ_MS: 1500, CURSE_MS: 2600, TORN_MS: 1700 },
+  // the hand's diary (page/diary.js, the phrasebook's secret chapter): it keeps at most MAX lines a visit (the oldest go first);
+  // typing WORD with the phrasebook open shows it
+  diary: { MAX: 300 },
+  // the basement (page/basement.js): at the very bottom of the page, PUSHES more scrolls down lift the footer like a trapdoor onto the
+  // hand's trophy wall. A wheel push is a burst of wheel events after GAP_MS without one, or PUSH_PX of wheel past the last push;
+  // the pushes must come within RESET_MS of each other; a touch push is a swipe up of TOUCH_PX. BOTTOM_PX: how close to the
+  // bottom counts. The wall is H_MAX px (or H_VH of the window) tall and opens in OPEN_MS; each trophy is TROPHY_PX wide; MAX kept
+  basement: { PUSHES: 3, GAP_MS: 220, PUSH_PX: 400, RESET_MS: 2500, TOUCH_PX: 40, BOTTOM_PX: 2, H_MAX: 460, H_VH: 0.62, OPEN_MS: 700, LID_DEG: 55, TROPHY_PX: 150, MAX: 40 },
+  word: { SETTLE_MS: 450, OVER_PX: 70, HOVER_MS: 650, PINCH_MS: 260, HOLD_MS: 1500, DRAG_MS: 1300, GONE_PX: 260 },
   speech: {
     TILT: [4, 4],                // every bubble leans right by 4 + up to 4 degrees
     RIDE_DY: -40,                // a body's bubble sits this far above the top of its rotated box

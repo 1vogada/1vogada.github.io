@@ -164,5 +164,190 @@ defineLines('sev.safe', ['safe here', 'shhh', 'you did not see me', 'тук съ
   gloss: { 'тук съм на сигурно': 'I am safe here', 'ここなら安全': 'safe here' },
   lang: ['en', 'en', 'en', 'bg', 'ja'],
 });
+// ---- the mirror game (the new hand is out; the old one copies it from the floor) ----
+defineLines('sev.mirror', ['anything you can do…', 'like this?', 'copy that.', 'I was doing this first', 'same. same.', 'и аз така!', 'まねっこ!'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: the mirror game',
+    when: 'An old hand that has met the new one is walking about in view while the arm is out. It sits up and copies every pose a beat late. Move the mouse round in circles and both their eyes follow it.' },
+  gloss: { 'и аз така!': 'me too, like this!', 'まねっこ!': 'copycat!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+// ---- playing dead (the new hand came for it while it was up and about) ----
+defineLines('sev.dead', ['*dies dramatically*', 'I am just a glove now', '(definitely not alive)', 'nobody home', 'x_x', 'умрях.', 'しーん…'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: plays dead',
+    when: 'The new hand goes for it while it is walking about. It flops onto its back, fingers in the air, X for an eye.' },
+  gloss: { 'умрях.': 'I died.', 'しーん…': '(dead silence)' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.twitch', ['eep!', 'ticklish!', 'hnnk', 'not the knuckle', 'that was a reflex', 'ой!', 'ひっ!'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: twitches', when: 'Playing dead, it is poked, and it twitches. The new hand saw.' },
+  gloss: { 'ой!': 'ow!', 'ひっ!': 'eek!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.spring', ['ALIVE! bye!', 'BOO! run!', 'cover blown!', 'you ruined it!', 'resurrection!', 'жив съм!', 'いきかえった!'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: springs up', when: 'Tap it while it plays dead, before the new hand has made up its mind. It jumps up and runs off to the left.' },
+  gloss: { 'жив съм!': 'I am alive!', 'いきかえった!': 'back to life!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.phew', ['and… scene.', 'Oscar-worthy, if I say so', 'and the award goes to…', 'it worked?!', 'best role of my life', 'фу, отървах се', 'あぶなかった'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: it worked', when: 'It played dead through both pokes and the new hand went away. It gets up and runs.' },
+  gloss: { 'фу, отървах се': 'phew, I got away', 'あぶなかった': 'that was close' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+// ---- not paper (the new hand took it for a card) ----
+defineLines('sev.notcard', ['I am NOT a card', 'do I look rectangular?!', 'wrong snack!', 'put me down, I am a HAND', 'no barcode, no deal', 'аз не съм карта!', 'カードじゃない!'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: taken for a card', when: 'You held it out at the right edge like a card, and the new hand took it.' },
+  gloss: { 'аз не съм карта!': 'I am not a card!', 'カードじゃない!': 'I am not a card!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.returned', ['…thanks?', 'rude, but thanks', 'I will take that as a compliment', 'ok that was weird', 'never do that again', 'благодаря… май', 'た、たすかった'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: handed back', when: 'The new hand decided it is not paper after all and put it down.' },
+  gloss: { 'благодаря… май': 'thanks… I guess', 'た、たすかった': 'th-that was a close one' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+// ---- sewn back on ----
+defineLines('sev.home', ['home!', 'reunited!', 'scoot over, wrist', 'I knew you would take me back', 'back where I belong', 'у дома!', 'ただいま!'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: back on', when: 'You let go of it right at the stump before the new hand has grown. The arm pulls it back on.' },
+  gloss: { 'у дома!': 'home!', 'ただいま!': 'I am home!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+// ---- the hitchhiker: it latches on to a card you picked up near it ----
+defineLines('sev.latch', ['room for one more?', 'going my way?', 'hold the card!', 'free ride!', '*boing*', 'mind if I hang around?', 'ще се повозя', 'のせてー!'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: hitches a ride',
+    when: 'You pick up a card or a piece of one near an old hand. Now and then (one time in ten) it jumps on and hangs from the edge.' },
+  gloss: { 'ще се повозя': 'I will take a ride', 'のせてー!': 'give me a ride!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.ride', ['this is the life', 'left a bit. no, your left', 'nice view from down here', 'are we there yet?', 'I could get used to this', 'carry on, driver', 'хубаво возене', 'らくちん'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: along for the ride', when: 'It dangles from the card while you carry it about gently.' },
+  gloss: { 'хубаво возене': 'a nice ride', 'らくちん': 'comfy, no effort at all' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.cling', ['easy! EASY!', 'not so fast!', 'my fingers are slipping', 'I am going to be sick', 'hold… on…', 'стига си клатил!', 'ゆらさないで!'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: hanging on', when: 'You swing the card it hangs from about too hard. Its grip is giving.' },
+  gloss: { 'стига си клатил!': 'stop shaking it!', 'ゆらさないで!': 'do not shake it!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.whee', ['WHEEEEE!', 'I can FLYYY', 'worth it!', 'tell my fingers I loved them', 'wheeeee—oof', 'аааа-ха-ха!', 'わーい!'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: lets go', when: 'Swung once too often, its grip gives out and it flies off the card.' },
+  gloss: { 'аааа-ха-ха!': 'aaaa-ha-ha!', 'わーい!': 'wheee!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.dizzy', ['I am dizzy', 'five of you. hello, all five', 'the floor is moving', 'which way is up', 'again! …no. later.', 'вие ми се свят', 'くらくら…'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: dizzy', when: 'It has landed after flying off a card, and lies there with its eye rolling.' },
+  gloss: { 'вие ми се свят': 'my head is spinning', 'くらくら…': 'so dizzy…' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.alight', ['thanks for the lift', 'my stop', 'I will walk from here', 'five stars', 'благодаря за возенето', 'ここでおります'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: gets off', when: 'You put the card it hangs from down. Once the card lies still it lets go.' },
+  gloss: { 'благодаря за возенето': 'thanks for the ride', 'ここでおります': 'I will get off here' },
+  lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+// ---- the cheese pull: it jumps on a card the arm is dragging off the shelf ----
+defineLines('sev.pounce', ['MINE!', 'not so fast, new guy', 'drop it!', 'I saw it first', 'share!', 'моя е!', 'まてー!'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: pounces', when: 'The arm drags a card off the shelf while an old hand is about. Sometimes it jumps on the other end.' },
+  gloss: { 'моя е!': 'it is mine!', 'まてー!': 'wait!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.cheese', ['pull! PULL!', 'it is stretching!', 'I had it first!', 'you let go!', 'my fingers are slipping!', 'дърпай, де!', 'はなしてよ!'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: the cheese pull', when: 'It hangs on to its end of the card and pulls against the arm. The card stretches like hot cheese.' },
+  gloss: { 'дърпай, де!': 'come on, pull!', 'はなしてよ!': 'let go of it!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.cheeseEnd', ['half is mine!', 'ha! my half', 'fair and square', 'stretchy!', 'половината е моя', 'はんぶんゲット'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: its half', when: 'The card tears in two in the cheese pull. It falls with its half and crushes it where it lands.' },
+  gloss: { 'половината е моя': 'half of it is mine', 'はんぶんゲット': 'got half!' },
+  lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+// ---- tug of war: the arm grabs the other end of the card it is crushing ----
+defineLines('sev.wrest', ['get your own!', 'I was in the middle of something!', 'you have a whole ARM, cheater', 'hnnngh… mine…', 'help! anyone with fingers!', 'няма да го пусна!', 'ぜったい はなさない!'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: tug of war', when: 'It is crushing a card near the right edge when the arm grabs the other end. It hangs on to its end and pulls.' },
+  gloss: { 'няма да го пусна!': 'I won\'t let it go!', 'ぜったい はなさない!': 'I will never let go!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.wrestSlip', ['you clicked me?! YOU?!', 'my grip! nooo—', 'traitor pointerrr', 'I was WINNING', 'whose cursor is that?!', 'изплъзна ми се!', 'すべったー!'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: slips', when: 'In the tug of war, you click the old hand. Its fingers slip and it flies off; the arm keeps the card.' },
+  gloss: { 'изплъзна ми се!': 'it slipped out of my hand!', 'すべったー!': 'I slipped!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.wrestWon', ['ha! weak wrist!', 'finders keepers, arm', 'all of it. ALL OF IT.', 'thank you, kind stranger', 'now, where was I…', 'победа!', 'しょうりー!'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: wins the tug of war', when: 'In the tug of war, you click the arm and its claws slip (or its hand is cut off). The old hand has the whole card and crushes it after all.' },
+  gloss: { 'победа!': 'victory!', 'しょうりー!': 'I won!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.wrestEnd', ['I got the end with the words', 'half a card is still a card', 'next time I keep both halves', 'it screamed in two directions', 'good enough to squeeze', 'и това е нещо', 'まあいいか'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: half a card', when: 'The card tears in two in the tug of war. The old hand crushes its half where it is.' },
+  gloss: { 'и това е нещо': 'that is something, at least', 'まあいいか': 'oh well, good enough' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+// ---- a gift for you: it brings you a ball of the card it crushed ----
+defineLines('sev.fetch', ['coming, coming', 'look what I made', 'wait till you see this', 'hold still, it is for you', 'nobody touch it', 'идвам, идвам', 'まっててね'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: brings you something', when: 'It crushes a card while your mouse pointer rests on the page. It keeps a ball of it and carries it over to you.' },
+  gloss: { 'идвам, идвам': 'coming, coming', 'まっててね': 'wait for me' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.gift', ['for you.', 'I made you this', 'a present!', 'do not say I never gave you anything', 'it was a card. now it is art.', 'за теб', 'どうぞ'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: a gift', when: 'It puts the crumpled ball down at your feet, below the cursor, like a cat with a mouse, and waits.' },
+  gloss: { 'за теб': 'for you', 'どうぞ': 'here you are' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.regift', ['that was for THEM', 'I worked hard on that', 'ungrateful thing', 'you could have said thanks', 'това беше подарък!', 'せっかくのプレゼントが…'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: its gift was eaten', when: 'You throw the ball it brought you at the new hand, and the new hand eats it.' },
+  gloss: { 'това беше подарък!': 'that was a present!', 'せっかくのプレゼントが…': 'and it was a present…' },
+  lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
+// ---- rock, paper, scissors with the new hand (scenes/rps.js) ----
+defineLines('sev.rpsYes', ['you are ON', 'I invented this game', 'fine. no cheating.', 'I have five fingers too', 'давай!', 'のぞむところだ'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: takes the challenge', when: 'The new hand challenges it to rock, paper, scissors. It stands up on its wrist.' },
+  gloss: { 'давай!': 'come on!', 'のぞむところだ': 'bring it on' },
+  lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.coached', ['got it, boss', 'ok ok ok', 'trust me', 'are you sure?', 'shh, it will hear you', 'разбрах', 'りょうかい'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: you coach it', when: 'Type r, p or s while they count: it plays your pick.' },
+  gloss: { 'разбрах': 'got it', 'りょうかい': 'roger' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.rpsWon', ['HA! still got it', 'the original is the best', 'the old ways are best', 'bow to me', 'спечелих!', 'かったー!'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: wins', when: 'It beats the new hand at rock, paper, scissors, and dances. The new hand sulks off.' },
+  gloss: { 'спечелих!': 'I won!', 'かったー!': 'I wooon!' },
+  lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.rpsLost', ['best of three?', 'that was a practice round', 'oh no', 'I want a lawyer', 'загубих…', 'まけた…'], {
+  who: 'sev',
+  trigger: { title: 'The cut-off hand: loses', when: 'The new hand beats it at rock, paper, scissors. Now it is fair game.' },
+  gloss: { 'загубих…': 'I lost…', 'まけた…': 'I lost…' },
+  lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
+});
 
 export function install(app) {}

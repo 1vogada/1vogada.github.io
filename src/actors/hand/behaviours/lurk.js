@@ -3,7 +3,7 @@
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE, TIMING } from '../../../core/tune.js';
 import { set, speak, shelf, big } from '../index.js';
-import { look, jealous } from '../old.js';
+import { look, jealous, mistake } from '../old.js';
 import { still } from '../idle.js';
 
 export default defineBehaviour('hand', 'lurk', {
@@ -17,6 +17,7 @@ export default defineBehaviour('hand', 'lurk', {
     if (held) { c.ly += (Math.max(80, Math.min(x.vh - 80, P[1])) - c.ly) * (1 - Math.exp(-dt * 3)); if (t > c.cool && P[0] > x.Z.tease && !shelf.near(P)) { if (!big(held)) { c.cool = t + TUNE.hand.COOL.small; set('sulk'); speak('small', true); return; }   // a scrap: it turns its nose up
       set('eager'); speak('eager'); c.patience = TIMING.span(TIMING.wait.tease) / 1000; } }
     else {   // nobody is holding anything: an old (cut-off) hand to meet or to eat? is there something lying on the shelf?
+      if (mistake(c, x)) return;   // an old hand held out in the tease zone like a card: it takes it for one
       jealous(c, t);   // (unless you carry an old hand around: long enough, and the arm is jealous)
       if (look(c, x)) return;
       if (t > c.cool && still(t)) { set('poke'); return; }   // the mouse has not moved for a while: is anybody there?

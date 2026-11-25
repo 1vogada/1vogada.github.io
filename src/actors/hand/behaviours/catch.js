@@ -22,6 +22,12 @@ export default defineBehaviour('hand', 'catch', {
       x.aim = Math.atan2(Hc[1] - c.y, Hc[0] - c.x); if (Math.cos(x.aim) > -0.2) x.aim = Math.PI; x.T = wristFor(Hc, x.aim);
       if (dist < 70) {
         o.body.setLinearVelocity({ x: 0, y: 0 }); o.body.setAngularVelocity(o.body.getAngularVelocity() * 0.2); o.hot = 0; o.body.setBullet(false);
+        if (o.ball) {   // a ball of paper an old hand brought you: always a treat, eaten on the spot
+          bus.emit('hand.grabbed', { card: o, how: 'catch' }); speak('caught', true);
+          o.body.setAngularDamping(TUNE.physics.HELD_SPIN); o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 }); o.el.style.pointerEvents = 'none';
+          c.joint = world.b2.createJoint(new world.pl.MouseJoint({ maxForce: TUNE.physics.MAX_FORCE * o.body.getMass(), frequencyHz: H_.JOINT_HZ, dampingRatio: 1 }, world.ground, o.body, { x: w.x, y: w.y }));
+          set('eat'); return;
+        }
         if (!big(o)) {   // a scrap: batted straight back
           o.body.setLinearVelocity({ x: H_.SWAT[0], y: H_.SWAT[1] }); o.body.setAngularVelocity((Math.random() - 0.5) * 14);
           bus.emit('hand.rejected', { card: o }); c.o = null; c.cool = x.t + H_.COOL.small; set('sulk'); speak('small', true);

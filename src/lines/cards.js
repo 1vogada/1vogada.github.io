@@ -168,6 +168,14 @@ defineLines('card.beg', ['please', 'I will be good', 'I have unmerged commits!',
   lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja', 'en'],
 });
 
+// ---- tug of war: an old hand on one end, the arm on the other ----
+defineLines('card.wrest', ['I am not a wishbone!', 'pick ONE hand!', 'this is not how hands work!', 'I can feel my staples!', 'somebody call a referee!', 'ще ме разкъсате!', 'さけるー!'], {
+  who: 'card',
+  trigger: { title: 'Pulled two ways', when: 'An old hand is crushing it near the right edge when the arm grabs its other end. Both pull; it stretches.' },
+  gloss: { 'ще ме разкъсате!': 'you will tear me apart!', 'さけるー!': 'I\'m tearing!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
 // toasts: one-line lists, no random draw
 // ---- apologise to the card (right-click a card that has been ripped out or torn) ----
 defineLines('card.forgive', ['…fine. I forgive you.', 'apology accepted', 'it is ok. it is not ok.', 'just this once', 'прощавам ти', 'ゆるす…'], {
@@ -184,6 +192,27 @@ defineLines('card.grudge', ['no. just no.', 'never.', 'I will remember your face
 });
 defineLines('card.again', ['you said that already', 'words are cheap', 'still torn, though'], { who: 'card', lang: 'en',
   trigger: { title: 'Sorry again', when: 'You apologise to the same card a second time.' } });
+
+// ---- the Konami code: every card is an omikuji slip for the rest of the visit (page/omikuji.js) ----
+// said by the card you ripped out, followed by its fortune's kanji and name ("it says: 大吉 · Great blessing")
+defineLines('card.omikuji', ['let me read it…', 'it says:', 'unrolling… it says', 'the slip says:', 'my fortune:', 'drum roll…', 'гласи:', 'おみくじによると'], {
+  who: 'card',
+  trigger: { title: 'Its fortune', when: 'After the Konami code every card is a folded omikuji slip. Rip one out of its slot: it unfolds and reads you its fortune.' },
+  gloss: { 'гласи:': 'it reads:', 'おみくじによると': 'according to the fortune slip' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('card.cursed', ['bad luck. tie me to a tree.', 'of course I got the curse', 'this is your fault', 'can I draw again?', 'cursed. lovely.', 'проклет съм.', '凶だって…'], {
+  who: 'card',
+  trigger: { title: 'A curse', when: 'The slip you ripped out unfolds to 凶, the curse.' },
+  gloss: { 'проклет съм.': 'I am cursed.', '凶だって…': 'it says "curse"…' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('card.tornslip', ['you tore my fortune!', 'that is seven years of bad luck', 'torn fortunes come true backwards', 'now nobody gets to know', 'the gods saw that', 'скъса ми късмета!', 'ばちが当たるよ'], {
+  who: 'card',
+  trigger: { title: 'A torn fortune', when: 'You yank an omikuji slip so hard it tears in two. Both halves read 凶.' },
+  gloss: { 'скъса ми късмета!': 'you tore my luck!', 'ばちが当たるよ': 'you will be punished for that' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
 
 defineLines('toast.ripped', ['Ripped it out! Stack them, or throw one hard to smash it.'], { who: 'toast', lang: 'en' });
 defineLines('toast.smashed', ['Smashed!'], { who: 'toast', lang: 'en' });

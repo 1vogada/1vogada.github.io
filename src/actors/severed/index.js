@@ -16,8 +16,8 @@ import { clock } from '../../core/clock.js';
 import { defineSpeaker, say as speak } from '../../core/speech.js';
 import { machine, behaviours } from '../../core/machine.js';
 import { isFree } from '../../core/claims.js';
-import { hook } from '../../core/debug.js';
-import { world, add, remove, isHeld } from '../../world/world.js';
+import { hook, flags } from '../../core/debug.js';
+import { world, add, remove, isHeld, isCrazy, worldPoly, fragment } from '../../world/world.js';
 import { drawOffset } from '../../world/loop.js';
 import { gore } from '../../world/fx.js';
 import { turn } from './gait.js';
@@ -84,7 +84,7 @@ export function gone(o) {
 
 // what it can sense of the other actors (wired in src/reactions.js): the shelf, as a place to hide from the new hand
 let sensed = {};
-/** what the old hands can sense: { shelf() -> { x0, x1, y, w } | null, onShelf(o) -> boolean } */
+/** what the old hands can sense: { shelf() -> { x0, x1, y, w } | null, onShelf(o) -> boolean, arm() -> { pose, x, y, look } | null, armed() -> boolean, pointer() -> [x, y] viewport px | null, moved() -> game ms the pointer last moved } */
 export function senses(s) { sensed = s || {}; }
 /** the arm has a hand of its own to cut off (not a stump, not before a card was ripped) */ export const armed = () => (sensed.armed ? sensed.armed() : false);
 
@@ -100,8 +100,39 @@ function vengeful(o, m) {
   return d < AV.SEE_PX;
 }
 
+/** the new hand, when the arm is out showing it (the mirror game), else null */ export const armOut = () => (sensed.arm ? sensed.arm() : null);
+
+// the mirror game: a walking old hand that has met the new one, in view, with nothing better to do (not hunting, running, hurt,
+// or hiding), while the arm is out
+function mirrors(o) {
+  const a = o.ai, t = frameT;
+  if (!a.met || a.hunting || t < a.flee || t < a.hurt || t < (a.mirrorCool || 0) || onRefuge(o) || !armOut()) return false;
+  const p = o.body.getPosition(), x = p.x * S - scrollX, y = p.y * S - scrollY;
+  return x > 0 && x < document.documentElement.clientWidth && y > 0 && y < innerHeight + B.h;
+}
 /** the shelf, if it is out (a place to hide) */ export const refuge = () => (sensed.shelf ? sensed.shelf() : null);
 /** o is on the shelf */ export const onRefuge = (o) => (sensed.onShelf ? sensed.onShelf(o) : false);
+/** your mouse pointer on the page, viewport px, or null */ export const pointer = () => (sensed.pointer ? sensed.pointer() : null);
+/**
+ * a gift for you: your pointer is on the page and has rested for GIFT.STILL_MS (off while window.__test.idle === false, like the
+ * arm's "are you still there?": the scenarios leave the mouse still)
+ */
+export const giving = () => !!pointer() && !!sensed.moved && flags().idle && clock.now() - sensed.moved() > SV.GIFT.STILL_MS;
+/**
+ * the crumpled ball of the card q it has just crushed, around q's own point (cx, cy) (px; crush takes it from the patterned band): a little piece of q,
+ * screwed up (its outline jagged, darker, creased). It is a piece (it can be thrown, and caught and eaten) marked ball.
+ */
+export function crumple(q, cx, cy, giver) {
+  const G = SV.GIFT, R = G.R, poly = [], clip = [];
+  for (let k = 0; k < 8; k++) { const t = k / 8 * 2 * Math.PI; poly.push([cx + Math.cos(t) * R * 0.86, cy + Math.sin(t) * R * 0.86]); }
+  for (let k = 0; k < 18; k++) { const t = k / 18 * 2 * Math.PI, r = R * (k % 2 ? 0.74 + 0.12 * Math.random() : 0.92 + 0.1 * Math.random()); clip.push(`${(cx + Math.cos(t) * r).toFixed(1)}px ${(cy + Math.sin(t) * r).toFixed(1)}px`); }
+  const b = fragment(q, poly, 'piece', {}, { ball: true, giver });
+  b.el.style.clipPath = `polygon(${clip.join(',')})`; b.el.style.filter = G.FILTER;
+  const fold = document.createElement('i');   // the creases and the shading of a ball of paper
+  Object.assign(fold.style, { position: 'absolute', left: (cx - R) + 'px', top: (cy - R) + 'px', width: 2 * R + 'px', height: 2 * R + 'px', borderRadius: '50%', pointerEvents: 'none', background: G.CREASES });
+  b.el.appendChild(fold);
+  return b;
+}
 
 /**
  * the new hand ate one of them (hand.devoured): every other old hand that is up to it walks to the spot (page x), bows, one of
@@ -117,6 +148,70 @@ export function scare() {
   for (const o of list) { const m = brains.get(o); if (o.ai.met && m.is('walk', 'rest', 'rise')) m.set('hide'); }
 }
 
+/** the new hand poked an old hand that plays dead (hand.poked): twitch, it gives itself away */
+export function poked(o, twitch) {
+  const m = brains.get(o); if (!m || !m.is('dead')) return;
+  o.ai.pokedAt = clock.now(); o.ai.twitched = !!twitch;
+  if (twitch) say(o, 'twitch', true);
+}
+
+/** the new hand took it for a card and has hold of it (hand.mistook): caught, and it says what it is */
+export function mistaken(o) { const m = brains.get(o); if (!m) return; o.ai.why = 'notcard'; m.set('caught'); }
+/** ...and gave it back (hand.returned): it drops, and says something about it */
+export function returned(o) { const m = brains.get(o); if (!m || !m.is('caught')) return; m.set('limp'); say(o, 'returned', true); }
+
+/**
+ * the cheese pull: the arm is dragging card q off the shelf (its grip at page px `from`). The nearest old hand in view close to
+ * it that is up to it may jump on the other end (TUNE.severed.CHEESE.CHANCE; the one random draw happens only when there is such
+ * a hand). @returns the old hand that pounced, or null
+ */
+export function pounce(q, from) {
+  const C = SV.CHEESE; if (!q || !world.bodies.has(q) || isCrazy()) return null;
+  const poly = worldPoly(q); let best = null, bd = C.NEAR_PX;
+  for (const o of list) {
+    if (!world.bodies.has(o) || !brains.get(o).is(...C.FROM) || !isFree(o) || isHeld(o)) continue;
+    const p = o.body.getWorldCenter(), y = p.y * S - scrollY, d = edgeDist(poly, p.x * S, p.y * S);
+    if (y > 0 && y < innerHeight + C.BELOW_PX && d < bd) { bd = d; best = o; }
+  }
+  if (!best || Math.random() >= C.CHANCE) return null;
+  Object.assign(best.ai, { ride: q, cheese: true, mine: false, away: from }); brains.get(best).set('hitch');
+  return best;
+}
+
+/** the cheese pull is over (hand.cheesed): with its half (mine) it rides it down; without, it is flicked off */
+export function cheesed(o, mine) {
+  const m = brains.get(o); if (!m || !m.is('cheese') || !world.bodies.has(o)) return;
+  if (mine && world.bodies.has(mine)) { Object.assign(o.ai, { ride: mine, mine: true, cheese: false }); o.ai.boast = true; m.set('hitch'); return; }   // (hitch says its line)
+  if (isHeld(o)) return;   // you took it off the card: it is yours now (held)
+  const C = SV.CHEESE; m.set('whee'); o.body.setLinearVelocity({ x: C.FLICK[0], y: C.FLICK[1] }); o.body.setAngularVelocity(-C.FLICK_SPIN);
+}
+
+/**
+ * tug of war over a card (hand.wrest): the arm took the other end of card q, which o was crushing. It lets go of the squeeze and
+ * hangs on to its end (wrest). @returns true when it did
+ */
+export function wrest(o, q) {
+  const m = brains.get(o); if (!m || !m.is('crush') || o.ai.prey !== q || !world.bodies.has(o)) return false;
+  o.ai.ride = q; m.set('wrest'); return true;
+}
+/** it has card q after all (the arm slipped or let go, or q is its half of the torn card): it says so, and crushes it */
+export function regain(o, q, kind) {
+  const m = brains.get(o); if (!m || !world.bodies.has(q)) return;
+  q.wrested = true;   // (no second tug of war over the same card)
+  o.ai.ride = null; o.ai.prey = q; say(o, kind, true); m.set('crush');
+}
+/** the tug of war is over (hand.wrested): with the whole card or its half (mine) it crushes it; without, it already slipped */
+export function wrested(o, mine, whole) {
+  const m = brains.get(o); if (!m || !m.is('wrest') || !world.bodies.has(o) || !mine || !world.bodies.has(mine)) return;
+  regain(o, mine, whole ? 'wrestWon' : 'wrestEnd');
+}
+
+/** the new hand ate a gift (hand.ate of a ball): the old hand that brought it is not pleased */
+export function regift(ball) { const o = ball.giver; if (o && list.has(o) && world.bodies.has(o)) say(o, 'regift', true); }
+
+/** rock, paper, scissors (scenes/rps.js): what the old hand shows while it plays ('rps'): { pose: rock | paper | scissors, pump } */
+export function play(o, look) { o.ai.rps = { ...(o.ai.rps || {}), ...look }; }
+
 /** legacy sevSet(o, st) */
 export function set(o, st) { const m = brains.get(o); if (m) m.set(st); }
 
@@ -127,7 +222,28 @@ export function cut() { const h = app && app.hand; if (h && typeof h.cut === 'fu
  * legacy sevFood(q): a card or big piece it may hunt. The flags it shares with the other actors (o.root, o.tug of the arm's
  * tug, o.sq of its own squeeze, o.die) stay; the pointer is world.grab; the arm's target (legacy claw.o) is a claim.
  */
-export const food = (q) => (q.kind === 'card' || (q.kind === 'piece' && !q.die)) && !q.root && !q.tug && !q.sq && !isHeld(q) && isFree(q);
+export const food = (q) => (q.kind === 'card' || (q.kind === 'piece' && !q.die)) && !q.root && !q.tug && !q.sq && !isHeld(q) && isFree(q) && !riding(q) && !q.ball;
+
+/** an old hand is riding on q (hitch) */
+export const riding = (q) => { for (const o of list) if (o.ai.ride === q && brains.get(o).is('hitch', 'cheese')) return true; return false; };
+
+// The hitchhiker: each time you pick up a card or a piece (the moment it is loose in your hand), the nearest old hand close by
+// that is up to it may jump on (TUNE.severed.HITCH.CHANCE; the one random draw happens only when there is such a hand)
+let eyed = null;   // the pick-up already looked at
+/** how far page point (x, y) is from the edge of an outline (page px) */
+function edgeDist(poly, x, y) {
+  let d = Infinity;
+  for (let i = 0; i < poly.length; i++) { const [ax, ay] = poly[i], [bx, by] = poly[(i + 1) % poly.length], ex = bx - ax, ey = by - ay, f = Math.max(0, Math.min(1, ((x - ax) * ex + (y - ay) * ey) / (ex * ex + ey * ey || 1))); d = Math.min(d, Math.hypot(x - ax - ex * f, y - ay - ey * f)); }
+  return d;
+}
+function hitchhike() {
+  const g = world.grab; if (!g || g === eyed || g.o.root) return;
+  eyed = g; const q = g.o, HI = SV.HITCH;
+  if ((q.kind !== 'card' && q.kind !== 'piece') || q.die || q.tug || q.sq || q.ball || isCrazy() || riding(q)) return;
+  const poly = worldPoly(q); let best = null, bd = HI.NEAR_PX;
+  for (const o of list) { if (!world.bodies.has(o) || !brains.get(o).is(...HI.FROM) || !isFree(o)) continue; const p = o.body.getWorldCenter(), d = edgeDist(poly, p.x * S, p.y * S); if (d < bd) { bd = d; best = o; } }
+  if (best && Math.random() < HI.CHANCE) { Object.assign(best.ai, { ride: q, cheese: false, mine: false, away: null }); brains.get(best).set('hitch'); }
+}
 
 /** legacy sevUnsquash(q): the card it was squeezing is let go, as it was */
 export function unsquash(q) {
@@ -142,9 +258,11 @@ export const busy = () => { for (const o of list) if (brains.get(o).busy) return
 export function tick(dt) {
   if (!list.size) return;
   frameT = clock.now();
+  hitchhike();
   for (const o of [...list]) {
     const a = o.ai, h = o.hand, m = brains.get(o); m.age(dt);
-    if (isHeld(o) && m.state !== 'held') m.set('held');
+    if (isHeld(o) && m.state !== 'held' && !m.def.tap) m.set('held');   // (a state with tap: true tells a tap from a pick-up itself)
+    else if (m.state === 'walk' && mirrors(o)) m.set('mirror');
     if (vengeful(o, m)) m.set('avenge');
     if (m.state === 'held') a.alone = frameT; else if (!a.painted && frameT - (a.alone ?? a.born) > SV.PAINT.MS && m.is('walk', 'rest')) { a.painted = true; m.set('paint'); }   // left alone long enough: it writes something
     m.step(dt);
@@ -175,5 +293,6 @@ export function install(a) {
   bus.on('body.removed', ({ body }) => { if (body.kind === 'hand') gone(body); });                 // legacy remove(): sevGone(o)
   bus.on('body.thrown', ({ body }) => { if (body.kind === 'hand') say(body, 'thrown', true); });   // legacy drop(): sp > HOT
   // world.reset: nothing of its own to undo (legacy resetAll removed every body, and remove() ran sevGone for each hand)
-  hook('__sev', { list, get SEV() { return table(); }, POSES, set, spawn, say, cut, mourn, scare });
+  hook('__sev', { list, get SEV() { return table(); }, POSES, set, spawn, say, cut, mourn, scare, brain, riding });
+  hook('__sev', { list, get SEV() { return table(); }, POSES, set, spawn, say, cut, mourn, scare, riding, pounce });
 }

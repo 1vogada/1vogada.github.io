@@ -99,13 +99,17 @@ export function slip(P, H) {
   set('sulk'); speak('slip', true);
   bus.emit('hand.slipped', { card: o });
 }
-/** torn in two between you and it (legacy clawRip(P, H); P, H: page px of the pointer and of the claw's grip); 'hand.ripped' where your half screamed */
-export function rip(P, H) {
-  { const el = get().o.el; el.style.maskImage = el.style.webkitMaskImage = ''; el.style.filter = ''; }   // the pieces are copies of this element: they must not inherit the stretch look
-  const c = get(), o = c.o, g = o.tug, W = o.w, Hh = o.h, cf = Math.cos(g.phi), sf = Math.sin(g.phi);
+/**
+ * cut o in two across the line of its tug (o.tug: gp, gh, phi, psi), with ragged teeth along the tear; P, H: page px where the two
+ * halves are held (gp at P, gh at H). Draws the teeth, then each half's die time (legacy clawRip order). src: the outline to cut.
+ * @returns { mine (the half at P), its (the half at H), cut } or null when the line misses the outline
+ */
+export function split(o, P, H, src) {
+  { const el = o.el; el.style.maskImage = el.style.webkitMaskImage = ''; el.style.filter = ''; }   // the pieces are copies of this element: they must not inherit the stretch look
+  const g = o.tug, W = o.w, Hh = o.h, cf = Math.cos(g.phi), sf = Math.sin(g.phi);
   // the tear runs across the pull, halfway between the two grips. A piece's outline can put that right on a corner (a sliver, an
   // edge too short to be a body): then a little to either side, the nearest place that gives two proper halves
-  const src = outline(o); let hs, us, cut, side;
+  let hs, us, cut, side;
   for (const off of [0, 12, -12, 24, -24, 36, -36]) {
     const mx = (g.gp[0] + g.gh[0]) / 2 + W / 2 + cf * off, my = (g.gp[1] + g.gh[1]) / 2 + Hh / 2 + sf * off;
     side = (p) => (p[0] - mx) * cf + (p[1] - my) * sf; hs = []; us = []; cut = [];
@@ -117,7 +121,7 @@ export function rip(P, H) {
     if (cut.length === 2 && validPoly(hs) && validPoly(us)) break;
     if (!o.poly) break;   // a whole card: as it always was
   }
-  if (cut.length !== 2 || !validPoly(hs) || !validPoly(us)) return slip(P, H);
+  if (cut.length !== 2 || !validPoly(hs) || !validPoly(us)) return null;
   // the tear is ragged: both halves get the same teeth along the cut, in the clip-path only. The bodies keep the straight edge
   const n = Math.max(6, Math.round(Math.hypot(cut[1][0] - cut[0][0], cut[1][1] - cut[0][1]) / 15)), teeth = [];
   for (let k = 1; k < n; k++) teeth.push([(k + (Math.random() - 0.5) * 0.5) / n, (k % 2 ? 1 : -1) * (4 + Math.random() * 9) * (Math.random() < 0.18 ? 2.2 : 1)]);
@@ -129,20 +133,18 @@ export function rip(P, H) {
     });
     return `polygon(${out.map(([x, y]) => `${x.toFixed(1)}px ${y.toFixed(1)}px`).join(',')})`;
   };
-  const ang = g.psi - g.phi, ca = Math.cos(ang), sa = Math.sin(ang), gr = world.grab;
+  const ang = g.psi - g.phi, ca = Math.cos(ang), sa = Math.sin(ang);
   const part = (poly, at, loc) => {
     o.body.setTransform({ x: (at[0] - (loc[0] * ca - loc[1] * sa)) / S, y: (at[1] - (loc[0] * sa + loc[1] * ca)) / S }, ang);
     const p = fragment(o, poly, 'piece', {}, polyArea(poly) < 3000 ? { die: now() + 2500 + Math.random() * 1200 } : {});
     p.el.style.clipPath = jag(poly); return p;
   };
   const mine = part(us, P, g.gp), its = part(hs, H, g.gh);
-  // legacy `world.destroyJoint(gr.joint); grab = null;`: the pointer's hold ends without a drop() (no release, no throw)
-  world.b2.destroyJoint(gr.joint); world.grab = null; o.tug = null; remove(o);
-  hold(mine, P[0], P[1], { pointerId: gr.id, clientX: gr.cx, clientY: gr.cy }); world.grab.moved = true; world.grab.h = gr.h; c.g = world.grab; c.far = false;
-  c.o = its; c.gh = g.gh; c.joint = world.b2.createJoint(new world.pl.MouseJoint({ maxForce: TUNE.physics.MAX_FORCE * its.body.getMass(), frequencyHz: H_.JOINT_HZ, dampingRatio: 1 }, world.ground, its.body, { x: H[0] / S, y: H[1] / S }));
-  its.body.setAngularDamping(HELD_SPIN);
-  // strings between the two torn edges, and a mess
-  const ux = Math.cos(g.psi), uy = Math.sin(g.psi), loc = (f) => ({ x: (cut[0][0] + (cut[1][0] - cut[0][0]) * f - W / 2) / S, y: (cut[0][1] + (cut[1][1] - cut[0][1]) * f - Hh / 2) / S });
+  return { mine, its, cut };
+}
+/** strings between the two torn edges, and a mess (after split; the strands live on the claw record, they stretch and snap) */
+export function strands(mine, its, g, cut, W, Hh) {
+  const c = get(), ux = Math.cos(g.psi), uy = Math.sin(g.psi), loc = (f) => ({ x: (cut[0][0] + (cut[1][0] - cut[0][0]) * f - W / 2) / S, y: (cut[0][1] + (cut[1][1] - cut[0][1]) * f - Hh / 2) / S });
   for (let k = 0; k < 7; k++) {
     const el = document.createElement('i'); el.className = 'strand'; world.layer.appendChild(el);
     c.strands.push({ el, q: loc(0.08 + 0.84 * (k + Math.random() * 0.8) / 7), a: mine, b: its, t: 0, life: 0.35 + Math.random() * 1.1, max: 240 + Math.random() * 460, w: 3 + Math.random() * 4 });
@@ -151,6 +153,19 @@ export function rip(P, H) {
     const q = loc(k / 8), A = mine.body.getWorldPoint(q), B = its.body.getWorldPoint(q);
     gore(A.x * S, A.y * S, ux, uy, 5, 1); gore(B.x * S, B.y * S, -ux, -uy, 5, 1); gore((A.x + B.x) / 2 * S, (A.y + B.y) / 2 * S, -uy, ux, 3, 0.6);
   }
+}
+/** torn in two between you and it (legacy clawRip(P, H); P, H: page px of the pointer and of the claw's grip); 'hand.ripped' where your half screamed */
+export function rip(P, H) {
+  const c = get(), o = c.o, g = o.tug, W = o.w, Hh = o.h;
+  const halves = split(o, P, H, outline(o));
+  if (!halves) return slip(P, H);
+  const { mine, its, cut } = halves, gr = world.grab;
+  // legacy `world.destroyJoint(gr.joint); grab = null;`: the pointer's hold ends without a drop() (no release, no throw)
+  world.b2.destroyJoint(gr.joint); world.grab = null; o.tug = null; remove(o);
+  hold(mine, P[0], P[1], { pointerId: gr.id, clientX: gr.cx, clientY: gr.cy }); world.grab.moved = true; world.grab.h = gr.h; c.g = world.grab; c.far = false;
+  c.o = its; c.gh = g.gh; c.joint = world.b2.createJoint(new world.pl.MouseJoint({ maxForce: TUNE.physics.MAX_FORCE * its.body.getMass(), frequencyHz: H_.JOINT_HZ, dampingRatio: 1 }, world.ground, its.body, { x: H[0] / S, y: H[1] / S }));
+  its.body.setAngularDamping(HELD_SPIN);
+  strands(mine, its, g, cut, W, Hh);
   bus.emit('hand.ripped', { mine, its }); set('triumph'); speak('rip', true);   // legacy say(mine, 'slice', true): your half screams
   shake();
   if (!c.ripped) { c.ripped = true; bus.emit('ui.toast', { msg: line('toast.halved') }); }

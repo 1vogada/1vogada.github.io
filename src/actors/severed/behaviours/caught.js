@@ -7,11 +7,12 @@ import { set, say } from '../index.js';
 
 export default defineBehaviour('sev', 'caught', {
   pose: 'held',
-  enter(o, m) { say(o, 'doomed', true); },
+  enter(o, m) { const a = o.ai; say(o, a.why || 'doomed', true); a.quiet = !!a.why; a.why = null; },   // (a.why: another first line, and no begging after it: see mistaken())
   tick(o, m, dt) {
     const a = o.ai; a.wig = 0.7;
     if (isFree(o)) { set(o, 'limp'); return; }   // the arm let go (cut off, gave up)
-    if (m.t > 1.2) say(o, 'doomed');
+    if (m.t > 1.2 && !a.quiet) say(o, 'doomed');
   },
+  leave(o, m) { o.ai.quiet = false; },
 });
 export function install(app) {}
