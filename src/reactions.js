@@ -47,10 +47,14 @@ export const RULES = [
   ['shelf.opened', () => severed.scare()],                                                                       // met old hands hide on it
   ['sev.avenged', () => hand.cut()],                                                                              // revenge: the thrown katana takes the new hand off
   ['sev.state', ({ self, from, to }) => from === 'crush' && to === 'gloat' && hand.oldStole(self)],             // it ate a card: the arm saw that
-  ['sev.state', ({ to }) => to === 'mirror' && hand.notice('mirror')],
+  ['sev.state', ({ to }) => to === 'mirror' && hand.notice('mirror')],                                       // the mirror game: the arm notices it is being copied
   ['sev.state', ({ self, to }) => to === 'crush' && hand.wrest(self, self.ai.prey)],                        // tug of war: the arm may grab the other end
   ['hand.wrest', ({ hand: o, card }) => severed.wrest(o, card)],                                                // ...the old hand hangs on to its end
-  ['hand.wrested', ({ hand: o, mine, its }) => severed.wrested(o, mine, !its)],                                // ...and crushes what it is left with                                          // the mirror game: the arm notices it is being copied
+  ['hand.wrested', ({ hand: o, mine, its }) => severed.wrested(o, mine, !its)],                                // ...and crushes what it is left with
+  ['sev.tower', ({ x, y }) => hand.peer(x, y)],                                    // the hand tower is up: the arm leans in to look
+  ['sev.towerGrab', () => hand.pulled()],                                          // ...the top one has it by the wrist: they pull it out
+  ['sev.towerFell', () => hand.towerFell()],                                       // ...it came down first: the arm laughs, or snaps back
+  ['hand.shookOff', () => severed.shookOff()],                                     // ...it shook them off: they fly, and land in a heap
   // ---- the shelf ----
   ['hand.reaching', ({ card, fear, dt, t, x }) => cards.panic(card, fear, dt, t, x)], // reach: the card on the shelf panics, bystanders point
   ['hand.state', ({ from, to }) => { if (from === 'reach' && to === 'eat') { const c = hand.get(), g = hand.grip(); severed.pounce(c.o, g && [g[0] + scrollX, g[1] + scrollY]); } }],   // the cheese pull: an old hand may jump on the snack
@@ -68,5 +72,6 @@ export function install(app) {
   hand.senses({ shelfSnack: () => shelf.snack(), nearShelf: (P) => shelf.near(P), onShelf: (o) => shelf.holds(o), want: (v) => shelf.want(v), shelf: () => shelf.state(), oldHands: () => severed.list });
   severed.senses({ shelf: () => shelf.state(), onShelf: (o) => shelf.holds(o), arm: () => hand.shown(),   // a place to hide from the new hand; the new hand out to copy
     pointer: () => idle.pointer(), moved: () => idle.lastMove(),   // your pointer, for a gift
-    armed: () => { const m = hand.brain(); return hand.awake() && !!m && !m.is('stump', 'regrow'); } });   // a hand on the arm to take revenge on
+    armed: () => { const m = hand.brain(); return hand.awake() && !!m && !m.is('stump', 'regrow'); },   // a hand on the arm to take revenge on
+    lurks: () => hand.lurks(), wrist: () => hand.wrist() });   // the arm out at the edge, and its wrist: for the hand tower   // a hand on the arm to take revenge on
 }

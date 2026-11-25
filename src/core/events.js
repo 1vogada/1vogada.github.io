@@ -61,6 +61,7 @@ export const EVENTS = {
   'hand.cheesed': '{ hand, mine, its } the cheese pull is over: the card tore in two (mine: the old hand\'s half, its: the arm\'s), or the old hand lost hold (mine: null, its: the whole card)',
   'hand.wrest': '{ hand, card } tug of war: it took the free end of a card an old hand was crushing (the old hand hangs on to the other end)',
   'hand.wrested': '{ hand, card, mine, its } the tug of war is over: torn in two (mine: the old hand\'s half, its: the arm\'s), or one slipped (the whole card in mine or its, null in the other)',
+  'hand.shookOff': '{ } the hand tower: pulled out onto the page, it shook the old hands off (before it sulks and its "towerSulk" line)',
   // ---- cut-off hands ----
   'sev.spawned': '{ hand } a cut-off hand body exists',
   'sev.state': '{ self, from, to, data } a cut-off hand changed state (emitted by core/machine.js for actor "sev"; from: null for the first)',
@@ -69,6 +70,10 @@ export const EVENTS = {
   'sev.cheese': '{ hand, card } an old hand landed on the far end of a card the arm is dragging off the shelf (the cheese pull)',
   'sev.slipped': '{ hand, card } you clicked an old hand in a tug of war over a card: it slips and flies off (before its line)',
   'sev.gift': '{ hand, ball } an old hand put a crumpled ball of a card it crushed down below your cursor (a present)',
+  'sev.towerGather': '{ hands } three old hands start the hand tower: they gather at the right edge ([bottom, middle, top]; after the bottom one\'s "towerCall" line)',
+  'sev.tower': '{ hand, x, y } the hand tower is up and the arm lurks: the top one (hand) reaches, its fingertips at page px x, y (again every second while the arm lurks)',
+  'sev.towerGrab': '{ hand, hands } the top one of the tower has the arm by the wrist; they pull (after its "towerPull" line)',
+  'sev.towerFell': '{ why } the hand tower came down before the arm shook them off (why: held | knocked | slow | bored | gone), after the hands switched to tumble',
   'sev.flung': '{ hand, card } a hitchhiking old hand lost its grip and flies off (before it says "whee")',
   // ---- shelf ----
   'shelf.opened': '{ y }',

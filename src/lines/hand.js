@@ -616,4 +616,42 @@ defineLines('hand.rpsQuit', ['coward.', 'where are you going?', 'forfeit!', 'we 
   lang: ['en', 'en', 'en', 'en', 'bg', 'ja'],
 });
 
+// ---- the hand tower (src/actors/severed/tower.js) ----
+defineLines('hand.towerPeer', ['what are you three up to?', 'is that… a tower?', 'very impressive. now what?', 'I am just looking', 'cute. really cute.', 'какво правите там?', 'なにしてるの?'], {
+  who: 'hand',
+  trigger: { title: 'The hand tower: it leans in to look', when: 'Three old hands stand on each other at the right edge. Curious, the arm leans down to look.' },
+  gloss: { 'какво правите там?': 'what are you doing there?', 'なにしてるの?': 'what are you doing?' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.pulled', ['hey! HEY! let go!', 'my elbow does not bend that way', 'I am not a rope!', 'unhand me! literally!', 'where are you taking me?!', 'this is NOT how arms work', 'пуснете ме!', 'はなせー!'], {
+  who: 'hand',
+  trigger: { title: 'The hand tower: pulled out', when: 'The tower has it by the wrist and drags it out onto the page, stretched far out of its corner.' },
+  gloss: { 'пуснете ме!': 'let me go!', 'はなせー!': 'let gooo!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.shakeOff', ['OFF. GET OFF.', 'enough!', 'shoo! all of you!', 'I said let go!', 'shake shake SHAKE', 'махайте се!', 'どけー!'], {
+  who: 'hand',
+  trigger: { title: 'The hand tower: shaking them off', when: 'Pulled far enough, it shakes the three off.' },
+  gloss: { 'махайте се!': 'get lost!', 'どけー!': 'out of my way!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.towerSulk', ['I am not talking about this', 'that was humiliating', 'I need to lie down', 'nobody saw that, right?', 'my poor wrist', 'унижение…', 'もうやだ…'], {
+  who: 'hand',
+  trigger: { title: 'The hand tower: it sulks', when: 'It shook them off and snaps back out of sight to sulk for a while.' },
+  gloss: { 'унижение…': 'humiliation…', 'もうやだ…': 'I have had enough…' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.towerSaved', ['phew. thank you.', 'I owe you one', 'that was far too close', 'my hero', 'I was about to win anyway', 'благодаря ти', 'たすかった…'], {
+  who: 'hand',
+  trigger: { title: 'The hand tower: you save it', when: 'You pick one of the old hands off the tower while they pull the arm: it comes down and the arm snaps back.' },
+  gloss: { 'благодаря ти': 'thank you', 'たすかった…': 'saved…' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.towerLaugh', ['ha! timber.', 'nice try, stack of thumbs', 'gravity, my friend', 'that was not even close', 'ten out of ten for effort', 'ха-ха, паднахте', 'おしかったね'], {
+  who: 'hand',
+  trigger: { title: 'The hand tower: it laughs', when: 'The tower comes down while the arm is looking at it.' },
+  gloss: { 'ха-ха, паднахте': 'ha-ha, you fell', 'おしかったね': 'so close' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
 export function install(app) {}
