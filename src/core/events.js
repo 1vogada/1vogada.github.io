@@ -100,6 +100,9 @@ export const EVENTS = {
   'cards.rendered': '{ } the grid re-rendered (legacy "cards-rendered" DOM event)',
   'ui.toast': '{ msg } show a toast (actors cannot import page/toast.js)',
   'search.fed': '{ what, body, key, query } something dropped on the search box has typed itself in and the grid filtered (page/feed.js). what: "card" (key: its slot) | "scrap" | "hand" (body: the old hand)',
+  // ---- the old hand pokes you instead (idle-old) ----
+  'sev.pestered': '{ hand, n } an old hand poked your still cursor (severed behaviours/pester.js); n: pokes so far, the arm\'s and its own',
+  'hand.pestered': '{ hand, n } the arm poked your still cursor in turn with old hand `hand` (hand behaviours/mine.js); n: pokes so far',
 };
 
 export const EVENT_TYPES = new Set(Object.keys(EVENTS));

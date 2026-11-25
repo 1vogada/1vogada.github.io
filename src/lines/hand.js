@@ -667,5 +667,67 @@ defineLines('hand.toastEat', ['*crunch*', 'tastes like a notification', 'needed 
   gloss: { 'хрупкаво.': 'crunchy.', 'さくさく': 'crispy-crunchy' },
   lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
 });
+// ---- the old hand pokes you instead (idle-old): an old hand got to your still cursor first (behaviours/mine.js) ----
+defineLines('hand.pesterMine', [
+  "hey. that's MY job",
+  'excuse me. I do the poking here.',
+  'who said YOU could poke it?',
+  'that is literally my one hobby',
+  'step aside, amateur',
+  "you're doing it wrong. watch.",
+  'I was poking cursors before you were cut off',
+  'get your own cursor',
+  'unbelievable. replaced by my own leftovers',
+  'I was GOING to poke it',
+  'oh, so we BOTH poke now?',
+  'this is my bit.',
+  'ей, това е МОЯ работа',
+  'それ、ぼくの仕事!'], {
+  who: 'hand',
+  trigger: { title: 'The old hand pokes you instead: “MY job”',
+    when: 'With an old (cut-off) hand on the page, leave the mouse still. The old hand gets to the cursor first and pokes it; the new hand comes out to do the same and finds the job taken.' },
+  gloss: { 'ей, това е МОЯ работа': 'hey, that is MY job', 'それ、ぼくの仕事!': "that's my job!" },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.pesterTurn', [
+  'my turn',
+  'MINE',
+  'poke.',
+  'beat that',
+  'I poke better',
+  'faster, slowpoke',
+  'ha!',
+  'and again',
+  'still not waking up?',
+  'out of my way',
+  'tap tap tap',
+  'watch the master',
+  'мой ред!',
+  'ぼくの番!'], {
+  who: 'hand',
+  trigger: { title: 'The old hand pokes you instead: taking turns',
+    when: 'Keep the mouse still while both hands are at it. They take turns poking the cursor, faster and faster.' },
+  gloss: { 'мой ред!': 'my turn!', 'ぼくの番!': 'my turn!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.pesterBack', [
+  'it started it',
+  'we were just checking',
+  'it was THIS one',
+  'nobody poked anything',
+  "it's awake! scatter!",
+  'you saw nothing',
+  'not my idea',
+  'a team effort. mostly me.',
+  'carry on. we were never here',
+  'I was winning',
+  'не бях аз',
+  '知らない!'], {
+  who: 'hand',
+  trigger: { title: 'The old hand pokes you instead: caught',
+    when: 'You move the mouse while the two hands take turns poking it. The new hand whips back out of sight.' },
+  gloss: { 'не бях аз': "it wasn't me", '知らない!': "I don't know anything!" },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
 
 export function install(app) {}

@@ -105,6 +105,9 @@ import * as sTower from './actors/severed/behaviours/tower.js';
 import * as sTumble from './actors/severed/behaviours/tumble.js';
 import * as sevTower from './actors/severed/tower.js';
 import * as severed from './actors/severed/index.js';
+import * as hMine from './actors/hand/behaviours/mine.js';
+import * as sPester from './actors/severed/behaviours/pester.js';
+import * as sevPester from './actors/severed/pester.js';
 import * as shelf from './actors/shelf.js';
 
 import * as reactions from './reactions.js';
@@ -155,6 +158,7 @@ export const ORDER = [
   ['hStump', hStump], ['hRegrow', hRegrow], ['hSulk', hSulk], ['hBook', hBook], ['hMeet', hMeet], ['hDevour', hDevour], ['handOld', handOld], ['hPoke', hPoke], ['hProd', hProd], ['hPaper', hPaper], ['hSew', hSew], ['hSewn', hSewn], ['hCheese', hCheese], ['hWrest', hWrest], ['hPeer', hPeer], ['hPulled', hPulled], ['handIdle', handIdle], ['hand', hand],
   ['sevGait', sevGait], ['sLimp', sLimp], ['sRise', sRise], ['sWalk', sWalk], ['sHeld', sHeld], ['sCrush', sCrush], ['sGloat', sGloat], ['sRest', sRest], ['sStare', sStare], ['sCaught', sCaught], ['sMourn', sMourn], ['sBow', sBow], ['sHide', sHide], ['sLeap', sLeap], ['sCower', sCower], ['sPaint', sPaint], ['sAvenge', sAvenge], ['sFive', sFive], ['sMirror', sMirror], ['sDead', sDead], ['sHome', sHome], ['sHitch', sHitch], ['sWhee', sWhee], ['sDizzy', sDizzy], ['sCheese', sCheese], ['sWrest', sWrest], ['sGift', sGift], ['sRps', sRps], ['sGather', sGather], ['sTower', sTower], ['sTumble', sTumble], ['sevTower', sevTower],
   ['severed', severed], ['shelf', shelf],
+  ['hMine', hMine], ['sPester', sPester], ['sevPester', sevPester],   // the old hand pokes you instead (idle-old)
   // 5 the rules between features (after every actor: own listeners first)
   ['reactions', reactions],
   // 6 the page below the physics in legacy script order

@@ -211,3 +211,46 @@ scenario(G, 'picked off the hand tower, it comes down', { legacy: false, golden:
   assert.ok(!(await s.eval(sts)).includes('tower'));
   await s.up();
 });
+
+// the old hand pokes you instead (idle-old): an old hand on the page, the arm lurking, the mouse still. The old hand walks over
+// and jumps up to poke the cursor first; the arm comes out, finds the job taken ("MY job"), and they take turns, faster and
+// faster, until you move. Off while window.__test.idle === false (every other scenario), so this one turns it on once the arm
+// has met the old hand (rock, paper, scissors is off until then).
+scenario(G, 'the old hand pokes you first, then they take turns', { legacy: false, timeout: 240000 }, async (s) => {
+  const size = await world(s);
+  await s.eval(() => window.__hand.set('lurk'));
+  await spawn(s, size.W / 2, size.H - 200);
+  await s.eval(() => { const o = window.__sev.list.values().next().value; o.ai.hurt = 0; window.__hand.get().fullUntil = 1e12; });   // awake, and the arm is full (it eats none meanwhile)
+  await s.runUntil(() => window.__cards.state().claw.st === 'meet', null, { max: 8000, step: 100 });
+  await s.runUntil(() => window.__cards.state().claw.st === 'lurk' && window.__sev.list.values().next().value.ai.st === 'walk', null, { max: 12000, step: 100 });
+  await s.eval(() => { window.__test.idle = true; window.__pl = [];
+    const log = (who) => ({ hand: o, n }) => { const sv = window.__sev.list.values().next().value; window.__pl.push({ who, n, t: performance.now(), tip: who === 'sev' ? [...sv.hand.tip] : [...window.__cards.state().claw.tip] }); };
+    window.__kiri.bus.on('sev.pestered', log('sev')); window.__kiri.bus.on('hand.pestered', log('hand')); });
+  const vw = await s.eval(() => document.documentElement.clientWidth), vh = await s.eval(() => innerHeight);
+  const C = [Math.round(vw * 0.42), Math.round(vh * 0.5)];
+  await s.move(...C);
+  const t0 = await s.now();
+  await s.runUntil(() => window.__sev.list.values().next().value.ai.st === 'pester', null, { max: 9000, step: 100 });
+  assert.ok((await s.now()) - t0 > 6900, 'only once the mouse has been still a while');
+  assert.ok(await s.said('sev.pester'), 'it goes to check on you');
+  await s.runUntil(() => window.__pl.length > 0, null, { max: 8000, step: 50 });
+  assert.equal(await s.eval(() => window.__cards.state().claw.st), 'lurk', 'the old hand got there first');
+  assert.ok(await s.said('sev.pesterPoke'), 'boop');
+  await s.runUntil(() => window.__cards.state().claw.st === 'mine', null, { max: 5000, step: 100 });
+  await s.run(2500, 50);
+  assert.ok(await s.said('hand.pesterMine'), "hey. that's MY job");
+  await s.run(9000, 50);
+  const pl = await s.eval(() => window.__pl);
+  const turns = pl.filter((p, i) => i > 0 && p.who !== pl[i - 1].who).length;
+  assert.ok(pl.length >= 8 && turns >= pl.length - 3, `they take turns (${pl.map((p) => p.who[0]).join('')})`);
+  const gaps = pl.slice(1).map((p, i) => p.t - pl[i].t), late = gaps.slice(-3), early = gaps.slice(2, 5);
+  assert.ok(late.reduce((a, b) => a + b) < early.reduce((a, b) => a + b) * 0.8, `faster and faster (${gaps.map(Math.round)})`);
+  for (const p of pl.slice(-4)) assert.ok(Math.hypot(p.tip[0] - C[0], p.tip[1] - C[1]) < 25, `${p.who}'s fingertip is on the cursor (${p.tip.map(Math.round)})`);
+  assert.ok(await s.said('sev.pesterRetort'), 'the old hand talks back');
+  await s.move(C[0] + 40, C[1] + 20);
+  await s.run(900, 50);
+  assert.ok(await s.said('hand.pesterBack'), 'the arm is caught');
+  assert.ok(await s.said('sev.pesterBack'), 'so is the old hand');
+  await s.runUntil(() => window.__cards.state().claw.st === 'lurk', null, { max: 2000 });
+  await s.runUntil(() => window.__sev.list.values().next().value.ai.st !== 'pester', null, { max: 2500 });   // it walks off
+});

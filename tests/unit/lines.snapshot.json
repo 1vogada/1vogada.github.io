@@ -1790,6 +1790,67 @@
    ["さくさく","ja","crispy-crunchy"]
   ]
  },
+ "hand.pesterMine": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"The old hand pokes you instead: “MY job”","when":"With an old (cut-off) hand on the page, leave the mouse still. The old hand gets to the cursor first and pokes it; the new hand comes out to do the same and finds the job taken."},
+  "lines": [
+   ["hey. that's MY job","en"],
+   ["excuse me. I do the poking here.","en"],
+   ["who said YOU could poke it?","en"],
+   ["that is literally my one hobby","en"],
+   ["step aside, amateur","en"],
+   ["you're doing it wrong. watch.","en"],
+   ["I was poking cursors before you were cut off","en"],
+   ["get your own cursor","en"],
+   ["unbelievable. replaced by my own leftovers","en"],
+   ["I was GOING to poke it","en"],
+   ["oh, so we BOTH poke now?","en"],
+   ["this is my bit.","en"],
+   ["ей, това е МОЯ работа","bg","hey, that is MY job"],
+   ["それ、ぼくの仕事!","ja","that's my job!"]
+  ]
+ },
+ "hand.pesterTurn": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"The old hand pokes you instead: taking turns","when":"Keep the mouse still while both hands are at it. They take turns poking the cursor, faster and faster."},
+  "lines": [
+   ["my turn","en"],
+   ["MINE","en"],
+   ["poke.","en"],
+   ["beat that","en"],
+   ["I poke better","en"],
+   ["faster, slowpoke","en"],
+   ["ha!","en"],
+   ["and again","en"],
+   ["still not waking up?","en"],
+   ["out of my way","en"],
+   ["tap tap tap","en"],
+   ["watch the master","en"],
+   ["мой ред!","bg","my turn!"],
+   ["ぼくの番!","ja","my turn!"]
+  ]
+ },
+ "hand.pesterBack": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"The old hand pokes you instead: caught","when":"You move the mouse while the two hands take turns poking it. The new hand whips back out of sight."},
+  "lines": [
+   ["it started it","en"],
+   ["we were just checking","en"],
+   ["it was THIS one","en"],
+   ["nobody poked anything","en"],
+   ["it's awake! scatter!","en"],
+   ["you saw nothing","en"],
+   ["not my idea","en"],
+   ["a team effort. mostly me.","en"],
+   ["carry on. we were never here","en"],
+   ["I was winning","en"],
+   ["не бях аз","bg","it wasn't me"],
+   ["知らない!","ja","I don't know anything!"]
+  ]
+ },
  "sev.cut": {
   "who": "sev",
   "legacy": "SEV_SAY.cut",
@@ -2563,6 +2624,86 @@
    ["did you mean: \"card\"? no. NO.","en"],
    ["няма ме там","bg","I'm not in there"],
    ["僕はいないよ","ja","I'm not there"]
+  ]
+ },
+ "sev.pester": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The old hand pokes you instead","when":"With an old (cut-off) hand on the page, leave the mouse still. It walks over to below your cursor to check on you."},
+  "lines": [
+   ["is it asleep?","en"],
+   ["hello? big one?","en"],
+   ["it stopped moving…","en"],
+   ["I'll check on it","en"],
+   ["don't die on me","en"],
+   ["is it… broken?","en"],
+   ["tiptoe, tiptoe","en"],
+   ["oh no. it's gone still.","en"],
+   ["someone has to make sure","en"],
+   ["me first, me first","en"],
+   ["nobody tell the new one","en"],
+   ["жив ли си?","bg","are you alive?"],
+   ["だいじょうぶ?","ja","are you okay?"]
+  ]
+ },
+ "sev.pesterPoke": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The old hand pokes you instead: poke","when":"It jumps up and pokes the cursor with one finger, again and again."},
+  "lines": [
+   ["boop","en"],
+   ["poke.","en"],
+   ["you awake?","en"],
+   ["wake up","en"],
+   ["poke poke","en"],
+   ["helloooo?","en"],
+   ["anybody in there?","en"],
+   ["tap","en"],
+   ["still there?","en"],
+   ["boop. boop.","en"],
+   ["don't make me poke twice","en"],
+   ["I'm small but I'm persistent","en"],
+   ["събуди се","bg","wake up"],
+   ["つんつん","ja","poke poke"]
+  ]
+ },
+ "sev.pesterRetort": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The old hand pokes you instead: it talks back","when":"The new hand says the poking is its job. The old hand answers with its next poke."},
+  "lines": [
+   ["I was here first","en"],
+   ["finders keepers","en"],
+   ["you snooze, you lose","en"],
+   ["job's taken","en"],
+   ["you used to be ME","en"],
+   ["I learned from the best. you.","en"],
+   ["it likes my poke better","en"],
+   ["there's room for two pokers","en"],
+   ["make me","en"],
+   ["it's a free cursor","en"],
+   ["I have one finger and I will use it","en"],
+   ["първо дойдох аз","bg","I came first"],
+   ["早い者勝ち","ja","first come, first served"]
+  ]
+ },
+ "sev.pesterBack": {
+  "who": "sev",
+  "legacy": null,
+  "trigger": {"title":"The old hand pokes you instead: you move","when":"You move the mouse while it pokes the cursor. It drops back down and scurries off."},
+  "lines": [
+   ["eep!","en"],
+   ["it's alive!","en"],
+   ["I knew it","en"],
+   ["it moved! it moved!","en"],
+   ["we were never here","en"],
+   ["abort, abort","en"],
+   ["good. you're fine.","en"],
+   ["phew","en"],
+   ["told you it was alive","en"],
+   ["run!","en"],
+   ["мърда!","bg","it moves!"],
+   ["動いた!","ja","it moved!"]
   ]
  },
  "toast.shelfGone": {

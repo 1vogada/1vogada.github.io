@@ -400,4 +400,86 @@ defineLines('sev.notthere', ['I\'m not in there', 'zero results. story of my lif
   lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
 });
 
+// ---- the old hand pokes you instead (idle-old): your mouse went still (behaviours/pester.js) ----
+defineLines('sev.pester', [
+  'is it asleep?',
+  'hello? big one?',
+  'it stopped moving…',
+  "I'll check on it",
+  "don't die on me",
+  'is it… broken?',
+  'tiptoe, tiptoe',
+  "oh no. it's gone still.",
+  'someone has to make sure',
+  'me first, me first',
+  'nobody tell the new one',
+  'жив ли си?',
+  'だいじょうぶ?'], {
+  who: 'sev',
+  trigger: { title: 'The old hand pokes you instead',
+    when: 'With an old (cut-off) hand on the page, leave the mouse still. It walks over to below your cursor to check on you.' },
+  gloss: { 'жив ли си?': 'are you alive?', 'だいじょうぶ?': 'are you okay?' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.pesterPoke', [
+  'boop',
+  'poke.',
+  'you awake?',
+  'wake up',
+  'poke poke',
+  'helloooo?',
+  'anybody in there?',
+  'tap',
+  'still there?',
+  'boop. boop.',
+  "don't make me poke twice",
+  "I'm small but I'm persistent",
+  'събуди се',
+  'つんつん'], {
+  who: 'sev',
+  trigger: { title: 'The old hand pokes you instead: poke',
+    when: 'It jumps up and pokes the cursor with one finger, again and again.' },
+  gloss: { 'събуди се': 'wake up', 'つんつん': 'poke poke' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.pesterRetort', [
+  'I was here first',
+  'finders keepers',
+  'you snooze, you lose',
+  "job's taken",
+  'you used to be ME',
+  'I learned from the best. you.',
+  'it likes my poke better',
+  "there's room for two pokers",
+  'make me',
+  "it's a free cursor",
+  'I have one finger and I will use it',
+  'първо дойдох аз',
+  '早い者勝ち'], {
+  who: 'sev',
+  trigger: { title: 'The old hand pokes you instead: it talks back',
+    when: 'The new hand says the poking is its job. The old hand answers with its next poke.' },
+  gloss: { 'първо дойдох аз': 'I came first', '早い者勝ち': 'first come, first served' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.pesterBack', [
+  'eep!',
+  "it's alive!",
+  'I knew it',
+  'it moved! it moved!',
+  'we were never here',
+  'abort, abort',
+  "good. you're fine.",
+  'phew',
+  'told you it was alive',
+  'run!',
+  'мърда!',
+  '動いた!'], {
+  who: 'sev',
+  trigger: { title: 'The old hand pokes you instead: you move',
+    when: 'You move the mouse while it pokes the cursor. It drops back down and scurries off.' },
+  gloss: { 'мърда!': 'it moves!', '動いた!': 'it moved!' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
 export function install(app) {}

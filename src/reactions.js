@@ -69,12 +69,16 @@ export const RULES = [
   ['body.dropped', (ev) => feed.dropped(ev)],                                      // let go on the search box: it eats it and searches
   ['search.fed', ({ what, key }) => what === 'card' && cards.putBack(key)],         // ...found its project: the card grows back into its slot
   ['search.fed', ({ what, body }) => what === 'hand' && severed.notThere(body)],    // ...searched for "hand": the old hand is not in there
+  // ---- the old hand pokes you instead (idle-old: src/actors/severed/pester.js, src/actors/hand/behaviours/mine.js) ----
+  ['sev.pestered', ({ hand: o, n }) => hand.pesterTurn(o, n)],                    // the old hand poked your still cursor: the arm's turn
+  ['hand.pestered', ({ hand: o, n }) => o && severed.pesterTurn(o, n)],           // ...the arm poked it: the old hand's turn, a little sooner
 ];
 
 export function install(app) {
   for (const [type, fn] of RULES) bus.on(type, fn);
   // what the hand can sense of the shelf (legacy: clawTick read shelfSnack / nearShelf / onShelf / shelf.want directly)
-  hand.senses({ shelfSnack: () => shelf.snack(), nearShelf: (P) => shelf.near(P), onShelf: (o) => shelf.holds(o), want: (v) => shelf.want(v), shelf: () => shelf.state(), oldHands: () => severed.list });
+  hand.senses({ shelfSnack: () => shelf.snack(), nearShelf: (P) => shelf.near(P), onShelf: (o) => shelf.holds(o), want: (v) => shelf.want(v), shelf: () => shelf.state(), oldHands: () => severed.list,
+    pester: () => severed.pestering() });   // an old hand poking your still cursor first (idle-old)
   severed.senses({ shelf: () => shelf.state(), onShelf: (o) => shelf.holds(o), arm: () => hand.shown(),   // a place to hide from the new hand; the new hand out to copy
     pointer: () => idle.pointer(), moved: () => idle.lastMove(),   // your pointer, for a gift
     armed: () => { const m = hand.brain(); return hand.awake() && !!m && !m.is('stump', 'regrow'); },   // a hand on the arm to take revenge on

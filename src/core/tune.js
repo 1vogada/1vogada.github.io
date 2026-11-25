@@ -120,7 +120,8 @@ export const TUNE = {
     SNATCH_REACH: [440, 0.36],        // it only snatches a card this close to the right edge (px, or share of vw); further away it just sulks
     JEALOUS: { MS: 5000, LEAN_MS: 2600, LEAN_PX: 150, COOL_MS: 30000 },   // you carry an old hand this long: the arm leans in, drumming its fingers, and says so
     SQUEEZE: { W: 520, SX: 0.4, RATE: 6, SAY_MS: 6000 },   // window narrower than W px while the hand is out: it is pressed flat (sx), complains every SAY_MS
-    IDLE: { MS: 10000, CREEP_S: 2.6, GIVE_UP_S: 9, COOL_MS: 30000 },   // "are you still there?": mouse still this long (Ivo: 10 s), creep, give up, not again for
+    IDLE: { MS: 10000, CREEP_S: 2.6, GIVE_UP_S: 9, COOL_MS: 30000 },
+    RIVAL: { CREEP_S: 1.6, STOP_PX: 60, SAY_S: 1.6, TAP_S: 0.5, TAP_MIN_S: 0.18, FLAT: 1.3, RATE: 30, SOLO_S: 3, MAX_S: 120 },   // "that's MY job" (idle-old, behaviours/mine.js): creep out, wait STOP_PX right of the cursor, speak, then poke in turn with the old hand (each TAP_S, its fingertip on the cursor while sin * FLAT >= 1, shortening with TUNE.severed.PESTER.RALLY.DECAY); alone after SOLO_S without an answer; give up after MAX_S   // "are you still there?": mouse still this long (Ivo: 10 s), creep, give up, not again for
     CIRCLE: { WINDOW_MS: 1000, TURNS: 0.75, R_MIN: 20, R_MAX: 420, HOLD_MS: 700, EYE_PX: 5 },   // the mouse going round in circles: the last WINDOW_MS of it winds TURNS times round its middle, R_MIN..R_MAX px out; eyes follow it for HOLD_MS after, the pupil up to EYE_PX off centre
     SHOWN_PX: 40,                     // the arm counts as out (the old hands may play the mirror game) while its wrist is within this many px past the right edge
     OLD: {                            // the new hand and the old (cut-off) one
@@ -278,6 +279,21 @@ export const TUNE = {
       FLING: [[-9, -4], [-6, -7]],    // shaken off: flung left between these speeds (m/s, [x, y] at the least and at the most)
       SPIN: 12,                       // and spun up to this fast (rad/s)
       LAND_V: 1, LAND_S: 3,           // landed (slower than this, m/s) or after this long: dizzy
+    },
+    PESTER: {                         // the old hand pokes you instead (idle-old): your mouse still, it jumps up and pokes the cursor
+      STILL_MS: 7000,                 // the pointer still this long (game ms; the arm's own poke is TUNE.hand.IDLE.MS): the nearest old hand goes
+      AT_PX: 30, FAR_PX: 260,         // it stops this close below the cursor (px across); further than FAR_PX it scuttles
+      GO_S: 14, MAX_S: 120,           // gives up getting there after this long; and pestering altogether after this long
+      LOOK_S: 0.6,                    // it looks up this long before the first jump
+      BOUNCE: 0.05,                   // waiting its turn it bounces on its fingers this much (leg length, m)
+      HOP_S: 0.9, HOP_MIN_S: 0.3,     // a jump up to the cursor and back takes this long, shortening with the rally (RALLY.DECAY per poke) to HOP_MIN_S
+      MIN_UP_PX: 40,                  // it always jumps at least this high (a cursor at or below it)
+      REACH_PX: 70,                   // first guess: its fingertip this far above its middle at the top (then measured from the drawing)
+      FLAT: 1.25,                     // the arc's height is min(1, sin * FLAT): it holds still at the top for a moment
+      SOLO_S: 2.2,                    // alone (nobody answering) it jumps again this long after a poke
+      BACK_S: 1,                      // you moved: it stands there this long, saying so, then walks off
+      RALLY: { GAP_MS: 1300, DECAY: 0.86, MIN_MS: 140 },   // taking turns with the arm: each answers its rival's poke after GAP_MS * DECAY^n (n pokes so far), at least MIN_MS
+      POSE: { curl: 0.95, th: 0.9, spread: 0.5, eye: 1.35, pupil: 0.7, happy: 0, point: 1, legs: 0 },   // in the air: one finger out
     },
   },
   // ---- the secret shelf ----

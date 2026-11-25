@@ -1,0 +1,309 @@
+{
+ "scenario": "sev / the old hand pokes you first, then they take turns",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 32,
+   "ms": 800,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "ms": 376,
+   "who": "card",
+   "key": "SAY.rip",
+   "text": "I was comfy!"
+  },
+  {
+   "doc": 1,
+   "t": 2976,
+   "ms": 1312,
+   "who": "hand",
+   "key": "SEV_SAY.cut",
+   "text": "…"
+  },
+  {
+   "doc": 1,
+   "t": 3568,
+   "ms": 2208,
+   "who": "hand",
+   "key": "hand.meet",
+   "text": "hello, former me"
+  },
+  {
+   "doc": 1,
+   "t": 4464,
+   "ms": 1312,
+   "who": "hand",
+   "key": "sev.meet",
+   "text": "impostor!"
+  },
+  {
+   "doc": 1,
+   "t": 13248,
+   "ms": 1520,
+   "who": "hand",
+   "key": "sev.pester",
+   "text": "tiptoe, tiptoe"
+  },
+  {
+   "doc": 1,
+   "t": 17360,
+   "ms": 1312,
+   "who": "hand",
+   "key": "sev.pesterPoke",
+   "text": "helloooo?"
+  },
+  {
+   "doc": 1,
+   "t": 18976,
+   "ms": 2496,
+   "who": "hand",
+   "key": "hand.pesterMine",
+   "text": "you're doing it wrong. watch."
+  },
+  {
+   "doc": 1,
+   "t": 20416,
+   "ms": 1488,
+   "who": "hand",
+   "key": "sev.pesterPoke",
+   "text": "つんつん"
+  },
+  {
+   "doc": 1,
+   "t": 22704,
+   "ms": 1584,
+   "who": "hand",
+   "key": "sev.pesterRetort",
+   "text": "първо дойдох аз"
+  },
+  {
+   "doc": 1,
+   "t": 23584,
+   "ms": 1312,
+   "who": "hand",
+   "key": "hand.pesterTurn",
+   "text": "beat that"
+  },
+  {
+   "doc": 1,
+   "t": 25680,
+   "ms": 1312,
+   "who": "hand",
+   "key": "sev.pesterPoke",
+   "text": "poke poke"
+  },
+  {
+   "doc": 1,
+   "t": 26192,
+   "ms": 1312,
+   "who": "hand",
+   "key": "hand.idle|hand.pesterTurn|sev.pesterPoke",
+   "text": "poke."
+  },
+  {
+   "doc": 1,
+   "t": 28144,
+   "ms": 912,
+   "who": "hand",
+   "key": "sev.pesterPoke",
+   "text": "wake up"
+  },
+  {
+   "doc": 1,
+   "t": 28960,
+   "ms": 608,
+   "who": "hand",
+   "key": "hand.pesterTurn",
+   "text": "my turn"
+  },
+  {
+   "doc": 1,
+   "t": 29056,
+   "ms": null,
+   "who": "hand",
+   "key": "hand.unsqueezed|sev.pesterBack",
+   "text": "phew"
+  },
+  {
+   "doc": 1,
+   "t": 29568,
+   "ms": null,
+   "who": "hand",
+   "key": "hand.pesterBack",
+   "text": "知らない!"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 16,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 48,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 832,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1208,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1228,
+   "claw": "off",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 2148,
+   "claw": "lurk",
+   "sev": "limp",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 3648,
+   "claw": "meet",
+   "sev": "stare",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6048,
+   "claw": "lurk",
+   "sev": "stare",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6248,
+   "claw": "lurk",
+   "sev": "walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 13264,
+   "claw": "lurk",
+   "sev": "pester",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 17464,
+   "claw": "mine",
+   "sev": "pester",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 29480,
+   "claw": "lurk",
+   "sev": "pester",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 30030,
+   "claw": "lurk",
+   "sev": "walk",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "hand": 1
+   }
+  }
+ ]
+}
