@@ -2,11 +2,11 @@
 // Legacy clawTick branch `c.st === 'tug'` (tick) and the post-chain block `c.st === 'tug' && c.o && c.o.tug && grab && grab.o === c.o`
 // (hold), moved verbatim. tick(c, m, dt) sets the motion target on the frame's ctx m.x; hold(c, m, x, H) runs after the easing.
 import { defineBehaviour } from '../../../core/machine.js';
-import { say } from '../../../core/speech.js';
+import { bus } from '../../../core/bus.js';
 import { world } from '../../../world/world.js';
 import { gore } from '../../../world/fx.js';
 import { POSES } from '../poses.js';
-import { set, speak, clamp01, tell } from '../index.js';
+import { set, speak, clamp01 } from '../index.js';
 import { wristFor, tugDraw, slip, rip } from '../tug.js';
 
 export default defineBehaviour('hand', 'tug', {
@@ -32,7 +32,7 @@ export default defineBehaviour('hand', 'tug', {
     const t = x.t, dt = x.dt, { ripE, strainE } = x;
     const g = c.o.tug, Pp = [grab.cx + scrollX, grab.cy + scrollY];
     g.rip = ripE; tugDraw(c.o, Pp, H);
-    if (g.e > 24) { const card = c.o, pain = clamp01(g.e / ripE); tell('card.hurt', { card, pain }, () => say(card, 'card.agony', { mode: 'agony', pain })); }
+    if (g.e > 24) bus.emit('card.hurt', { card: c.o, pain: clamp01(g.e / ripE) });   // legacy cardSay(c.o, pain)
     const st = clamp01((g.e - strainE) / (ripE - strainE));
     if (g.e > strainE) {
       g.grip -= dt * (0.1 + 1.6 * st * st); speak('tug');

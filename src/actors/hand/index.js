@@ -31,7 +31,6 @@ import { clock, now } from '../../core/clock.js';
 import { defineSpeaker, say as speechSay, expire, place, flushLater, addFirst, hush } from '../../core/speech.js';
 import { list, line } from '../../core/lines.js';
 import { machine } from '../../core/machine.js';
-import { isEvent } from '../../core/events.js';
 import { claim } from '../../core/claims.js';
 import { hook } from '../../core/debug.js';
 import { world, isCrazy, load, init, report } from '../../world/world.js';
@@ -100,13 +99,6 @@ export function notice(kind) {
   if (!c.react) c.react = { kind, at: t + wait, born: t }; else { c.react.at = Math.min(c.react.at, t + wait); if (Math.random() < 0.5) c.react.kind = kind; }
   clock.wake();
 }
-
-/**
- * what the hand does to a card goes out as an event the cards answer with their line (legacy: the claw code said it on the
- * card at this point). An event the catalogue does not carry yet (card.hurt, card.begged, card.crushed, hand.tossed: requested)
- * falls back to the legacy speech call, so the line is said exactly once either way
- */
-export function tell(type, payload, fallback) { if (isEvent(type)) bus.emit(type, payload); else fallback(); }
 
 /** out of patience: it takes the held card (legacy snatch(o)) */
 export function snatch(o) { claw.o = o; set('snatch'); }

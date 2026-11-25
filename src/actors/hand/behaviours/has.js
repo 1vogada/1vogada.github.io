@@ -2,11 +2,11 @@
 // Legacy clawTick branch `c.st === 'has'` (tick) and the post-chain block `c.st === 'has' && c.o` (hold: the snap of the stretch,
 // then the joint follows the grip), moved verbatim. tick(c, m, dt) sets the motion target on the frame's ctx m.x.
 import { defineBehaviour } from '../../../core/machine.js';
+import { bus } from '../../../core/bus.js';
 import { TUNE } from '../../../core/tune.js';
-import { say } from '../../../core/speech.js';
 import { world } from '../../../world/world.js';
 import { POSES } from '../poses.js';
-import { set, speak, tell } from '../index.js';
+import { set, speak } from '../index.js';
 import { wristFor, pre, tug, tugDraw, untug } from '../tug.js';
 
 const S = TUNE.physics.S, P_ = TUNE.physics, H_ = TUNE.hand;
@@ -24,7 +24,7 @@ export default defineBehaviour('hand', 'has', {
       const hard = Math.random() < H_.TOSS_HARD; world.b2.destroyJoint(c.joint); c.joint = null; c.o = null;
       o.body.setGravityScale(P_.FALL); o.body.setAngularDamping(P_.SPIN); o.body.setLinearVelocity(hard ? { x: -24, y: -8 } : { x: -9, y: -7 }); o.body.setAngularVelocity((Math.random() - 0.5) * 8);
       if (hard) { o.hot = t + P_.HOT_MS; o.body.setBullet(true); }
-      tell('hand.tossed', { card: o, hard }, () => { if (hard) say(o, 'card.throw', { force: true }); });   // legacy say(o, 'throw', true) when hard
+      bus.emit('hand.tossed', { card: o, hard });   // legacy say(o, 'throw', true) when hard: the card says it
       c.cool = t + H_.COOL.toss; set('lurk'); speak('toss', true);
     }
   },
