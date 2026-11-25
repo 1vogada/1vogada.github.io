@@ -14,12 +14,12 @@ export const EVENTS = {
   'card.ripped': '{ card } torn out of the grid (legacy tear, after its "rip" line, before the toast)',
   'card.landed': '{ card, at, closing } a hard landing that did not break it',
   'card.smashed': '{ card, at, closing, pieces } shattered (after the smash scream, before the body is removed)',
-  'card.cutting': '{ card, at } the blade tip entered it (after the "cutting" scream)',
+  'card.cutting': '{ card, grid, at } the blade tip entered it (after the "cutting" scream). card: the body, or null for a card still in the grid; grid: that grid element, else null; at: the tip, page px',
   'card.cut': '{ card, at, pieces, held } cut in two by the blade (after the katana\'s own line)',
   'card.hurt': '{ card, pain } the arm is hurting it (tug past 24 px, or a squeeze): pain 0..1 picks the agony tier (legacy cardSay)',
   'card.begged': '{ card } the long pause of a crush, once per crush',
   'card.crushed': '{ card, at } crushed in the arm\'s fist (after the gore, before the body is removed and the arm\'s own line)',
-  'card.stabbed': '{ card, at, held } in and out by the same side. Emitted BEFORE the wound is pushed and before the "stab" line',
+  'card.stabbed': '{ card, grid, at, held } in and out by the same side (card: the body, or null for a card still in the grid; grid: that grid element, else null). Emitted BEFORE the wound is pushed and before the "stab" line',
   // ---- any body ----
   'body.added': '{ body } a body joined world.bodies',
   'body.removed': '{ body } about to leave: emitted after the grab is dropped and its bubble hushed, before destroyBody (legacy sevGone point)',
@@ -33,7 +33,7 @@ export const EVENTS = {
   'katana.sheathed': '{ katana } put back',
   'blade.moved': '{ from, to, speed, dt } the tip moved this frame (page px, px/s). Emitted once per frame by world/cut.js',
   // ---- the arm's hand ----
-  'hand.state': '{ from, to } the arm changed state (legacy clawSet)',
+  'hand.state': '{ self, from, to, data } the arm changed state (legacy clawSet; emitted by core/machine.js for actor "hand"; from: null for the first)',
   'hand.said': '{ kind, ms } a hand line went up (kind: the key without "hand.")',
   'hand.grabbed': '{ card, how } (how: tug | catch | reach | snatch) it closed its fingers on a card (tug, catch, reach)',
   'hand.slipped': '{ card } its claws slid off',
@@ -46,14 +46,14 @@ export const EVENTS = {
   'hand.reaching': '{ card, fear, dt, t, x } every frame of the creep towards a card on the shelf (x: wrist, viewport px)',
   // ---- cut-off hands ----
   'sev.spawned': '{ hand } a cut-off hand body exists',
-  'sev.state': '{ self, from, to, data } (emitted by core/machine.js for actor "sev")',
+  'sev.state': '{ self, from, to, data } a cut-off hand changed state (emitted by core/machine.js for actor "sev"; from: null for the first)',
   'sev.gone': '{ hand } it left the world',
   // ---- shelf ----
   'shelf.opened': '{ y }',
   'shelf.closed': '{ }',
   // ---- scenes ----
   'slip.opened': '{ project, fortune }',
-  'slip.closed': '{ how } how: "x" | "secret" | "escape" | "hand" | "backdrop"',
+  'slip.closed': '{ how } how: "x" (No or the × pressed, or welcome back, while there is no hand to play the coin game: no __hand (reduced motion) or crazy mode; with a hand they start the game instead) | "secret" (the secret × in the corner) | "escape" | "hand" (the hand closed it, scenes/coin.js) | "backdrop"',
   'coin.tossed': '{ side, call } side: "heads" | "tails" | null (it did not bother)',
   'scene.started': '{ name }',
   'scene.ended': '{ name, killed }',

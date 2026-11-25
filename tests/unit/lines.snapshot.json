@@ -1,0 +1,1309 @@
+{
+ "card.pull": {
+  "who": "card",
+  "legacy": "SAY.pull",
+  "trigger": {"title":"On being taken hold of","when":"You begin to drag a card that still sits in its place in the grid. A card the Hand plucks out of the air says the same."},
+  "lines": [
+   ["hey!","en"],
+   ["nope.","en"],
+   ["let go!","en"],
+   ["I live here","en"],
+   ["hands off","en"],
+   ["не!","bg","no!"],
+   ["やめて!","ja","stop it!"],
+   ["excuse me?","en"]
+  ]
+ },
+ "card.strain": {
+  "who": "card",
+  "legacy": "SAY.strain",
+  "trigger": {"title":"Under strain","when":"You have pulled some 160 px from where you took hold, and the root begins to lose its grip."},
+  "lines": [
+   ["nnngh!","en"],
+   ["holding… on…","en"],
+   ["not… today","en"],
+   ["stop iiit","en"],
+   ["my roots!!","en"],
+   ["ъъъгх","bg","nnngh"]
+  ]
+ },
+ "card.back": {
+  "who": "card",
+  "legacy": "SAY.back",
+  "trigger": {"title":"Let go in time","when":"You release the card before it tears. It springs home, and gloats."},
+  "lines": [
+   ["ha!","en"],
+   ["told you","en"],
+   ["too weak","en"],
+   ["nice try","en"],
+   ["stubborn > you","en"]
+  ]
+ },
+ "card.rip": {
+  "who": "card",
+  "legacy": "SAY.rip",
+  "trigger": {"title":"Torn out","when":"You pull past 350 px, or hold the strain until the root gives up. The card comes loose in your hand."},
+  "lines": [
+   ["AAAH!","en"],
+   ["nooo!","en"],
+   ["rude.","en"],
+   ["ау!","bg","ow!"],
+   ["I was comfy!","en"],
+   ["put me back!","en"]
+  ]
+ },
+ "card.throw": {
+  "who": "card",
+  "legacy": "SAY.throw",
+  "trigger": {"title":"Thrown","when":"A loose card is let go at more than 900 px a second."},
+  "lines": [
+   ["wheee","en"],
+   ["NOOO","en"],
+   ["not the wall!","en"],
+   ["I can fly?!","en"],
+   ["aaaaaa","en"]
+  ]
+ },
+ "card.land": {
+  "who": "card",
+  "legacy": "SAY.land",
+  "trigger": {"title":"A hard landing","when":"The card strikes something at more than 500 px a second, and survives it."},
+  "lines": [
+   ["oof","en"],
+   ["ow","en"],
+   ["ugh","en"],
+   ["I'm fine","en"],
+   ["ох…","bg","oh…"],
+   ["my corner!","en"]
+  ]
+ },
+ "button.hi": {
+  "who": "button",
+  "legacy": "SAY.btnhi",
+  "trigger": {"title":"The new buttons","when":"After it snaps, a fresh Heads and Tails poof in and each says hello."},
+  "lines": [
+   ["hi!","en"],
+   ["hello again","en"],
+   ["we are back","en"],
+   ["miss us?","en"],
+   ["pick me!","en"],
+   ["no, me!","en"],
+   ["hey there","en"],
+   ["ta-da","en"],
+   ["здрасти!","bg","hi!"],
+   ["ей!","bg","hey!"],
+   ["ето ни пак","bg","here we are again"],
+   ["やあ!","ja","hey!"],
+   ["こんにちは","ja","hello"],
+   ["ただいま","ja","we are home"],
+   ["おっす","ja","yo"]
+  ]
+ },
+ "card.cutting": {
+  "who": "card",
+  "legacy": "SAY.cutting",
+  "trigger": {"title":"With the blade inside","when":"The very tip of the katana has entered the card and has not yet come out."},
+  "lines": [
+   ["AAAAAAAAA","en"],
+   ["IT IS IN ME","en"],
+   ["STOP STOP STOP","en"],
+   ["NOT THE MIDDLE","en"],
+   ["I CAN FEEL IT","en"],
+   ["痛い痛い痛い!!","ja","it hurts, it hurts, it hurts!!"],
+   ["ААААААА!","bg","a scream"],
+   ["боли боли боли","bg","hurts, hurts, hurts"]
+  ]
+ },
+ "card.stab": {
+  "who": "card",
+  "legacy": "SAY.stab",
+  "trigger": {"title":"Stabbed, not cut","when":"The tip leaves by the same side it came in through. The card is not divided, but it bleeds for a while."},
+  "lines": [
+   ["was I spared???","en"],
+   ["just a flesh wound","en"],
+   ["I'm leaking","en"],
+   ["that's going to scar","en"],
+   ["it only went in a little","en"],
+   ["you missed. mostly.","en"],
+   ["am I… alive?","en"],
+   ["まだ生きてる…?","ja","still alive…?"],
+   ["жив съм?!","bg","I am alive?!"]
+  ]
+ },
+ "card.slice": {
+  "who": "card",
+  "legacy": "SAY.slice",
+  "trigger": {"title":"Cut in two","when":"The tip goes in by one side and out by another. These are also the last words of a card torn in half between you and the Hand."},
+  "lines": [
+   ["AAAAAAARGH!!","en"],
+   ["NOOOOOOOO—","en"],
+   ["EEEEEEEEK!!","en"],
+   ["GYAAAAAAH!","en"],
+   ["AAAAAAAAAAA!!!","en"],
+   ["ААААААААА!!!","bg","a scream"],
+   ["НЕЕЕЕЕЕЕ!","bg","NOOOOO!"],
+   ["ぎゃああああ!!","ja","a shriek"],
+   ["うわあああ!!","ja","a wail"],
+   ["HHHHRRRKK—","en"]
+  ]
+ },
+ "card.smash": {
+  "who": "card",
+  "legacy": "SAY.smash",
+  "trigger": {"title":"Shattered","when":"A thrown card meets a wall, the floor or another card at more than 1300 px a second. Only a thrown card breaks; one that is dropped or carried never does."},
+  "lines": [
+   ["AAAAAAAAAA—","en"],
+   ["NOOOOO!!","en"],
+   ["ААААА!!","bg","a scream"],
+   ["ぐはっ!!","ja","the wind knocked out of it"],
+   ["KRRRK—","en"]
+  ]
+ },
+ "card.agony.0": {
+  "who": "card",
+  "legacy": "AGONY.0",
+  "trigger": {"title":"Stretched: the first degree","when":"You and the Hand each hold an end of the same card, and it has begun to grow longer."},
+  "lines": [
+   ["uh oh","en"],
+   ["not again","en"],
+   ["too… long…","en"],
+   ["I bend, I do not br—","en"],
+   ["pick a side!","en"],
+   ["ъъъгх","bg","nnngh"],
+   ["のびてる!","ja","I am stretching!"]
+  ]
+ },
+ "card.agony.1": {
+  "who": "card",
+  "legacy": "AGONY.1",
+  "trigger": {"title":"Stretched: the second degree","when":"The card is pulled past a third of what it can bear. Also said in the Hand’s fist, while it is being crushed."},
+  "lines": [
+   ["IT HURTS","en"],
+   ["STOP PULLING","en"],
+   ["MY MIDDLE!!","en"],
+   ["I am not cheese!","en"],
+   ["LET GO LET GO","en"],
+   ["БОЛИИИ!","bg","IT HUUURTS!"],
+   ["痛い!!","ja","it hurts!!"]
+  ]
+ },
+ "card.agony.2": {
+  "who": "card",
+  "legacy": "AGONY.2",
+  "trigger": {"title":"Stretched: the third degree","when":"The card is close to tearing, or close to being a ball of paper. The letters grow, redden and shake."},
+  "lines": [
+   ["AAAAAAAAAAAAAA","en"],
+   ["I CAN SEE MY INSIDES","en"],
+   ["I AM COMING APART","en"],
+   ["NOT LIKE THIS","en"],
+   ["МАМООООО","bg","MOOOMMY"],
+   ["ぎゃああああ!!","ja","a shriek"],
+   ["AAAAAAA—","en"]
+  ]
+ },
+ "card.panic.0": {
+  "who": "card",
+  "legacy": "PANIC.0",
+  "trigger": {"title":"On the shelf: it has noticed","when":"A card lies on the secret shelf and the Hand has started across the screen for it."},
+  "lines": [
+   ["uh. guys?","en"],
+   ["is that… coming here?","en"],
+   ["it's not looking at me. right?","en"],
+   ["nobody move","en"],
+   ["I do not like this shelf","en"],
+   ["ъъъ… хора?","bg","uhh… guys?"],
+   ["あれ、こっち来てる?","ja","huh, is it coming this way?"]
+  ]
+ },
+ "card.panic.1": {
+  "who": "card",
+  "legacy": "PANIC.1",
+  "trigger": {"title":"On the shelf: it is coming","when":"The Hand is a third of the way there. The card shakes and hops and shuffles away from it."},
+  "lines": [
+   ["IT IS COMING HERE","en"],
+   ["somebody pick me up!","en"],
+   ["not me not me not me","en"],
+   ["I am just a card!","en"],
+   ["take another one!","en"],
+   ["ПОМОЩ!","bg","HELP!"],
+   ["こっち来ないで!","ja","do not come over here!"]
+  ]
+ },
+ "card.panic.2": {
+  "who": "card",
+  "legacy": "PANIC.2",
+  "trigger": {"title":"On the shelf: it is here","when":"The Hand is nearly on it. Pick the card up and it is saved."},
+  "lines": [
+   ["HELP HELP HELP","en"],
+   ["PICK ME UP PICK ME UP","en"],
+   ["I CAN SMELL IT","en"],
+   ["AAAAAAAAAA","en"],
+   ["DO SOMETHING","en"],
+   ["НЕ МЕ ЯЖ!!","bg","DO NOT EAT ME!!"],
+   ["助けてぇぇ!!","ja","heeelp!!"]
+  ]
+ },
+ "card.notme": {
+  "who": "card",
+  "legacy": "NOTME",
+  "trigger": {"title":"Not me","when":"Said by a loose card lying near the shelf while the Hand is coming for another."},
+  "lines": [
+   ["take that one!","en"],
+   ["not me. phew.","en"],
+   ["don't look at me","en"],
+   ["I was never here","en"],
+   ["it wants the one on the shelf","en"],
+   ["вземи него!","bg","take him!"],
+   ["あっちだよ!","ja","it is that one, over there!"]
+  ]
+ },
+ "card.beg": {
+  "who": "card",
+  "legacy": "BEG",
+  "trigger": {"title":"Begging","when":"In the Hand’s closed fist, in the quiet pause after the second squeeze."},
+  "lines": [
+   ["please","en"],
+   ["I will be good","en"],
+   ["I have unmerged commits!","en"],
+   ["not the corners","en"],
+   ["we can talk about this","en"],
+   ["моля те…","bg","please…"],
+   ["やめて…","ja","stop…"],
+   ["tell me what you want","en"]
+  ]
+ },
+ "toast.ripped": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["Ripped it out! Stack them, or throw one hard to smash it.","en"]
+  ]
+ },
+ "toast.smashed": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["Smashed!","en"]
+  ]
+ },
+ "toast.smashed10": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["10 cards smashed. Feeling better?","en"]
+  ]
+ },
+ "toast.halved": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["It keeps its half.","en"]
+  ]
+ },
+ "katana.drop": {
+  "who": "katana",
+  "legacy": "SAY.kdrop",
+  "trigger": {"title":"Dropped","when":"You let go of it."},
+  "lines": [
+   ["oops.","en"],
+   ["I meant to do that","en"],
+   ["gravity wins again","en"],
+   ["catch me?!","en"],
+   ["timber!","en"],
+   ["butterfingers","en"],
+   ["おっと","ja","oops"],
+   ["опа!","bg","whoops!"]
+  ]
+ },
+ "katana.hello": {
+  "who": "katana",
+  "legacy": "SAY.khello",
+  "trigger": {"title":"Introducing itself","when":"You tear it out of the banner, or double-click to take it in hand."},
+  "lines": [
+   ["hello! I'm the sharpest katana ever!","en"],
+   ["careful: I cut things just by touching them","en"],
+   ["sharpest blade in the world, hi!","en"],
+   ["don't touch anything you like with me","en"],
+   ["世界一切れる刀です","ja","I am the sharpest sword in the world"],
+   ["най-острата катана на света, здрасти!","bg","the sharpest katana in the world, hello!"]
+  ]
+ },
+ "katana.brag": {
+  "who": "katana",
+  "legacy": "SAY.kbrag",
+  "trigger": {"title":"Boasting","when":"It has just cut a card in two while you were holding it. It boasts about two times in five."},
+  "lines": [
+   ["told you. sharpest ever.","en"],
+   ["I didn't even try","en"],
+   ["one touch is all it takes","en"],
+   ["I barely touched it!","en"],
+   ["too sharp, sorry","en"],
+   ["スパッ","ja","the sound of a clean cut"],
+   ["като масло","bg","like butter"]
+  ]
+ },
+ "katana.cut": {
+  "who": "katana",
+  "legacy": "SAY.kcut",
+  "trigger": {"title":"Cutting by accident","when":"It cuts a card with nobody holding it, on its way down the page."},
+  "lines": [
+   ["whoops, sorry","en"],
+   ["slicing on my way down","en"],
+   ["not my fault","en"],
+   ["don't mind me","en"],
+   ["it was in the way","en"]
+  ]
+ },
+ "toast.katanaFound": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["A katana?! Pull it out of the ground.","en"]
+  ]
+ },
+ "toast.katanaDrawn": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["The very tip of the blade cuts, however slowly. Double-click the katana to keep it in hand.","en"]
+  ]
+ },
+ "hand.eager": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.eager",
+  "trigger": {"title":"Wanting","when":"You carry a loose card towards the right edge of the screen. Said again if you keep it waiting."},
+  "lines": [
+   ["gimme","en"],
+   ["ooh. snack.","en"],
+   ["closer…","en"],
+   ["GIVE.","en"],
+   ["yes yes yes","en"],
+   ["do not test me","en"],
+   ["I will take it","en"],
+   ["дай!","bg","give!"],
+   ["ちょうだい","ja","give it to me"]
+  ]
+ },
+ "hand.grab": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.grab",
+  "trigger": {"title":"Taking hold","when":"You bring the card within its reach and it closes its fingers on the far end. The tug of war begins."},
+  "lines": [
+   ["mine.","en"],
+   ["GOT IT","en"],
+   ["thank you!","en"],
+   ["мое!","bg","mine!"],
+   ["いただき!","ja","got it!"]
+  ]
+ },
+ "hand.tug": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.tug",
+  "trigger": {"title":"In the tug of war","when":"You pull against it hard enough that its grip starts to slip."},
+  "lines": [
+   ["stretchy…","en"],
+   ["let gooo","en"],
+   ["pull harder","en"],
+   ["hnnngh","en"],
+   ["it's MINE","en"],
+   ["разтяга се…","bg","it stretches…"],
+   ["のびる…","ja","it stretches…"]
+  ]
+ },
+ "hand.rip": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.rip",
+  "trigger": {"title":"A card comes apart","when":"A card is torn out of the grid while it watches, or torn in half between the two of you."},
+  "lines": [
+   ["CHEESE PULL!!!!","en"],
+   ["CHEESE PULL!!!!","en"],
+   ["CHEESE PULL!!!!","en"],
+   ["RIIIP","en"],
+   ["half is fine!","en"],
+   ["again! again!","en"],
+   ["チーズ!!!","ja","CHEESE!!!"],
+   ["СИРЕНЕ!!!","bg","CHEESE!!!"]
+  ]
+ },
+ "hand.eat": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.eat",
+  "trigger": {"title":"Eating","when":"It drags its half of the card off the screen."},
+  "lines": [
+   ["nom.","en"],
+   ["*crunch*","en"],
+   ["papery.","en"],
+   ["needs salt","en"],
+   ["ごちそうさま","ja","thank you for the meal"],
+   ["ммм.","bg","mmm."]
+  ]
+ },
+ "hand.keep": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.keep",
+  "trigger": {"title":"Winning the whole card","when":"You let go during the tug of war."},
+  "lines": [
+   ["mine.","en"],
+   ["hehehe","en"],
+   ["no take-backs","en"],
+   ["finders keepers","en"],
+   ["хе-хе","bg","heh-heh"]
+  ]
+ },
+ "hand.toss": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.toss",
+  "trigger": {"title":"Bored of it","when":"It has held a card for two seconds. The card comes back, and about one time in three it comes back hard."},
+  "lines": [
+   ["bored.","en"],
+   ["catch.","en"],
+   ["yeet","en"],
+   ["tastes like JavaScript","en"],
+   ["いらない","ja","do not want it"]
+  ]
+ },
+ "hand.sulk": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.sulk",
+  "trigger": {"title":"Sulking","when":"You tempt it and take the card away, or the thing it was holding is cut or smashed."},
+  "lines": [
+   ["aww.","en"],
+   ["tease.","en"],
+   ["rude.","en"],
+   ["fine.","en"],
+   ["ケチ","ja","stingy"],
+   ["пф.","bg","pff."]
+  ]
+ },
+ "hand.cut": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.cut",
+  "trigger": {"title":"Watching a cut","when":"It saw the katana divide a card."},
+  "lines": [
+   ["ooh, sharp.","en"],
+   ["save me a slice","en"],
+   ["messy.","en"],
+   ["I could do that with my nails","en"],
+   ["thinner! thinner!","en"],
+   ["いい切れ味","ja","a fine edge"],
+   ["режи, режи…","bg","cut, cut…"]
+  ]
+ },
+ "hand.stab": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.stab",
+  "trigger": {"title":"Watching a stab","when":"It saw the katana go in and come out the same way."},
+  "lines": [
+   ["finish it!","en"],
+   ["so close.","en"],
+   ["amateur.","en"],
+   ["I smell blood","en"],
+   ["again, deeper","en"]
+  ]
+ },
+ "hand.smash": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.smash",
+  "trigger": {"title":"Watching a card shatter","when":"It saw a thrown card break."},
+  "lines": [
+   ["what a waste of a snack","en"],
+   ["boom.","en"],
+   ["I felt that","en"],
+   ["again!","en"],
+   ["бум!","bg","boom!"],
+   ["もったいない","ja","what a waste"]
+  ]
+ },
+ "hand.loose": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.loose",
+  "trigger": null,
+  "lines": [
+   ["fresh one!","en"],
+   ["bring it here","en"],
+   ["ooh, a loose one","en"],
+   ["that one looks tasty","en"],
+   ["дай го насам","bg","hand it over here"]
+  ]
+ },
+ "hand.throw": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.throw",
+  "trigger": {"title":"Watching a throw","when":"It saw you throw a card."},
+  "lines": [
+   ["wheee","en"],
+   ["over here!","en"],
+   ["pass it!","en"],
+   ["nice arm","en"]
+  ]
+ },
+ "hand.katana": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.katana",
+  "trigger": {"title":"On the katana","when":"It saw you draw the katana, or take it in hand."},
+  "lines": [
+   ["show-off.","en"],
+   ["I prefer claws","en"],
+   ["pointy.","en"],
+   ["keep that away from me","en"],
+   ["かっこつけ","ja","show-off"]
+  ]
+ },
+ "hand.kdrop": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.kdrop",
+  "trigger": {"title":"On the katana, dropped","when":"It saw you drop the katana."},
+  "lines": [
+   ["butterfingers","en"],
+   ["clumsy.","en"],
+   ["ha.","en"],
+   ["and you call ME grabby","en"]
+  ]
+ },
+ "hand.caught": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.caught",
+  "trigger": {"title":"A catch","when":"You throw a card towards the right edge, and it plucks it out of the air."},
+  "lines": [
+   ["nice throw","en"],
+   ["CAUGHT IT","en"],
+   ["thanks!","en"],
+   ["delivery!","en"],
+   ["for me? again?","en"],
+   ["хванах!","bg","caught it!"],
+   ["ナイスパス!","ja","nice pass!"]
+  ]
+ },
+ "hand.slip": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.slip",
+  "trigger": {"title":"Losing its grip","when":"You yank the card away the moment it grabs, or take back the card it was celebrating with."},
+  "lines": [
+   ["slippery!","en"],
+   ["hey!!","en"],
+   ["no fair","en"],
+   ["my snack!","en"]
+  ]
+ },
+ "hand.snatch": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.snatch",
+  "trigger": {"title":"Out of patience","when":"You have teased it for too long with a card just out of reach. The arm shoots out as far as it must."},
+  "lines": [
+   ["TOO SLOW","en"],
+   ["YOINK","en"],
+   ["MINE NOW","en"],
+   ["enough games","en"],
+   ["дай тука!","bg","give it here!"],
+   ["もらった!","ja","mine now!"]
+  ]
+ },
+ "hand.savour": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.savour",
+  "trigger": {"title":"Savouring","when":"In the pauses of the crushing, while it turns the card over and looks at it."},
+  "lines": [
+   ["shhh.","en"],
+   ["slowly…","en"],
+   ["does it hurt?","en"],
+   ["look at me.","en"],
+   ["not yet.","en"],
+   ["one more squeeze","en"],
+   ["бавно…","bg","slowly…"],
+   ["まだだよ","ja","not yet"]
+  ]
+ },
+ "hand.shelf": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.shelf",
+  "trigger": {"title":"The shelf","when":"There is a secret written under the fog in the top right corner of the banner. With the shelf out, you leave a card lying on it and let go: it reaches for it, slowly."},
+  "lines": [
+   ["ooh. left out for me?","en"],
+   ["a snack on a shelf","en"],
+   ["don't mind if I do","en"],
+   ["nobody is looking…","en"],
+   ["unattended. mine.","en"],
+   ["какво имаме тук…","bg","what have we here…"],
+   ["いただきます…","ja","thanks for the meal… (said before eating)"]
+  ]
+ },
+ "hand.severed": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.severed",
+  "trigger": {"title":"Its hand cut off","when":"The very tip of the katana passes through its arm while the arm is out on the screen. The hand drops, and the arm whips back out of sight."},
+  "lines": [
+   ["MY HAND!!","en"],
+   ["I NEEDED THAT","en"],
+   ["AAAAAAAAA","en"],
+   ["you… you CUT it","en"],
+   ["that was my favourite one","en"],
+   ["РЪКАТА МИ!!","bg","MY HAND!!"],
+   ["手がぁぁ!!","ja","my haaand!!"]
+  ]
+ },
+ "hand.regrow": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.regrow",
+  "trigger": {"title":"A new hand","when":"Some eight seconds after losing one. It comes back to show it off."},
+  "lines": [
+   ["grew a new one.","en"],
+   ["ta-da.","en"],
+   ["I have spares","en"],
+   ["that one was old anyway","en"],
+   ["good as new","en"],
+   ["нова-новеничка","bg","brand new"],
+   ["生えた。","ja","it grew back."]
+  ]
+ },
+ "hand.crush": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.crush",
+  "trigger": {"title":"The crunch","when":"The card it snatched is finally crushed."},
+  "lines": [
+   ["squish.","en"],
+   ["*CRUNCH*","en"],
+   ["paper is weak","en"],
+   ["that is what teasing gets you","en"],
+   ["смачках го.","bg","I crushed it."],
+   ["ぐしゃ","ja"]
+  ]
+ },
+ "hand.ask": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.ask",
+  "trigger": {"title":"The question","when":"Surprise me draws you a fortune and a project. It leans in beside the slip and asks, and asks once more if you have done nothing for seven seconds."},
+  "lines": [
+   ["go there?","en"],
+   ["well? go there?","en"],
+   ["this one. go?","en"],
+   ["I picked this for you. go?","en"],
+   ["shall we?","en"],
+   ["отиваме ли?","bg"],
+   ["行く?","ja"]
+  ]
+ },
+ "hand.heads": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.heads",
+  "trigger": {"title":"Heads","when":"The coin lands heads up, and it reads it out."},
+  "lines": [
+   ["heads.","en"],
+   ["it is heads.","en"],
+   ["heads it is","en"],
+   ["ези.","bg"],
+   ["表。","ja"]
+  ]
+ },
+ "hand.tails": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.tails",
+  "trigger": {"title":"Tails","when":"The coin lands tails up, and it reads it out."},
+  "lines": [
+   ["tails.","en"],
+   ["it is tails.","en"],
+   ["tails it is","en"],
+   ["тура.","bg"],
+   ["裏。","ja"]
+  ]
+ },
+ "hand.stay": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.stay",
+  "trigger": {"title":"Letting you stay","when":"A moment after you win the toss, before it closes the slip for you."},
+  "lines": [
+   ["you may stay. this time.","en"],
+   ["stay. for now.","en"],
+   ["you got lucky. stay.","en"],
+   ["остани. засега.","bg"],
+   ["今回だけだぞ。","ja"]
+  ]
+ },
+ "hand.hello": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.hello",
+  "trigger": {"title":"Answering a no","when":"Surprise me offers you a project and you say No. The Hand comes out to see about that."},
+  "lines": [
+   ["oh? a \"no\"?","en"],
+   ["hello there.","en"],
+   ["you said no. to ME?","en"],
+   ["hi. I live here.","en"],
+   ["picky, are we","en"],
+   ["здрасти.","bg","hi."],
+   ["やあ。","ja","hey."]
+  ]
+ },
+ "hand.smashbtn": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.smashbtn",
+  "trigger": {"title":"Smashing Yes and No","when":"A few moments after it greets you, it slams itself down on the Yes and No buttons. They fly off the page in pieces."},
+  "lines": [
+   ["no \"no\".","en"],
+   ["WRONG BUTTONS.","en"],
+   ["not these.","en"],
+   ["I hate these two","en"],
+   ["my game. my buttons.","en"],
+   ["BAM.","en"],
+   ["не тези!","bg"],
+   ["このボタン、きらい","ja"]
+  ]
+ },
+ "hand.better": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.better",
+  "trigger": {"title":"Its own buttons","when":"It snaps two fingers, and Heads and Tails poof in where Yes and No were."},
+  "lines": [
+   ["much better.","en"],
+   ["much better now.","en"],
+   ["there. better.","en"],
+   ["now we play MY game","en"],
+   ["see? nicer.","en"],
+   ["така е по-добре.","bg"],
+   ["これでよし。","ja"]
+  ]
+ },
+ "hand.flip": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.flip",
+  "trigger": {"title":"The toss","when":"It throws a coin and makes you call it, heads or tails."},
+  "lines": [
+   ["heads or tails?","en"],
+   ["call it.","en"],
+   ["let the coin decide","en"],
+   ["one flip. no take-backs.","en"],
+   ["ези или тура?","bg","heads or tails?"],
+   ["表か裏か?","ja","heads or tails?"]
+  ]
+ },
+ "hand.won": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.won",
+  "trigger": {"title":"Beaten by a coin","when":"You called it right. You may stay on the page."},
+  "lines": [
+   ["…fine.","en"],
+   ["lucky.","en"],
+   ["tch. stay then.","en"],
+   ["next time.","en"],
+   ["пф. късмет.","bg","pff. luck."],
+   ["ちっ","ja","tch"]
+  ]
+ },
+ "hand.lost": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.lost",
+  "trigger": {"title":"The taunt","when":"You called it wrong. It reaches over and presses Yes for you."},
+  "lines": [
+   ["WRONG.","en"],
+   ["ha. wrong side.","en"],
+   ["the coin has spoken","en"],
+   ["loser walks","en"],
+   ["не позна!","bg","wrong guess!"],
+   ["ハズレ!","ja","miss!"]
+  ]
+ },
+ "hand.idgaf": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.idgaf",
+  "trigger": {"title":"Not bothering with the coin","when":"One toss in ten it pockets the coin and decides for you anyway."},
+  "lines": [
+   ["you know what? idgaf.","en"],
+   ["actually, forget the coin","en"],
+   ["you're going anyway","en"],
+   ["coin? what coin.","en"],
+   ["майната ѝ на монетата","bg","to hell with the coin"],
+   ["どうでもいい。行け。","ja","whatever. go."]
+  ]
+ },
+ "hand.waiting": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.waiting",
+  "trigger": {"title":"Waiting on you","when":"You lost the toss. Yes and No are back, and you have five seconds before it presses Yes for you."},
+  "lines": [
+   ["well?","en"],
+   ["tick tock","en"],
+   ["go on. press it.","en"],
+   ["or I press it for you","en"],
+   ["3… 2…","en"],
+   ["хайде де","bg"],
+   ["はやく","ja"]
+  ]
+ },
+ "hand.bye": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.bye",
+  "trigger": {"title":"Seeing you off","when":"You pressed neither button for five seconds, so its finger is on Yes. You are leaving."},
+  "lines": [
+   ["BYE BYE","en"],
+   ["BYE BYEEE","en"],
+   ["HAHAHA BYE","en"],
+   ["see ya never","en"],
+   ["ЧАО-ЧАО!","bg","BYE-BYE!"],
+   ["バイバイ!","ja","bye-bye!"]
+  ]
+ },
+ "hand.slap": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.slap",
+  "trigger": {"title":"Knocking the buttons away","when":"The first time you reach for Heads or Tails on a visit, it slaps, backhands or slams both buttons off the slip."},
+  "lines": [
+   ["no.","en"],
+   ["not yet!","en"],
+   ["*slap*","en"],
+   ["hands off","en"],
+   ["I am not done","en"],
+   ["чакай!","bg","wait!"],
+   ["だめ!","ja","no!"]
+  ]
+ },
+ "hand.snap": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.snap",
+  "trigger": {"title":"Snapping","when":"Right after the buttons go flying. It has had enough of you."},
+  "lines": [
+   ["ENOUGH.","en"],
+   ["FINE. FINE!","en"],
+   ["ugh. you are exhausting","en"],
+   ["stop poking things","en"],
+   ["стига вече!","bg","enough already!"],
+   ["もういい!","ja","that is enough!"]
+  ]
+ },
+ "hand.yourpick": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.yourpick",
+  "trigger": {"title":"Letting you pick","when":"Half the time after it snaps, it lets you call it after all."},
+  "lines": [
+   ["go on then. pick.","en"],
+   ["pick. now.","en"],
+   ["your call. literally.","en"],
+   ["избирай.","bg","pick."],
+   ["選べ。","ja","pick."]
+  ]
+ },
+ "hand.secret": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.secret",
+  "trigger": {"title":"The secret is out","when":"You bring the pointer near the bottom-right corner of the fortune slip and the hidden × rises out of it. If it was not already out, it bursts in to protest."},
+  "lines": [
+   ["NOOOOOOO","en"],
+   ["NOOO! not the secret!","en"],
+   ["who told you about that?!","en"],
+   ["stop. right. there.","en"],
+   ["that is NOT for you","en"],
+   ["you were never supposed to find that","en"],
+   ["НЕЕЕЕЕ!","bg","NOOOOO!"],
+   ["намери тайната!","bg","you found the secret!"],
+   ["не пипай това!","bg","do not touch that!"],
+   ["だめーーー!","ja","nooooo!"],
+   ["ひみつが!","ja","my secret!"],
+   ["バレた!","ja","busted!"]
+  ]
+ },
+ "hand.escaped": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.escaped",
+  "trigger": {"title":"Escaped","when":"You click the secret ×, and the slip closes under its nose. Also when you lose the toss and press No anyway."},
+  "lines": [
+   ["...fine.","en"],
+   ["cheater.","en"],
+   ["I will remember this","en"],
+   ["nobody likes a sneak","en"],
+   ["ずるい","ja","no fair"],
+   ["измамник.","bg","cheat."]
+  ]
+ },
+ "hand.callit": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.callit",
+  "trigger": {"title":"Hurry up","when":"The coin is spinning and you have not called it. Four seconds in it nags you."},
+  "lines": [
+   ["call it already","en"],
+   ["heads? tails? anything?","en"],
+   ["the coin is getting dizzy","en"],
+   ["I can do this all day","en"],
+   ["it is a coin, not a test","en"],
+   ["ези или тура? хайде!","bg"],
+   ["はやく決めて","ja"]
+  ]
+ },
+ "hand.mypick": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.mypick",
+  "trigger": {"title":"Picking for you","when":"The other half of the time after it snaps, it pokes Heads or Tails itself. It also does when you leave the coin spinning for nine seconds."},
+  "lines": [
+   ["I'll do it myself","en"],
+   ["too slow. mine.","en"],
+   ["give me that","en"],
+   ["сам ще избера","bg","I will pick myself"],
+   ["貸して","ja","give it here"]
+  ]
+ },
+ "hand.back": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.back",
+  "trigger": {"title":"You came back","when":"It pressed Yes for you, and now you are on this page again. It noticed."},
+  "lines": [
+   ["hmm. didn't like the repo?","en"],
+   ["back already?","en"],
+   ["oh. you again.","en"],
+   ["that bad, huh?","en"],
+   ["not your thing?","en"],
+   ["missed me?","en"],
+   ["you came back. cute.","en"],
+   ["върна се, а?","bg","you came back, huh?"],
+   ["не ти хареса, а?","bg","did not like it, huh?"],
+   ["おかえり。","ja","welcome back."],
+   ["気に入らなかった?","ja","did you not like it?"]
+  ]
+ },
+ "hand.rematch": {
+  "who": "hand",
+  "legacy": "CLAW_SAY.rematch",
+  "trigger": {"title":"The rematch","when":"It draws you another project and tosses the coin again."},
+  "lines": [
+   ["wanna play another coin toss?","en"],
+   ["another coin toss?","en"],
+   ["rematch. call it.","en"],
+   ["double or nothing?","en"],
+   ["same game. new coin.","en"],
+   ["heads or tails. again.","en"],
+   ["още едно хвърляне?","bg","one more toss?"],
+   ["пак ли? ези или тура?","bg","again? heads or tails?"],
+   ["もう一回?","ja","one more time?"],
+   ["もう一度、表か裏か?","ja","once more: heads or tails?"]
+  ]
+ },
+ "toast.severed": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["You cut its hand off. It will grow another. The old one has plans of its own.","en"]
+  ]
+ },
+ "sev.cut": {
+  "who": "sev",
+  "legacy": "SEV_SAY.cut",
+  "trigger": {"title":"The cut-off hand: just fallen","when":"Said by the hand that was cut off, lying where it fell and twitching."},
+  "lines": [
+   ["…","en"],
+   ["*twitch*","en"],
+   ["ow. wait.","en"],
+   ["where is my arm","en"],
+   ["ъъ?","bg","uh?"]
+  ]
+ },
+ "sev.rise": {
+  "who": "sev",
+  "legacy": "SEV_SAY.rise",
+  "trigger": {"title":"The cut-off hand: up on two fingers","when":"After a couple of seconds it stands up on its first two fingers and walks off on tiptoe."},
+  "lines": [
+   ["I can walk?!","en"],
+   ["freedom.","en"],
+   ["who needs an arm","en"],
+   ["look, no arm!","en"],
+   ["сам съм си шеф","bg","I am my own boss"],
+   ["自由だ!","ja","I am free!"]
+  ]
+ },
+ "sev.held": {
+  "who": "sev",
+  "legacy": "SEV_SAY.held",
+  "trigger": {"title":"The cut-off hand: picked up","when":"You take it in your hand. It wriggles."},
+  "lines": [
+   ["put me DOWN","en"],
+   ["unhand me. ha.","en"],
+   ["hands off the hand","en"],
+   ["I bite","en"],
+   ["I was walking here","en"],
+   ["пусни ме!","bg","let me go!"],
+   ["はなせ!","ja","let go!"]
+  ]
+ },
+ "sev.thrown": {
+  "who": "sev",
+  "legacy": "SEV_SAY.thrown",
+  "trigger": {"title":"The cut-off hand: thrown","when":"You let it go at more than 900 px a second."},
+  "lines": [
+   ["WHEEE—","en"],
+   ["not agaaain","en"],
+   ["I just got free!","en"],
+   ["ааааа!","bg","aaaaa!"]
+  ]
+ },
+ "sev.hunt": {
+  "who": "sev",
+  "legacy": "SEV_SAY.hunt",
+  "trigger": {"title":"The cut-off hand: it has seen a card","when":"A loose card lies within about 500 px of it, on its level. It tiptoes over, faster."},
+  "lines": [
+   ["snack.","en"],
+   ["there you are","en"],
+   ["mine mine mine","en"],
+   ["stay still","en"],
+   ["ела тук","bg","come here"],
+   ["みーつけた","ja","found you"]
+  ]
+ },
+ "sev.squeeze": {
+  "who": "sev",
+  "legacy": "SEV_SAY.squeeze",
+  "trigger": {"title":"The cut-off hand: squeezing","when":"It has climbed onto the card and closed around it, in the pause before the last squeeze."},
+  "lines": [
+   ["shhh.","en"],
+   ["no arm needed","en"],
+   ["I remember how","en"],
+   ["бавно…","bg","slowly…"]
+  ]
+ },
+ "sev.crush": {
+  "who": "sev",
+  "legacy": "SEV_SAY.crush",
+  "trigger": {"title":"The cut-off hand: crushed it","when":"There is no card any more. It does a little dance."},
+  "lines": [
+   ["*crunch*","en"],
+   ["still got it","en"],
+   ["squish.","en"],
+   ["смачках го.","bg","I crushed it."],
+   ["ぐしゃ","ja"]
+  ]
+ },
+ "sev.rest": {
+  "who": "sev",
+  "legacy": "SEV_SAY.rest",
+  "trigger": {"title":"The cut-off hand: sitting down","when":"After a while of walking with nothing to catch. It gets up again by itself, or when something bumps it."},
+  "lines": [
+   ["zzz","en"],
+   ["five minutes…","en"],
+   ["tired fingers","en"],
+   ["ねむい…","ja","sleepy…"]
+  ]
+ },
+ "sev.drag": {
+  "who": "sev",
+  "legacy": "SEV_SAY.drag",
+  "trigger": {"title":"The cut-off hand: dragging itself","when":"Freshly cut off, it cannot stand yet: it lies on its belly, reaches out with two fingers and pulls the rest along."},
+  "lines": [
+   ["…ow","en"],
+   ["everything hurts","en"],
+   ["just… a bit… further","en"],
+   ["legs. I need legs.","en"],
+   ["ох, ох, ох","bg","ow, ow, ow"]
+  ]
+ },
+ "sev.flee": {
+  "who": "sev",
+  "legacy": "SEV_SAY.flee",
+  "trigger": {"title":"The cut-off hand: running for it","when":"The tip of the katana comes within about 280 px of it. It runs the other way on all five."},
+  "lines": [
+   ["NOT AGAIN","en"],
+   ["keep that thing away!","en"],
+   ["nope nope nope","en"],
+   ["I have seen what it does","en"],
+   ["не, не пак!","bg","no, not again!"],
+   ["やだやだやだ!","ja","no no no!"]
+  ]
+ },
+ "toast.shelfGone": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["The shelf is gone.","en"]
+  ]
+ },
+ "toast.shelfIn": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["棚 · A shelf. Leave a card on it and look away.","ja"]
+  ]
+ },
+ "toast.shelfFirst": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["棚 · A shelf. Pull a card out and leave it there.","ja"]
+  ]
+ },
+ "greeting.hello": {
+  "who": "greeting",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["Hi there.","en"],
+   ["Здравей.","bg"],
+   ["こんにちは。","ja"],
+   ["Welcome.","en"],
+   ["Добре дошли.","bg"],
+   ["ようこそ。","ja"]
+  ]
+ },
+ "fortune.slip": {
+  "who": "fortune",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   [["大吉","Great blessing · Голям късмет","The fog parts just for you today.",3],"en"],
+   [["中吉","Middle blessing · Среден късмет","Something you build today will compile on the first try.",3],"en"],
+   [["小吉","Small blessing · Малък късмет","A small bug will flee before you.",3],"en"],
+   [["吉","Blessing · Късмет","The katana is on your side. Mostly.",3],"en"],
+   [["末吉","Future blessing · Бъдещ късмет",[["霧の中で、自分の形を忘れていく","In the fog I am forgetting my own shape"],["割れた鏡の向こうで、知らない顔が笑う","Beyond the broken mirror, a face I do not know is smiling"],["崩れていく僕を、誰か見つけて","Someone, find me while I crumble"],["止まった時計の中で、まだ息をしている","Inside a stopped clock, I am still breathing"],["霧が晴れたら、僕はまだここにいるかな","When the fog lifts, will I still be here?"],["色のない世界で、赤だけが痛い","In a world without colour, only the red hurts"],["名前を呼ばれても、返事ができない","They call my name and I cannot answer"]],2],"en"],
+   [["凶","Curse · Лош късмет","Tie this slip to a tree and draw again.",1],"en"]
+  ]
+ },
+ "toast.fog": {
+  "who": "toast",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["霧が出た · Мъгла падна · The fog rolls in","ja"]
+  ]
+ },
+ "raid.bored": {
+  "who": "raid",
+  "legacy": null,
+  "trigger": {"title":"Bored of your reading","when":"You keep this menu open for 5 seconds. The Hand comes in and picks something to do, at random, again and again: throw a card at the left edge of the screen, eat one, ask you to help rip one, or take the scroll. It says these as it arrives and as it throws."},
+  "lines": [
+   ["boring.","en"],
+   ["too many words","en"],
+   ["less reading, more snacks","en"],
+   ["you read too slow","en"],
+   ["I am in this one!","en"],
+   ["spoilers.","en"],
+   ["YEET","en"],
+   ["next!","en"],
+   ["this one too","en"],
+   ["скука.","bg","boring."],
+   ["つまらない","ja","boring"],
+   ["ポイ","ja","the sound of tossing something away"]
+  ]
+ },
+ "raid.swat": {
+  "who": "raid",
+  "legacy": null,
+  "trigger": {"title":"Swatted","when":"You click the Hand while it is in this menu. It drops what it holds and stays away for at least five seconds."},
+  "lines": [
+   ["OW!","en"],
+   ["hey!!","en"],
+   ["rude.","en"],
+   ["my knuckles!","en"],
+   ["I was reading that","en"],
+   ["what was that for","en"],
+   ["you hit me?!","en"],
+   ["ау!","bg","ow!"],
+   ["боли!","bg","it hurts!"],
+   ["痛っ!","ja","ouch!"],
+   ["ひどい!","ja","how mean!"]
+  ]
+ },
+ "raid.grudge": {
+  "who": "raid",
+  "legacy": null,
+  "trigger": {"title":"Back, and careful","when":"About half the time it returns from a swat wary, and creeps towards the next card slowly."},
+  "lines": [
+   ["fine. slowly.","en"],
+   ["gently, then","en"],
+   ["do not hit me","en"],
+   ["tiptoe…","en"],
+   ["I am being nice now","en"],
+   ["полека…","bg","easy does it…"],
+   ["そーっと…","ja","ever so quietly…"]
+  ]
+ },
+ "raid.angry": {
+  "who": "raid",
+  "legacy": null,
+  "trigger": {"title":"Back, and angry","when":"The other half of the time it returns furious: it reaches fast, throws three cards in a row, and may take hold of the scroll."},
+  "lines": [
+   ["THAT IS IT","en"],
+   ["you asked for it","en"],
+   ["no more mister nice hand","en"],
+   ["NOW I am angry","en"],
+   ["сега ще видиш!","bg","now you will see!"],
+   ["もう怒った!","ja","now I am angry!"]
+  ]
+ },
+ "raid.scroll": {
+  "who": "raid",
+  "legacy": null,
+  "trigger": {"title":"Shaking the scroll","when":"It grabs the right edge of the menu and yanks the page up and down for two to four seconds, so you lose your place."},
+  "lines": [
+   ["lost your place?","en"],
+   ["where were we?","en"],
+   ["up! down! up!","en"],
+   ["wheeee","en"],
+   ["нагоре-надолу!","bg","up and down!"],
+   ["ぐるぐる〜","ja","round and round"]
+  ]
+ },
+ "raid.help": {
+  "who": "raid",
+  "legacy": null,
+  "trigger": {"title":"Asking for help","when":"It pulls a card out of this menu and holds it out to you. Grab the card and pull it left, and it rips in two: you get half, it eats the other."},
+  "lines": [
+   ["help me rip this","en"],
+   ["grab the other end!","en"],
+   ["you pull, I pull","en"],
+   ["hold this. PULL.","en"],
+   ["too tough for one hand","en"],
+   ["дърпай!","bg","pull!"],
+   ["手伝って!","ja","help me!"],
+   ["引っぱって!","ja","pull!"]
+  ]
+ },
+ "raid.alone": {
+  "who": "raid",
+  "legacy": null,
+  "trigger": {"title":"Nobody helped","when":"It held the card out for about eight seconds and you did not take the other end. It throws it instead."},
+  "lines": [
+   ["fine. alone then.","en"],
+   ["no help? ok.","en"],
+   ["useless.","en"],
+   ["I do everything here","en"],
+   ["сам ще си го…","bg","I will do it myself…"],
+   ["もういい!","ja","that is enough!"]
+  ]
+ },
+ "raid.more": {
+  "who": "raid",
+  "legacy": null,
+  "trigger": {"title":"Still scrolling","when":"Half the time it does not let go after that, and shakes the scroll for a few seconds more."},
+  "lines": [
+   ["again!","en"],
+   ["not done","en"],
+   ["one more lap","en"],
+   ["still lost?","en"],
+   ["още!","bg","more!"],
+   ["もう一回!","ja","one more time!"]
+  ]
+ },
+ "raid.hide": {
+  "who": "raid",
+  "legacy": null,
+  "trigger": {"title":"Hiding","when":"The other half it lets go, says this, and hides off the screen for a few seconds as if it was never there."},
+  "lines": [
+   ["was not me.","en"],
+   ["you saw nothing","en"],
+   ["I was never here","en"],
+   ["*hides*","en"],
+   ["не бях аз.","bg","it was not me."],
+   ["かくれんぼ!","ja","hide and seek!"],
+   ["知らないよ","ja","I know nothing"]
+  ]
+ },
+ "raid.done": {
+  "who": "raid",
+  "legacy": null,
+  "trigger": null,
+  "lines": [
+   ["all gone.","en"]
+  ]
+ }
+}

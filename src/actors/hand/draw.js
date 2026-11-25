@@ -3,7 +3,7 @@
 // document.documentElement (read at call time), the eye's place E is TUNE.hand.EYE. The arm's wrapper (legacy
 // clawDraw(wig, shake, strain) = handDraw(claw, ...)) is draw() in ./index.js.
 // handDraw draws two Math.random values per call (the shake offset) even when shake is 0: every call counts for parity.
-// tests/unit/hand-draw.test.js runs the legacy functions out of scripts/legacy.js next to these and compares every path.
+// tests/unit/hand-draw.test.js compares every path with what the legacy functions drew (tests/unit/fixtures/hand-draw.*.json).
 
 import { now } from '../../core/clock.js';
 import { FING, THUMB, BEND, ARCH, PALM, EYE } from './poses.js';

@@ -1,4 +1,6 @@
 'use strict';
+// LEGACY COMPARISON: delete together with scripts/legacy.js, scripts/lang.js and scripts/phrasebook.js. It only compares the
+// old script with the modules; nothing in npm test, tests/unit/*.test.js or CI depends on it.
 // Not a unit test (no .test.js suffix: `node --test tests/unit/*.test.js` skips it). Package W1's parity check of the world:
 // the same scripted throw (seed 1, frozen clock, the harness's pointer) on legacy and on ?next, with the ?dbg logging on,
 // and the logged release speed and impact (contact closing) speeds compared. They must match within 2 %.
@@ -27,7 +29,7 @@ if (process.env.W1_CHILD) {
   });
 } else {
   const run = (next) => {
-    const r = spawnSync(process.execPath, ['--test', '--test-reporter=spec', __filename], { env: { ...process.env, W1_CHILD: '1', NEXT: next ? '1' : '0', ONLY: 'dbg throw' }, encoding: 'utf8', cwd: path.resolve(__dirname, '..', '..') });
+    const r = spawnSync(process.execPath, ['--test', '--test-reporter=spec', __filename], { env: { ...process.env, W1_CHILD: '1', LEGACY: next ? '0' : '1', ONLY: 'dbg throw' }, encoding: 'utf8', cwd: path.resolve(__dirname, '..', '..') });
     const m = /W1RESULT (.*)/.exec(r.stdout + r.stderr);
     if (!m) { console.error(r.stdout, r.stderr); throw new Error('no result from the ' + (next ? '?next' : 'legacy') + ' run'); }
     return JSON.parse(m[1]);

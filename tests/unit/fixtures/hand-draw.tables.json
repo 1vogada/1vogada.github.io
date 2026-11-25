@@ -1,0 +1,10 @@
+{
+"FING": [{"a":-0.36,"b":[58,-27],"l":[44,33,25],"w":12},{"a":-0.13,"b":[66,-11],"l":[52,38,27],"w":13},{"a":0.09,"b":[64,5],"l":[46,34,24],"w":12},{"a":0.32,"b":[56,19],"l":[35,26,19],"w":10}],
+"THUMB": {"a":1.1,"b":[14,22],"l":[36,30,23],"w":13},
+"BEND": [0.3,1.05,0.85],
+"ARCH": [-0.3,0.2,0.24],
+"GRIP": [98,20],
+"PALM": [[-8,-15],[18,-25],[56,-33],[72,-12],[70,14],[58,27],[30,30],[8,27],[-8,14]],
+"POSES": {"clamp":{"curl":0.82,"eye":0.8,"happy":0,"pinch":0,"point":0,"pupil":0.8,"spread":0.45,"th":0.85},"eager":{"curl":0.12,"eye":1.25,"happy":0,"pinch":0,"point":0,"pupil":1.25,"spread":1.4,"th":0.05},"joy":{"curl":0.82,"eye":1,"happy":1,"pinch":0,"point":0,"pupil":1,"spread":0.5,"th":0.85},"lunge":{"curl":-0.12,"eye":1.45,"happy":0,"pinch":0,"point":0,"pupil":0.6,"spread":1.7,"th":-0.15},"lurk":{"curl":0.5,"eye":0.3,"happy":0,"pinch":0,"point":0,"pupil":0.6,"spread":0.75,"th":0.4},"pinch":{"curl":0.95,"eye":0.55,"happy":0,"pinch":1,"point":0,"pupil":0.7,"spread":0.5,"th":0.62},"point":{"curl":0.95,"eye":1.2,"happy":0,"pinch":0,"point":1,"pupil":0.7,"spread":0.5,"th":0.9},"snapped":{"curl":0.95,"eye":1.2,"happy":0,"pinch":0.45,"point":0,"pupil":0.9,"spread":0.5,"th":0.1},"strain":{"curl":0.95,"eye":0.3,"happy":0,"pinch":0,"point":0,"pupil":0.45,"spread":0.3,"th":1},"sulk":{"curl":0.95,"eye":0.2,"happy":0,"pinch":0,"point":0,"pupil":0.5,"spread":0.2,"th":0.55}},
+"POSES order": ["lurk","eager","lunge","clamp","strain","joy","sulk","point","pinch","snapped"]
+}

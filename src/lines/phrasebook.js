@@ -1,6 +1,6 @@
 // What the hand says in the phrasebook menu (legacy scripts/phrasebook.js RAID_SAY ... HIDE_SAY) and its one literal.
 // legacy: none of these were on window.__lines (no `legacy` path).
-// Generated once from scripts/legacy.js and scripts/phrasebook.js; tests/unit/lines-data.test.js checks every list against them.
+// Generated once from the old scripts; tests/unit/lines.snapshot.json pins every list (edit, UPDATE_SNAPSHOT=1, review the diff).
 // Keep each array's contents and order exactly: line() draws by index, and the array itself is the picker's memory key.
 // lang: one tag per line ('en' | 'bg' | 'ja', by script: Cyrillic = bg, kana/kanji = ja, else en), or one string for all.
 import { defineLines } from '../core/lines.js';

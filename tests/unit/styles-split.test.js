@@ -8,16 +8,16 @@
 //     same specificity and pseudo-element as a selector of the other, or the elements the two selectors style cannot be one
 //     element: different tags, different ids (a bare id is looked up in index.html for its tag), or each needs a different class
 //     of COMPONENTS, the classes that name what an element is and that no element ever carries two of. That last fact is checked
-//     here over every class string in index.html and the page scripts, and in the rendered page in every state of
+//     here over every class string in index.html and the page's modules (src/**/*.js), and in the rendered page in every state of
 //     tests/unit/styles-split.screens.js;
 //  3. the <link> lines in styles/README.md (and in index.html, once the inline block is replaced) are in that same order.
-// The inline block is read from index.html, or, once it has been replaced by the links, from the commit the split was made against.
+// The inline block is read from index.html, or, once it has been replaced by the links, from tests/unit/fixtures/inline-style-df0dc3b.css
+// (the inline <style> of index.html at df0dc3b, the commit the split was made against, copied byte for byte: no git history needed).
 // Needs Chromium through Playwright (preinstalled); skipped if it cannot be launched. Run: node --test tests/unit/styles-split.test.js
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { execFileSync } = require('node:child_process');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const ORDER = ['base', 'cards', 'physics', 'hand', 'omikuji', 'fog', 'crazy'];
@@ -26,7 +26,10 @@ const BASE_COMMIT = 'df0dc3b';   // the commit whose index.html inline <style> w
 const COMPONENTS = ['band', 'btn', 'btn-say', 'card', 'claw', 'crease', 'cursor', 'date', 'empty', 'katana', 'katana-in', 'omi-actions',
   'omi-pick', 'omi-puff', 'omi-seal', 'omikuji', 'phys-actions', 'pill', 'pin', 'reader', 'sec', 'secret', 'slip', 'slop-only', 'toast',
   'toggle', 'vein'];
-const SOURCES = ['index.html', 'scripts/legacy.js', 'scripts/phrasebook.js', 'scripts/lang.js'];
+// where class strings come from: the page and every module under src/
+const srcFiles = (dir) => fs.readdirSync(path.join(ROOT, dir), { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? srcFiles(dir + '/' + e.name) : e.name.endsWith('.js') ? [dir + '/' + e.name] : [])).sort();
+const SOURCES = ['index.html', ...srcFiles('src')];
+const REFERENCE = path.join(__dirname, 'fixtures', 'inline-style-' + BASE_COMMIT + '.css');
 
 // the inline <style> block of an index.html (the only <style> without attributes in the head), or null
 function inlineBlock(html) {
@@ -36,8 +39,7 @@ function inlineBlock(html) {
 function referenceCss() {
   const own = inlineBlock(fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8'));
   if (own) return { css: own, from: 'index.html' };
-  const old = execFileSync('git', ['show', BASE_COMMIT + ':index.html'], { cwd: ROOT, encoding: 'utf8' });
-  return { css: inlineBlock(old), from: BASE_COMMIT + ':index.html' };
+  return { css: fs.readFileSync(REFERENCE, 'utf8'), from: path.relative(ROOT, REFERENCE) };
 }
 
 // ---- specificity: [ids, classes/attributes/pseudo-classes, types/pseudo-elements], and the pseudo-element the selector ends in ----
@@ -210,4 +212,4 @@ test('styles/*.css hold the inline <style> rules unchanged, in an order that kee
   }
 });
 
-module.exports = { ORDER, COMPONENTS, inlineBlock, BASE_COMMIT };
+module.exports = { ORDER, COMPONENTS, inlineBlock, BASE_COMMIT, REFERENCE };

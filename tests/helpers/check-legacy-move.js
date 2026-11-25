@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+// LEGACY COMPARISON: delete together with scripts/legacy.js, scripts/lang.js and scripts/phrasebook.js, along with the
+// `check:legacy` script in package.json and its CI step (which runs only while scripts/legacy.js exists).
 // Proves that scripts/legacy.js is the old big inline <script> of index.html, byte for byte.
 // Usage: node tests/helpers/check-legacy-move.js [git-ref]   (default ref: 41683e8, the master commit the move was made from)
 // Exit 0 when identical, 1 when not (prints where the first difference is).

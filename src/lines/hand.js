@@ -1,6 +1,6 @@
 // What the arm's hand says: every legacy CLAW_SAY list, key = 'hand.' + its name.
 // The first rip after each page load is always hand.rip[0] (CHEESE PULL): say(claw, 'hand.rip', { first: { id: 'cheese', text: list('hand.rip')[0] } }).
-// Generated once from scripts/legacy.js and scripts/phrasebook.js; tests/unit/lines-data.test.js checks every list against them.
+// Generated once from the old scripts; tests/unit/lines.snapshot.json pins every list (edit, UPDATE_SNAPSHOT=1, review the diff).
 // Keep each array's contents and order exactly: line() draws by index, and the array itself is the picker's memory key.
 // lang: one tag per line ('en' | 'bg' | 'ja', by script: Cyrillic = bg, kana/kanji = ja, else en), or one string for all.
 import { defineLines } from '../core/lines.js';

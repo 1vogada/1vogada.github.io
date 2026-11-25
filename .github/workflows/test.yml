@@ -27,7 +27,8 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Fonts the harness pins
         run: sudo apt-get install -y --no-install-recommends fonts-dejavu-core fonts-ipafont-gothic
-      - name: scripts/legacy.js is the old inline script, byte for byte
+      - name: scripts/legacy.js is the old inline script, byte for byte (until it is deleted)
+        if: ${{ hashFiles('scripts/legacy.js') != '' }}
         run: npm run check:legacy
       - name: Import map is current
         run: npm run stamp:check
