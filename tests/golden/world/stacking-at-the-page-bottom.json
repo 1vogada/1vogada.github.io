@@ -60,7 +60,7 @@
   },
   {
    "doc": 1,
-   "t": 8688,
+   "t": 8704,
    "ms": 1312,
    "who": "hand",
    "key": "CLAW_SAY.sulk",
@@ -68,11 +68,11 @@
   },
   {
    "doc": 1,
-   "t": 10688,
+   "t": 10704,
    "ms": null,
    "who": "hand",
    "key": "CLAW_SAY.loose",
-   "text": "that one looks tasty"
+   "text": "bring it here"
   }
  ],
  "states": [
@@ -193,7 +193,7 @@
   },
   {
    "doc": 1,
-   "t": 8696,
+   "t": 8712,
    "claw": "sulk",
    "sev": "",
    "pb": "closed",

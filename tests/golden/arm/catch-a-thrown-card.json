@@ -28,7 +28,7 @@
   },
   {
    "doc": 1,
-   "t": 5472,
+   "t": 5344,
    "ms": 1776,
    "who": "hand",
    "key": "CLAW_SAY.caught",
@@ -36,7 +36,7 @@
   },
   {
    "doc": 1,
-   "t": 7472,
+   "t": 7344,
    "ms": 1488,
    "who": "hand",
    "key": "CLAW_SAY.toss",
@@ -44,7 +44,7 @@
   },
   {
    "doc": 1,
-   "t": 9424,
+   "t": 9328,
    "ms": null,
    "who": "card",
    "key": "SAY.land",
@@ -52,7 +52,7 @@
   },
   {
    "doc": 1,
-   "t": 9472,
+   "t": 9344,
    "ms": null,
    "who": "hand",
    "key": "CLAW_SAY.throw",
@@ -112,7 +112,7 @@
   },
   {
    "doc": 1,
-   "t": 5436,
+   "t": 5308,
    "claw": "catch",
    "sev": "",
    "pb": "closed",
@@ -125,7 +125,7 @@
   },
   {
    "doc": 1,
-   "t": 5484,
+   "t": 5356,
    "claw": "has",
    "sev": "",
    "pb": "closed",
@@ -138,7 +138,7 @@
   },
   {
    "doc": 1,
-   "t": 7484,
+   "t": 7356,
    "claw": "lurk",
    "sev": "",
    "pb": "closed",

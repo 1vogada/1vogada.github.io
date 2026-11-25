@@ -110,7 +110,7 @@ export const TUNE = {
     SEVER_PX: [13, 16], SEVER_STEP: 8,
     CATCH_CHANCE_CRUSH: 0.3, REACH_CHANCE_CRUSH: 0.4, SNATCH_CHANCE: 0.5, SNATCH_AGAIN: 0.6, TOSS_HARD: 0.3,
     ZONES: { maxW: 1080, gutter: 16, col: 306, narrow: 0.4, grabMin: 220, grabFrac: 0.4,
-      teaseMax: 300, teaseFrac: 0.25, grabMax: 200, grabMaxFrac: 0.22 },   // Ivo 2026-11-25: zones reached half the screen; tease/catch never wider than these from the right edge
+      cardMaxFrac: 0.45 },   // Ivo 2026-11-25: tease and catch zones are each one card wide from the right edge (never more than this share of vw: on a phone a card is the whole screen)
     NEAR: [190, 0.28],                // a held card this close to the right edge (px, or this share of vw if less) gets lunged at and pulled
     SNATCH_REACH: [440, 0.36],        // it only snatches a card this close to the right edge (px, or share of vw); further away it just sulks
   },
@@ -178,7 +178,7 @@ export const TIMING = {
   gap: { show: 600, after: 500, card: 1400, katana: 2000, scream: 2000, hand: 2000, handIdle: 2400, handLate: 1200, sev: 2200, sevForce: 900, notme: 2600, raid: 1300, raidAsk: 2900 },
   react: { min: 700, spread: 2100, calm: 0.65, flinch: 1500 },
   wait: {
-    tease: [1400, 2200], teaseAgain: [1200, 2000],
+    tease: [2000, 2800], teaseAgain: [1200, 2000], teaseMin: 2000,   // teaseMin: Ivo wants teasing to last at least 2 s before it lunges or snatches
     ask: 7000,
     secret: 350,
     hello: 2200, back: 2500,
