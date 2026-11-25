@@ -118,3 +118,10 @@ Read this before porting anything from `scripts/legacy.js` into `src/`.
 - Requests to other hosts never leave the machine; a navigation of the page itself to another host (the hand sends you to a project)
   is recorded (`s.leftTo()`) and dropped.
 - A Bulgarian keyboard cannot be simulated with Playwright's keyboard (US layout only): `рафт` is sent as synthetic keydown events.
+
+## English only by default (added with wave 0)
+
+`scripts/lang.js` runs right after `legacy.js` and thins `window.__lines`, `hellos`, `FORTUNES`, toasts and the 棚 glyph to English unless
+`localStorage['kiripad-lang'] === 'all'`; `scripts/phrasebook.js` thins its own lists through `window.__thin`. `legacy.js` is untouched.
+The footer button `#lang` (made by lang.js) flips the key and reloads. The new code must do the same in `src/page/language.js` through
+`setLanguages(['en'])`: English only unless the key is `all`, same button, same texts. The suite always runs with `all`.
