@@ -34,8 +34,8 @@ import { drawOffset } from '../world/loop.js';
 
 const { world } = W;
 const S = TUNE.physics.S;
-const REGROW_MS = 700;                     // TUNE-REQUEST TUNE.cards.REGROW_MS: the torn-out grid cards regrow (CSS 'regrow' class)
-const CRUSH_DY = -70;                      // TUNE-REQUEST TUNE.cards.CRUSH_DY: the crushed card's last scream, above the arm's fist
+const REGROW_MS = TUNE.cards.REGROW_MS;
+const CRUSH_DY = TUNE.cards.CRUSH_DY;
 const notMine = (o) => o.kind !== 'katana' && o.kind !== 'hand';   // the katana and the cut-off hands have their own lines
 
 // ---- pull and tear (the world calls them through onPull / onTear('card')) ----
