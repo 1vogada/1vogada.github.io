@@ -164,11 +164,15 @@ export function sulkFor(ms) { if (!claw) return; claw.sulkUntil = now() + ms; cl
 /** it won at rock, paper, scissors: the old hand o is fair game for TUNE.rps.FAIR_MS (./old.js) */
 export function oldLost(o) { if (claw && !isCrazy()) lost(o, now() + TUNE.rps.FAIR_MS); }
 
+/** the old hand poked your still cursor (sev.pestered; n: pokes so far): in 'mine' with that old hand, its turn next (behaviours/mine.js) */
+export function pesterTurn(o, n) { const c = claw; if (c && m.is('mine') && c.rival === o) { c.reply = n; clock.wake(); } }
+
 /** out of patience: it takes the held card (legacy snatch(o)) */
 export function snatch(o) { claw.o = o; set('snatch'); }
 
 // what it can sense of other actors, injected by src/reactions.js:
-// { shelfSnack() -> body|null, nearShelf(P) -> bool, onShelf(o) -> bool, want(v), shelf() -> state|null, oldHands() -> Set of cut-off hand bodies }
+// { shelfSnack() -> body|null, nearShelf(P) -> bool, onShelf(o) -> bool, want(v), shelf() -> state|null, oldHands() -> Set of cut-off hand bodies,
+//   pester() -> { hand, poked, n } | null (an old hand poking your still cursor) }
 let sensed = {};
 /** what senses() was given */ export const sense = () => sensed;
 export function senses(s) { sensed = s || {}; }

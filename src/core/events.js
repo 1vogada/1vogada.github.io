@@ -99,6 +99,9 @@ export const EVENTS = {
   'data.loaded': '{ data } projects.json arrived and the grid rendered',
   'cards.rendered': '{ } the grid re-rendered (legacy "cards-rendered" DOM event)',
   'ui.toast': '{ msg } show a toast (actors cannot import page/toast.js)',
+  // ---- the old hand pokes you instead (idle-old) ----
+  'sev.pestered': '{ hand, n } an old hand poked your still cursor (severed behaviours/pester.js); n: pokes so far, the arm\'s and its own',
+  'hand.pestered': '{ hand, n } the arm poked your still cursor in turn with old hand `hand` (hand behaviours/mine.js); n: pokes so far',
 };
 
 export const EVENT_TYPES = new Set(Object.keys(EVENTS));

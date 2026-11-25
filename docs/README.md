@@ -40,6 +40,7 @@ public API. Every module exports `install(app)`; `app` holds every module by its
 | the arm's hand (18 states) | `src/actors/hand/index.js` (tick, speech, sever), `behaviours/<state>.js`, `tug.js` (tug, slip, rip, crush helpers), `draw.js`, `poses.js`, `zones.js` | `src/lines/hand.js` | `styles/hand.css` |
 | cut-off hands (7 states) | `src/actors/severed/index.js`, `behaviours/<state>.js`, `gait.js` (legs, walking forces) | `src/lines/severed.js` | `styles/hand.css` |
 | the secret shelf (棚 tana) | `src/actors/shelf.js`; opened by `src/page/kiri.js` (typed), `src/page/search.js` (Enter) | `src/lines/shelf.js` (toasts) | `styles/physics.css` |
+| the old hand pokes your still cursor first, then turns with the arm (idle-old) | `src/actors/severed/pester.js` (who, the pace), `severed/behaviours/pester.js`, `hand/behaviours/mine.js` ("that's MY job") | `sev.pester*`, `hand.pester*` | |
 | who reacts to whom | `src/reactions.js` (`RULES`, plus `hand.senses(...)` for the shelf) | | |
 | speech bubbles (every one) | `src/core/speech.js`; each actor calls `defineSpeaker` in its `install` | | `styles/physics.css`, `hand.css` |
 | toasts | `src/page/toast.js` (actors emit `ui.toast`) | `toast.*` in each `src/lines/*.js` | `styles/base.css` |

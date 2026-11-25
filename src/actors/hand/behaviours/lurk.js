@@ -1,9 +1,10 @@
 // hand state "lurk": follows a held card up and down; eager when it is brought into the tease zone (not near the shelf); otherwise eyes the shelf for 700 ms and reaches.
+// The mouse still for TUNE.hand.IDLE.MS: poke, or 'mine' when an old hand is already poking the cursor (old.js rival()).
 // Legacy clawTick branch `c.st === 'lurk'`, moved verbatim. tick(c, m, dt) sets the motion target on the frame's ctx m.x.
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE, TIMING } from '../../../core/tune.js';
 import { set, speak, shelf, big } from '../index.js';
-import { look, jealous, mistake } from '../old.js';
+import { look, jealous, mistake, rival } from '../old.js';
 import { still } from '../idle.js';
 
 export default defineBehaviour('hand', 'lurk', {
@@ -20,7 +21,10 @@ export default defineBehaviour('hand', 'lurk', {
       if (mistake(c, x)) return;   // an old hand held out in the tease zone like a card: it takes it for one
       jealous(c, t);   // (unless you carry an old hand around: long enough, and the arm is jealous)
       if (look(c, x)) return;
-      if (t > c.cool && still(t)) { set('poke'); return; }   // the mouse has not moved for a while: is anybody there?
+      if (t > c.cool && still(t)) {   // the mouse has not moved for a while: is anybody there?
+        const r = rival(); if (!r) { set('poke'); return; }
+        if (r.poked) { c.rival = r.hand; set('mine'); return; }   // an old hand got there first: that's ITS job (mine.js); (not yet poked: it waits)
+      }
       const q0 = shelf.snack(), q = q0 && big(q0) ? q0 : null; if (shelf.state()) shelf.want(!!q);
       if (!q) c.eyed = null; else if (q !== c.eyed) { c.eyed = q; c.eyedAt = t; } else if (t > c.cool && t - c.eyedAt > 700) { c.o = q; c.eyed = null; set('reach'); speak('shelf', true); }
     }

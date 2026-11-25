@@ -13,6 +13,8 @@
 //            it anyway (OLD.AWAKE, rolled once per old hand per OLD.ROLL_MS, never while full). That one plays dead (prod.js).
 //   wrest    an old hand it has met starts crushing a card near the right edge while it lurks with nothing in its hand (not
 //            full, not cooling off): now and then (TUNE.hand.WREST.CHANCE, rolled once per crush) it grabs the other end (wrest.js).
+//   rival    an old hand got to your still cursor first and pokes it (severed/pester.js): the arm leaves it alone meanwhile
+//            (look() skips it) and, once it has poked, comes out to do its job anyway ('mine', see rival()).
 import { TUNE } from '../../core/tune.js';
 import { bus } from '../../core/bus.js';
 import { now } from '../../core/clock.js';
@@ -90,7 +92,7 @@ export function look(c, x) {
   let prey = null, best = -1, awake = null;
   const reach = Math.min(OLD.REACH[0], vw * OLD.REACH[1]);
   for (const o of olds()) {
-    if (isHeld(o) || !isFree(o) || o.ai.st === 'held' || o.ai.st === 'caught') continue;
+    if (isHeld(o) || !isFree(o) || o.ai.st === 'held' || o.ai.st === 'caught' || o.ai.st === 'pester') continue;
     const q = at(o); if (!inView(q, vw, vh)) continue;
     if (!met.has(o)) {   // it takes a moment to notice, and does not interrupt a hunt or a meal
       if (o.ai.hunting || o.ai.st === 'crush' || o.ai.st === 'gloat') { seen.delete(o); continue; }
@@ -134,5 +136,8 @@ export function jealous(c, t) {
   c.carryAt = null; c.jealousAt = t; c.mood = 'jealous'; c.flinch = t + J.LEAN_MS; c.react = null;
   speak('jealous', true);
 }
+
+/** an old hand poking your still cursor (sense().pester): { hand, poked, n }, or null (none wired: none) */
+export const rival = () => { const f = sense().pester; return f ? f() : null; };
 
 export function install(app) {}
