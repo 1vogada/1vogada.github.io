@@ -30,8 +30,12 @@ jobs:
       - name: scripts/legacy.js is the old inline script, byte for byte (until it is deleted)
         if: ${{ hashFiles('scripts/legacy.js') != '' }}
         run: npm run check:legacy
+      - name: Layers (what may import what; no timers or window.__ outside core)
+        run: node scripts/lint-layers.mjs
       - name: Import map is current
         run: npm run stamp:check
+      - name: Unit tests
+        run: node --test tests/unit/*.test.js
       - name: Scenarios (the modules under src/, against tests/golden)
         run: npm test
       - name: Scenarios on /?legacy (the old script, until it is deleted)
