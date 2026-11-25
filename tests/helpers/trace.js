@@ -14,26 +14,60 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-// the phrasebook keeps its own lists (the hand's lines in the menu) inside scripts/phrasebook.js; they are read from there once
-let pbLists = null;
-function phrasebookLists() {
-  if (pbLists) return pbLists;
-  pbLists = {};
+// Which list(s) a bubble's text comes from. The index is built from the modules' own line registry (src/core/lines.js
+// allLines(), filled by src/lines/*.js loaded here in node, in the order src/main.js imports them), never from the page:
+//  - a list that carries a `legacy:` path ('SAY.pull', 'AGONY.1', 'BEG') is named by that path, walked in the shape and order of
+//    the old window.__lines (what lines.legacy() builds), exactly as the goldens were recorded
+//  - the phrasebook raid's lists keep the names the goldens give them (PB_NAMES: the old scripts/phrasebook.js constants)
+//  - every other list (a new one) is named by its own key, e.g. 'hand.wave'
+const SRC = path.join(__dirname, '..', '..', 'src');
+const PB_NAMES = { 'raid.bored': 'PB.RAID_SAY', 'raid.swat': 'PB.SWAT_SAY', 'raid.grudge': 'PB.GRUDGE_SAY', 'raid.angry': 'PB.ANGRY_SAY',
+  'raid.scroll': 'PB.SCROLL_SAY', 'raid.help': 'PB.HELP_SAY', 'raid.alone': 'PB.ALONE_SAY', 'raid.more': 'PB.MORE_SAY', 'raid.hide': 'PB.HIDE_SAY' };
+
+let registry = null;
+/** every list the page can say: [{ key, legacy, lines: [{ text }] }] (src/core/lines.js allLines()), loaded once */
+function allLines() {
+  if (registry) return registry;
+  const main = fs.readFileSync(path.join(SRC, 'main.js'), 'utf8');
+  const files = [...main.matchAll(/from '\.\/lines\/([\w-]+\.js)'/g)].map((m) => m[1]);
+  for (const f of fs.readdirSync(path.join(SRC, 'lines')).sort()) if (f.endsWith('.js') && !files.includes(f)) files.push(f);
+  // the modules are ES modules in a package without "type": node loads them but warns once; that warning is noise here
+  const emit = process.emitWarning;
+  process.emitWarning = function (w, ...a) { const code = a[0] && typeof a[0] === 'object' ? a[0].code : a[1]; if (code === 'MODULE_TYPELESS_PACKAGE_JSON') return undefined; return emit.call(process, w, ...a); };
   try {
-    const src = fs.readFileSync(path.join(__dirname, '..', '..', 'scripts', 'phrasebook.js'), 'utf8');
-    for (const m of src.matchAll(/const ([A-Z]+_SAY) = (\[[^\n]*\]);/g)) { try { pbLists[m[1]] = new Function('return ' + m[2])(); } catch (e) { /* skip */ } }
-  } catch (e) { /* no phrasebook */ }
-  return pbLists;
+    const { lines } = require(path.join(SRC, 'core', 'lines.js'));
+    for (const f of files) require(path.join(SRC, 'lines', f));
+    registry = lines.allLines();
+  } finally { process.emitWarning = emit; }
+  return registry;
 }
 
-function keyIndex(lines) {
+/** text -> [list names], first name first */
+function keyIndex(defs = allLines()) {
   const idx = new Map();
   const add = (text, key) => { const k = idx.get(text); if (!k) idx.set(text, [key]); else if (!k.includes(key)) k.push(key); };
-  for (const [list, v] of Object.entries(lines || {})) {
+  const texts = (d) => d.lines.map((l) => l.text);
+  // 1. the legacy-named lists, in the shape of the old window.__lines (same construction as lines.legacy()), walked as before
+  const shaped = {};
+  for (const d of defs) {
+    if (!d.legacy) continue;
+    const [top, sub] = d.legacy.split('.');
+    if (sub == null) shaped[top] = texts(d);
+    else if (/^\d+$/.test(sub)) (shaped[top] = shaped[top] || [])[+sub] = texts(d);
+    else (shaped[top] = shaped[top] || {})[sub] = texts(d);
+  }
+  for (const [list, v] of Object.entries(shaped)) {
     if (Array.isArray(v)) v.forEach((t, i) => (Array.isArray(t) ? t.forEach((x) => add(x, `${list}.${i}`)) : add(t, list)));
     else if (v && typeof v === 'object') for (const [k, arr] of Object.entries(v)) if (Array.isArray(arr)) arr.forEach((t) => add(t, `${list}.${k}`));
   }
-  for (const [list, arr] of Object.entries(phrasebookLists())) arr.forEach((t) => add(t, 'PB.' + list));
+  // 2. the phrasebook raid's lists, under their old names
+  const byKey = new Map(defs.map((d) => [d.key, d]));
+  for (const [key, name] of Object.entries(PB_NAMES)) if (byKey.has(key)) texts(byKey.get(key)).forEach((t) => add(t, name));
+  // 3. every other list under its own key (a line given as alternatives counts each one)
+  for (const d of defs) {
+    if (d.legacy || PB_NAMES[d.key]) continue;
+    for (const t of texts(d)) (Array.isArray(t) ? t : [t]).forEach((x) => add(x, d.key));
+  }
   return idx;
 }
 
@@ -45,19 +79,21 @@ function who(cls) {
   return 'card';
 }
 
-let cachedIdx = null, cachedFor = null;
-function buildTrace(raw, lines) {
-  if (cachedFor !== lines) { cachedIdx = keyIndex(lines); cachedFor = lines; }
-  const idx = cachedIdx;
+let cachedIdx = null;
+function buildTrace(raw) {
+  const idx = cachedIdx || (cachedIdx = keyIndex());
   const bubbles = raw.bubbles.map((b) => ({ doc: b.doc, t: b.t, ms: b.ms, who: who(b.cls), key: (idx.get(b.text) || ['?']).join('|'), text: b.text, ...(b.lvl ? { lvl: b.lvl } : {}) }));
   return { bubbles, states: raw.states };
 }
 
 const KIND_FIELDS = ['claw', 'sev', 'pb', 'kat', 'shelf'];
+const NOT_KIND = new Set(['doc', 't', 'grab', 'objs', ...KIND_FIELDS]);
 function kindStates(states) {
   const out = []; let last = null;
   for (const s of states) {
-    const p = KIND_FIELDS.map((f) => `${f}=${s[f]}`).join(' ');
+    // the fields a new actor reports (harness sampleState) count as state changes too; existing goldens have none
+    const more = Object.keys(s).filter((k) => !NOT_KIND.has(k)).sort().map((k) => `${k}=${JSON.stringify(s[k])}`);
+    const p = [...KIND_FIELDS.map((f) => `${f}=${s[f]}`), ...more].join(' ');
     if (p !== last) { out.push(`${s.doc}| ${p}`); last = p; }
   }
   return out;
@@ -92,4 +128,4 @@ function compareTrace(want, got, mode = 'strict') {
   throw new Error('TRACE_MATCH must be strict or kind');
 }
 
-module.exports = { buildTrace, compareTrace, kindStates, keyIndex, who };
+module.exports = { buildTrace, compareTrace, kindStates, keyIndex, allLines, who, PB_NAMES };
