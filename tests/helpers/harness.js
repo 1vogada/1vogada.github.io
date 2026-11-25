@@ -120,8 +120,10 @@ class Session {
     //  - no CSS transitions on the cards, the planted katana and the secret ×, and no screen shake (#projects.shake, a 0.28 s CSS
     //    animation that moves the whole grid by up to 5 px after a hard landing, a crush or a smash): they run on real time, and
     //    rectangles read by the page (a pull measures its card) or by the test while one runs would depend on the machine
+    //  - the same for the phrasebook's jolt (.pb-card.pb-jolt, after a smash or a rip) and the tugged line's shiver (.pb-tug): the raid
+    //    hand aims at the line's rectangle every frame
     await this.ctx.addInitScript(() => { document.addEventListener('DOMContentLoaded', () => { const st = document.createElement('style'); st.dataset.test = 'harness';
-      st.textContent = '*, *::before, *::after { font-family: "DejaVu Sans", "IPAGothic", sans-serif !important; } .grid .card, .katana-in, .omi-secret { transition: none !important; } #projects.shake { animation: none !important; }'; document.head.appendChild(st); }); });
+      st.textContent = '*, *::before, *::after { font-family: "DejaVu Sans", "IPAGothic", sans-serif !important; } .grid .card, .katana-in, .omi-secret { transition: none !important; } #projects.shake, .pb-card.pb-jolt, .pb-tug { animation: none !important; }'; document.head.appendChild(st); }); });
     const has = (x) => x && Object.keys(x).length;
     if (has(session) || has(local)) {
       await this.page.goto(base + '/__blank');
