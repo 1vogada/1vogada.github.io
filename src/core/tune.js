@@ -107,7 +107,7 @@ export const TUNE = {
     STUMP_S: 8, REGROW_SAY_S: 0.7, REGROW_S: 2.4,
     AGIT_MAX: 6, AGIT_DECAY: 0.6, REACT_TTL_MS: 6000,
     COOL: { slip: 2500, reach: 800, catch: 600, toss: 1200, gloat: 1200, eat: 1800, regrow: 1500, grab: 1500, small: 4000 },
-    PIECE_BIG: 0.35,     // a piece of a card with at least this share of the card's area is worth eating; smaller ones it rejects
+    PIECE_BIG: 0.25,     // a piece of a card with at least this share of the card's area gets everything a whole card gets; smaller scraps it rejects
     SWAT: [-22, -9],     // m/s it bats a small piece back with
     JOINT_HZ: 30,
     SEVER_PX: [13, 16], SEVER_STEP: 8,

@@ -21,8 +21,8 @@ export default defineBehaviour('hand', 'eager', {
     else {
       // in the catch zone it grabs at once (Ivo 2026-11-25); in the tease zone it lunges only after the 2 s tease, close to the edge
       c.ly = Math.max(80, Math.min(x.vh - 80, P[1])); x.T = [vw - 10, P[1]]; x.aim = Math.atan2(P[1] - c.y, P[0] - c.x); if (Math.cos(x.aim) > -0.4) x.aim = Math.PI;
-      // brought close: a tug of war for a whole card; a piece is not worth one, it just takes it
-      if (P[0] > x.Z.grab || (c.far && teased && P[0] > vw - x.NEAR)) { if (held.kind !== 'card') snatch(held); else { c.o = held; c.pre = pre(held); set('lunge'); } } else if (m.t > 2.6) speak('eager');
+      // brought close: a tug of war, for a whole card or a piece of one alike
+      if (P[0] > x.Z.grab || (c.far && teased && P[0] > vw - x.NEAR)) { c.o = held; c.pre = pre(held); set('lunge'); } else if (m.t > 2.6) speak('eager');
     }
   },
 });

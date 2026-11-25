@@ -494,7 +494,7 @@
  "hand.small": {
   "who": "hand",
   "legacy": null,
-  "trigger": {"title":"A scrap","when":"You offer it, or throw it, a piece that is less than about a third of a card. It will not have it: held out, it turns away; thrown, it bats it back. Bigger pieces it eats."},
+  "trigger": {"title":"A scrap","when":"You offer it, or throw it, a scrap: a piece under a quarter of a card. It will not have it: held out, it turns away; thrown, it bats it back. With a bigger piece it does all it does with a whole card."},
   "lines": [
    ["too small.","en"],
    ["crumbs?!","en"],

@@ -39,7 +39,7 @@ import { gore, shake } from '../../world/fx.js';
 import { handParts, handDraw } from './draw.js';
 import { POSES } from './poses.js';
 import { zones } from './zones.js';
-import { gripPt, untug } from './tug.js';
+import { gripPt, untug, ownClip } from './tug.js';
 
 export { POSES };
 
@@ -51,9 +51,9 @@ let claw = null, m = null;
 
 /** it stays away, scenes and the phrasebook included, until a card has been taken out of its slot (in this tab's session) */
 export const awake = () => everRipped();
-/** what it takes for food: whole cards, and pieces of cards that are not crumbling away */
+/** what it takes: whole cards, and pieces of cards that are not crumbling away. With a piece it does everything it does with a card */
 export const edible = (o) => o.kind === 'card' || (o.kind === 'piece' && !o.die);
-/** a whole card, or a piece big enough to be worth eating (TUNE.hand.PIECE_BIG of the card's area); smaller pieces it rejects */
+/** a whole card, or a piece big enough to bother with (TUNE.hand.PIECE_BIG of the card's area); smaller scraps it rejects */
 export const big = (o) => o.kind === 'card' || !o.poly || polyArea(o.poly) >= H_.PIECE_BIG * o.w * o.h;
 
 /** a direct write of c.st (legacy `c.st = st`): no restart of t, no until, no wake */
@@ -200,7 +200,7 @@ export function letGo() {
   const c = claw, o = c.o; let crushed = null; if (c.joint) { world.b2.destroyJoint(c.joint); c.joint = null; }
   if (o && world.bodies.has(o)) {
     const grab = world.grab, mineToo = grab && grab.o === o;
-    if (o.tug && o.tug.crush) { o.tug = null; o.el.style.clipPath = ''; o.el.style.filter = ''; crushed = o; }   // legacy say(o, 'stab', true): see sever()
+    if (o.tug && o.tug.crush) { o.tug = null; ownClip(o); o.el.style.filter = ''; crushed = o; }   // legacy say(o, 'stab', true): see sever()
     else if (o.tug) { const H = gripPt(), Hp = [H[0] + scrollX, H[1] + scrollY], g = o.tug; untug(o, mineToo ? [grab.cx + scrollX, grab.cy + scrollY] : [Hp[0] - Math.cos(g.psi) * g.d0, Hp[1] - Math.sin(g.psi) * g.d0], Hp); }
     o.el.style.pointerEvents = ''; o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF });
     o.body.setGravityScale(mineToo ? 1 : TUNE.physics.FALL); o.body.setAngularDamping(mineToo ? TUNE.physics.HELD_SPIN : TUNE.physics.SPIN); o.body.setAwake(true);
