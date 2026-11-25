@@ -211,3 +211,58 @@ scenario(G, 'picked off the hand tower, it comes down', { legacy: false, golden:
   assert.ok(!(await s.eval(sts)).includes('tower'));
   await s.up();
 });
+
+// crazy mode with old hands on the page: they dance, the arm bobs at the edge; picked up, one keeps dancing; crazy mode off: they
+// freeze, look round and pretend nothing happened (src/actors/severed/dance.js, behaviours dance / jive / freeze, hand/bob.js)
+scenario(G, 'old hands dance in crazy mode', { legacy: false, rand: 0.5 }, async (s) => {
+  const size = await world(s);
+  await spawn(s, size.W / 2 - 200, size.H - 300);
+  await spawn(s, size.W / 2 + 200, size.H - 300);
+  await s.run(1500);
+  const sts = () => [...window.__sev.list].map((o) => o.ai.st).join(' ');
+  const seen = () => { const css = (el) => getComputedStyle(el).display !== 'none' && getComputedStyle(el).visibility !== 'hidden';
+    const hs = [...window.__sev.list], c = window.__hand.get();
+    return { phys: getComputedStyle(document.getElementById('phys')).display, hands: hs.every((o) => css(o.hand.over) && css(o.el)), arm: css(c.over), x: c.x, vw: document.documentElement.clientWidth }; };
+  assert.equal(await s.eval(sts), 'limp limp');
+  // crazy mode on
+  await s.press('#toggle');
+  await s.press('#warn-yes');
+  await s.run(600);
+  assert.equal(await s.eval(sts), 'dance dance', 'every old hand stops and dances');
+  assert.ok(await s.said('sev.dance'), 'and says so');
+  let v = await s.eval(seen);
+  assert.ok(v.phys !== 'none' && v.hands && v.arm, `crazy mode does not hide them (${JSON.stringify(v)})`);
+  await s.run(1600, 50);
+  v = await s.eval(seen);
+  assert.ok(v.x < v.vw && v.x > v.vw - 140, `the arm bobs just inside the right edge (${Math.round(v.x)} of ${v.vw})`);
+  assert.ok(await s.said('hand.bob'), 'pretending it is not dancing');
+  // on the beat: the feet step and the moves change
+  const beats = new Set(), steps = new Set();
+  for (let i = 0; i < 30; i++) {
+    await s.run(60, 30);
+    const [b, sw] = await s.eval(() => { const o = window.__sev.list.values().next().value; return [o.ai.beat, o.ai.feet ? Object.values(o.ai.feet).filter((f) => f.sw).length : 0]; });
+    beats.add(b); if (sw) steps.add(b);
+  }
+  assert.ok(beats.size >= 3 && steps.size >= 2, `it steps to the beat (${beats.size} beats, a foot up on ${steps.size})`);
+  // pick one up mid-dance
+  const bottom = await s.eval(() => document.documentElement.scrollHeight - innerHeight);
+  await s.scrollTo(bottom);
+  const sy = await s.scrollY();
+  const [x, y] = await s.eval(() => { const p = window.__sev.list.values().next().value.body.getPosition(); return [p.x * 100, p.y * 100]; });
+  await s.move(x, y - sy); await s.down();
+  assert.equal(await s.eval(sts), 'jive dance', 'in your hand it keeps dancing');
+  assert.ok(await s.said('sev.jive'), '"don\'t stop the music"');
+  await s.line(x, y - sy, x - 60, y - sy - 120, 10);
+  await s.run(1500);
+  assert.equal(await s.eval(sts), 'jive dance');
+  await s.up();
+  await s.runUntil(() => [...window.__sev.list].every((o) => o.ai.st === 'dance'), null, { max: 4000, step: 50 });
+  // crazy mode off
+  await s.press('#toggle');
+  assert.equal(await s.eval(sts), 'freeze freeze', 'the music stops: they freeze');
+  assert.ok(await s.said('sev.freeze'));
+  v = await s.eval(seen);
+  assert.equal(await s.eval(() => document.getElementById('phys').style.display), '', 'the inline overrides are gone');
+  await s.runUntil(() => [...window.__sev.list].every((o) => o.ai.st === 'walk'), null, { max: 6000, step: 50 });
+  assert.ok(await s.said('sev.pretend'), 'and pretend nothing happened');
+});

@@ -24,6 +24,7 @@
 // it is cleared or replaced.
 // It never imports another actor: the shelf reaches it through senses() (wired in src/reactions.js), the blade through
 // world.blade, and what happens to cards goes out as events (hand.grabbed, hand.reaching, hand.ripped, ...).
+// In crazy mode tick() returns before all of that; while the old hands dance it bobs along at the edge instead (./bob.js).
 
 import { TUNE, TIMING } from '../../core/tune.js';
 import { bus } from '../../core/bus.js';
@@ -42,6 +43,9 @@ import { zones } from './zones.js';
 import { gripPt, untug, ownClip } from './tug.js';
 import { stole, wants, lost, wrestable } from './old.js';
 import { circling } from './idle.js';
+import { bob, bobbing, bobTick } from './bob.js';
+
+export { bob, bobbing };
 
 export { POSES };
 
@@ -185,13 +189,13 @@ export const shelf = {
 export const busy = () => {
   const c = claw; if (!c) return false;
   const sh = shelf.state();
-  return (!!sh && sh.want) || !!c.react || !!c.later || now() < (c.flinch || 0) || c.strands.length > 0 || (c.sx ?? 1) !== 1 || !!c.say || m.busy || (!!m.def.busyUntil && now() < c.until) || (m.is('lurk') && wants(c));
+  return (!!sh && sh.want) || !!c.react || !!c.later || now() < (c.flinch || 0) || c.strands.length > 0 || (c.sx ?? 1) !== 1 || !!c.say || m.busy || (!!m.def.busyUntil && now() < c.until) || (m.is('lurk') && wants(c)) || bobbing();
 };
 
 // legacy clawTick(dt)
 function tick(dt) {
   if (!claw) { if (!world.ripped.size || isCrazy()) return; clawInit(); }
-  const c = claw; if (isCrazy() || m.def.borrowed) return;
+  const c = claw; if (isCrazy() || m.def.borrowed) { if (!m.def.borrowed) bobTick(c, dt); return; }   // crazy mode: it only bobs along to the old hands' dance (./bob.js)
   const vw = html().clientWidth, vh = innerHeight, t = now(); m.age(dt);
   if (c.o && !world.bodies.has(c.o)) { c.o = null; c.joint = null; c.snap = null; if (!m.def.calm) { set('sulk'); speak('sulk'); } }   // someone cut or smashed what it was holding
   if (world.grab !== c.g) { c.g = world.grab; c.far = false; }

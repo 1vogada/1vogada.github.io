@@ -654,4 +654,18 @@ defineLines('hand.towerLaugh', ['ha! timber.', 'nice try, stack of thumbs', 'gra
   lang: ['en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
 });
 
+// ---- crazy mode: the arm bobs along (src/actors/hand/bob.js) ----
+defineLines('hand.bob', ["I am not dancing. this is a twitch.", "ugh. fine. ONE song.", "my wrist just does this", "do not tell the cards", "I bob ironically", "I have a reputation, you know", "this beat is… acceptable", "nobody films this", "just keeping warm", "these old hands have no shame", "I'm only here for the snacks", "не танцувам, мърдам се", "おどってないし"], {
+  who: 'hand',
+  trigger: { title: "Crazy mode: bobbing along", when: "Crazy mode goes on while old hands are on the page. They dance; the arm comes in at the right edge and bobs along, pretending it is not." },
+  gloss: {"не танцувам, мърдам се": "I'm not dancing, I'm fidgeting", "おどってないし": "I'm not dancing"},
+  lang: ["en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "bg", "ja"],
+});
+defineLines('hand.danced', ["oh, I saw that.", "nothing happened, sure", "smooth. very smooth.", "I have screenshots", "the floor misses you", "stretching. right.", "encore? no? shame.", "I never bobbed. you have no proof", "pretend all you like", "видях ви", "みてたよ"], {
+  who: 'hand',
+  trigger: { title: "Crazy mode: after the dance", when: "Crazy mode goes off and the old hands pretend they were never dancing. A little later, the arm comments." },
+  gloss: {"видях ви": "I saw you", "みてたよ": "I was watching"},
+  lang: ["en", "en", "en", "en", "en", "en", "en", "en", "en", "bg", "ja"],
+});
+
 export function install(app) {}

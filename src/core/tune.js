@@ -343,6 +343,29 @@ export const TUNE = {
     EDGE: 6, APART: 10, APART_HOLD: 34, APART_TOUCH: 4, STACK: 16, DODGE: 10, DODGE_GAP: 14, TAIL: 14, LEAN_GROW: 0.07,
     BUTTON_EXTRA_MS: 100,
   },
+  // crazy mode with old hands on the page (src/actors/severed/dance.js, behaviours dance / jive / freeze; src/actors/hand/bob.js):
+  // they dance in place to a beat of BEAT_TICKS ticks of the scrolling tab title (TUNE.crazy.TITLE_MS), and the arm bobs at the edge
+  dance: {
+    BEAT_TICKS: 3,                    // one beat = this many title scroll steps (3 x 180 ms: about 111 bpm)
+    FROM: ['walk', 'rest', 'limp', 'rise', 'stare', 'gloat', 'mirror', 'cower', 'dizzy', 'dead'],   // what an old hand may be doing when the music takes it
+    STILL_V: 1,                       // limp: only once it lies this still (m/s), so a thrown one lands first
+    STEP_PX: 16,                      // on each beat one foot steps out this far to the side and back
+    SHUFFLE: 0.22,                    // m/s: the body sways two beats right, two beats left
+    DIP: 0.24,                        // m: it dips on every beat (and comes back up before the next)
+    SPIN_EVERY: 8,                    // beats between two spins on the spot
+    POSE_RATE: 14,                    // how fast the free fingers snap to the beat's move
+    WIG: 0.22,                        // finger wiggle while dancing (held: HELD_WIG)
+    HELD_WIG: 0.6,
+    SAY_MS: 7000, HELD_SAY_MS: 2600,  // how often it chats while dancing / while you hold it (unforced)
+    MOVES: [                          // its moves, one per beat (fingers 0 and 1 are its legs; the others do the moves)
+      { curl: 0.9, th: 0.95, spread: 0.5, eye: 1, pupil: 1, happy: 1, point: 0, legs: 1 },
+      { curl: 0.2, th: 0.15, spread: 1.35, eye: 1.3, pupil: 0.8, happy: 0, point: 0, legs: 1 },
+      { curl: 0.9, th: 0.9, spread: 0.5, eye: 1.1, pupil: 1, happy: 1, point: 1, legs: 1 },
+      { curl: 1.1, th: 1.05, spread: 0.3, eye: 0.5, pupil: 0.6, happy: 0, point: 0, legs: 1 },
+    ],
+    FREEZE: { STILL_S: 0.8, LOOK_S: 0.5, LOOKS: 3, PRETEND_S: 2.6, END_S: 4.4 },   // the music stops: stock still, then it looks left and right LOOKS times, then pretends nothing happened, then walks on
+    BOB: { EDGE_PX: 70, PX: 18, SWAY: 0.22, RATE: 7, WIG: 0.35, SAY_MS: 900 },   // the arm: its wrist this far in from the right edge, bobbing this many px a beat, the hand swaying (rad); its line after SAY_MS
+  },
 };
 
 // ---- timing: how long every speech bubble stays up, how long anyone waits before speaking again, and how long you get to answer ----

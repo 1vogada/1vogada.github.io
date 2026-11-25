@@ -9,6 +9,8 @@
 // install(app): onTick 'severed' (legacy sevTick), clock.hasWork/keepAwake(busy), the 'severed' speaker, body.removed of a
 // hand -> gone(o), body.thrown of a hand -> say(o, 'thrown', true), hook('__sev', { list, SEV, POSES, set, spawn, say, cut }).
 // The 'hand.severed' event is wired to spawn() in src/reactions.js.
+// Crazy mode (src/reactions.js, mode.changed -> groove): ./dance.js sets them dancing (behaviours dance, jive, freeze) and shows
+// them through crazy mode's hiding rules; danceTick() runs once a frame here.
 
 import { TUNE } from '../../core/tune.js';
 import { bus } from '../../core/bus.js';
@@ -22,6 +24,7 @@ import { drawOffset } from '../../world/loop.js';
 import { gore } from '../../world/fx.js';
 import { turn } from './gait.js';
 import { towerTick, shookOff, tower } from './tower.js';
+import { danceTick, groove, grooving } from './dance.js';
 
 const S = TUNE.physics.S, P = TUNE.physics, SV = TUNE.severed, B = SV.BODY;
 
@@ -106,6 +109,7 @@ export const lurks = () => (sensed.lurks ? !!sensed.lurks() : false);
 /** the arm's wrist and grip (viewport px), its state and seconds in it, or null: { st, t, x, y, grip, is(...states) } */
 export const wrist = () => { const r = sensed.wrist ? sensed.wrist() : null; return r && { ...r, is: (...s) => s.includes(r.st) }; };
 export { shookOff, tower };
+export { groove, grooving };
 /** the new hand, when the arm is out showing it (the mirror game), else null */ export const armOut = () => (sensed.arm ? sensed.arm() : null);
 
 // the mirror game: a walking old hand that has met the new one, in view, with nothing better to do (not hunting, running, hurt,
@@ -266,9 +270,10 @@ export function tick(dt) {
   frameT = clock.now();
   hitchhike();
   towerTick(dt);
+  danceTick();
   for (const o of [...list]) {
     const a = o.ai, h = o.hand, m = brains.get(o); m.age(dt);
-    if (isHeld(o) && m.state !== 'held' && !m.def.tap) m.set('held');   // (a state with tap: true tells a tap from a pick-up itself)
+    if (isHeld(o) && m.state !== 'held' && !m.def.tap && !m.def.held) m.set(m.def.heldAs || 'held');   // (a state with tap: true tells a tap from a pick-up itself; held: true is a state you hold it in; heldAs: where it goes when picked up)
     else if (m.state === 'walk' && mirrors(o)) m.set('mirror');
     if (vengeful(o, m)) m.set('avenge');
     if (m.state === 'held') a.alone = frameT; else if (!a.painted && frameT - (a.alone ?? a.born) > SV.PAINT.MS && m.is('walk', 'rest')) { a.painted = true; m.set('paint'); }   // left alone long enough: it writes something
