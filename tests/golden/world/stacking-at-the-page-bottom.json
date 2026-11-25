@@ -24,51 +24,51 @@
    "ms": 804,
    "who": "card",
    "key": "SAY.pull",
-   "text": "hey!"
+   "text": "let go!"
   },
   {
    "doc": 1,
    "t": 4432,
    "ms": 1312,
    "who": "card",
-   "key": "SAY.rip|PB.SWAT_SAY",
-   "text": "ау!"
+   "key": "SAY.rip|CLAW_SAY.sulk|PB.SWAT_SAY",
+   "text": "rude."
   },
   {
    "doc": 1,
-   "t": 6656,
+   "t": 4480,
    "ms": 1312,
    "who": "hand",
-   "key": "CLAW_SAY.loose",
-   "text": "fresh one!"
+   "key": "CLAW_SAY.eager",
+   "text": "closer…"
   },
   {
    "doc": 1,
-   "t": 7304,
-   "ms": 792,
+   "t": 6480,
+   "ms": 1648,
+   "who": "hand",
+   "key": "CLAW_SAY.loose",
+   "text": "ooh, a loose one"
+  },
+  {
+   "doc": 1,
+   "t": 7204,
+   "ms": 796,
    "who": "card",
    "key": "SAY.pull|CLAW_SAY.slap",
    "text": "hands off"
   },
   {
    "doc": 1,
-   "t": 8096,
-   "ms": 1392,
+   "t": 8000,
+   "ms": 1312,
    "who": "card",
    "key": "SAY.rip",
-   "text": "put me back!"
+   "text": "nooo!"
   },
   {
    "doc": 1,
-   "t": 8704,
-   "ms": 1312,
-   "who": "hand",
-   "key": "CLAW_SAY.sulk",
-   "text": "пф."
-  },
-  {
-   "doc": 1,
-   "t": 10704,
+   "t": 10064,
    "ms": null,
    "who": "hand",
    "key": "CLAW_SAY.loose",
@@ -115,8 +115,21 @@
   },
   {
    "doc": 1,
+   "t": 1540,
+   "claw": "eager",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
    "t": 2876,
-   "claw": "lurk",
+   "claw": "sulk",
    "sev": "",
    "pb": "closed",
    "kat": "hidden",
@@ -129,7 +142,7 @@
   {
    "doc": 1,
    "t": 3644,
-   "claw": "lurk",
+   "claw": "sulk",
    "sev": "",
    "pb": "closed",
    "kat": "hidden",
@@ -142,7 +155,33 @@
   {
    "doc": 1,
    "t": 4444,
+   "claw": "sulk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4476,
    "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 2
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4492,
+   "claw": "eager",
    "sev": "",
    "pb": "closed",
    "kat": "hidden",
@@ -155,7 +194,7 @@
   {
    "doc": 1,
    "t": 6452,
-   "claw": "lurk",
+   "claw": "sulk",
    "sev": "",
    "pb": "closed",
    "kat": "hidden",
@@ -167,8 +206,8 @@
   },
   {
    "doc": 1,
-   "t": 7320,
-   "claw": "lurk",
+   "t": 7220,
+   "claw": "sulk",
    "sev": "",
    "pb": "closed",
    "kat": "hidden",
@@ -180,7 +219,33 @@
   },
   {
    "doc": 1,
-   "t": 8104,
+   "t": 8004,
+   "claw": "sulk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 3
+   }
+  },
+  {
+   "doc": 1,
+   "t": 8052,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 3
+   }
+  },
+  {
+   "doc": 1,
+   "t": 8068,
    "claw": "eager",
    "sev": "",
    "pb": "closed",
@@ -193,34 +258,8 @@
   },
   {
    "doc": 1,
-   "t": 8712,
+   "t": 10028,
    "claw": "sulk",
-   "sev": "",
-   "pb": "closed",
-   "kat": "hidden",
-   "shelf": false,
-   "grab": "card",
-   "objs": {
-    "card": 3
-   }
-  },
-  {
-   "doc": 1,
-   "t": 10128,
-   "claw": "sulk",
-   "sev": "",
-   "pb": "closed",
-   "kat": "hidden",
-   "shelf": false,
-   "grab": null,
-   "objs": {
-    "card": 3
-   }
-  },
-  {
-   "doc": 1,
-   "t": 10328,
-   "claw": "lurk",
    "sev": "",
    "pb": "closed",
    "kat": "hidden",

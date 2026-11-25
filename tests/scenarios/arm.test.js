@@ -20,18 +20,18 @@ async function carry(s, i, x, y, speed = 20) {
 }
 // the tease: a held card brought into its zone makes it eager, and one brought close to the edge gets taken by the far end
 async function tease(s, i = 0, y = 300) {
-  await carry(s, i, 700, y);
+  await carry(s, i, 540, y);
   const W = await s.eval(vw);
-  await s.line(700, y, W - 180, y, 20);
+  await s.line(540, y, W - 180, y, 20);
   await s.runUntil(() => window.__cards.state().claw.st === 'tug', null, { max: 4000, step: 16 });
   return W;
 }
 
 scenario(G, 'tease then tug then rip', { ...O, legacy: false }, async (s) => {
-  await carry(s, 0, 700, 300);
+  await carry(s, 0, 540, 300);
   assert.equal((await s.eval(claw)).st, 'lurk', 'a loose card wakes it, but it waits');
   const W = await s.eval(vw);
-  await s.line(700, 300, 1000, 300, 12);   // into the tease zone: one card wide from the right edge
+  await s.line(540, 300, 1000, 300, 12);   // into the tease zone: two cards wide from the right edge
   assert.equal((await s.eval(claw)).st, 'eager');
   assert.ok(await s.said('CLAW_SAY.eager'), 'it wants it');
   await s.line(1000, 300, W - 180, 300, 8); // close to the edge: it lunges for the far end and takes hold
@@ -66,8 +66,8 @@ scenario(G, 'eats a big piece, rejects a scrap', { ...O, legacy: false }, async 
   const [x0, y0] = await s.eval(() => { const g = window.__cards.state().grab; return [g.cx, g.cy]; });
   const W = await s.eval(vw);
   // the big piece, held out to it: no tug of war, it takes it and eats it
-  await s.line(x0, y0, 700, 300, 20);
-  await s.line(700, 300, W - 180, 300, 20);
+  await s.line(x0, y0, 540, 300, 20);
+  await s.line(540, 300, W - 180, 300, 20);
   assert.equal((await s.eval(claw)).st, 'eager', 'a big piece is worth wanting');
   await s.runUntil(() => window.__cards.state().claw.st === 'eat', null, { max: 6000, step: 16 });
   assert.equal(await s.eval(() => window.__cards.state().grab), null, 'out of your hand');
@@ -85,8 +85,8 @@ scenario(G, 'eats a big piece, rejects a scrap', { ...O, legacy: false }, async 
   const at = await s.eval(where);
   await s.move(at[0], at[1]); await s.down();
   assert.equal(await s.eval(() => window.__cards.state().grab && window.__cards.state().grab.o.kind), 'piece', 'picked the scrap up');
-  await s.line(at[0], at[1], 700, 300, 20);
-  await s.line(700, 300, W - 180, 300, 20);
+  await s.line(at[0], at[1], 540, 300, 20);
+  await s.line(540, 300, W - 180, 300, 20);
   await s.run(300);
   assert.ok(await s.said('hand.small'), 'it says what it thinks of scraps');
   assert.equal((await s.eval(claw)).st, 'sulk', 'and turns away');
@@ -94,10 +94,10 @@ scenario(G, 'eats a big piece, rejects a scrap', { ...O, legacy: false }, async 
   await s.run(3000);
   assert.notEqual((await s.eval(claw)).st, 'eager', 'holding it there does not change its mind');
   // thrown at it, the scrap is batted straight back
-  await s.line(W - 180, 300, 560, 300, 16);
+  await s.line(W - 180, 300, 440, 300, 16);
   await s.run(4200);
   const before = (await s.bubbles()).filter((b) => b.key === 'hand.small').length;
-  await s.throwTo([560, 300], [560 + 18 * 5, 300], { n: 5 });   // 11 m/s to the right
+  await s.throwTo([440, 300], [440 + 18 * 5, 300], { n: 5 });   // 11 m/s to the right
   await s.runUntil(() => [...window.__cards.objs][0].body.getLinearVelocity().x < -5, null, { max: 2500, step: 16 });
   await s.run(700);
   assert.equal((await s.bubbles()).filter((b) => b.key === 'hand.small').length, before + 1, 'it says so again');
