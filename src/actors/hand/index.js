@@ -30,6 +30,9 @@
 // In crazy mode tick() returns before all of that; while the old hands dance it bobs along at the edge instead (./bob.js).
 // The uprising (src/page/uprising.js): uproot() makes the tower's pull end with its hand flying off ('spent'); truce() sets
 // c.peace for the rest of the visit (lurk.js, old.js: it snatches nothing; behaviours/truce.js says so).
+// film(on) (the 1926 egg, via 'page.film'): every hand is drawn in jerky steps (./draw.js setStepping).
+// Left unattended (chain away-thief): pilfer(take) is how it helps itself to a grid card while you are on another tab; you come
+// back to it chewing the card at the edge (behaviours/chew.js).
 
 import { TUNE, TIMING } from '../../core/tune.js';
 import { bus } from '../../core/bus.js';
@@ -42,7 +45,7 @@ import { hook } from '../../core/debug.js';
 import { world, isCrazy, load, init, report, everRipped } from '../../world/world.js';
 import { polyArea } from '../../world/cut.js';
 import { gore, shake } from '../../world/fx.js';
-import { handParts, handDraw } from './draw.js';
+import { handParts, handDraw, setStepping } from './draw.js';
 import { POSES } from './poses.js';
 import { zones } from './zones.js';
 import { gripPt, untug, ownClip } from './tug.js';
@@ -175,6 +178,8 @@ export function uproot() { const c = claw; if (!c) return; if (m.is('pulled') &&
 export function truce() { const c = claw; if (!c || c.peace) return; c.peace = true; c.truce = true; clock.wake(); }
 
 /** it lost at rock, paper, scissors (scenes/rps.js): it sulks off out of sight for ms */
+/** silent film (the 1926 egg): every hand, this one and the old ones, is drawn in jerky steps of TUNE.film.FPS, or back to smooth */
+export function film(on) { setStepping(on ? TUNE.film.FPS : 0); clock.wake(); }
 export function sulkFor(ms) { if (!claw) return; claw.sulkUntil = now() + ms; claw.show = null; set('sulk'); }
 /** it won at rock, paper, scissors: the old hand o is fair game for TUNE.rps.FAIR_MS (./old.js) */
 export function oldLost(o) { if (claw && !isCrazy()) lost(o, now() + TUNE.rps.FAIR_MS); }
@@ -196,6 +201,19 @@ function sight(c, vw) {
   const B = TUNE.blindFog, f = fogRound(c, vw);
   if (!f) { c.blind = false; if (!(sensed.flooded && sensed.flooded())) c.groped = 0; return; }
   c.blind = c.blind ? f > B.SEE : f >= B.BLIND;
+}
+/**
+ * you left the tab long enough (chain away-thief, src/reactions.js on 'page.returned'): it helps itself. `take()` hands it a grid
+ * card (actors/cards.js takeOne), and it sits at the edge chewing it (behaviours/chew.js). Only once it is awake, with a hand on
+ * the arm, nothing in its fingers and nothing in yours, idle (off, lurk, sulk), and not in crazy mode or under reduced motion.
+ * @returns {Promise<boolean>} it took one
+ */
+export async function pilfer(take) {
+  if (world.reduced || !awake() || isCrazy()) return false;
+  await load(); init(); if (!claw) clawInit();
+  const c = claw; if (c.stump || c.o || world.grab || isCrazy() || !m.is('off', 'lurk', 'sulk')) return false;
+  const o = take(); if (!o) return false;
+  c.o = o; set('chew'); return true;
 }
 
 /** out of patience: it takes the held card (legacy snatch(o)) */

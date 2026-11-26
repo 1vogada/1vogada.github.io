@@ -1,7 +1,7 @@
 // The Konami code (↑ ↑ ↓ ↓ ← → ← → B A, typed anywhere but a text box): every grid card folds itself into an omikuji slip
 // for the rest of the visit (sessionStorage). Rip one out of its slot and it unfolds and reads you its fortune, drawn from the
 // Surprise me slips ('fortune.slip', thinned for English-only like scenes/fortune.js does); a 凶 complains about it after. Yank
-// one so hard it tears and both halves read 凶. Nothing hints at it.
+// one so hard it tears and both halves read 凶. Nothing hints at it. Typing the code emits 'secret.found' { name: 'konami' } (page/stamps.js).
 // The slip is a layer inside the card (styled inline: styles/*.css stay as they were); torn-out copies keep it, since the
 // physics layer clones the card with its children. The arrow keys still scroll the page and nothing is prevented, so
 // page/kiri.js's typed words and the phrasebook's keys are untouched. Random draws only on this path: the toast's line, and
@@ -97,6 +97,7 @@ function start() {
   on = true; try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
   foldAll();
   if (first) bus.emit('ui.toast', { msg: line('page.konami') });
+  bus.emit('secret.found', { name: 'konami' });
 }
 
 export function install(app) {

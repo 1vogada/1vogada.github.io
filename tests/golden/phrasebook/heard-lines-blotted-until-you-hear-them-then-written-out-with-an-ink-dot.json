@@ -1,0 +1,172 @@
+{
+ "scenario": "phrasebook / heard lines: blotted until you hear them, then written out with an ink dot",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 572,
+   "ms": 788,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "hey!"
+  },
+  {
+   "doc": 1,
+   "t": 1360,
+   "ms": 1312,
+   "who": "card",
+   "key": "SAY.rip|CLAW_SAY.sulk|PB.SWAT_SAY",
+   "text": "rude."
+  },
+  {
+   "doc": 1,
+   "t": 2268,
+   "ms": 1316,
+   "who": "hand",
+   "key": "CLAW_SAY.eager",
+   "text": "GIVE."
+  },
+  {
+   "doc": 1,
+   "t": 3232,
+   "ms": 1312,
+   "who": "card",
+   "key": "SAY.land",
+   "text": "oof"
+  },
+  {
+   "doc": 1,
+   "t": 5388,
+   "ms": null,
+   "who": "hand",
+   "key": "CLAW_SAY.sulk",
+   "text": "tease."
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 20,
+   "claw": "off",
+   "sev": "",
+   "pb": "open",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 140,
+   "claw": "off",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 588,
+   "claw": "off",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1372,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 1848,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 2168,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "open",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 2388,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 5508,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "open",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6048,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 2,
+   "t": 20,
+   "claw": "off",
+   "sev": "",
+   "pb": "open",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  }
+ ]
+}

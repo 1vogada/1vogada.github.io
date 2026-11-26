@@ -4,6 +4,7 @@
 // clawDraw(wig, shake, strain) = handDraw(claw, ...)) is draw() in ./index.js.
 // handDraw draws two Math.random values per call (the shake offset) even when shake is 0: every call counts for parity.
 // tests/unit/hand-draw.test.js compares every path with what the legacy functions drew (tests/unit/fixtures/hand-draw.*.json).
+// setStepping(fps) (the 1926 egg, chain silent-film): every hand is redrawn on the page only fps times a second, all else unchanged.
 
 import { now } from '../../core/clock.js';
 import { FING, THUMB, BEND, ARCH, PALM, EYE } from './poses.js';
@@ -25,6 +26,20 @@ export function handParts(extra) {
 // and pose.legs stands it on its first two fingers, stepping with c.gait
 /** legacy handDraw(c, wig, shake, strain); sets c.tip, c.arm2 */
 export function handDraw(c, wig, shake, strain) {
+  if (step && held(c)) { const s = Object.create(c); for (const k of PARTS) s[k] = SINK; paint(s, wig, shake, strain); c.tip = s.tip; if (Object.hasOwn(s, 'arm2')) c.arm2 = s.arm2; return; }
+  paint(c, wig, shake, strain);
+}
+
+// silent film (the 1926 egg; src/reactions.js on 'page.film'): every hand's drawing is put on the page only `fps` times a second of
+// game time, so it moves in jerky, hand-cranked steps. Everything is still computed every call (the same two random draws, the same
+// c.tip and c.arm2 for the logic); between two steps the paths are written to a sink instead of the SVG
+let step = 0;
+const PARTS = ['thumb', 'talonT', 'flesh', 'talon', 'crease', 'vein', 'eye', 'pupil'], SINK = { setAttribute() {} };
+/** draw every hand at fps frames a second (0: every frame, as normal) */
+export function setStepping(fps) { step = fps > 0 ? 1000 / fps : 0; }
+function held(c) { const t = now(); if (c.stepAt != null && t >= c.stepAt && t - c.stepAt < step) return true; c.stepAt = t; return false; }
+
+function paint(c, wig, shake, strain) {
   const p = c.pose, ca = Math.cos(c.a), sa = Math.sin(c.a), tm = now() / 1000, vw = document.documentElement.clientWidth, mr = c.m || 1;
   const ox = c.x + (Math.random() - 0.5) * shake, oy = c.y + (Math.random() - 0.5) * shake, f1 = (v) => v.toFixed(1);
   const sx = c.sx ?? 1, cx = c.cx ?? 0;   // sx under 1 narrows the whole drawing towards the upright line through cx: the hand turning round, seen from the side

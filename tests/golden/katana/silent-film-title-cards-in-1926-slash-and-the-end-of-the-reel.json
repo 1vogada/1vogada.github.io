@@ -1,0 +1,90 @@
+{
+ "scenario": "katana / silent film: title cards in 1926, SLASH!, and the end of the reel",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 4656,
+   "ms": 2592,
+   "who": "card",
+   "key": "SAY.khello",
+   "text": "世界一切れる刀です"
+  },
+  {
+   "doc": 1,
+   "t": 6032,
+   "ms": 1315,
+   "who": "card",
+   "key": "SAY.cutting",
+   "text": "IT IS IN ME"
+  },
+  {
+   "doc": 1,
+   "t": 6384,
+   "ms": 1312,
+   "who": "card",
+   "key": "card.filmSlash",
+   "text": "Посечен!",
+   "lvl": "2"
+  },
+  {
+   "doc": 1,
+   "t": 10236,
+   "ms": null,
+   "who": "card",
+   "key": "page.filmEnd",
+   "text": "Intermission. Colour resumes shortly."
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 20,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 4512,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "found",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 4706,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "equipped",
+   "shelf": false,
+   "grab": "katana",
+   "objs": {
+    "katana": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6384,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "equipped",
+   "shelf": false,
+   "grab": "katana",
+   "objs": {
+    "katana": 1,
+    "piece": 2
+   }
+  }
+ ]
+}

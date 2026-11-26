@@ -109,6 +109,19 @@ export const EVENTS = {
   'uprising.step': '{ step, hand } the uprising reached a step, in order: "revenge" (hand: the avenger) | "tower" | "sewn" | "truce"',
   'hand.flewOff': '{ x, y } the uprising: shaking the tower off, its own hand flew off too (page px of the grip); the stump stays out on the page ("spent")',
   'hand.truce': '{ } the uprising: back at the edge with an old hand sewn on, it said "fine. truce." (behaviours/truce.js); it snatches nothing from now on',
+  'secret.found': '{ name } a page secret with no event of its own was found (name: "1926" | "moon" | "konami" | "basement" | "diary" | "toast"); page/stamps.js stamps it',
+  // ---- silent film (chain silent-film) ----
+  'page.film': '{ on } the 1926 egg went on (the page is sepia) or off (page/eggs.js). Reactions: title-card bubbles, jerky hands',
+  // ---- left unattended (away-thief) ----
+  'page.returned': '{ ms } the tab is visible again after ms of wall time hidden (page/away.js; not in crazy mode). Reaction: after TUNE.awayThief.AWAY_MS the hand helps itself to a grid card',
+  'hand.chewing': '{ card, n } the arm took another bite of the grid card it is chewing at the edge (hand behaviours/chew.js; n: bite marks so far, first: true on the way in)',
+  'hand.unchewed': '{ card } you pulled the half-eaten card out of its fingers (hand behaviours/chew.js), after the arm\'s line; the card is yours, bite marks and all',
+  // ---- the ghost in the fog (chain fog-ghost: page/ghost.js) ----
+  'ghost.risen': '{ x, y } the old hand the new one ate lingers on as a ghost in the banner fog (page px)',
+  'ghost.slipped': '{ hits } you wiped through the ghost: it slipped away and waved (hits so far)',
+  'ghost.roaming': '{ x, y } the ghost roams the kiri flood and looks for an old hand in view to mourn it (every TUNE.ghost.CALL_MS until one comes)',
+  'ghost.tapped': '{ card, x, y } the ghost tapped a card in the flood (card: its element); it shivers and says so',
+  'ghost.rested': '{ } wiped away for good: it bowed and faded; it does not come back this visit',
 };
 
 export const EVENT_TYPES = new Set(Object.keys(EVENTS));

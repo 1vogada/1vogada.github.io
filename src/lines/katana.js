@@ -62,4 +62,12 @@ defineLines('katana.tana', [
 defineLines('toast.katanaFound', ['A katana?! Pull it out of the ground.'], { who: 'toast', lang: 'en' });
 defineLines('toast.katanaDrawn', ['The very tip of the blade cuts, however slowly. Double-click the katana to keep it in hand.'], { who: 'toast', lang: 'en' });
 
+// ---- silent film (chain silent-film): 1926-only lists that take the place of others while the egg is on (core/speech.js FILM) ----
+defineLines('katana.film', ["THWICK.", "And lo, the blade sang.", "Steel speaks; paper listens.", "A clean cut, sir.", "Justice, swift and shiny.", "Thus ends the scoundrel card.", "Behold: the fine edge of 1926.", "The blade bows to no one.", "Another, if you please.", "A tragedy, beautifully edged.", "Чисто, господине.", "一刀両断。"], {
+  who: 'katana',
+  trigger: { title: "1926: the blade speaks", when: "While the page is in 1926 (hover the © year in the footer for a few seconds), every bubble is a silent-film title card. It has just cut something in two." },
+  gloss: {"Чисто, господине.": "clean, sir.", "一刀両断。": "cut in two with a single stroke."},
+  lang: ["en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "bg", "ja"],
+});
+
 export function install(app) {}

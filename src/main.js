@@ -131,14 +131,17 @@ import * as kiri from './page/kiri.js';
 import * as theme from './page/theme.js';
 import * as crazy from './page/crazy.js';
 import * as away from './page/away.js';
+import * as hChew from './actors/hand/behaviours/chew.js';
 import * as eggs from './page/eggs.js';
 import * as omikuji from './page/omikuji.js';
 import * as diary from './page/diary.js';
 import * as basement from './page/basement.js';
+import * as stamps from './page/stamps.js';
 import * as bread from './page/bread.js';
 import * as phraseSay from './phrasebook/say.js';
 import * as slash from './page/slash.js';
 import * as hGrope from './actors/hand/behaviours/grope.js';
+import * as ghost from './page/ghost.js';
 import * as konsole from './page/console.js';
 import * as feed from './page/feed.js';
 import * as uprising from './page/uprising.js';
@@ -188,6 +191,9 @@ export const ORDER = [
   ['slash', slash],
   ['hGrope', hGrope],
   ['hSpent', hSpent], ['hTruce', hTruce], ['uprising', uprising],   // the uprising: revenge, the tower, sew it back on, truce
+  ['stamps', stamps],
+  ['hChew', hChew],   // left unattended (away-thief)
+  ['ghost', ghost],
 ];
 
 /** the app every install(app) receives: each module by name, plus a few flags */

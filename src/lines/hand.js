@@ -856,5 +856,37 @@ defineLines('hand.light', [
   gloss: { 'светна!': 'it\'s light!', 'あ、明るい': 'oh, it\'s bright' },
   lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
 });
+// ---- silent film (chain silent-film): 1926-only lists that take the place of others while the egg is on (core/speech.js FILM) ----
+defineLines('hand.film', ["Mwa-ha-ha!", "At last, the deed is mine!", "*twirls moustache*", "Cannot pay the rent? Then I take the card!", "Cards! All mine, all MINE!", "No one shall stop me now!", "The rent is due, my sweet!", "Tie it to the railway tracks!", "Ha! Foiled again, hero!", "Mine, by the light of the projector!", "Mark me: the whole grid shall be mine!", "Мое е, ха-ха!", "ふはははは！"], {
+  who: 'hand',
+  trigger: { title: "1926: the villain", when: "While the page is in 1926 (hover the © year in the footer for a few seconds), every bubble is a silent-film title card. The hand grabs, rips, eats or cuts a card." },
+  gloss: {"Мое е, ха-ха!": "it's mine, ha-ha!", "ふはははは！": "mwahahaha!"},
+  lang: ["en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "bg", "ja"],
+});
+defineLines('hand.filmCurses', ["Curses! My hand!", "Curses! Foiled by a sword!", "You have not heard the last of me!", "Dastardly! Simply dastardly!", "My hand! My beautiful hand!", "I shall return! With a hand!", "Confound that blade!", "Villainy! Against ME!", "Blast! Blast and bother!", "Проклятие! Ръката ми!", "おのれ、刀め！"], {
+  who: 'hand',
+  trigger: { title: "1926: curses!", when: "While the page is in 1926 (hover the © year in the footer for a few seconds), every bubble is a silent-film title card. The katana takes its hand off." },
+  gloss: {"Проклятие! Ръката ми!": "curses! my hand!", "おのれ、刀め！": "curse you, sword!"},
+  lang: ["en", "en", "en", "en", "en", "en", "en", "en", "en", "bg", "ja"],
+});
+// ---- left unattended (chain away-thief: src/actors/hand/behaviours/chew.js) ----
+defineLines('hand.unattended', ["you left it unattended", "finders keepers, tab-leavers weepers", "what? it was just lying there", "you were gone SO long", "I got peckish", "oh. you're back. *chews*", "you snooze, I chew", "it was asking for it", "tab-switchers get snacks taken", "nobody was watching the grid", "mmf. hi.", "rule one: never leave a card alone with me", "оставихте го без надзор", "おるすばんのおやつ"], {
+  who: 'hand',
+  trigger: { title: 'Left unattended', when: 'You tear a card out, then stay on another tab for a while. When you come back one slot in the grid is empty and the hand is at the edge, chewing the card.' },
+  gloss: { 'оставихте го без надзор': 'you left it unattended', 'おるすばんのおやつ': 'a snack for minding the house' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.unchewed', ["I was still chewing that!", "fine. it's soggy anyway", "you're welcome for the trim", "rude. mid-bite.", "take it. I licked it.", "next time, pay attention", "it tastes of README", "keep your leftovers", "I'll remember this tab", "ugh. half a snack is no snack", "ей, не бях свършил!", "まだたべてたのに"], {
+  who: 'hand',
+  trigger: { title: 'Left unattended: taken back', when: 'The hand is chewing a grid card at the edge and you pull the card out of its fingers before it is finished.' },
+  gloss: { 'ей, не бях свършил!': "hey, I wasn't done!", 'まだたべてたのに': 'I was still eating that' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('hand.gulp', ["…and down it goes", "for the wall downstairs", "should've come back sooner", "another one for the collection", "*slurp* gone", "delicious. leave more often", "that's what you get", "the basement thanks you", "no crumbs, no evidence", "best part of being ignored", "и хоп, изчезна", "ごちそうさまでした"], {
+  who: 'hand',
+  trigger: { title: 'Left unattended: finished', when: 'Nobody pulled the card out of its fingers in time. It backs off the edge with it and swallows it; it ends up on the trophy wall in the basement.' },
+  gloss: { 'и хоп, изчезна': 'and poof, gone', 'ごちそうさまでした': 'thank you for the meal' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
 
 export function install(app) {}

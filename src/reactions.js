@@ -19,6 +19,10 @@ import * as toast from './page/toast.js';
 import * as feed from './page/feed.js';
 import * as slash from './page/slash.js';
 import * as kiri from './page/kiri.js';
+import { setStyle } from './core/speech.js';
+import { current as sceneNow } from './scenes/scene.js';
+import { isCrazy } from './world/world.js';
+import * as ghost from './page/ghost.js';
 
 const notMine = (o) => o.kind !== 'katana' && o.kind !== 'hand';
 
@@ -85,6 +89,15 @@ export const RULES = [
   ['uprising.step', ({ step }) => step === 'tower' && hand.uproot()],             // revenge came first: it shakes so hard its own hand flies off
   ['uprising.step', ({ step }) => step === 'sewn' && hand.truce()],               // ...an old hand back on: "fine. truce.", and no more snatching
   ['uprising.step', ({ step, hand: o }) => severed.cheer(step === 'revenge' ? o : null)],   // ...and the old hands cheer each step
+  // ---- silent film (chain silent-film): in 1926 nobody has a voice ----
+  ['page.film', ({ on }) => setStyle(on ? 'film' : null)],                        // every bubble is a title card (core/speech.js)
+  ['page.film', ({ on }) => hand.film(on)],                                        // ...and every hand moves in jerky, low-frame steps
+  // ---- left unattended (chain away-thief: src/page/away.js, src/actors/hand/behaviours/chew.js) ----
+  ['page.returned', ({ ms }) => { if (ms >= TUNE.awayThief.AWAY_MS && !isCrazy() && !sceneNow()) hand.pilfer(() => cards.takeOne()); }],   // away too long: it helped itself to a grid card, and is chewing it at the edge
+  // ---- a ghost in the fog (chain fog-ghost: page/ghost.js) ----
+  ['hand.devoured', () => ghost.rise()],                                           // the old hand it ate lingers in the banner fog
+  ['ghost.roaming', () => { const de = document.documentElement, at = severed.salute({ l: scrollX, t: scrollY, r: scrollX + de.clientWidth, b: scrollY + innerHeight }); if (at) ghost.attend(at); }],   // in the flood: old hands in view walk over to bow to it
+  ['sev.state', ({ self, to }) => to === 'bow' && self.ai.fun && self.ai.fun.ghost && ghost.bowBack()],   // ...it bows back
 ];
 
 export function install(app) {

@@ -6,6 +6,7 @@
 // pointer's round wipe is off (fog.js bladeInHand). The flood's regrow closes the slits again.
 // What the arm's hand can sense of it (chain blind-fog, wired in reactions.js hand.senses): flooded() (rolled in or rolling, not
 // yet lifting) and fogAt(x, y) (how thick the flood is at a viewport point, 0..1, wipes and slits included).
+// overlay(fn): something drawn on top of the flood each frame, hidden by its mask (page/ghost.js); floodState() says how far it is.
 // The shelf is reached through its contract name app.shelf.toggle (legacy window.__shelf?.(), which did not exist under
 // reduced motion), never by importing actors/shelf.js.
 
@@ -76,6 +77,7 @@ function kFrame(t) {
   clock.nextFrame(kFrame);
   const s = (t - flood.t0) / 1000;
   const alpha = 1 - Math.min(1, Math.max(0, (s - liftAt(flood)) / K.FLOOD_OUT_S));
+  flood.alpha = alpha; flood.s = s;
   if (alpha <= 0) { state = null; kv.classList.remove('on'); return; }
   kMaskSize();
   regrowMask(kmctx, km, t, kGrow);
@@ -102,7 +104,17 @@ function kFrame(t) {
   }
   kctx.globalCompositeOperation = 'destination-in';
   kctx.drawImage(km, 0, sy * kS, km.width, kH * kS, 0, 0, kW, kH);
+  if (overlays.length) {
+    const view = { t, ox: scrollX, oy: sy, w: kW, h: kH, mask: km, mx: 0, my: sy, ms: kS, fade: alpha };
+    kctx.globalCompositeOperation = 'source-over';
+    for (const fn of overlays) fn(kctx, view);
+  }
 }
+const overlays = [];
+/** draw something over the flood each frame: fn(ctx, view), as page/fog.js overlay (ctx in viewport px) */
+export function overlay(fn) { overlays.push(fn); }
+/** the flood now: null, or { s (seconds since it began), in (fully rolled in), lifting, alpha } */
+export function floodState() { const f = state; return f ? { s: f.s || 0, in: (f.s || 0) >= K.FLOOD_IN_S, lifting: f.lift != null && (f.s || 0) >= f.lift, alpha: f.alpha ?? 1 } : null; }
 
 /** legacy floodPage(): a wall of fog rolls down over the whole page */
 export function flood() {

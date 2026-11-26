@@ -98,6 +98,11 @@ function frame(t) {
   }
   ctx.globalCompositeOperation = 'destination-in';
   ctx.drawImage(mask, 0, 0, W, H);
+  if (overlays.length) {
+    const h = hero.getBoundingClientRect(), view = { t, ox: h.left + scrollX, oy: h.top + scrollY, w: W, h: H, mask, mx: 0, my: 0, ms: dpr, fade: 1 };
+    ctx.globalCompositeOperation = 'source-over';
+    for (const fn of overlays) fn(ctx, view);
+  }
   clock.nextFrame(frame);
 }
 
@@ -106,6 +111,24 @@ export function setRunning(on) { if (on && !running) { running = true; clock.nex
 
 /** legacy refog(msg): the whole banner fogged over again, the hint back */
 export function refog(msg) { mctx.fillStyle = '#000'; mctx.fillRect(0, 0, W, H); hint.classList.remove('gone'); wiped = 0; if (msg) toast(msg); }
+
+const overlays = [];
+/**
+ * draw something over the fog each frame: fn(ctx, view), ctx in banner px; view: { t, ox, oy (page px of the canvas' top left),
+ * w, h, mask (alpha = fog), mx, my, ms (mask px = (canvas px + m*) * ms), fade }
+ */
+export function overlay(fn) { overlays.push(fn); }
+let tiny = null;
+/** how much of the banner is still fogged, 0-1 (the mask's mean alpha, from a 24 x 12 copy) */
+export function cover() {
+  if (!mask || !mask.width || !mask.height) return 1;
+  if (!tiny) { tiny = document.createElement('canvas'); tiny.width = 24; tiny.height = 12; }
+  const c = tiny.getContext('2d', { willReadFrequently: true });
+  c.clearRect(0, 0, 24, 12); c.drawImage(mask, 0, 0, 24, 12);
+  const d = c.getImageData(0, 0, 24, 12).data; let n = 0;
+  for (let i = 3; i < d.length; i += 4) n += d[i];
+  return n / (255 * 24 * 12);
+}
 
 /** the fog's alpha (0-255) at a viewport point (legacy: getImageData on the mask, for the shelf secret tap) */
 export function alphaAt(x, y) {

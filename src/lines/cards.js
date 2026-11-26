@@ -228,10 +228,46 @@ defineLines('card.home', ['I\'m home!', 'never feed me to that thing again', 'it
   lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
 });
 
+// ---- left unattended (chain away-thief: the hand chews a grid card at the edge) ----
+defineLines('card.chewed', ["WHERE WERE YOU?!", "it's been chewing me for AGES", "it took me from my slot!", "I can see its eye from here", "you said you'd be right back!", "pull me OUT!", "I'm being eaten alive here", "it bit my description off", "don't let it finish me!", "my corner! it ate my corner!", "is that YouTube more important than me?!", "I'm 30% teeth marks now", "спасете ме!", "かまれてるー!"], {
+  who: 'card',
+  trigger: { title: 'Left unattended: chewed', when: 'You come back to the tab and the hand has a grid card in its fist at the edge, taking a bite every second or so.' },
+  gloss: { 'спасете ме!': 'save me!', 'かまれてるー!': "I'm being bitten!" },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('card.bitten', ["look what it DID to me", "I'm a crescent now", "I'll never be rectangular again", "it bit me. it actually BIT me", "you came back for me!", "I can feel the draught", "does it show? it shows.", "slightly digested, still a card", "I have tooth marks. TOOTH MARKS.", "never switch tabs on me again", "call it a design choice", "нахапа ме!", "かじられた…"], {
+  who: 'card',
+  trigger: { title: 'Left unattended: saved', when: 'You pull the half-eaten card out of the hand\'s fingers before it finishes. It is yours again, with the bites taken out of its edge.' },
+  gloss: { 'нахапа ме!': 'it bit me!', 'かじられた…': 'I got nibbled…' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+
 defineLines('toast.ripped', ['Ripped it out! Stack them, or throw one hard to smash it.'], { who: 'toast', lang: 'en' });
 defineLines('toast.smashed', ['Smashed!'], { who: 'toast', lang: 'en' });
 defineLines('toast.smashed10', ['10 cards smashed. Feeling better?'], { who: 'toast', lang: 'en' });
 defineLines('toast.snapped', ['Too hard: it tore. Pull and hold instead, like pulling a tooth.'], { who: 'toast', lang: 'en' });
 defineLines('toast.halved', ['It keeps its half.'], { who: 'toast', lang: 'en' });
 
+// ---- silent film (chain silent-film): 1926-only lists that take the place of others while the egg is on (core/speech.js FILM) ----
+defineLines('card.filmSlash', ["SLASH!", "SLASH!!", "Rent asunder!", "Cleft in twain!", "Cut down in my prime!", "Struck by cold steel!", "O, the blade! The blade!", "Divided, as by Fate.", "In twain! IN TWAIN!", "SNICKT!", "Thus perish all cards.", "Посечен!", "斬られた！"], {
+  who: 'card',
+  trigger: { title: "1926: cut in two", when: "While the page is in 1926 (hover the © year in the footer for a few seconds), every bubble is a silent-film title card. The katana cuts a card in two." },
+  gloss: {"Посечен!": "cut down!", "斬られた！": "I've been cut!"},
+  lang: ["en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "bg", "ja"],
+});
+defineLines('card.filmAlas', ["Alas!", "Alas! Alack!", "Unhand me, you brute!", "Will no one save me?!", "Fie upon thee!", "Oh, the humanity!", "Mother! Mother, help!", "I am undone!", "Ruined! Utterly ruined!", "Tell Mabel I loved her!", "A curse upon this grid!", "Is there no constable?!", "Горко ми!", "ああ、無念！"], {
+  who: 'card',
+  trigger: { title: "1926: alas!", when: "While the page is in 1926 (hover the © year in the footer for a few seconds), every bubble is a silent-film title card. A card is ripped out, smashed, stabbed, or pulled to its very worst." },
+  gloss: {"Горко ми!": "woe is me!", "ああ、無念！": "ah, the pity of it!"},
+  lang: ["en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "bg", "ja"],
+});
+
 export function install(app) {}
+
+// ---- the ghost in the fog taps the cards in the kiri flood (chain fog-ghost, page/ghost.js) ----
+defineLines('card.ghost', ['did you feel that', 'who touched me?!', 'something cold just poked me', 'the fog has FINGERS', 'I felt a draft… with knuckles', 'is this page haunted?!', 'don\'t look now but', 'it went right through my border', 'brrr. BRRR.', 'I\'m not scared, YOU\'RE scared', 'it said my slug out loud…', 'mum? is that you?', 'I want my slot to be less spooky', 'who turned the fog on', 'кой ме пипна?!', 'いま、さわった?'], {
+  who: 'card',
+  trigger: { title: 'Tapped by the ghost', when: 'A ghost lingers in the fog and you type kiri: it roams the flooded page and taps the cards. They shiver.' },
+  gloss: { 'кой ме пипна?!': 'who touched me?!', 'いま、さわった?': 'did you just touch me?' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});

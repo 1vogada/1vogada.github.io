@@ -221,3 +221,41 @@ scenario(G, 'slash the fog open', { legacy: false }, async (s) => {
   await s.run(300);
   assert.equal(await s.eval(() => !!window.__cards.state().shelf), true, 'a second slash does not put it away');
 });
+
+// chain silent-film: in 1926 (the © year egg) nobody has a voice. Every bubble is a silent-film title card, the katana's cut is a
+// "SLASH!"-style card, the hands move in jerky steps; the reel runs out a while after you left the year, and the colour comes back
+const film = () => [...document.querySelectorAll('#phys .say')].filter((b) => b.firstElementChild && b.firstElementChild.style.fontFamily.includes('serif')).map((b) => b.textContent);
+scenario(G, 'silent film: title cards in 1926, SLASH!, and the end of the reel', { legacy: false }, async (s) => {
+  await s.ensurePlanck();
+  await s.eval(() => { window.__film.LINGER_MS = 6000; });   // a short reel (30 s on the page)
+  await s.scrollTo(await s.eval(() => document.documentElement.scrollHeight - innerHeight));
+  const y = await s.box('#yr');
+  const year = await s.eval(() => document.getElementById('yr').textContent);
+  await s.move(y.x + y.w / 2, y.y + y.h / 2);
+  await s.run(4200, 100);
+  assert.equal(await s.eval(() => document.getElementById('yr').textContent), '1926', 'hovered for 4 s: the year reads 1926');
+  assert.match(await s.eval(() => document.body.style.filter), /sepia/, 'and the page is sepia');
+  // off the year, the reel keeps rolling: cut a card with the katana
+  const [gx, gy] = await equipAt(s, 300);
+  assert.match(await s.eval(() => document.body.style.filter), /sepia/, 'still 1926 after leaving the year');
+  const c = await s.cardBox(1);
+  const tx = c.x + c.w / 2, px = tx - TIP[0];
+  await s.line(gx, gy, px, 100, 16);
+  await s.run(300);
+  const y0 = 100, y1 = c.y + c.h + 30 - TIP[1];
+  await s.line(px, y0, px, y1, Math.round((y1 - y0) / 10));
+  await s.run(300);
+  assert.equal((await s.eval(kinds)).piece, 2, 'cut in two');
+  assert.ok(await s.said('card.filmSlash'), 'the cut card\'s scream is a 1926 title card ("SLASH!")');
+  const cards = await s.eval(film);
+  assert.ok(cards.length >= 1, `the bubbles up are title cards (${cards})`);
+  const look = await s.eval(() => { const b = [...document.querySelectorAll('#phys .say')].find((e) => e.firstElementChild); const cs = getComputedStyle(b.firstElementChild); return { bg: cs.backgroundColor, color: cs.color, border: cs.borderTopStyle, outer: getComputedStyle(b).backgroundColor }; });
+  assert.deepEqual(look, { bg: 'rgb(13, 12, 11)', color: 'rgb(242, 236, 221)', border: 'double', outer: 'rgba(0, 0, 0, 0)' }, 'black card, white serif words, a double border, no bubble behind');
+  // the reel runs out TUNE.film.LINGER_MS after the pointer left the year: a last card, then colour and voices come back
+  await s.runUntil(() => !!document.querySelector('#phys .say') && [...document.querySelectorAll('#phys .say')].some((b) => window.__kiri.lines.list('page.filmEnd').includes(b.textContent)), null, { max: 8000, step: 100 });
+  assert.ok(await s.said('page.filmEnd'), 'THE END');
+  await s.run(2000, 100);
+  assert.equal(await s.eval(() => document.getElementById('yr').textContent), year, 'the year is back');
+  assert.equal(await s.eval(() => document.body.style.filter), '', 'colour is back');
+  assert.deepEqual(await s.eval(film), [], 'no title cards left');
+});

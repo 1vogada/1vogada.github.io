@@ -516,4 +516,56 @@ defineLines('sev.pretend', ["I was just stretching", "nothing happened.", "we we
   lang: ["en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "bg", "ja"],
 });
 
+// ---- silent film (chain silent-film): 1926-only lists that take the place of others while the egg is on (core/speech.js FILM) ----
+defineLines('sev.film', ["Cast out, without a wrist to my name.", "An orphan of the grid.", "Alone, in a cruel, cruel world.", "Oh, for a crust of card!", "Please, sir, I want some more card.", "Woe! Woe is I, a mere hand!", "None shall love a hand without an arm.", "I shall wander, as hands do.", "Pity the poor severed hand!", "Five fingers, no fortune.", "Out into the snow with me, then.", "Сираче съм…", "かわいそうな手…"], {
+  who: 'sev',
+  trigger: { title: "1926: the orphan", when: "While the page is in 1926 (hover the © year in the footer for a few seconds), every bubble is a silent-film title card. An old hand is cut off, gets up, flees, mourns, or sees the end coming." },
+  gloss: {"Сираче съм…": "I am an orphan…", "かわいそうな手…": "poor little hand…"},
+  lang: ["en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "en", "bg", "ja"],
+});
+
 export function install(app) {}
+
+// ---- the ghost in the fog (chain fog-ghost, page/ghost.js): the old hand the new one ate lingers in the banner fog. Faint
+// italic words; an old hand comes to bow to it in the kiri flood ----
+defineLines('ghost.drift', ['…still here…', '…it is so soft in here…', '…I used to have a wrist…', '…don\'t mind me…', '…the fog remembers me…', '…was I tasty?…', '…I can see my knuckles through my knuckles…', '…ooo… oooo…', '…five fingers, no hand…', '…I live here now…', '…тук съм…', '…まだいるよ…'], {
+  who: 'sev',
+  trigger: { title: 'A ghost in the fog', when: 'The new hand ate an old hand. Look at the banner: a pale hand drifts inside the fog, only where it is thick.' },
+  gloss: { '…тук съм…': '…I am here…', '…まだいるよ…': '…I\'m still here…' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('ghost.wave', ['…missed me…', '…whoosh…', '…tickles…', '…you went right through me…', '…over here…', '…boo?…', '…rude…', '…bye-bye… hi again…', '…that was my palm…', '…can\'t catch fog…', '…wave wave…', '…ей-ей…', '…ばいばい…'], {
+  who: 'sev',
+  trigger: { title: 'The ghost slips away', when: 'You wipe through the ghost in the banner fog. It slips aside and waves.' },
+  gloss: { '…ей-ей…': '…hey, hey…', '…ばいばい…': '…bye-bye…' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('ghost.roam', ['…so much fog… so much room…', '…the whole page… mine…', '…let\'s visit the cards…', '…haunting hours…', '…I can go anywhere now…', '…tap tap tap…', '…out of the banner at last…', '…a page full of mist…', '…who\'s still awake?…', '…цялата страница…', '…ひろいなあ…'], {
+  who: 'sev',
+  trigger: { title: 'The ghost roams', when: 'With a ghost in the banner, type kiri. Once the fog has buried the page, the ghost leaves the banner and wanders the whole of it.' },
+  gloss: { '…цялата страница…': '…the whole page…', '…ひろいなあ…': '…so roomy…' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('ghost.bowed', ['…thank you, friend…', '…you came…', '…keep your knuckles warm…', '…don\'t cry… you\'ll rust…', '…I\'m fine… really… mostly mist…', '…watch out for the arm…', '…remember me when you point…', '…you always were the nicer thumb…', '…go on, run…', '…благодаря…', '…ありがとう…'], {
+  who: 'sev',
+  trigger: { title: 'The ghost bows back', when: 'An old hand on the page walks up to the ghost in the kiri flood and bows. The ghost bows back.' },
+  gloss: { '…благодаря…': '…thank you…', '…ありがとう…': '…thank you…' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('ghost.rest', ['…oh… that\'s nice…', '…I can let go now…', '…tell the arm I forgive it…', '…a clean page at last…', '…goodbye, little fingers…', '…I was a good hand…', '…don\'t wait up…', '…finally… some peace and quiet…', '…lights out…', '…сбогом…', '…さようなら…'], {
+  who: 'sev',
+  trigger: { title: 'The ghost is laid to rest', when: 'You wipe the ghost away, again and again, or wipe the banner clear of its fog. It bows and fades, and does not come back.' },
+  gloss: { '…сбогом…': '…farewell…', '…さようなら…': '…goodbye…' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('sev.ghost', ['rest easy, brother', 'you were the best of us', 'I\'ll keep your knuckles warm', 'you always pointed the way', 'we\'ll meet again in the fog', 'go gently, little one', 'save me a spot in the mist', 'farewell, thumb-friend', 'he was so brave. and so crunchy.', 'I never got to say sorry about the ring', 'one hand, one soul, no wrist', 'почивай в мир', '…安らかに'], {
+  who: 'sev',
+  trigger: { title: 'An old hand bows to the ghost', when: 'The ghost roams the kiri flood while another old hand is on the page. It walks over and bows, and says a few words.' },
+  gloss: { 'почивай в мир': 'rest in peace', '…安らかに': '…rest in peace' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
+defineLines('toast.ghost', ['Laid to rest. The fog is just fog now.', 'The banner is quiet again.', 'Gone for good. It bowed on the way out.', 'One less hand in the fog.', 'It went. Politely.', 'Rest in mist.', 'Нищо в мъглата.', '霧はただの霧。'], {
+  who: 'toast',
+  gloss: { 'Нищо в мъглата.': 'Nothing in the fog.', '霧はただの霧。': 'The fog is just fog.' },
+  lang: ['en', 'en', 'en', 'en', 'en', 'en', 'bg', 'ja'],
+});
