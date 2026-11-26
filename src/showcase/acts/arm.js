@@ -15,10 +15,17 @@ const vw = () => document.documentElement.clientWidth;
 /** the arm's state, and its record */
 const st = (app) => { const m = app.hand.brain(); return m ? m.state : null; };
 const claw = (app) => app.hand.get();
-/** wait until the arm is in one of the states; throws when it does not get there (the act then shows as failed) */
+// every state the arm has been in since the last to(): a short one (eat, when the card is already at the edge) is not missed
+let since = null;
+function track() { if (since) return; since = []; bus.on('hand.state', ({ to: s }) => { if (s === 'off') since.length = 0; since.push(s); }); }   // (off: the stage set the scene for a new act)
+/** wait until the arm is in (or has passed through, since the last call) one of the states; throws when it does not get there
+ * (the act then shows as failed) */
 async function to(r, app, states, max = 10000) {
-  const want = [].concat(states);
-  if (!(await r.until(() => want.includes(st(app)), max))) throw new Error(`the arm never got to ${want.join('/')} (it is ${st(app)})`);
+  track();
+  const want = [].concat(states), hit = () => want.includes(st(app)) || since.some((s) => want.includes(s));
+  const ok = await r.until(hit, max);
+  since.length = 0; if (want.includes(st(app))) since.push(st(app));
+  if (!ok) throw new Error(`the arm never got to ${want.join('/')} (it is ${st(app)})`);
 }
 /** set a tuning number for this act only */
 function tune(r, obj, key, v) { const was = obj[key]; obj[key] = v; r.after(() => { obj[key] = was; }); }
@@ -37,7 +44,7 @@ function fidget(r) {
 }
 
 /** what the arm remembers from an act before (full after eating, jealous lately, the truce): forgotten, for a fresh start */
-function fresh(app) { const c = claw(app); c.fullUntil = 0; c.jealousAt = null; c.cool = 0; c.sulkUntil = 0; c.peace = false; c.truce = false; c.uproot = false; c.tempted = 0; }
+function fresh(app) { const c = claw(app); if (!c) return; c.fullUntil = 0; c.jealousAt = null; c.cool = 0; c.sulkUntil = 0; c.peace = false; c.truce = false; c.uproot = false; c.tempted = 0; }
 /** the hand out lurking, the bottom of the page in view (where old hands end up: they fall to the floor), and old hands spawned
  * there at page x = W - dx (lying limp). `awake`: up on its feet at once (not hurt from the cut). @returns the old hands */
 async function oldHands(r, app, dxs, { awake = false, met = false } = {}) {
@@ -92,9 +99,21 @@ async function sewOn(r, app) {
 /** the ghost picks up a loose body (card, piece, toast, old hand) where it is now. @returns where the ghost is */
 async function pick(r, o) {
   const where = () => { if (!o.poly) return r.at(o); const n = o.poly.length, cx = o.poly.reduce((s, p) => s + p[0], 0) / n - o.w / 2, cy = o.poly.reduce((s, p) => s + p[1], 0) / n - o.h / 2, q = toPage(o, [cx, cy]); return [q[0] - scrollX, q[1] - scrollY]; };
-  let [x, y] = where(); await r.glide(x, y);
-  [x, y] = where(); await r.move(x, y); await r.down();
-  if (!r.held()) throw new Error('the ghost could not pick it up');
+  let [x, y] = where();
+  const bar = document.querySelector('.sc-bar'), B = bar && bar.getBoundingClientRect();
+  const still = !o.body || o.body.getLinearVelocity().length() < 0.5;
+  if ((y < 60 || y > innerHeight - 60 || (B && x > B.left - 20 && x < B.right + 20 && y > B.top - 20))) { await r.scrollTo(scrollY + y - innerHeight / 2); [x, y] = where(); }   // (in view, and not under the stage's bar)
+  // a card just out of its slot is still falling: it waits in the air for the ghost to get there (as a quick hand would catch it)
+  const b = o.kind === 'card' && o.body, g = b && b.getGravityScale();
+  if (b && !still) { b.setGravityScale(0); b.setLinearVelocity({ x: 0, y: 0 }); }
+  try {
+    await r.glide(x, y);
+    for (let k = 0; k < 3 && r.held() !== o; k++) {   // (it may still have been tumbling into place: try again where it is now)
+      if (k) { await r.up(); await r.wait(250); }
+      [x, y] = where(); await r.move(x, y); await r.down();
+    }
+  } finally { if (b && world.bodies.has(o)) b.setGravityScale(g); }
+  if (r.held() !== o) throw new Error('the ghost could not pick it up');
   return [x, y];
 }
 /** a grid card out of its slot and in the ghost's hand (the quick way: no tugging), the arm awake. @returns where the ghost is */
@@ -125,6 +144,20 @@ async function pullBack(r, app, y = 340) {
   while (st(app) === 'tug' && x > 300) { x -= 8; await r.move(x, y); }
   return x;
 }
+
+/** every act: a clean slate for the arm (the last act's tail may have left it cooling off after a poke), and the ghost's pointer
+ * never still long enough for a poke or an old hand's pester, except in the acts that wait for exactly that */
+const STILL = new Set(['arm-idle', 'arm-mine']);
+function steady(a) {
+  return { ...a, async play(r, app) {
+    fresh(app);
+    if (STILL.has(a.id)) return a.play(r, app);
+    const stop = fidget(r);
+    try { await a.play(r, app); } finally { stop(); }
+  } };
+}
+/** the kiri flood gone again, thinned out all the way */
+async function unflood(r, app) { if (app.kiri.floodState()) app.kiri.lift(); await r.until(() => !app.kiri.floodState(), 8000); }
 
 export const PART = {
   id: 'arm', title: 'The hand',
@@ -200,7 +233,7 @@ export const PART = {
         await holdCard(r, 1);
         await carry(r, 560, 330);
         await r.wait(500);
-        await fling(r, [560, 330], [560 + 18 * 5, 330], 5);
+        await fling(r, [560, 330], [560 + 26 * 5, 330], 5);
         await to(r, app, 'has', 2000);
         await to(r, app, 'lurk', 5000);
       } },
@@ -212,7 +245,7 @@ export const PART = {
         await holdCard(r, 0);
         await carry(r, 560, 330);
         await r.wait(500);
-        await fling(r, [560, 330], [560 + 18 * 5, 330], 5);
+        await fling(r, [560, 330], [560 + 26 * 5, 330], 5);
         await to(r, app, 'crush', 2000);
         await to(r, app, 'gloat', 8000);
       } },
@@ -248,12 +281,12 @@ export const PART = {
         await carry(r, 560, 340, 14);
         await to(r, app, 'lurk', 4000);
         await r.wait(2700);
-        await fling(r, [560, 340], [560 + 18 * 5, 340], 5);
+        await fling(r, [560, 340], [560 + 26 * 5, 340], 5);
         await r.until(() => !world.bodies.has(sc) || sc.body.getLinearVelocity().x < -5, 3000);
       } },
     { id: 'arm-shelf', title: 'It comes for a card left on the shelf',
       how: 'Type tana to bring out the secret shelf and leave a card lying on it: the hand creeps all the way across the screen for it while the card panics and its neighbour says it was not it.',
-      shortcut: 'The cards come out of their slots without tugging; it always crushes this one (really: four times in ten, else it drags it off to eat).',
+      shortcut: 'The cards come out of their slots without tugging (the second is dropped on the first for you); it always crushes this one (really: four times in ten, else it drags it off to eat).',
       async play(r, app) {
         tune(r, H_, 'REACH_CHANCE_CRUSH', 1);
         await r.awake();
@@ -263,15 +296,21 @@ export const PART = {
         await r.scrollTo(sh.y - 330);
         const y0 = sh.y - scrollY;
         await carry(r, 200, y0 - 140, 14); await r.wait(800); await r.up(); await r.wait(400);
-        // a second card on top of it: it is not on the shelf, so it only watches (and says it was not it)
-        const A = [...world.bodies].find((o) => o.kind === 'card'), ay = A.body.getPosition().y * TUNE.physics.S - scrollY;
-        const B = await r.loose(0); await r.wait(30);
-        await pick(r, B);
-        await carry(r, 210, ay - A.h - 30, 14); await r.wait(900);
-        await r.up();
+        // a second card dropped on top of it: it is not on the shelf, so it only watches (and says it was not it)
+        const A = [...world.bodies].find((o) => o.kind === 'card'), S = TUNE.physics.S;
+        const B = await r.loose(0), p = A.body.getPosition();
+        B.body.setTransform({ x: p.x + 0.1, y: p.y - (A.h / 2 + B.h / 2 + 15) / S }, 0); B.body.setLinearVelocity({ x: 0, y: 0 }); B.body.setAwake(true);
         await r.glide(700, 520);
-        await to(r, app, 'reach', 6000);
-        await to(r, app, 'crush', 16000);
+        for (let k = 0; ; k++) {   // (in its panic the card may hop right off the shelf, and the arm gives up: it goes back on)
+          await to(r, app, 'reach', 6000);
+          await r.until(() => st(app) !== 'reach', 16000);
+          if (st(app) === 'crush') break;   // (else it gave up: sulk, or lurk already)
+          if (k === 2) throw new Error('the card kept hopping off the shelf');
+          await r.until(() => st(app) === 'lurk', 4000);
+          if (!app.shelf.holds(A)) { await pick(r, A); await r.scrollTo(sh.y - 330); await carry(r, 200, sh.y - scrollY - 140, 14); await r.wait(800); await r.up(); }
+          await r.glide(700, 520);
+        }
+        await to(r, app, 'crush', 1000);
         await to(r, app, 'gloat', 8000);
       } },
     { id: 'arm-sever', title: 'Cut its hand off with the katana tip; a new one grows',
@@ -286,8 +325,16 @@ export const PART = {
         await r.scrollTo(sh.y - 330);
         await carry(r, 200, sh.y - scrollY - 140, 14); await r.wait(800); await r.up();
         await r.glide(620, 120);
-        await to(r, app, 'reach', 6000);
-        await r.wait(2200);   // the arm well out across the page
+        const q = [...world.bodies].find((b) => b.kind === 'card');
+        for (let k = 0; ; k++) {   // (in its panic the card may hop right off the shelf, and the arm gives up: it goes back on)
+          await to(r, app, 'reach', 6000);
+          await r.wait(2000);   // the arm well out across the page
+          if (st(app) === 'reach') break;
+          if (k === 2) throw new Error('the card kept hopping off the shelf');
+          await r.until(() => st(app) === 'lurk', 4000);
+          if (!app.shelf.holds(q)) { await pick(r, q); await r.scrollTo(sh.y - 330); await carry(r, 200, sh.y - scrollY - 140, 14); await r.wait(800); await r.up(); }
+          await r.glide(620, 120);
+        }
         equip(r); await r.wait(300);
         if (!world.blade || world.blade.root) throw new Error('the katana is not in hand');
         await r.move(r.x + 2, r.y); await r.wait(50);
@@ -380,19 +427,22 @@ export const PART = {
         await to(r, app, 'crush', 3000);
         await r.up();
         await to(r, app, 'gloat', 8000);
+        await unflood(r, app);
       } },
     { id: 'arm-blind-lift', title: 'Blind in the fog until it lifts',
       how: 'Type kiri: the hand cannot see a thing and gropes about. Press Escape and the fog thins out: it blinks and can see again.',
-      shortcut: 'The stage wakes the hand without a rip.',
+      shortcut: 'The card comes out of its slot without tugging.',
       async play(r, app) {
         r.after(() => { if (app.kiri.floodState()) app.kiri.lift(); });
-        await wake(r, app);
+        await holdCard(r, 0);
+        await carry(r, 420, 460); await r.wait(300); await r.up();   // (a card lying about, as there is once the hand is out)
         await r.glide(500, 500);
         await r.type('kiri');
         await to(r, app, 'grope', 6000);
         await r.wait(4000);
         await r.key('Escape');
         await to(r, app, 'lurk', 4000);
+        await r.until(() => !app.kiri.floodState(), 8000);
       } },
     { id: 'arm-film', title: 'Silent film: it moves in jerky steps',
       how: 'Hover the year in the footer until it reads 1926: in the silent film every hand moves in jerky steps, twelve a second.',
@@ -400,6 +450,7 @@ export const PART = {
       async play(r, app) {
         tune(r, H_, 'SNATCH_AGAIN', 0);
         r.after(() => bus.emit('page.film', { on: false }));
+        await r.until(() => !app.kiri.floodState(), 8000);
         await holdCard(r, 0);
         await carry(r, 540, 380);
         bus.emit('page.film', { on: true });
@@ -526,7 +577,7 @@ export const PART = {
       how: 'An old hand the arm has met starts crushing a card near the right edge: now and then the arm grabs the other end, and they pull until the card tears.',
       shortcut: 'The stage drops the old hand there, already met, and a card next to it; the arm always grabs the card (really: about one time in three).',
       async play(r, app) {
-        tune(r, H_.WREST, 'CHANCE', 1);
+        tune(r, H_.WREST, 'CHANCE', 1); tune(r, H_.OLD, 'AWAKE', 0);   // (and it does not go and prod the old hand instead)
         const [o] = await oldHands(r, app, 330, { awake: true, met: true });
         await r.toGrid();
         const q = await r.loose(0);
@@ -553,8 +604,17 @@ export const PART = {
         const old = await r.oldHand(qp.x * TUNE.physics.S + 40, qp.y * TUNE.physics.S - q.h / 2 - 70); meet(old); old.ai.met = true;   // it lies down on the card
         await r.wait(1000);
         app.severed.set(old, 'rest');
-        await to(r, app, 'reach', 12000);
-        await to(r, app, ['eat', 'crush'], 16000);
+        for (let k = 0; ; k++) {   // (in its panic the card may hop right off the shelf, and the arm gives up: it goes back on)
+          await to(r, app, 'reach', 12000);
+          // it stays put, resting by the card (not off copying the pointer, or walking away) until the arm has the card
+          await r.until(() => { if (!TUNE.severed.CHEESE.FROM.concat('hitch', 'cheese').includes(sevSt(old)) && ['reach'].includes(st(app))) app.severed.set(old, 'rest'); return st(app) !== 'reach'; }, 16000);
+          if (['eat', 'cheese'].includes(st(app))) break;
+          if (k === 2) throw new Error('the card kept hopping off the shelf');
+          await r.until(() => st(app) === 'lurk', 4000);
+          if (!app.shelf.holds(q)) { await pick(r, q); await r.scrollTo(sh.y - 330); await carry(r, 160, sh.y - scrollY - 140, 14); await r.wait(800); await r.up(); }
+          await r.glide(700, 560);
+        }
+        await to(r, app, 'eat', 1000);
         await to(r, app, 'cheese', 1500);
         await to(r, app, 'eat', 7000);
         await to(r, app, 'lurk', 9000);
@@ -642,5 +702,5 @@ export const PART = {
         await r.click('#toggle');
         await r.wait(1500);
       } },
-  ],
+  ].map(steady),
 };
