@@ -73,6 +73,12 @@ export function bowBack() {
   if (g.attend) g.attend.until = Math.min(g.attend.until, g.life + G.DIP_S + 0.6);
 }
 
+/** no ghost, as on a fresh visit (the stage clears it after its acts: src/showcase/acts/page.js). Emits nothing */
+export const get = () => g;
+/** laid to rest on this visit */
+export const isLaid = () => laid;
+export function reset() { g = null; laid = false; mourned = false; lastT = null; coolUntil = 0; coverAt = 0; }
+
 function set(st) { g.st = st; g.t = 0; }
 
 /** laid to rest: a small bow, and it fades */
@@ -260,5 +266,5 @@ export function install(app) {
   fogOverlay(onFog);
   kiriOverlay(onKiri);
   document.addEventListener('pointermove', moved, { passive: true });
-  hook('__ghost', { rise, attend, bowBack, get: () => g, laid: () => laid });
+  hook('__ghost', { rise, attend, bowBack, get, laid: isLaid });
 }

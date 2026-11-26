@@ -100,6 +100,12 @@ function start() {
   bus.emit('secret.found', { name: 'konami' });
 }
 
+/** the cards are cards again (the stage undoes its act with it: src/showcase/acts/page.js) */
+export function off() {
+  on = false; try { sessionStorage.removeItem(KEY); } catch (e) {}
+  document.querySelectorAll('#grid .card > .omi-card').forEach((s) => s.remove());
+}
+
 export function install(app) {
   try { on = sessionStorage.getItem(KEY) === '1'; } catch (e) {}
   let at = 0;

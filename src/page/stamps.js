@@ -82,6 +82,13 @@ export function mark(id) {
   return true;
 }
 
+/** a stamp already found thumps down again on the open card (the stage shows a new find with it, since nothing is inked
+ * while it plays: src/showcase/acts/page.js). @returns false when the card is not open or that stamp was never found */
+export function replay(id) {
+  if (!card || !cells || !load().found[id]) return false;
+  thumpIn(id); return true;
+}
+
 // ---- the card ----
 const css = (el, s) => { Object.assign(el.style, s); return el; };
 const div = (s, text) => { const d = css(document.createElement('div'), s); if (text != null) d.textContent = text; return d; };
