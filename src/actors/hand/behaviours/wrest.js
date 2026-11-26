@@ -21,7 +21,7 @@ import { segDist } from '../../../world/math.js';
 import { shake } from '../../../world/fx.js';
 import { POSES } from '../poses.js';
 import { set, speak, clamp01, get, brain } from '../index.js';
-import { gripPt, wristFor, untug } from '../tug.js';
+import { gripPt, wristFor, untug, aimAt } from '../tug.js';
 import { page, grabAt as grab, pullGeom, surge, strained, tearOff } from '../pull.js';
 
 const S = TUNE.physics.S, W = TUNE.hand.WREST;
@@ -66,7 +66,7 @@ export default defineBehaviour('hand', 'wrest', {
       const { gh, gp } = ends(q), Hp = world_(q, gh), Hc = [Hp[0] - scrollX, Hp[1] - scrollY];
       if (m.t < W.WAIT_S) { x.T = [x.vw - 10, Hc[1]]; x.rate = 6; x.pose = POSES.eager; x.wig = 0.3; return; }
       const g = gripPt(); x.pose = POSES.lunge; x.rate = W.RATE; x.wig = 0.1;
-      x.aim = Math.atan2(Hc[1] - c.y, Hc[0] - c.x); if (Math.cos(x.aim) > -0.2) x.aim = Math.PI; x.T = wristFor(Hc, x.aim);
+      x.aim = aimAt([c.x, c.y], Hc); x.T = wristFor(Hc, x.aim);
       if (Math.hypot(g[0] - Hc[0], g[1] - Hc[1]) < W.GRAB_PX) {   // got it: the old hand stops squeezing and hangs on to its end
         bus.emit('hand.wrest', { hand: old, card: q });
         if (old.ai.st !== 'wrest' || !world.bodies.has(q)) { done(c); set('lurk'); return; }

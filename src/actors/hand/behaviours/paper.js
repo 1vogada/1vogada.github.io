@@ -10,7 +10,7 @@ import { bus } from '../../../core/bus.js';
 import { world, drop, isHeld, HIT_ALL, NO_HIT, pinJoint } from '../../../world/world.js';
 import { POSES } from '../poses.js';
 import { set, speak } from '../index.js';
-import { gripPt, wristFor } from '../tug.js';
+import { gripPt, wristFor, aimAt } from '../tug.js';
 
 const S = TUNE.physics.S, OLD = TUNE.hand.OLD, PA = OLD.PAPER;
 
@@ -25,7 +25,7 @@ export default defineBehaviour('hand', 'paper', {
       if (!isHeld(o)) { c.o = null; c.cool = x.t + PA.COOL_MS; set('sulk'); speak('sulk'); return; }   // you took it away
       const w = o.body.getWorldCenter(), Hc = [w.x * S - scrollX, w.y * S - scrollY], q = gripPt();
       x.pose = POSES.eager; x.rate = PA.RATE; x.wig = 0.25;
-      x.aim = Math.atan2(Hc[1] - c.y, Hc[0] - c.x); if (Math.cos(x.aim) > -0.2) x.aim = Math.PI; x.T = wristFor(Hc, x.aim);
+      x.aim = aimAt([c.x, c.y], Hc); x.T = wristFor(Hc, x.aim);
       if (Math.hypot(q[0] - Hc[0], q[1] - Hc[1]) < PA.GRAB_PX) {   // got it: out of your hand and into its grip
         drop();
         o.body.getFixtureList().setFilterData(NO_HIT); o.body.setGravityScale(0); o.body.setAngularDamping(TUNE.physics.HELD_SPIN);

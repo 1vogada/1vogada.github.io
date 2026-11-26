@@ -8,7 +8,7 @@ import { bus } from '../../../core/bus.js';
 import { world, NO_HIT, pinJoint } from '../../../world/world.js';
 import { POSES } from '../poses.js';
 import { set, speak, big } from '../index.js';
-import { gripPt, wristFor, crushStart, middle } from '../tug.js';
+import { gripPt, wristFor, crushStart, middle, aimAt } from '../tug.js';
 import { take } from '../coin.js';
 
 const S = TUNE.physics.S, H_ = TUNE.hand;
@@ -22,7 +22,7 @@ export default defineBehaviour('hand', 'catch', {
     if (!o || (world.grab && world.grab.o === o)) { c.o = null; set('lurk'); }
     else {
       const w = o.body.getWorldCenter(), Hc = [w.x * S - scrollX, w.y * S - scrollY], q = gripPt(), dist = Math.hypot(q[0] - Hc[0], q[1] - Hc[1]);
-      x.aim = Math.atan2(Hc[1] - c.y, Hc[0] - c.x); if (Math.cos(x.aim) > -0.2) x.aim = Math.PI; x.T = wristFor(Hc, x.aim);
+      x.aim = aimAt([c.x, c.y], Hc); x.T = wristFor(Hc, x.aim);
       if (dist < 70) {
         o.body.setLinearVelocity({ x: 0, y: 0 }); o.body.setAngularVelocity(o.body.getAngularVelocity() * 0.2); o.hot = 0; o.body.setBullet(false);
         if (o.ball || o.kind === 'toast') {   // a ball of paper an old hand brought you, or the toast (page/bread.js): always a treat, eaten on the spot

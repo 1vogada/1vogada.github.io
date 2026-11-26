@@ -6,7 +6,7 @@ import { bus } from '../../../core/bus.js';
 import { drop } from '../../../world/world.js';
 import { POSES } from '../poses.js';
 import { set, speak, unseen } from '../index.js';
-import { gripPt, wristFor, crushStart } from '../tug.js';
+import { gripPt, wristFor, crushStart, aimAt } from '../tug.js';
 
 const S = TUNE.physics.S;
 
@@ -20,7 +20,7 @@ export default defineBehaviour('hand', 'snatch', {
     else if (x.held !== o) { c.o = null; set('sulk'); speak('sulk'); }
     else {
       const w = o.body.getWorldCenter(), Hc = [w.x * S - scrollX, w.y * S - scrollY], q = gripPt();
-      x.aim = Math.atan2(Hc[1] - c.y, Hc[0] - c.x); if (Math.cos(x.aim) > -0.2) x.aim = Math.PI; x.T = wristFor(Hc, x.aim);
+      x.aim = aimAt([c.x, c.y], Hc); x.T = wristFor(Hc, x.aim);
       if (Math.hypot(q[0] - Hc[0], q[1] - Hc[1]) < 34) {   // got it: out of your hand and into its fist
         drop();
         crushStart(o); set('crush'); speak('snatch', true);

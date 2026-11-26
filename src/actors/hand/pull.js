@@ -7,7 +7,7 @@ import { bus } from '../../core/bus.js';
 import { remove, rectPoly, NO_HIT, pinJoint } from '../../world/world.js';
 import { POSES } from './poses.js';
 import { clamp01 } from '../../world/math.js';
-import { wristFor, tugDraw, split, strands } from './tug.js';
+import { wristFor, aimAt, tugDraw, split, strands } from './tug.js';
 
 const S = TUNE.physics.S;
 
@@ -35,7 +35,7 @@ export function surge(x, g, K, t, wob) {
   const Hg = [g.H0[0] + ux * grow * K.ARM_SHARE - scrollX, g.H0[1] + uy * grow * K.ARM_SHARE + K.SAG_PX * u - scrollY];
   g.P = [Math.max(scrollX + K.EDGE_PX, g.P0[0] - ux * grow * (1 - K.ARM_SHARE)), g.P0[1] - uy * grow * (1 - K.ARM_SHARE) + K.SAG_PX * u + wob];
   const pain = clamp01((g.d - g.d0) / g.rip);
-  x.aim = Math.atan2(g.P[1] - scrollY - Hg[1], g.P[0] - scrollX - Hg[0]); if (Math.cos(x.aim) > -0.2) x.aim = Math.PI;
+  x.aim = aimAt(Hg, [g.P[0] - scrollX, g.P[1] - scrollY]);
   x.T = wristFor(Hg, x.aim); x.rate = 5; x.pose = pain > 0.5 ? POSES.strain : POSES.clamp; x.wig = 0.1; x.shake = 1.5 + 3 * pain; x.strain = pain;
   return pain;
 }
