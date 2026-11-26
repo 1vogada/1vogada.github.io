@@ -16,6 +16,7 @@ import { allLines, list, langOf } from '../core/lines.js';
 import { bus } from '../core/bus.js';
 import { clock } from '../core/clock.js';
 import { hook } from '../core/debug.js';
+import { rehearsing } from '../core/rehearsal.js';
 import { figure, resetPlates, esc } from './figures.js';
 import * as raid from './raid.js';
 import * as heard from './heard.js';
@@ -336,8 +337,10 @@ const diaryTab = () => `<button type="button" class="pb-tab" data-go="${DIARY.id
 /** the diary goes in under the last chapter, and the menu scrolls to it */
 function reveal() {
   if (!opened || !scroller || app.reduced) return;
-  diaryOn = true; try { sessionStorage.setItem(DIARY.key, '1'); } catch (e) {}
-  bus.emit('secret.found', { name: 'diary' });   // page/stamps.js stamps it
+  if (!rehearsing()) {   // on the stage it shows for this look only: not found (core/rehearsal.js)
+    diaryOn = true; try { sessionStorage.setItem(DIARY.key, '1'); } catch (e) {}
+    bus.emit('secret.found', { name: 'diary' });   // page/stamps.js stamps it
+  }
   let sec = document.getElementById('pb-' + DIARY.id);
   if (!sec) {
     const end = scroller.querySelector('.pb-end'), box = document.createElement('div'); box.innerHTML = diaryHTML(); sec = box.firstChild;
