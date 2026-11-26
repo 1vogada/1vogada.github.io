@@ -22,6 +22,8 @@ let n = 0;
 
 /** how far the story has got: '' | 'revenge' | 'tower' | 'sewn' | 'truce' */
 export const stage = () => STEPS[n];
+/** set how far the story has got, without the steps' events (the test hook; the stage puts it back after an act) */
+export function set(s) { const i = STEPS.indexOf(s); if (i >= 0) n = i; }
 
 function reach(i, hand) {
   if (n !== i - 1) return false;
@@ -35,5 +37,5 @@ export function install(app) {
   bus.on('sev.towerGrab', () => reach(2));
   bus.on('hand.sewn', () => reach(3));
   bus.on('hand.truce', () => { if (reach(4)) bus.emit('ui.toast', { msg: line('toast.truce') }); });
-  hook('__uprising', { stage, set: (s) => { const i = STEPS.indexOf(s); if (i >= 0) n = i; } });
+  hook('__uprising', { stage, set });
 }
