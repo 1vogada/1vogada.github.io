@@ -22,8 +22,7 @@ let n = 0;
 
 /** how far the story has got: '' | 'revenge' | 'tower' | 'sewn' | 'truce' */
 export const stage = () => STEPS[n];
-
-/** put the count at a step without telling anyone (the test hook, and the stage: src/showcase/acts/page.js) */
+/** put the count at a step without telling anyone (the test hook, and the stage's acts: src/showcase/acts/page.js, old.js) */
 export function set(s) { const i = STEPS.indexOf(s); if (i >= 0) n = i; }
 
 function reach(i, hand) {

@@ -143,6 +143,7 @@ export function rig(app) {
     /** the act is over (or stopped): the ghost lets go and goes, the act's own clean-ups run */
     end() {
       if (dead) return; dead = true; r.hide();
+      document.documentElement.dispatchEvent(new PointerEvent('pointerleave', { pointerId: ID, pointerType: 'mouse' }));   // the ghost is no pointer left resting on the page (gift, pester)
       for (const fn of undo.reverse()) { try { fn(); } catch (e) {} }
     },
   };
