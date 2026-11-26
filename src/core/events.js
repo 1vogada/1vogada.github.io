@@ -81,7 +81,7 @@ export const EVENTS = {
   'shelf.closed': '{ }',
   // ---- scenes ----
   'slip.opened': '{ project, fortune }',
-  'slip.closed': '{ how } how: "x" (No or the × pressed, or welcome back, while there is no hand to play the coin game: no __hand (reduced motion) or crazy mode; with a hand they start the game instead) | "secret" (the secret × in the corner) | "escape" | "hand" (the hand closed it, scenes/coin.js) | "backdrop"',
+  'slip.closed': '{ how } how: "x" (No or the × pressed, or welcome back, while there is no hand to play the coin game: no __hand (reduced motion) or crazy mode; with a hand they start the game instead) | "secret" (the secret × in the corner) | "escape" | "hand" (the hand closed it, scenes/coin.js) | "backdrop" | "stage" (the secret stage clears the scene before an act)',
   'coin.tossed': '{ side, call } side: "heads" | "tails" | "edge" (it landed on its rim, 1 in 100) | null (it did not bother)',
   'rps.played': '{ hand, arm, old, you, winner } rock, paper, scissors: both showed (arm / old: rock | paper | scissors; you: you shouted the old hand\'s pick; winner: "arm" | "old" | null)',
   'scene.started': '{ name }',
