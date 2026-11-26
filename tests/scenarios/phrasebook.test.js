@@ -14,7 +14,7 @@ async function openBook(s) {
 
 // Heard lines (src/phrasebook/heard.js): the book writes out only the lines heard on this browser. The scenarios that look at
 // every line (or let the raid loose on them) first hear everything with the test hook, so the book is as full as it ever was.
-const heardAll = (s) => s.eval(() => window.__heard.all());
+const heardAll = (s) => s.eval(() => window.__heard && window.__heard.all());   // (no record on ?legacy: its book shows every line)
 
 scenario(G, 'open, every line list shown, close', async (s) => {
   await heardAll(s);

@@ -13,7 +13,7 @@ jobs:
   scenarios:
     # the goldens were recorded on Ubuntu 24.04 with DejaVu Sans and IPAGothic; card sizes (and so the physics) come from text wrapping
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 60   # the modules suite alone is ~25 min with the chains, then the legacy run
     steps:
       - uses: actions/checkout@v4
         with:
