@@ -29,6 +29,7 @@ import { turn } from './gait.js';
 import { towerTick, shookOff, tower } from './tower.js';
 import { pesterTick, pestering, pesterTurn } from './pester.js';
 import { danceTick, groove, grooving } from './dance.js';
+import { easePose } from '../../world/math.js';
 
 const S = TUNE.physics.S, P = TUNE.physics, SV = TUNE.severed, B = SV.BODY;
 
@@ -321,7 +322,7 @@ export function tick(dt) {
     if (!world.bodies.has(o)) continue;
     const b = o.body, p = b.getPosition(), ang = b.getAngle(), pose = POSES[m.def.pose], kp = 1 - Math.exp(-dt * 10);
     const look = m.state === 'walk' && a.look2 ? POSES[a.look2] : pose;
-    if (!a.poseSet) for (const key in look) h.pose[key] = (h.pose[key] || 0) + (look[key] - (h.pose[key] || 0)) * kp;
+    if (!a.poseSet) easePose(h.pose, look, kp);
     turn(o, dt, b, p, ang);
     const ang2 = b.getAngle();
     h.a = ang2; h.x = p.x * S - scrollX - 35 * Math.cos(ang2); h.y = p.y * S - scrollY - 35 * Math.sin(ang2);

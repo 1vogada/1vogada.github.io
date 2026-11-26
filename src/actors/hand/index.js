@@ -60,12 +60,12 @@ export { POSES };
 const S = TUNE.physics.S, H_ = TUNE.hand;
 const html = () => document.documentElement;
 export { clamp01, wrapA } from '../../world/math.js';   // re-exported for the behaviours
-import { clamp01, wrapA, segDist } from '../../world/math.js';
+import { clamp01, wrapA, segDist, easePose } from '../../world/math.js';
 /** one frame of the arm easing to its wrist target T, angle aim and pose: at rate (position), aRate (angle), pRate (pose) per second; the shoulder follows */
 export function easeArm(c, dt, T, aim, pose, rate, aRate, pRate) {
   const k = 1 - Math.exp(-dt * rate), ka = 1 - Math.exp(-dt * aRate), kp = 1 - Math.exp(-dt * pRate);
   c.x += (T[0] - c.x) * k; c.y += (T[1] - c.y) * k; c.a += wrapA(aim - c.a) * ka; c.sh += (c.y + 70 - c.sh) * (1 - Math.exp(-dt * 4));
-  for (const key in pose) c.pose[key] = (c.pose[key] || 0) + (pose[key] - (c.pose[key] || 0)) * kp;
+  easePose(c.pose, pose, kp);
 }
 /** where the arm's bubble goes (TUNE.speech.ARM): above and left of the hand (Hv: the grip in viewport px), kept on screen */
 export function placeBubble(c, vw, Hv) {

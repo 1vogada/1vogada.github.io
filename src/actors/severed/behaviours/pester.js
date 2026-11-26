@@ -14,6 +14,7 @@ import { isCrazy, HIT_ALL, NO_HIT } from '../../../world/world.js';
 import { GAIT, head, clamp01, wrapA } from '../gait.js';
 import { set, say, pointer, moved } from '../index.js';
 import { pesterFrom, poked } from '../pester.js';
+import { easePose } from '../../../world/math.js';
 
 const S = TUNE.physics.S, PE = TUNE.severed.PESTER;
 
@@ -74,7 +75,7 @@ export default defineBehaviour('sev', 'pester', {
     b.setTransform({ x: x / S, y: y / S }, an); b.setLinearVelocity({ x: 0, y: 0 }); b.setAngularVelocity(0);
     pe.prev = [x - scrollX, y - scrollY]; pe.top = f >= 1;
     const hp = o.hand.pose, kp = 1 - Math.exp(-dt * 14);
-    for (const key in PE.POSE) hp[key] = (hp[key] || 0) + (PE.POSE[key] - (hp[key] || 0)) * kp;
+    easePose(hp, PE.POSE, kp);
     a.wig = 0.08;
     if (u >= 0.5 && !pe.hit) {   // poke
       pe.hit = true; const n = pe.n + 1; pe.n = n; poked(o, n);

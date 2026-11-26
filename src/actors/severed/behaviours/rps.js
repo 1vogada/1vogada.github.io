@@ -4,6 +4,7 @@
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { clamp01, wrapA } from '../gait.js';
+import { easePose } from '../../../world/math.js';
 
 const S = TUNE.physics.S, R = TUNE.rps;
 
@@ -20,7 +21,7 @@ export default defineBehaviour('sev', 'rps', {
     b.setTransform({ x: a.from.x + (a.base.x - a.from.x) * e, y: a.from.y + (a.base.y - a.from.y) * e - pump }, a.from.a + wrapA(-Math.PI / 2 - a.from.a) * e);
     b.setLinearVelocity({ x: 0, y: 0 }); b.setAngularVelocity(0);
     const want = R.OLD[a.rps.pose] || R.OLD.rock, hp = o.hand.pose, kp = 1 - Math.exp(-dt * (a.rps.pump ? 10 : 30));
-    for (const key in want) hp[key] = (hp[key] || 0) + (want[key] - (hp[key] || 0)) * kp;
+    easePose(hp, want, kp);
     a.poseSet = true; a.wig = a.rps.pump ? 0.05 : 0.02;
   },
   leave(o, m) { const a = o.ai; a.poseSet = false; a.wig = 0; o.body.setGravityScale(TUNE.physics.FALL); o.body.setAwake(true); },

@@ -9,6 +9,7 @@ import { clamp01, wrapA } from '../gait.js';
 import { set, say, POSES } from '../index.js';
 import { tower, tier, place } from '../tower.js';
 import { HIT_ALL } from '../../../world/world.js';
+import { easePose } from '../../../world/math.js';
 
 const S = TUNE.physics.S, TW = TUNE.severed.TOWER;
 const TEAM = { groupIndex: -7, categoryBits: 1, maskBits: 0xFFFF };   // the three never collide with each other
@@ -38,7 +39,7 @@ export default defineBehaviour('sev', 'tower', {
     b.setTransform({ x: a.tw.x / S, y: a.tw.y / S }, a.tw.a); b.setLinearVelocity({ x: 0, y: 0 }); b.setAngularVelocity(0);
     // the bottom one braces with its fingers spread wide, the top one reaches; pulling, all of them clench and strain
     const want = T.phase === 'pull' ? POSES.fist : top && T.phase === 'reach' ? POSES.held : i === 0 ? POSES.held : POSES.grip, hp = o.hand.pose, kp = 1 - Math.exp(-dt * 8);
-    for (const key in want) hp[key] = (hp[key] || 0) + (want[key] - (hp[key] || 0)) * kp;
+    easePose(hp, want, kp);
     hp.legs = 0; hp.eye = T.phase === 'pull' ? 1.4 : want.eye; a.poseSet = true;
   },
   leave(o, m) {
