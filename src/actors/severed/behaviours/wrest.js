@@ -11,7 +11,7 @@ import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
 import { world, isHeld, HIT_ALL, NO_HIT } from '../../../world/world.js';
 import { clamp01, wrapA } from '../gait.js';
-import { set, say, POSES, regain } from '../index.js';
+import { set, say, regain, strained } from '../index.js';
 
 const S = TUNE.physics.S, HI = TUNE.severed.HITCH, WR = TUNE.severed.WREST;
 
@@ -38,9 +38,7 @@ export default defineBehaviour('sev', 'wrest', {
     const th = g.psi + Math.sin(m.t * 17) * 0.06, P = g.P, k = clamp01(m.t / WR.EASE_S), e = k * k * (3 - 2 * k);
     const tx = (P[0] - HI.TIP_PX * Math.cos(th)) / S, ty = (P[1] - HI.TIP_PX * Math.sin(th)) / S;
     b.setTransform({ x: a.from.x + (tx - a.from.x) * e, y: a.from.y + (ty - a.from.y) * e }, a.from.a + wrapA(th - a.from.a) * e); b.setLinearVelocity({ x: 0, y: 0 }); b.setAngularVelocity(0);
-    const pain = clamp01((g.d - g.d0) / g.rip), hp = o.hand.pose, G = POSES.grip, F = POSES.fist;
-    for (const key in G) hp[key] = G[key] + (F[key] - G[key]) * pain; hp.eye = 1 + 0.5 * pain; hp.pupil = 0.8 - 0.4 * pain; a.poseSet = true;
-    a.wig = 0.15 + 0.3 * pain;
+    strained(o, (g.d - g.d0) / g.rip);
     if (m.t > 0.9) say(o, 'wrest');
   },
   leave(o, m) {

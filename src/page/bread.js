@@ -16,7 +16,7 @@ import { bus } from '../core/bus.js';
 import { clock } from '../core/clock.js';
 import { defineSpeaker, say } from '../core/speech.js';
 import { world, load, init, add, remove, isCrazy, showReset } from '../world/world.js';
-import { drawOffset } from '../world/loop.js';
+import { rideAnchor } from '../world/loop.js';
 import { makeLedge } from './ledge.js';
 
 const B = TUNE.bread, S = TUNE.physics.S;
@@ -67,10 +67,7 @@ function spawn(msg, r, dir) {
 export function install(app) {
   if (app && app.reduced) return;
   defineSpeaker('bread', { kinds: ['toast'], prefix: 'bread.', gate: 'card', layer: () => world.layer,
-    anchor: (o) => {   // like a card's: above the rotated slice, upright, offset like the held body is drawn
-      const p = o.body.getPosition(), a = o.body.getAngle(), [hx, hy] = drawOffset(o), top = Math.abs(Math.sin(a)) * o.w / 2 + Math.abs(Math.cos(a)) * o.h / 2;
-      return { x: p.x * S + hx, ax: p.x * S + hx, y: p.y * S + hy - top + TUNE.speech.RIDE_DY };
-    } });
+    anchor: rideAnchor });   // like a card's: above the rotated slice
   bus.on('body.thrown', ({ body }) => { if (body.kind === 'toast') say(body, 'bread.thrown', { force: true }); });
   bus.on('hand.grabbed', ({ card }) => { if (card.kind === 'toast' && world.bodies.has(card)) say(card, 'bread.caught', { mode: 'plain' }); });
   bus.on('body.removed', ({ body }) => { if (body === slice) { slice = null; ledge.off(); } });

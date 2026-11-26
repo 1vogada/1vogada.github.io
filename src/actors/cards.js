@@ -35,7 +35,7 @@ import { line } from '../core/lines.js';
 import { TUNE, TIMING } from '../core/tune.js';
 import { clock } from '../core/clock.js';
 import * as W from '../world/world.js';
-import { drawOffset } from '../world/loop.js';
+import { rideAnchor } from '../world/loop.js';
 import { validPoly } from '../world/cut.js';
 import { gore, shake } from '../world/fx.js';
 import { unstretch } from '../world/stretch.js';
@@ -256,10 +256,7 @@ export function install(app) {
   if (app && app.reduced) return;
   // legacy draw(): the bubble rides above the rotated box and stays upright, offset like the held body is drawn
   defineSpeaker('card', { kinds: ['card', 'piece', 'shard'], prefix: 'card.', gate: 'card', layer: () => world.layer,
-    anchor: (o) => {
-      const p = o.body.getPosition(), a = o.body.getAngle(), [hx, hy] = drawOffset(o), top = Math.abs(Math.sin(a)) * o.w / 2 + Math.abs(Math.cos(a)) * o.h / 2;
-      return { x: p.x * S + hx, ax: p.x * S + hx, y: p.y * S + hy - top + TUNE.speech.RIDE_DY };
-    } });
+    anchor: rideAnchor });
   W.onPull(startPull);
   W.onTear('card', tear);
   W.onGive('card', give);

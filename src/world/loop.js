@@ -32,6 +32,11 @@ const S = TUNE.physics.S, DT = TUNE.physics.DT, P = TUNE.physics, D = TUNE.drag;
 let hx = 0, hy = 0;
 /** the draw correction of the held body this frame ([0, 0] for any other body): bubble anchors add it (legacy draw()) */
 export const drawOffset = (o) => (world.grab && world.grab.o === o && !o.root ? [hx, hy] : [0, 0]);
+/** a speaker anchor for a body: its bubble upright above the top of its rotated box, offset like the held body is drawn */
+export function rideAnchor(o) {
+  const S = TUNE.physics.S, p = o.body.getPosition(), a = o.body.getAngle(), [dx, dy] = drawOffset(o), top = Math.abs(Math.sin(a)) * o.w / 2 + Math.abs(Math.cos(a)) * o.h / 2;
+  return { x: p.x * S + dx, ax: p.x * S + dx, y: p.y * S + dy - top + TUNE.speech.RIDE_DY };
+}
 
 function pose() {
   for (const o of world.bodies) { const b = o.body, p = b.getPosition(); o.px = p.x; o.py = p.y; o.pa = b.getAngle(); }

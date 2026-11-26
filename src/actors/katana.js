@@ -18,7 +18,7 @@ import { bus } from '../core/bus.js';
 import { defineSpeaker, say } from '../core/speech.js';
 import { line } from '../core/lines.js';
 import { world, load, init, add, remove, hold, drop, carry, onTear, setBlade, report, isCrazy } from '../world/world.js';
-import { drawOffset } from '../world/loop.js';
+import { rideAnchor } from '../world/loop.js';
 
 const S = TUNE.physics.S, K = TUNE.katana;
 
@@ -103,8 +103,7 @@ export function install(app) {
   const actions = document.createElement('div'); actions.className = 'phys-actions'; actions.appendChild(sheatheBtn); document.body.appendChild(actions);
 
   defineSpeaker('katana', { kinds: ['katana'], prefix: 'katana.', gate: 'card', quiet: TIMING.gap.katana, layer: () => world.layer,
-    anchor: (o) => { const p = o.body.getPosition(), a = o.body.getAngle(), [hx, hy] = drawOffset(o), top = Math.abs(Math.sin(a)) * o.w / 2 + Math.abs(Math.cos(a)) * o.h / 2;
-      return { x: p.x * S + hx, ax: p.x * S + hx, y: p.y * S + hy - top + TUNE.speech.RIDE_DY }; } });
+    anchor: rideAnchor });
   report('found', () => found);
   report('katana', () => katObj);
   onTear('katana', free);

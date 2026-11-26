@@ -6,7 +6,7 @@
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { world, HIT_ALL, NO_HIT } from '../../../world/world.js';
-import { set, say, POSES } from '../index.js';
+import { set, say, strained } from '../index.js';
 
 const S = TUNE.physics.S, HI = TUNE.severed.HITCH;
 
@@ -20,9 +20,7 @@ export default defineBehaviour('sev', 'cheese', {
     if (!g || g.cheese !== o) { a.hold = true; set(o, 'hitch'); return; }   // the arm let go of its end: it is all ours (and we are falling)
     const th = g.psi + Math.sin(m.t * 17) * 0.06, P = g.P;
     b.setTransform({ x: (P[0] - HI.TIP_PX * Math.cos(th)) / S, y: (P[1] - HI.TIP_PX * Math.sin(th)) / S }, th); b.setLinearVelocity({ x: 0, y: 0 }); b.setAngularVelocity(0);
-    const pain = Math.max(0, Math.min(1, (g.d - g.d0) / g.rip)), hp = o.hand.pose, G = POSES.grip, F = POSES.fist;
-    for (const key in G) hp[key] = G[key] + (F[key] - G[key]) * pain; hp.eye = 1 + 0.5 * pain; hp.pupil = 0.8 - 0.4 * pain; a.poseSet = true;
-    a.wig = 0.15 + 0.3 * pain;
+    strained(o, (g.d - g.d0) / g.rip);
     if (m.t > 0.8) say(o, 'cheese');
   },
   leave(o, m) { const a = o.ai; a.poseSet = false; a.wig = 0; if (world.bodies.has(o)) { b0(o); } },

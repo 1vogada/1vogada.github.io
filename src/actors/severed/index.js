@@ -23,13 +23,13 @@ import { machine, behaviours } from '../../core/machine.js';
 import { isFree } from '../../core/claims.js';
 import { hook, flags } from '../../core/debug.js';
 import { world, add, remove, isHeld, isCrazy, worldPoly, fragment, HIT_ALL } from '../../world/world.js';
-import { drawOffset } from '../../world/loop.js';
+import { rideAnchor } from '../../world/loop.js';
 import { gore } from '../../world/fx.js';
 import { turn } from './gait.js';
 import { towerTick, shookOff, tower } from './tower.js';
 import { pesterTick, pestering, pesterTurn } from './pester.js';
 import { danceTick, groove, grooving } from './dance.js';
-import { easePose } from '../../world/math.js';
+import { clamp01, easePose, segDist } from '../../world/math.js';
 
 const S = TUNE.physics.S, P = TUNE.physics, SV = TUNE.severed, B = SV.BODY;
 
@@ -333,13 +333,19 @@ export function tick(dt) {
 /** the table of behaviours by name (legacy SEV), for __sev */
 const table = () => Object.fromEntries(behaviours('sev'));
 
+/** an old hand hanging on to its end of a pulled card (cheese, wrest): its grip clenches to a fist and its eye widens with the
+ *  strain k (clamped to 0..1); sets a.poseSet so the frame's own pose easing leaves it alone */
+export function strained(o, k) {
+  const a = o.ai, pain = clamp01(k), hp = o.hand.pose, G = POSES.grip, F = POSES.fist;
+  for (const key in G) hp[key] = G[key] + (F[key] - G[key]) * pain; hp.eye = 1 + 0.5 * pain; hp.pupil = 0.8 - 0.4 * pain; a.poseSet = true;
+  a.wig = 0.15 + 0.3 * pain;
+}
 export function install(a) {
   app = a || {};
   if (app.reduced) return;   // legacy: the whole of cardPhysics() is skipped, __sev never exists
   // the bubble rides above the body like a card's (legacy draw()), and gets the hand's look (legacy sevSay: .claw-say)
   defineSpeaker('severed', { kinds: ['hand'], gate: 'severed', extraCls: 'claw-say', layer: () => world.layer,
-    anchor: (o) => { const p = o.body.getPosition(), an = o.body.getAngle(), [hx, hy] = drawOffset(o), top = Math.abs(Math.sin(an)) * o.w / 2 + Math.abs(Math.cos(an)) * o.h / 2;
-      return { x: p.x * S + hx, ax: p.x * S + hx, y: p.y * S + hy - top + TUNE.speech.RIDE_DY }; } });
+    anchor: rideAnchor });
   clock.onTick(tick, 'severed');
   clock.hasWork(busy);    // legacy clawBusy() = sevBusy() || ...: both the start-of-frame and the end-of-frame checks
   clock.keepAwake(busy);
