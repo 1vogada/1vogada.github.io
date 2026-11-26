@@ -2,7 +2,8 @@
 // Layer lint for src/ (no dependencies). Fails (exit 1) on:
 //   - an import that breaks the layer order: a file may import only from layers above it (lower number), or from its own
 //     package (src/core, src/world, one actor = src/actors/<name>(.js|/), src/scenes, src/page, src/phrasebook, src/lines);
-//     layer 4 is split: page/ and lines/ are 4, scenes/ and phrasebook/ are 4.5 (they may import page/, not each other);
+//     layer 4 is split: page/ and lines/ are 4, scenes/ and phrasebook/ are 4.5 (they may import page/, not each other),
+//     showcase/ (the secret stage) is 4.8 and may import any of them;
 //     src/main.js may import anything in src/
 //   - an actor importing another actor
 //   - an import that leaves src/ or is not a relative path
@@ -29,6 +30,7 @@ function where(r) {
   if (top === 'actors') return { layer: 3, pkg: 'actors/' + (second || '').replace(/\.m?js$/, ''), actor: true };
   if (top === 'page' || top === 'lines') return { layer: 4, pkg: top };
   if (top === 'scenes' || top === 'phrasebook') return { layer: 4.5, pkg: top };   // they sit on the page: may import page/
+  if (top === 'showcase') return { layer: 4.8, pkg: top };   // the secret stage plays every feature: may import all of the above
   return { layer: 0, pkg: '?' };
 }
 

@@ -153,6 +153,8 @@ import * as raid from './phrasebook/raid.js';
 
 import * as language from './page/language.js';
 
+import * as showcase from './showcase/index.js';
+
 /** [name, module] in install order */
 export const ORDER = [
   // 1 core
@@ -194,6 +196,8 @@ export const ORDER = [
   ['stamps', stamps],
   ['hChew', hChew],   // left unattended (away-thief)
   ['ghost', ghost],
+  // 11 the secret stage: plays every one of the above on demand (type maku)
+  ['showcase', showcase],
 ];
 
 /** the app every install(app) receives: each module by name, plus a few flags */

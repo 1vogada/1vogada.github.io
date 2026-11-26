@@ -9,6 +9,7 @@ import { TUNE } from '../core/tune.js';
 import { onSaid } from '../core/speech.js';
 import { allLines } from '../core/lines.js';
 import { hook } from '../core/debug.js';
+import { rehearsing } from '../core/rehearsal.js';
 
 const KEY = 'kiripad-heard', SEEN = 'kiripad-heard-seen';
 const order = [], set = new Set(), subs = [];
@@ -32,7 +33,7 @@ function save() {
 
 /** the said-hook: the words of every bubble are a line you have now heard */
 function remember({ text }) {
-  if (!text || set.has(text)) return;
+  if (!text || set.has(text) || rehearsing()) return;   // an act on the stage is not hearing it (core/rehearsal.js)
   set.add(text); order.push(text); trim(); save();
   for (const fn of subs.slice()) fn(text);
 }

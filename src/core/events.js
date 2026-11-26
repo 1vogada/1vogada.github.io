@@ -88,6 +88,8 @@ export const EVENTS = {
   'scene.ended': '{ name, killed }',
   // ---- phrasebook ----
   'phrasebook.opened': '{ }',
+  'stage.opened': '{ } the secret stage (src/showcase/) was raised: its list of acts is in front',
+  'stage.closed': '{ } the stage list went away (an act may still be playing behind its bar)',
   'phrasebook.closed': '{ }',
   'phrasebook.spoke': '{ key, text, who, heard } a line was picked in the open phrasebook and its owner (who: card | katana | hand | old) said it (heard) or refused (text: the refusal); after the bubble went up (phrasebook/say.js)',
   // ---- page ----
@@ -109,7 +111,7 @@ export const EVENTS = {
   'uprising.step': '{ step, hand } the uprising reached a step, in order: "revenge" (hand: the avenger) | "tower" | "sewn" | "truce"',
   'hand.flewOff': '{ x, y } the uprising: shaking the tower off, its own hand flew off too (page px of the grip); the stump stays out on the page ("spent")',
   'hand.truce': '{ } the uprising: back at the edge with an old hand sewn on, it said "fine. truce." (behaviours/truce.js); it snatches nothing from now on',
-  'secret.found': '{ name } a page secret with no event of its own was found (name: "1926" | "moon" | "konami" | "basement" | "diary" | "toast"); page/stamps.js stamps it',
+  'secret.found': '{ name } a page secret with no event of its own was found (name: "1926" | "moon" | "konami" | "basement" | "diary" | "toast" | "stage"); page/stamps.js stamps it',
   // ---- silent film (chain silent-film) ----
   'page.film': '{ on } the 1926 egg went on (the page is sepia) or off (page/eggs.js). Reactions: title-card bubbles, jerky hands',
   // ---- left unattended (away-thief) ----

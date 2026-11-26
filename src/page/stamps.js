@@ -10,6 +10,7 @@
 // the Konami code, the basement, the diary, the fallen toast). Nothing here draws Math.random except the card's two lines, and
 // only when the card opens. Styles are inline (styles/*.css stay as they were).
 import { TUNE } from '../core/tune.js';
+import { rehearsing } from '../core/rehearsal.js';
 import { bus } from '../core/bus.js';
 import { real } from '../core/clock.js';
 import { line } from '../core/lines.js';
@@ -53,7 +54,8 @@ export const STAMPS = [
   { id: 'dance', jp: '踊', name: 'DANCE', hint: 'a crazy party', on: [['sev.state', (e) => e && e.to === 'dance']],
     art: '<path d="M9 18V6.5l10-2.2v11.5"/><path d="M9 9.3l10-2.2"/><ellipse cx="6.8" cy="18" rx="2.3" ry="1.8" fill="currentColor"/><ellipse cx="16.8" cy="15.8" rx="2.3" ry="1.8" fill="currentColor"/>' },
   { id: 'pester', jp: '突', name: 'PESTER', hint: 'sit very still', on: ['sev.pestered'],
-    art: '<path d="M4 3l11.5 9-5 .8 3 6.2-2.2 1.1-3-6.3L4.6 17z"/><path d="M17 4.5l2-1.5M18.5 8l2.4-.4M15.5 2.2l.3-1.2" stroke-width="1"/>' },
+    art: '<path d="M4 3l11.5 9-5 .8 3 6.2-2.2 1.1-3-6.3L4.6 17z"/><path d="M17 4.5l2-1.5M18.5 8l2.4-.4M15.5 2.2l.3-1.2" stroke-width="1"/>' },  { id: 'stage', jp: '幕', name: 'STAGE', hint: 'raise the curtain', on: [['secret.found', (e) => e && e.name === 'stage']],
+    art: '<path d="M2.5 3.5h19"/><path d="M4 3.5v16c2.6-1.4 4.6-6 5-11.5M20 3.5v16c-2.6-1.4-4.6-6-5-11.5"/><path d="M9 3.5c.6 3.6 1.6 5.6 3 6.6 1.4-1 2.4-3 3-6.6"/><path d="M2.5 20.5h19" stroke-width=".8"/>' },
 ];
 
 // ---- what you found: { found: { id: ms }, seen: [ids already shown on the card] } ----
@@ -74,7 +76,7 @@ export const found = () => STAMPS.filter((s) => load().found[s.id]).map((s) => s
 /** a secret was found (once; again is nothing). If the card is open it thumps down at once */
 export function mark(id) {
   const st = load();
-  if (st.found[id] || !STAMPS.some((s) => s.id === id)) return false;
+  if (st.found[id] || !STAMPS.some((s) => s.id === id) || (rehearsing() && id !== 'stage')) return false;   // the stage only shows off (core/rehearsal.js)
   st.found[id] = Date.now(); save();
   if (card) thumpIn(id);
   return true;

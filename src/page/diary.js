@@ -3,6 +3,7 @@
 // The phrasebook shows it as a secret last chapter when you type "kotoba" (言葉, words) with it open (phrasebook/menu.js); pages
 // written since the book was last open get its red ink dot, and the pages not written yet show as blots (heard lines).
 // Nothing here draws Math.random.
+import { rehearsing } from '../core/rehearsal.js';
 import { TUNE } from '../core/tune.js';
 import { bus } from '../core/bus.js';
 
@@ -19,7 +20,7 @@ function load() {
 export const entries = () => load().slice();
 
 function write({ kind, text }) {
-  if (!text) return;
+  if (!text || rehearsing()) return;   // the stage is only showing off (core/rehearsal.js)
   const d = load(); d.push({ at: Date.now(), kind, text });
   if (d.length > TUNE.diary.MAX) d.splice(0, d.length - TUNE.diary.MAX);
   try { sessionStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {}

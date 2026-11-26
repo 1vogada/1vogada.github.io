@@ -1,0 +1,81 @@
+/* 幕 The stage (src/showcase/): the secret menu of every animation on the page. Same design language as the phrasebook: one big
+   card over the tinted page. While an act plays, the card steps aside and a small bar stays at the bottom left. All classes sc-. */
+html.sc-lock { overflow: hidden; }
+.sc { position: fixed; inset: 0; z-index: 46; display: grid; place-items: center; padding: 16px; opacity: 0; transition: opacity .22s; }
+.sc[hidden] { display: none; }
+.sc.in { opacity: 1; }
+.sc-shade { position: absolute; inset: 0; background: radial-gradient(ellipse 90% 85% at 50% 50%, rgba(14, 12, 17, .5), rgba(14, 12, 17, .78));
+            backdrop-filter: blur(7px) saturate(.8); -webkit-backdrop-filter: blur(7px) saturate(.8); }
+.sc-card { position: relative; width: min(1120px, 100%); height: 100%; max-height: 940px; display: flex; flex-direction: column; overflow: hidden;
+           background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 20px;
+           box-shadow: 0 0 0 1px rgba(0, 0, 0, .04), 0 30px 90px rgba(0, 0, 0, .45), 0 8px 24px rgba(0, 0, 0, .25);
+           transform: translateY(18px) scale(.98); transition: transform .3s cubic-bezier(.2, .8, .2, 1); }
+.sc.in .sc-card { transform: none; }
+/* a curtain's hem instead of the phrasebook's plain red rule */
+.sc-card::before { content: ""; flex: none; height: 10px; background: radial-gradient(circle at 10px -4px, transparent 9px, var(--accent) 9.5px) 0 0 / 20px 10px repeat-x; }
+
+.sc-top { flex: none; padding: 16px 26px 12px; border-bottom: 1px solid transparent; transition: border-color .2s, box-shadow .2s; position: relative; z-index: 2; }
+.sc.scrolled .sc-top { border-bottom-color: var(--border); box-shadow: 0 6px 14px -10px rgba(0, 0, 0, .25); }
+.sc-top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.sc-top h2 { margin: 0; font-size: clamp(1.5rem, 3.4vw, 2rem); letter-spacing: -0.02em; line-height: 1.15; display: flex; align-items: center; gap: 12px; }
+.sc-seal { display: inline-grid; place-items: center; width: 1.5em; height: 1.5em; font-size: .8em; color: #fff; background: var(--accent); border-radius: 6px; rotate: -4deg; }
+.sc-sub { margin: 4px 0 0; color: var(--muted); font-size: .93rem; }
+.sc-x { flex: none; font-size: .95rem; }
+.sc-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.sc-tab { font: inherit; font-size: .85rem; font-weight: 600; color: var(--muted); background: transparent; border: 1px solid var(--border); border-radius: 999px; padding: 5px 13px; cursor: pointer; transition: color .15s, background .15s, border-color .15s; }
+.sc-tab:hover { color: var(--text); border-color: color-mix(in srgb, var(--accent) 55%, var(--border)); }
+
+.sc-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 8px 26px 34px; outline: none; scrollbar-gutter: stable; position: relative; }
+.sc-sec { padding-top: 18px; }
+.sc-sec-h { display: flex; align-items: center; gap: 10px; }
+.sc-sec-h h3 { margin: 0; font-size: 1.3rem; letter-spacing: -0.01em; }
+.sc-sec-h::after { content: ""; flex: 1; height: 1px; background: var(--border); order: 2; }
+.sc-pill { font-size: .7rem; font-weight: 500; color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
+.sc-all { order: 3; font: inherit; font-size: .8rem; font-weight: 650; color: var(--accent); background: var(--accent-soft); border: 1px solid transparent; border-radius: 999px; padding: 4px 12px; cursor: pointer; white-space: nowrap; }
+.sc-all:hover { border-color: var(--accent); }
+.sc-intro { margin: 8px 0 16px; color: var(--muted); font-size: .95rem; max-width: 78ch; }
+.sc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 14px; }
+
+.sc-act { margin: 0; background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 13px 14px 14px 16px; display: flex; flex-direction: column; gap: 7px; min-width: 0; transition: border-color .15s, transform .15s; }
+.sc-act:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); }
+.sc-act-h { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.sc-act h4 { margin: 0; font-size: 1rem; font-weight: 650; line-height: 1.3; }
+.sc-play { flex: none; width: 38px; height: 38px; border-radius: 50%; border: 0; background: var(--accent); color: #fff; font-size: .95rem; padding-left: 3px; cursor: pointer;
+           box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--accent) 70%, transparent); transition: transform .12s, box-shadow .12s; }
+.sc-play:hover { transform: scale(1.08); }
+.sc-play:active { transform: scale(.94); }
+.sc-how, .sc-cut { margin: 0; color: var(--muted); font-size: .86rem; line-height: 1.45; }
+.sc-how b, .sc-cut b { font-size: .66rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-right: 4px; }
+.sc-cut b { color: var(--muted); }
+
+/* the bar: what is playing, at the bottom left (the hand lives at the right edge) */
+.sc-bar { position: fixed; left: 16px; bottom: 16px; z-index: 61; display: flex; align-items: center; gap: 10px; max-width: min(460px, calc(100vw - 32px));
+          background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 999px; padding: 7px 8px 7px 14px;
+          box-shadow: 0 12px 34px rgba(0, 0, 0, .28), 0 2px 8px rgba(0, 0, 0, .14); }
+.sc-bar[hidden] { display: none; }
+.sc-dot { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); animation: sc-pulse 1.1s ease-in-out infinite; }
+.sc-bar.done .sc-dot { animation: none; background: #3f8a5a; }
+.sc-bar.failed .sc-dot { animation: none; background: var(--muted); }
+@keyframes sc-pulse { 50% { opacity: .35; transform: scale(.8); } }
+.sc-now { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+.sc-title { font-size: .86rem; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sc-step { font-style: normal; font-size: .72rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sc-btns { display: flex; gap: 4px; flex: none; margin-left: auto; }
+.sc-b { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: .9rem; cursor: pointer; display: grid; place-items: center; padding: 0; }
+.sc-b:hover { border-color: var(--accent); color: var(--accent); }
+
+/* the ghost pointer that plays your part */
+.sc-ghost { position: fixed; left: 0; top: 0; z-index: 62; pointer-events: none; opacity: 0; transition: opacity .2s; will-change: transform; }
+.sc-ghost.on { opacity: 1; }
+.sc-ghost svg { display: block; overflow: visible; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .35)); transition: transform .1s; transform-origin: 4px 2px; }
+.sc-ghost path { fill: #fff; stroke: var(--accent); stroke-width: 1.6; stroke-linejoin: round; }
+.sc-ghost::after { content: ""; position: absolute; left: -10px; top: -12px; width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--accent); opacity: 0; transform: scale(.4); transition: opacity .12s, transform .12s; }
+.sc-ghost.down svg { transform: scale(.86); }
+.sc-ghost.down::after { opacity: .7; transform: scale(1); }
+
+@media (max-width: 640px) {
+  .sc { padding: 8px; }
+  .sc-top { padding: 14px 16px 10px; }
+  .sc-scroll { padding: 4px 16px 28px; }
+  .sc-bar { left: 8px; right: 8px; bottom: 8px; max-width: none; }
+}
