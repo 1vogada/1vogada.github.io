@@ -4,9 +4,9 @@
 
 import { TUNE } from '../core/tune.js';
 import { now } from '../core/clock.js';
+import { clamp01 } from './math.js';
 
 const S = TUNE.physics.S, D = TUNE.drag;
-const clamp01 = (v) => Math.max(0, Math.min(1, v));
 
 // the points along o's edge that the stretch and the crumple move: 26 (or n) per side of a card, every 12 px or so of a piece
 export function rim(o, n) {

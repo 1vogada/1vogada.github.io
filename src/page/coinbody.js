@@ -19,7 +19,7 @@ import { bus } from '../core/bus.js';
 import { clock, real } from '../core/clock.js';
 import { defineSpeaker, say } from '../core/speech.js';
 import { hook } from '../core/debug.js';
-import { world, load, init, add, remove, isCrazy, showReset, isHeld } from '../world/world.js';
+import { world, load, init, add, remove, isCrazy, showReset } from '../world/world.js';
 import { drawOffset } from '../world/loop.js';
 import { makeLedge } from './ledge.js';
 

@@ -17,8 +17,9 @@ import { world } from '../../world/world.js';
 const S = TUNE.physics.S, P = TUNE.physics, LEG = TUNE.severed.LEG;
 
 export const GAIT = TUNE.severed.GAIT, TURN = TUNE.severed.TURN, NEXT = TUNE.severed.NEXT;
-/** legacy clamp01 / wrapA (the same one-liners the arm uses) */
-export const clamp01 = (v) => Math.max(0, Math.min(1, v)), wrapA = (a) => a - 2 * Math.PI * Math.round(a / (2 * Math.PI));
+/** legacy clamp01 / wrapA (world/math.js, the same ones the arm uses) */
+export { clamp01, wrapA } from '../../world/math.js';   // re-exported for the behaviours
+import { clamp01, wrapA } from '../../world/math.js';
 
 /** the ground under a page point, looking from a little above it down (legacy sevGround(x, y)). @returns page y or null */
 export function ground(x, y) {

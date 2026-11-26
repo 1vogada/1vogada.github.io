@@ -59,7 +59,8 @@ export { POSES };
 
 const S = TUNE.physics.S, H_ = TUNE.hand;
 const html = () => document.documentElement;
-export const clamp01 = (v) => Math.max(0, Math.min(1, v)), wrapA = (a) => a - 2 * Math.PI * Math.round(a / (2 * Math.PI));
+export { clamp01, wrapA } from '../../world/math.js';   // re-exported for the behaviours
+import { clamp01, wrapA } from '../../world/math.js';
 /** one frame of the arm easing to its wrist target T, angle aim and pose: at rate (position), aRate (angle), pRate (pose) per second; the shoulder follows */
 export function easeArm(c, dt, T, aim, pose, rate, aRate, pRate) {
   const k = 1 - Math.exp(-dt * rate), ka = 1 - Math.exp(-dt * aRate), kp = 1 - Math.exp(-dt * pRate);
