@@ -6,17 +6,17 @@
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
-import { world, drop, isHeld } from '../../../world/world.js';
+import { world, drop, isHeld, HIT_ALL, NO_HIT, pinJoint } from '../../../world/world.js';
 import { POSES } from '../poses.js';
 import { set, speak } from '../index.js';
 import { gripPt, wristFor } from '../tug.js';
 
-const S = TUNE.physics.S, OLD = TUNE.hand.OLD, PA = OLD.PAPER, NONE = { groupIndex: 0, categoryBits: 1, maskBits: 0 }, ALL = { groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF };
+const S = TUNE.physics.S, OLD = TUNE.hand.OLD, PA = OLD.PAPER;
 
 /** let go of it, whole (it falls where it is) */
 function letGo(c, o) {
   if (c.joint) { world.b2.destroyJoint(c.joint); c.joint = null; }
-  if (world.bodies.has(o)) { o.body.getFixtureList().setFilterData(ALL); o.body.setGravityScale(isHeld(o) ? 1 : TUNE.physics.FALL); o.body.setAwake(true); }
+  if (world.bodies.has(o)) { o.body.getFixtureList().setFilterData(HIT_ALL); o.body.setGravityScale(isHeld(o) ? 1 : TUNE.physics.FALL); o.body.setAwake(true); }
   c.o = null;
 }
 
@@ -33,8 +33,8 @@ export default defineBehaviour('hand', 'paper', {
       x.aim = Math.atan2(Hc[1] - c.y, Hc[0] - c.x); if (Math.cos(x.aim) > -0.2) x.aim = Math.PI; x.T = wristFor(Hc, x.aim);
       if (Math.hypot(q[0] - Hc[0], q[1] - Hc[1]) < PA.GRAB_PX) {   // got it: out of your hand and into its grip
         drop();
-        o.body.getFixtureList().setFilterData(NONE); o.body.setGravityScale(0); o.body.setAngularDamping(TUNE.physics.HELD_SPIN);
-        c.joint = world.b2.createJoint(new world.pl.MouseJoint({ maxForce: TUNE.physics.MAX_FORCE * o.body.getMass(), frequencyHz: TUNE.hand.JOINT_HZ, dampingRatio: 1 }, world.ground, o.body, { x: w.x, y: w.y }));
+        o.body.getFixtureList().setFilterData(NO_HIT); o.body.setGravityScale(0); o.body.setAngularDamping(TUNE.physics.HELD_SPIN);
+        c.joint = pinJoint(o.body, { x: w.x, y: w.y }, TUNE.hand.JOINT_HZ);
         c.gotAt = m.t; c.gotY = c.y;
         bus.emit('hand.mistook', { hand: o });
       } else if (m.t > PA.REACH_S) { c.o = null; c.cool = x.t + PA.COOL_MS; set('sulk'); speak('sulk'); }

@@ -14,7 +14,7 @@ import { bus } from '../../core/bus.js';
 import { clock } from '../../core/clock.js';
 import { isFree } from '../../core/claims.js';
 import { flags } from '../../core/debug.js';
-import { world, isHeld, isCrazy } from '../../world/world.js';
+import { world, isHeld, isCrazy, NO_HIT } from '../../world/world.js';
 import { ground } from './gait.js';
 import { list, brain, set, say, onRefuge, lurks, wrist } from './index.js';
 
@@ -122,7 +122,7 @@ export function towerTick(dt) {
     if (arm.is('lurk') && lurks() && t >= T.asked) { T.asked = t + TW.ASK_MS; bus.emit('sev.tower', { hand: T.hands[2], x: px, y: py }); }   // up here! the arm leans in to look
     if (arm.is('peer') && arm.t > TW.GRAB_AFTER_S && Math.hypot(arm.grip[0] + scrollX - px, arm.grip[1] + scrollY - py) < TW.GRAB_PX) {
       T.phase = 'pull'; T.at = t; T.G = [arm.grip[0] + scrollX, arm.grip[1] + scrollY];
-      for (const o of T.hands) o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 });   // hanging on: nothing on the page knocks them now
+      for (const o of T.hands) o.body.getFixtureList().setFilterData(NO_HIT);   // hanging on: nothing on the page knocks them now
       say(T.hands[2], 'towerPull', true);
       bus.emit('sev.towerGrab', { hand: T.hands[2], hands: [...T.hands] });
     }

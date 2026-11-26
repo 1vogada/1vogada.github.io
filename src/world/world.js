@@ -165,6 +165,13 @@ export function remove(o) {
 }
 
 /** @returns {boolean} the pointer holds o */
+/** collision filters: NO_HIT for a body a hand carries (nothing bumps into it), HIT_ALL to make it solid again (planck copies them) */
+export const NO_HIT = Object.freeze({ groupIndex: 0, categoryBits: 1, maskBits: 0 });
+export const HIT_ALL = Object.freeze({ groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF });
+/** a MouseJoint from the ground to body at `at` (metres), strong enough for its mass: how a hand holds a body. @returns the joint */
+export function pinJoint(body, at, hz, damping = 1) {
+  return world.b2.createJoint(new world.pl.MouseJoint({ maxForce: TUNE.physics.MAX_FORCE * body.getMass(), frequencyHz: hz, dampingRatio: damping }, world.ground, body, at));
+}
 export const isHeld = (o) => !!world.grab && world.grab.o === o;
 
 /** page px of local point q (px from the body centre). @returns {[number, number]} */

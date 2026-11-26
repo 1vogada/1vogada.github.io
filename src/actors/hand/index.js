@@ -42,7 +42,7 @@ import { list, line } from '../../core/lines.js';
 import { machine } from '../../core/machine.js';
 import { claim } from '../../core/claims.js';
 import { hook } from '../../core/debug.js';
-import { world, isCrazy, load, init, report, everRipped } from '../../world/world.js';
+import { world, isCrazy, load, init, report, everRipped, HIT_ALL } from '../../world/world.js';
 import { polyArea } from '../../world/cut.js';
 import { gore, shake } from '../../world/fx.js';
 import { handParts, handDraw, setStepping } from './draw.js';
@@ -324,7 +324,7 @@ export function letGo() {
     const grab = world.grab, mineToo = grab && grab.o === o;
     if (o.tug && o.tug.crush) { o.tug = null; ownClip(o); o.el.style.filter = ''; crushed = o; }   // legacy say(o, 'stab', true): see sever()
     else if (o.tug) { const H = gripPt(), Hp = [H[0] + scrollX, H[1] + scrollY], g = o.tug; untug(o, mineToo ? [grab.cx + scrollX, grab.cy + scrollY] : [Hp[0] - Math.cos(g.psi) * g.d0, Hp[1] - Math.sin(g.psi) * g.d0], Hp); }
-    o.el.style.pointerEvents = ''; o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF });
+    o.el.style.pointerEvents = ''; o.body.getFixtureList().setFilterData(HIT_ALL);
     o.body.setGravityScale(mineToo ? 1 : TUNE.physics.FALL); o.body.setAngularDamping(mineToo ? TUNE.physics.HELD_SPIN : TUNE.physics.SPIN); o.body.setAwake(true);
   }
   c.o = null; c.snap = null;

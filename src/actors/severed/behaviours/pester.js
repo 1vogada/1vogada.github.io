@@ -10,13 +10,12 @@
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
-import { isCrazy } from '../../../world/world.js';
+import { isCrazy, HIT_ALL, NO_HIT } from '../../../world/world.js';
 import { GAIT, head, clamp01, wrapA } from '../gait.js';
 import { set, say, pointer, moved } from '../index.js';
 import { pesterFrom, poked } from '../pester.js';
 
 const S = TUNE.physics.S, PE = TUNE.severed.PESTER;
-const NONE = { groupIndex: 0, categoryBits: 1, maskBits: 0 }, ALL = { groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF };
 
 /** up it goes: from where it stands now */
 function hop(o, m) {
@@ -24,12 +23,12 @@ function hop(o, m) {
   pe.base = { x: p.x * S, y: p.y * S, a: b.getAngle() }; pe.phase = 'hop'; pe.at = m.t; pe.hit = false;
   pe.dur = Math.max(PE.HOP_MIN_S, PE.HOP_S * Math.pow(PE.RALLY.DECAY, pe.n));
   a.up = false; a.hop = 0; a.vx = 0; a.poseSet = true;
-  b.setGravityScale(0); b.getFixtureList().setFilterData(NONE); b.setAwake(true);
+  b.setGravityScale(0); b.getFixtureList().setFilterData(NO_HIT); b.setAwake(true);
 }
 /** back on the ground (or let go in mid-air): gravity and collisions as before */
 function land(o) {
   const b = o.body; o.ai.poseSet = false;
-  b.setGravityScale(TUNE.physics.FALL); b.getFixtureList().setFilterData(ALL); b.setLinearVelocity({ x: 0, y: 0 }); b.setAngularVelocity(0); b.setAwake(true);
+  b.setGravityScale(TUNE.physics.FALL); b.getFixtureList().setFilterData(HIT_ALL); b.setLinearVelocity({ x: 0, y: 0 }); b.setAngularVelocity(0); b.setAwake(true);
 }
 
 export default defineBehaviour('sev', 'pester', {

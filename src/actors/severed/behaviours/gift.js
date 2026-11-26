@@ -7,16 +7,16 @@ import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
 import { claim } from '../../../core/claims.js';
-import { world, isHeld } from '../../../world/world.js';
+import { world, isHeld, HIT_ALL, NO_HIT } from '../../../world/world.js';
 import { GAIT, head } from '../gait.js';
 import { set, say, pointer } from '../index.js';
 
-const S = TUNE.physics.S, SV = TUNE.severed, G = SV.GIFT, NONE = { groupIndex: 0, categoryBits: 1, maskBits: 0 }, ALL = { groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF };
+const S = TUNE.physics.S, SV = TUNE.severed, G = SV.GIFT;
 
 /** it takes the ball it made (crush): claimed, weightless, passing through everything */
 export function pickUp(o) {
   const a = o.ai, q = a.ball; if (!q || a.free || !world.bodies.has(q)) return;
-  a.free = claim(q, 'sev', 'gift'); q.body.getFixtureList().setFilterData(NONE); q.body.setGravityScale(0);
+  a.free = claim(q, 'sev', 'gift'); q.body.getFixtureList().setFilterData(NO_HIT); q.body.setGravityScale(0);
 }
 /** the ball rides on its back (each frame) */
 export function carry(o) {
@@ -27,7 +27,7 @@ export function carry(o) {
 /** it lets go of the ball (it drops where it is, with a little push) */
 export function putDown(o, push) {
   const a = o.ai, q = a.ball; if (a.free) { a.free(); a.free = null; }
-  if (q && world.bodies.has(q)) { q.body.getFixtureList().setFilterData(ALL); q.body.setGravityScale(TUNE.physics.FALL); q.body.setLinearVelocity({ x: push ? a.fd * G.PUSH[0] : 0, y: push ? -G.PUSH[1] : 0 }); q.body.setAwake(true); }
+  if (q && world.bodies.has(q)) { q.body.getFixtureList().setFilterData(HIT_ALL); q.body.setGravityScale(TUNE.physics.FALL); q.body.setLinearVelocity({ x: push ? a.fd * G.PUSH[0] : 0, y: push ? -G.PUSH[1] : 0 }); q.body.setAwake(true); }
 }
 
 export default defineBehaviour('sev', 'gift', {

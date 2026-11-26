@@ -7,7 +7,7 @@ import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { claim } from '../../../core/claims.js';
 import { say as speak, sayAt } from '../../../core/speech.js';
-import { world, remove, rectPoly, isHeld } from '../../../world/world.js';
+import { world, remove, rectPoly, isHeld, NO_HIT } from '../../../world/world.js';
 import { gore } from '../../../world/fx.js';
 import { pickUp } from './gift.js';
 import { clamp01, wrapA } from '../gait.js';
@@ -22,7 +22,7 @@ export default defineBehaviour('sev', 'crush', {
     const a = o.ai, q = a.prey, n = q.poly || rectPoly(q), cx = n.reduce((s, r) => s + r[0], 0) / n.length, cy = n.reduce((s, r) => s + r[1], 0) / n.length, pts = [];
     for (let i = 0; i < n.length; i++) for (let k = 0; k < 4; k++) { const r = n[(i + 1) % n.length]; pts.push([n[i][0] + (r[0] - n[i][0]) * k / 4, n[i][1] + (r[1] - n[i][1]) * k / 4, 0.4 + 0.25 * Math.sin((i * 4 + k) * 1.9) + 0.2 * Math.random()]); }
     q.sq = { clip: q.el.style.clipPath, pts, cx, cy, free: claim(q, 'sev', 'crush') }; q.hot = 0; q.body.setGravityScale(0); q.body.setLinearVelocity({ x: 0, y: 0 }); q.body.setAngularVelocity(0);
-    q.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 }); q.el.style.pointerEvents = 'none';
+    q.body.getFixtureList().setFilterData(NO_HIT); q.el.style.pointerEvents = 'none';
     o.body.setGravityScale(0); a.from = { x: o.body.getPosition().x, y: o.body.getPosition().y, a: o.body.getAngle() }; speak(q, 'card.pull', { force: true });
   },
   tick(o, m, dt) {

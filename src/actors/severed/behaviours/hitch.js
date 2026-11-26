@@ -9,11 +9,11 @@ import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
 import { isFree } from '../../../core/claims.js';
-import { world, isHeld, worldPoly } from '../../../world/world.js';
+import { world, isHeld, worldPoly, HIT_ALL, NO_HIT } from '../../../world/world.js';
 import { clamp01, wrapA } from '../gait.js';
 import { set, say } from '../index.js';
 
-const S = TUNE.physics.S, HI = TUNE.severed.HITCH, NONE = { groupIndex: 0, categoryBits: 1, maskBits: 0 }, ALL = { groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF };
+const S = TUNE.physics.S, HI = TUNE.severed.HITCH;
 
 /** where on the card it takes hold (page px): a corner (the lowest one; for a cheese pull the one furthest from the arm), a little way in */
 function holdAt(q, away) {
@@ -28,7 +28,7 @@ const bodyFor = (A, th) => ({ x: (A[0] - HI.TIP_PX * Math.cos(th)) / S, y: (A[1]
 /** it has hold: the joint between its fingertips and the card */
 export function latch(o) {
   const a = o.ai, q = a.ride, A = q.body.getWorldPoint(a.at);
-  o.body.getFixtureList().setFilterData(ALL); o.body.setGravityScale(isHeld(q) ? 1 : TUNE.physics.FALL); o.body.setAngularDamping(0.4); o.body.setAwake(true);
+  o.body.getFixtureList().setFilterData(HIT_ALL); o.body.setGravityScale(isHeld(q) ? 1 : TUNE.physics.FALL); o.body.setAngularDamping(0.4); o.body.setAwake(true);
   a.joint = world.b2.createJoint(new world.pl.RevoluteJoint({ collideConnected: false }, o.body, q.body, A));
   a.grip = 1; a.acc = 0; a.pv = null; a.still = 0; a.chat = 0; a.clung = false;
 }
@@ -36,7 +36,7 @@ export function latch(o) {
 export function unlatch(o) {
   const a = o.ai;
   if (a.joint) { if (world.bodies.has(o) && a.ride && world.bodies.has(a.ride)) world.b2.destroyJoint(a.joint); a.joint = null; }
-  if (world.bodies.has(o)) { o.body.getFixtureList().setFilterData(ALL); o.body.setGravityScale(isHeld(o) ? 1 : TUNE.physics.FALL); o.body.setAngularDamping(TUNE.severed.BODY.damping); }
+  if (world.bodies.has(o)) { o.body.getFixtureList().setFilterData(HIT_ALL); o.body.setGravityScale(isHeld(o) ? 1 : TUNE.physics.FALL); o.body.setAngularDamping(TUNE.severed.BODY.damping); }
 }
 /** its grip gave out: off it flies */
 function fling(o) {
@@ -55,7 +55,7 @@ export default defineBehaviour('sev', 'hitch', {
     if (a.mine || a.hold) { a.hold = false; a.at = q.body.getLocalPoint(o.body.getWorldPoint({ x: HI.TIP_PX / S, y: 0 })); latch(o); return; }   // it already has hold (its half of a cheese pull, or the arm let go of the other end)
     const A = holdAt(q, a.away); a.at = q.body.getLocalPoint({ x: A[0] / S, y: A[1] / S });
     a.from = { x: p.x, y: p.y, a: o.body.getAngle() };
-    o.body.getFixtureList().setFilterData(NONE); o.body.setGravityScale(0);   // in the air it passes through everything
+    o.body.getFixtureList().setFilterData(NO_HIT); o.body.setGravityScale(0);   // in the air it passes through everything
     say(o, a.cheese ? 'pounce' : 'latch', true);
   },
   tick(o, m, dt) {
