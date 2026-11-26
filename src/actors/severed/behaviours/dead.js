@@ -9,6 +9,7 @@ import { isFree } from '../../../core/claims.js';
 import { isHeld } from '../../../world/world.js';
 import { set, say, tickNow } from '../index.js';
 import { wrapA } from '../gait.js';
+import { easePose } from '../../../world/math.js';
 
 const SV = TUNE.severed, DE = SV.DEAD;
 
@@ -25,7 +26,7 @@ export default defineBehaviour('sev', 'dead', {
   },
   tick(o, m, dt) {
     const a = o.ai, b = o.body, t = tickNow(), hp = o.hand.pose, kp = 1 - Math.exp(-dt * 10);
-    for (const k in DE.POSE) hp[k] = (hp[k] || 0) + (DE.POSE[k] - (hp[k] || 0)) * kp;
+    easePose(hp, DE.POSE, kp);
     a.wig = a.twitched && t - a.pokedAt < DE.TWITCH_MS ? 0.9 : 0;   // stone still, but for the twitch
     if (m.t < DE.ROLL_S) b.setAngularVelocity(wrapA(DE.ANGLE - b.getAngle()) * DE.ROLL_RATE);   // over onto its back
     if (isHeld(o)) { a.press += dt; if (a.press > DE.TAP_S) set(o, 'held'); return; }

@@ -3,22 +3,17 @@
 // "wait. this is not paper." Then it makes up its mind (one draw, PAPER.EAT): it eats it anyway (devour, from the shake on), or
 // carries it back in from the edge, lets go of it (hand.returned) and goes back to lurking.
 // tick(c, m, dt) sets the motion target on the frame's ctx m.x. The old hand is c.o (claimed 'hand' / 'target').
+import { dropOld } from '../old.js';
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
 import { world, drop, isHeld, HIT_ALL, NO_HIT, pinJoint } from '../../../world/world.js';
 import { POSES } from '../poses.js';
 import { set, speak } from '../index.js';
-import { gripPt, wristFor } from '../tug.js';
+import { gripPt, wristFor, aimAt } from '../tug.js';
 
 const S = TUNE.physics.S, OLD = TUNE.hand.OLD, PA = OLD.PAPER;
 
-/** let go of it, whole (it falls where it is) */
-function letGo(c, o) {
-  if (c.joint) { world.b2.destroyJoint(c.joint); c.joint = null; }
-  if (world.bodies.has(o)) { o.body.getFixtureList().setFilterData(HIT_ALL); o.body.setGravityScale(isHeld(o) ? 1 : TUNE.physics.FALL); o.body.setAwake(true); }
-  c.o = null;
-}
 
 export default defineBehaviour('hand', 'paper', {
   pose: 'lunge',
@@ -30,7 +25,7 @@ export default defineBehaviour('hand', 'paper', {
       if (!isHeld(o)) { c.o = null; c.cool = x.t + PA.COOL_MS; set('sulk'); speak('sulk'); return; }   // you took it away
       const w = o.body.getWorldCenter(), Hc = [w.x * S - scrollX, w.y * S - scrollY], q = gripPt();
       x.pose = POSES.eager; x.rate = PA.RATE; x.wig = 0.25;
-      x.aim = Math.atan2(Hc[1] - c.y, Hc[0] - c.x); if (Math.cos(x.aim) > -0.2) x.aim = Math.PI; x.T = wristFor(Hc, x.aim);
+      x.aim = aimAt([c.x, c.y], Hc); x.T = wristFor(Hc, x.aim);
       if (Math.hypot(q[0] - Hc[0], q[1] - Hc[1]) < PA.GRAB_PX) {   // got it: out of your hand and into its grip
         drop();
         o.body.getFixtureList().setFilterData(NO_HIT); o.body.setGravityScale(0); o.body.setAngularDamping(TUNE.physics.HELD_SPIN);
@@ -40,7 +35,7 @@ export default defineBehaviour('hand', 'paper', {
       } else if (m.t > PA.REACH_S) { c.o = null; c.cool = x.t + PA.COOL_MS; set('sulk'); speak('sulk'); }
       return;
     }
-    if (isHeld(o)) { letGo(c, o); c.cool = x.t + PA.COOL_MS; set('sulk'); speak('robbed', true); return; }   // you took it back
+    if (isHeld(o)) { dropOld(c, o); c.cool = x.t + PA.COOL_MS; set('sulk'); speak('robbed', true); return; }   // you took it back
     const k = m.t - c.gotAt;
     if (c.back == null) {   // it holds it up and looks at it: then the penny drops
       x.pose = k < PA.PAUSE_S ? POSES.pinch : POSES.clamp; x.rate = 4; x.wig = 0.04; x.aim = Math.PI - 0.15; x.T = [Math.min(c.x, x.vw - 90), Math.max(110, c.gotY - 40)];
@@ -53,7 +48,7 @@ export default defineBehaviour('hand', 'paper', {
     }
     // it hands it back: carried in from the edge and let go
     x.pose = POSES.clamp; x.rate = 3; x.wig = 0.04; x.aim = Math.PI; x.T = [x.vw - PA.BACK_PX, Math.min(x.vh - 120, c.gotY + 60)];
-    if (m.t - c.back > PA.BACK_S) { letGo(c, o); bus.emit('hand.returned', { hand: o }); c.cool = x.t + PA.COOL_MS; set('lurk'); }
+    if (m.t - c.back > PA.BACK_S) { dropOld(c, o); bus.emit('hand.returned', { hand: o }); c.cool = x.t + PA.COOL_MS; set('lurk'); }
   },
   leave(c, m) { c.back = null; },
 });

@@ -23,12 +23,13 @@ import { machine, behaviours } from '../../core/machine.js';
 import { isFree } from '../../core/claims.js';
 import { hook, flags } from '../../core/debug.js';
 import { world, add, remove, isHeld, isCrazy, worldPoly, fragment, HIT_ALL } from '../../world/world.js';
-import { drawOffset } from '../../world/loop.js';
+import { rideAnchor } from '../../world/loop.js';
 import { gore } from '../../world/fx.js';
 import { turn } from './gait.js';
 import { towerTick, shookOff, tower } from './tower.js';
 import { pesterTick, pestering, pesterTurn } from './pester.js';
 import { danceTick, groove, grooving } from './dance.js';
+import { clamp01, easePose, segDist } from '../../world/math.js';
 
 const S = TUNE.physics.S, P = TUNE.physics, SV = TUNE.severed, B = SV.BODY;
 
@@ -282,7 +283,7 @@ let eyed = null;   // the pick-up already looked at
 /** how far page point (x, y) is from the edge of an outline (page px) */
 function edgeDist(poly, x, y) {
   let d = Infinity;
-  for (let i = 0; i < poly.length; i++) { const [ax, ay] = poly[i], [bx, by] = poly[(i + 1) % poly.length], ex = bx - ax, ey = by - ay, f = Math.max(0, Math.min(1, ((x - ax) * ex + (y - ay) * ey) / (ex * ex + ey * ey || 1))); d = Math.min(d, Math.hypot(x - ax - ex * f, y - ay - ey * f)); }
+  for (let i = 0; i < poly.length; i++) d = Math.min(d, segDist([x, y], poly[i], poly[(i + 1) % poly.length]));
   return d;
 }
 function hitchhike() {
@@ -321,7 +322,7 @@ export function tick(dt) {
     if (!world.bodies.has(o)) continue;
     const b = o.body, p = b.getPosition(), ang = b.getAngle(), pose = POSES[m.def.pose], kp = 1 - Math.exp(-dt * 10);
     const look = m.state === 'walk' && a.look2 ? POSES[a.look2] : pose;
-    if (!a.poseSet) for (const key in look) h.pose[key] = (h.pose[key] || 0) + (look[key] - (h.pose[key] || 0)) * kp;
+    if (!a.poseSet) easePose(h.pose, look, kp);
     turn(o, dt, b, p, ang);
     const ang2 = b.getAngle();
     h.a = ang2; h.x = p.x * S - scrollX - 35 * Math.cos(ang2); h.y = p.y * S - scrollY - 35 * Math.sin(ang2);
@@ -332,13 +333,19 @@ export function tick(dt) {
 /** the table of behaviours by name (legacy SEV), for __sev */
 const table = () => Object.fromEntries(behaviours('sev'));
 
+/** an old hand hanging on to its end of a pulled card (cheese, wrest): its grip clenches to a fist and its eye widens with the
+ *  strain k (clamped to 0..1); sets a.poseSet so the frame's own pose easing leaves it alone */
+export function strained(o, k) {
+  const a = o.ai, pain = clamp01(k), hp = o.hand.pose, G = POSES.grip, F = POSES.fist;
+  for (const key in G) hp[key] = G[key] + (F[key] - G[key]) * pain; hp.eye = 1 + 0.5 * pain; hp.pupil = 0.8 - 0.4 * pain; a.poseSet = true;
+  a.wig = 0.15 + 0.3 * pain;
+}
 export function install(a) {
   app = a || {};
   if (app.reduced) return;   // legacy: the whole of cardPhysics() is skipped, __sev never exists
   // the bubble rides above the body like a card's (legacy draw()), and gets the hand's look (legacy sevSay: .claw-say)
   defineSpeaker('severed', { kinds: ['hand'], gate: 'severed', extraCls: 'claw-say', layer: () => world.layer,
-    anchor: (o) => { const p = o.body.getPosition(), an = o.body.getAngle(), [hx, hy] = drawOffset(o), top = Math.abs(Math.sin(an)) * o.w / 2 + Math.abs(Math.cos(an)) * o.h / 2;
-      return { x: p.x * S + hx, ax: p.x * S + hx, y: p.y * S + hy - top + TUNE.speech.RIDE_DY }; } });
+    anchor: rideAnchor });
   clock.onTick(tick, 'severed');
   clock.hasWork(busy);    // legacy clawBusy() = sevBusy() || ...: both the start-of-frame and the end-of-frame checks
   clock.keepAwake(busy);

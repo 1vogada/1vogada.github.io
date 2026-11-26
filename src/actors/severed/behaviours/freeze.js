@@ -5,6 +5,7 @@ import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { isHeld } from '../../../world/world.js';
 import { set, say, POSES } from '../index.js';
+import { easePose } from '../../../world/math.js';
 
 const F = TUNE.dance.FREEZE;
 
@@ -20,7 +21,7 @@ export default defineBehaviour('sev', 'freeze', {
     if (look < F.LOOKS) a.dir = look % 2 ? a.wasDir : -a.wasDir;   // a look over each shoulder
     else a.dir = a.wasDir;
     const want = m.t < F.PRETEND_S ? POSES.sneak : POSES.walk, kp = 1 - Math.exp(-dt * 8);
-    for (const key in want) hp[key] = (hp[key] || 0) + (want[key] - (hp[key] || 0)) * kp;
+    easePose(hp, want, kp);
     if (!a.said4 && m.t > F.PRETEND_S) { a.said4 = true; say(o, 'pretend', true); }
     if (m.t > F.END_S) set(o, 'walk');
   },

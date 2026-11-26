@@ -11,6 +11,7 @@ import { world, isHeld } from '../../../world/world.js';
 import { POSES } from '../poses.js';
 import { set, speak } from '../index.js';
 import { at } from '../old.js';
+import { aimAt } from '../tug.js';
 
 const OLD = TUNE.hand.OLD, PR = OLD.PROD;
 
@@ -31,7 +32,7 @@ export default defineBehaviour('hand', 'prod', {
     }
     // hover over it, fingertip down; a poke takes the fingertip down to it and back
     const q = at(o), P0 = [q[0], q[1] - 18];
-    let aim = Math.atan2(P0[1] - c.y, P0[0] - c.x); if (Math.cos(aim) > -0.2) aim = Math.PI;
+    let aim = aimAt([c.x, c.y], P0);
     const k = c.pokes < PR.POKE_S.length ? (m.t - PR.POKE_S[c.pokes]) / PR.POKE_LEN : -1, dip = k > 0 && k < 1 ? Math.sin(k * Math.PI) : 0, lift = PR.HOVER_PX * (1 - dip);
     const P = [P0[0] - Math.cos(aim) * lift, P0[1] - Math.sin(aim) * lift], tip = c.tip || [c.x - 120, c.y];
     x.pose = POSES.point; x.rate = dip ? 14 : PR.RATE; x.wig = 0.04; x.aim = aim; x.T = [c.x + P[0] - tip[0], c.y + P[1] - tip[1]];

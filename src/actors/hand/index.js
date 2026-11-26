@@ -60,12 +60,12 @@ export { POSES };
 const S = TUNE.physics.S, H_ = TUNE.hand;
 const html = () => document.documentElement;
 export { clamp01, wrapA } from '../../world/math.js';   // re-exported for the behaviours
-import { clamp01, wrapA } from '../../world/math.js';
+import { clamp01, wrapA, segDist, easePose } from '../../world/math.js';
 /** one frame of the arm easing to its wrist target T, angle aim and pose: at rate (position), aRate (angle), pRate (pose) per second; the shoulder follows */
 export function easeArm(c, dt, T, aim, pose, rate, aRate, pRate) {
   const k = 1 - Math.exp(-dt * rate), ka = 1 - Math.exp(-dt * aRate), kp = 1 - Math.exp(-dt * pRate);
   c.x += (T[0] - c.x) * k; c.y += (T[1] - c.y) * k; c.a += wrapA(aim - c.a) * ka; c.sh += (c.y + 70 - c.sh) * (1 - Math.exp(-dt * 4));
-  for (const key in pose) c.pose[key] = (c.pose[key] || 0) + (pose[key] - (c.pose[key] || 0)) * kp;
+  easePose(c.pose, pose, kp);
 }
 /** where the arm's bubble goes (TUNE.speech.ARM): above and left of the hand (Hv: the grip in viewport px), kept on screen */
 export function placeBubble(c, vw, Hv) {
@@ -306,10 +306,9 @@ function tick(dt) {
   const kt = world.blade;
   if (kt && !kt.root && kt.tips && c.arm2 && !c.stump && c.x < vw - 30 && !m.def.uncut) {
     const a = kt.tipWas || kt.tips, b = kt.tips, n = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / H_.SEVER_STEP));
-    const near = (q, u, v) => { const ex = v[0] - u[0], ey = v[1] - u[1], f = clamp01(((q[0] - u[0]) * ex + (q[1] - u[1]) * ey) / (ex * ex + ey * ey || 1)); return Math.hypot(q[0] - u[0] - ex * f, q[1] - u[1] - ey * f); };
     for (let i = 0; i <= n; i++) {
       const q = [a[0] + (b[0] - a[0]) * i / n - scrollX, a[1] + (b[1] - a[1]) * i / n - scrollY];
-      if (q[0] < vw - 6 && (near(q, c.arm2[1], c.arm2[2]) < H_.SEVER_PX[0] || near(q, c.arm2[0], c.arm2[1]) < H_.SEVER_PX[1])) { sever(q, kt.tipDt > 0 ? [(b[0] - a[0]) / kt.tipDt, (b[1] - a[1]) / kt.tipDt] : [0, 0]); break; }
+      if (q[0] < vw - 6 && (segDist(q, c.arm2[1], c.arm2[2]) < H_.SEVER_PX[0] || segDist(q, c.arm2[0], c.arm2[1]) < H_.SEVER_PX[1])) { sever(q, kt.tipDt > 0 ? [(b[0] - a[0]) / kt.tipDt, (b[1] - a[1]) / kt.tipDt] : [0, 0]); break; }
     }
   }
 }

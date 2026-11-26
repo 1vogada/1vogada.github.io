@@ -8,6 +8,7 @@ import { TUNE } from '../../../core/tune.js';
 import { GAIT } from '../gait.js';
 import { say, tickNow } from '../index.js';
 import { beat } from '../dance.js';
+import { easePose } from '../../../world/math.js';
 
 const D = TUNE.dance;
 
@@ -32,7 +33,7 @@ export default defineBehaviour('sev', 'dance', {
       if (n % D.SPIN_EVERY === 0 && m.t > 1) a.dir = -a.dir;
     }
     const want = D.MOVES[((n % D.MOVES.length) + D.MOVES.length) % D.MOVES.length], kp = 1 - Math.exp(-dt * D.POSE_RATE);
-    for (const key in want) h.pose[key] = (h.pose[key] || 0) + (want[key] - (h.pose[key] || 0)) * kp;
+    easePose(h.pose, want, kp);
     a.hop = D.DIP * (1 - u) * (1 - u);
     a.vx = (Math.floor(n / 2) % 2 ? -1 : 1) * D.SHUFFLE;
     a.wig = D.WIG;

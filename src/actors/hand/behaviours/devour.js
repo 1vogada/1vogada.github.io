@@ -1,6 +1,7 @@
 // hand state "devour": it goes for an old (cut-off) hand that cannot get away (rules in ../old.js), takes it, drags it off the
 // right edge like a card it eats, and is full for a while. Pick the old hand up on the way to save it.
 // tick(c, m, dt) sets the motion target on the frame's ctx m.x. The old hand is c.o (claimed 'hand' / 'target').
+import { dropOld } from '../old.js';
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
@@ -9,17 +10,12 @@ import { world, remove, isHeld, HIT_ALL, NO_HIT, pinJoint } from '../../../world
 import { gore, shake } from '../../../world/fx.js';
 import { POSES } from '../poses.js';
 import { set, speak } from '../index.js';
-import { gripPt, wristFor } from '../tug.js';
+import { gripPt, wristFor, aimAt } from '../tug.js';
 
 const S = TUNE.physics.S, OLD = TUNE.hand.OLD;
 
 /** let go of it, whole (it falls where it is) */
-function letGo(c, o) {
-  if (c.joint) { world.b2.destroyJoint(c.joint); c.joint = null; }
-  if (world.bodies.has(o)) { o.body.getFixtureList().setFilterData(HIT_ALL); o.body.setGravityScale(isHeld(o) ? 1 : TUNE.physics.FALL); o.body.setAwake(true); }
-  c.o = null;
-  bus.emit('hand.dropped', { hand: o });
-}
+function letGo(c, o) { dropOld(c, o); bus.emit('hand.dropped', { hand: o }); }
 
 export default defineBehaviour('hand', 'devour', {
   pose: 'lunge',
@@ -31,7 +27,7 @@ export default defineBehaviour('hand', 'devour', {
     if (!c.joint) {   // reaching for it: slower than for a card, it is savouring this
       const w = o.body.getWorldCenter(), Hc = [w.x * S - scrollX, w.y * S - scrollY], q = gripPt();
       x.pose = m.t < 0.5 ? POSES.eager : POSES.lunge; x.rate = 7; x.wig = 0.2;
-      x.aim = Math.atan2(Hc[1] - c.y, Hc[0] - c.x); if (Math.cos(x.aim) > -0.2) x.aim = Math.PI; x.T = wristFor(Hc, x.aim);
+      x.aim = aimAt([c.x, c.y], Hc); x.T = wristFor(Hc, x.aim);
       if (Math.hypot(q[0] - Hc[0], q[1] - Hc[1]) < OLD.GRAB_PX) {   // got it
         o.body.getFixtureList().setFilterData(NO_HIT); o.body.setGravityScale(0); o.body.setAngularDamping(TUNE.physics.HELD_SPIN);
         c.joint = pinJoint(o.body, { x: w.x, y: w.y }, TUNE.hand.JOINT_HZ);

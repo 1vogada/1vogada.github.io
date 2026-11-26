@@ -42,6 +42,8 @@ function reachOf(o, x, y, ux, uy) {
 /** the claw's grip point, viewport px (legacy gripPt) */
 export const gripPt = () => { const c = get(), ca = Math.cos(c.a), sa = Math.sin(c.a); return [c.x + GRIP[0] * ca + GRIP[1] * sa, c.y + GRIP[0] * sa - GRIP[1] * ca]; };
 /** where the wrist goes for the grip to be at H with the hand turned to a (legacy wristFor) */
+/** the arm's angle from point `from` towards `to` (viewport px), never aiming backwards (then straight left, PI) */
+export function aimAt(from, to) { const a = Math.atan2(to[1] - from[1], to[0] - from[0]); return Math.cos(a) > -0.2 ? Math.PI : a; }
 export const wristFor = (H, a) => { const ca = Math.cos(a), sa = Math.sin(a); return [H[0] - GRIP[0] * ca - GRIP[1] * sa, H[1] - GRIP[0] * sa + GRIP[1] * ca]; };
 
 // where the claw takes the card: on the far side of it from the pointer, seen from the hand
