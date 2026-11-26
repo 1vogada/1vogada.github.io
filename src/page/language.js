@@ -5,9 +5,9 @@
 // The filter is applied when this module is EVALUATED (main.js imports it before boot(), so before any install and before
 // anything speaks; legacy lang.js likewise ran before phrasebook.js). install() does the DOM part: data-lang on <html>, the
 // 棚 glyph of #secret dropped, and the footer button #lang that flips the key and reloads.
-// Other packages reach it through isEnglishOnly(), plain(text) and thinFortunes(list).
+// Other packages reach it through plain(text), thinFortunes(list), fortunes() and drawSlip(F).
 
-import { setLanguages, languages } from '../core/lines.js';
+import { setLanguages, languages, list } from '../core/lines.js';
 import { bus } from '../core/bus.js';
 
 const KEY = 'kiripad-lang';
@@ -30,6 +30,16 @@ export function thinFortunes(list) {
   if (!en) return list;
   for (const f of list) { f[1] = plain(f[1]); if (Array.isArray(f[2])) f[2] = f[2].map((t) => [t[1], '']); }
   return list;
+}
+/** a fresh, thinned copy of the omikuji slips ('fortune.slip'): [kanji, name, text | [[ja, en], ...], weight] */
+export const fortunes = () => thinFortunes(list('fortune.slip').map((f) => [...f]));
+/** one slip by weight from F (fortunes()): one Math.random, and one more for a slip with several lines (末吉).
+ *  @returns {[object, [string, string]]} the slip and its [text, tooltip] */
+export function drawSlip(F) {
+  const total = F.reduce((a, f) => a + f[3], 0);
+  let r = Math.random() * total, f = F[0];
+  for (const x of F) { if ((r -= x[3]) < 0) { f = x; break; } }
+  return [f, Array.isArray(f[2]) ? f[2][Math.floor(Math.random() * f[2].length)] : [f[2], '']];
 }
 /** switch: ['en'] = English only, null = all. Stores the choice and reloads, so every list is rebuilt from scratch */
 export function set(l) {

@@ -11,16 +11,17 @@
 import { TIMING, TUNE } from '../core/tune.js';
 import { real } from '../core/clock.js';
 import { bus } from '../core/bus.js';
-import { list } from '../core/lines.js';
 import { isCrazy } from '../world/world.js';
 import * as hand from '../actors/hand/index.js';
 import { data, band } from '../page/directory.js';
-import { thinFortunes } from '../page/language.js';
+import { fortunes, drawSlip } from '../page/language.js';
 import { current } from './scene.js';
 import { handScene } from './coin.js';
 
 const { STEPS, STEP_MS, STEP_GROW, ASK_DELAY_MS } = TUNE.surprise;
-const SURPRISE = 'Surprise me', GO_THERE = 'Go there?';   // the button's label and the slip's question (page labels, as in index.html)
+const SURPRISE = 'Surprise me';   // the button's label (a page label, as in index.html)
+/** the slip's question (a page label, as in index.html; scenes/coin.js puts it back) */
+export const GO_THERE = 'Go there?';
 
 /** the slip's elements (filled at install; scenes/coin.js uses them too) */
 export const dom = {};
@@ -30,6 +31,8 @@ let app = { reduced: false, root: null }, FORTUNES = [], askAgain = null;
 
 /** legacy window.__hand: there is a hand unless reduced motion (cardPhysics() returned first) */
 export const H = () => (app.reduced || !hand.awake() ? null : hand);   // and it keeps away until a card has been ripped out of its slot
+/** the slip's own Yes and No back in its actions row, Yes unpressed */
+export const restoreActs = () => { const { actEl, goBtn, noBtn } = dom; actEl.innerHTML = ''; actEl.append(goBtn, noBtn); goBtn.classList.remove('pressed'); };
 /** legacy clearTimeout(showOff) */
 export const keepShow = () => { if (st.showOff) { st.showOff(); st.showOff = null; } };
 /** legacy showOff = setTimeout(() => root.classList.remove('hand-show'), 2000) */
@@ -40,14 +43,12 @@ export const candidates = (d) => d.projects.filter((p) => !/^https:\/\/github\.c
 /** legacy drawFortune(list, pick): one Math.random for the fortune, one more for a 末吉 line */
 export function drawFortune(list, pick) {
   const { omi, slip, goBtn, noBtn, qEl, actEl, secret } = dom, $ = (id) => document.getElementById(id);
-  const total = FORTUNES.reduce((a, f) => a + f[3], 0);
-  let r = Math.random() * total, f = FORTUNES[0];
-  for (const x of FORTUNES) { if ((r -= x[3]) < 0) { f = x; break; } }
-  $('omi-kanji').textContent = f[0]; $('omi-name').textContent = f[1]; { const t = Array.isArray(f[2]) ? f[2][Math.floor(Math.random() * f[2].length)] : [f[2], '']; $('omi-text').textContent = t[0]; $('omi-text').title = t[1]; $('omi-text').lang = Array.isArray(f[2]) ? 'ja' : ''; }
+  const [f, t] = drawSlip(FORTUNES);
+  $('omi-kanji').textContent = f[0]; $('omi-name').textContent = f[1]; $('omi-text').textContent = t[0]; $('omi-text').title = t[1]; $('omi-text').lang = Array.isArray(f[2]) ? 'ja' : '';
   $('omi-proj').textContent = pick.name; $('omi-desc').textContent = pick.description || '';
   goBtn.href = pick.url; qEl.textContent = H() && !isCrazy() ? '' : GO_THERE;
   { const b = band(pick.name, 0); slip.style.setProperty('--c1', b.c1); slip.style.setProperty('--tile', b.style.slice(b.style.indexOf(':') + 1).replaceAll('&quot;', '"')); }   // the project's own embroidery
-  actEl.innerHTML = ''; actEl.append(goBtn, noBtn); goBtn.classList.remove('pressed'); noBtn.disabled = false;
+  restoreActs(); noBtn.disabled = false;
   slip.classList.toggle('curse', f[0] === '凶');
   omi.hidden = false; fitOmi(); secret.classList.remove('near'); st.found = false;
   slip.style.animation = 'none'; void slip.offsetWidth; slip.style.animation = '';
@@ -86,7 +87,7 @@ export function unpeek() {
 
 export function install(a) {
   app = a;
-  FORTUNES = thinFortunes(list('fortune.slip').map((f) => [...f]));   // legacy lang.js thinned FORTUNES in place; a copy here
+  FORTUNES = fortunes();   // legacy lang.js thinned FORTUNES in place; a copy here
   const $ = (id) => document.getElementById(id);
   Object.assign(dom, { surprise: $('surprise'), label: $('surprise-label'), omi: $('omikuji'), slip: $('slip'), goBtn: $('omi-go'), noBtn: $('omi-no'), qEl: $('omi-q'), actEl: $('omi-actions'), secret: $('omi-secret') });
   const { surprise, label, omi, slip, secret } = dom;

@@ -16,10 +16,12 @@ import { list } from '../core/lines.js';
 import { sayIn } from '../core/speech.js';
 import { isCrazy } from '../world/world.js';
 import { scene, current, GONE } from './scene.js';
-import { dom, st, H, keepShow, endShow, closeFortune } from './fortune.js';
+import { dom, st, H, keepShow, endShow, closeFortune, restoreActs, GO_THERE } from './fortune.js';
 import { SENT } from './welcome-back.js';
 import { keep } from '../page/coinbody.js';
-const GO_THERE = 'Go there?', HEADS = 'Heads', TAILS = 'Tails';   // page labels
+const HEADS = 'Heads', TAILS = 'Tails';   // page labels
+/** a puff of smoke on el (styles/omikuji.css .omi-puff), gone after its animation */
+const puff = (el) => { const p = document.createElement('i'); p.className = 'omi-puff'; el.appendChild(p); real.after(520, () => p.remove()); };
 
 let free = false;   // the coin landed on its edge: until the slip closes, No just closes it
 let swatsLeft = 1;   // the first time you go for heads or tails (once per visit) it knocks the buttons away, then snaps
@@ -80,12 +82,12 @@ export async function handScene(back) {
       // back up, thumb on its middle finger; a snap; and its own two buttons poof in
       H_.to({ x: hx, y: hy, pose: 'pinch', tip: false, aim: Math.PI, rate: 9, bob: false }); await sleep(950);
       H_.to({ pose: 'snapped', rate: 60 });
-      { const q = H_.get().tip2 || [hx, hy], sn = document.createElement('div'); sn.className = 'omi-snap'; sn.style.translate = `${q[0].toFixed(0)}px ${q[1].toFixed(0)}px`;   // tip2 is never set: always [hx, hy] (legacy)
+      { const q = [hx, hy], sn = document.createElement('div'); sn.className = 'omi-snap'; sn.style.translate = `${q[0].toFixed(0)}px ${q[1].toFixed(0)}px`;   // at the hand's spot (legacy read a tip2 that was never set)
         for (let k = 0; k < 7; k++) { const ray = document.createElement('i'); ray.style.rotate = (k * 360 / 7) + 'deg'; sn.appendChild(ray); }
         document.body.appendChild(sn); real.after(420, () => sn.remove()); }
       await sleep(160);
       makeBtns(); heads.disabled = tails.disabled = true; actEl.style.minHeight = '';
-      for (const el of [heads, tails]) { el.classList.add('poof'); const puff = document.createElement('i'); puff.className = 'omi-puff'; el.appendChild(puff); real.after(520, () => puff.remove()); }
+      for (const el of [heads, tails]) { el.classList.add('poof'); puff(el); }
       await sleep(900); const ms = H_.say('better'); H_.to({ pose: 'joy', rate: 10, bob: true });
       await sleep(Math.max(TIMING.wait.better, ms));
     }
@@ -163,7 +165,7 @@ export async function handScene(back) {
         makeBtns(); heads.disabled = tails.disabled = true;
         const hi = list('button.hi'), a = Math.floor(Math.random() * hi.length), b2 = (a + 1 + Math.floor(Math.random() * (hi.length - 1))) % hi.length;
         [heads, tails].forEach((el, i) => {
-          el.classList.add('poof'); const puff = document.createElement('i'); puff.className = 'omi-puff'; el.appendChild(puff); real.after(520, () => puff.remove());
+          el.classList.add('poof'); puff(el);
           real.after(250 + i * 450, () => sayIn(el, 'button.hi', { text: hi[i ? b2 : a], floor: 'btn' }));
         });
         await sleep(2600);
@@ -189,7 +191,7 @@ export async function handScene(back) {
       H_.to({ pose: 'sulk', aim: Math.PI, rate: 8 });
       await sleep(Math.max(TIMING.wait.escaped, H_.say('edgepick')));
       free = true;   // your No closes the slip now, no game
-      actEl.innerHTML = ''; actEl.append(goBtn, noBtn); goBtn.classList.remove('pressed'); qEl.textContent = GO_THERE;
+      restoreActs(); qEl.textContent = GO_THERE;
       H_.leave();
       return;
     }
@@ -202,7 +204,7 @@ export async function handScene(back) {
         await sleep(Math.max(TIMING.wait.verdict, ms)); keep(coin, side); H_.say('stay');
         await sleep(1500); await poke(document.getElementById('omi-x'));   // it closes the slip for you, then goes back where it came from
         omi.hidden = true; H_.leave();
-        qEl.textContent = GO_THERE; actEl.innerHTML = ''; actEl.append(goBtn, noBtn); goBtn.classList.remove('pressed');
+        qEl.textContent = GO_THERE; restoreActs();
         bus.emit('slip.closed', { how: 'hand' });
         return;
       }
@@ -237,7 +239,7 @@ export async function handScene(back) {
     if (e !== GONE) throw e;
   } finally {
     my.coin = null; if (my.coinEl) my.coinEl.remove(); actEl.style.minHeight = '';
-    if (my.dead) { const H2 = H(); if (H2) H2.leave(); qEl.textContent = GO_THERE; actEl.innerHTML = ''; actEl.append(goBtn, noBtn); goBtn.classList.remove('pressed'); }
+    if (my.dead) { const H2 = H(); if (H2) H2.leave(); qEl.textContent = GO_THERE; restoreActs(); }
     my.done();
     noBtn.disabled = false;
     endShow();
