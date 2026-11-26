@@ -226,9 +226,15 @@ export const PART = {
         const g = box('#secret b');
         if (!g) { bus.emit('ui.toast', { msg: 'The 棚 is written only with "More languages" on (in the footer).' }); await r.wait(2500); return; }
         const cx = g.left + g.width / 2, cy = g.top + g.height / 2;
-        await r.glide(...aim(cx - 40, cy - 55), 16);
+        await r.glide(...aim(cx - 45, cy - 60), 16);
         await r.wait(2200);   // its hello is long enough ago for it to gloat
-        await r.line(r.x, r.y, ...aim(cx + 40, cy + 55), 4);
+        // one fast stroke across the writing; the blade trails the hand a little, so if the tip did not get across, again the other way
+        for (let k = 0; k < 3 && !slashed.n; k++) {
+          const s = k % 2 ? -1 : 1;
+          await r.line(r.x, r.y, ...aim(cx + 45 * s, cy + 60 * s), 4);
+          await r.until(() => slashed.n, 600, 16);
+          if (!slashed.n) await r.wait(1600);   // a slash cools down for 1.5 s
+        }
         must(await r.until(() => slashed.n && app.shelf.state(), 1500, 16), 'the shelf came out');
         await r.wait(900);
         await r.glide(...aim(cx - 300, cy + 300), 12);
