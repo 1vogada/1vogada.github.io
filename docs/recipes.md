@@ -514,6 +514,26 @@ regression. `TRACE_MATCH=kind` helps to see whether only times and texts moved.
 
 ---
 
+## 11. Add an act to the stage
+
+The stage (`src/showcase/`, type *maku* on the page) plays every animation on demand. A new feature gets an act there.
+
+1. Pick the part in `src/showcase/acts/` (`cards`, `katana`, `arm`, `old`, `surprise`, `page`, `book`) and add to its `PART.acts`:
+   `{ id, title, how, shortcut?, play: async (r, app) => { ... }, tail? }`. `how` says how a visitor sets it off for real;
+   `shortcut` says what the stage skips (only when it does).
+2. In `play`, do the visitor's part with the ghost pointer `r` (`src/showcase/rig.js`): `r.tugOut(i)`, `r.loose(i)`, `r.pull`,
+   `r.throwTo`, `r.glide`, `r.down`/`r.up`, `r.click(sel)`, `r.type('word')`, `r.key('Escape')`; set up with `r.awake()` (the arm
+   wakes without a rip), `r.oldHand(px, py)`, `r.toGrid()`, `r.toBottom()`; wait with `r.wait(ms)` / `r.until(fn, max)`. They all
+   throw `STOP` when the act is stopped, so no clean-up code is needed for that; anything you change (a TUNE value, a mode, a
+   pinned `Math.random`) is put back with `r.after(fn)`.
+3. Before every act `setScene` (`src/showcase/index.js`) puts the cards back, removes cut-off hands and the toast, puts the
+   katana back, closes the shelf, resets the arm, lifts the flood and closes the menus. Something else your act opens, close in
+   `r.after`.
+4. `npm run stamp`, open the page, type *maku*, press ▶. In a test or a script: `window.__stage.play(id)` (resolves when the act
+   ends), `window.__stage.state()` (`bar`: `playing` | `done` | `failed`), `window.__stage.all(part)`.
+
+While the stage is up (`core/rehearsal.js`), nothing counts as heard (phrasebook), inked (stamp book) or written (diary).
+
 ## Verified
 
 Applied to a copy of this tree (then thrown away; nothing of it is committed):
