@@ -82,6 +82,9 @@ function end(why, flung) {
   if (!flung) bus.emit('sev.towerFell', { why });
 }
 
+/** forget the cool-down after the last tower (TOWER.COOL_MS): the stage plays its tower acts one after another */
+export function cooled() { next = 0; }
+
 /** the arm shook them off (reactions: hand.shookOff): they fly, and land in a heap */
 export function shookOff() { if (T && T.phase === 'pull') end('shaken', true); }
 
