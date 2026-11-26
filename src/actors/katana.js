@@ -91,6 +91,8 @@ export function putBack() {
 /** legacy say(katObj, 'kbrag', true) when it took the hand off */ export const brag = () => say(katObj, 'katana.brag', { force: true });
 /** it slashed the 棚 writing open (chain fog-slash, 'tana.slashed' in src/reactions.js) */ export const tana = () => katObj && say(katObj, 'katana.tana', { force: true });
 /** the fog was wiped off it (legacy found) */ export const isFound = () => found;
+/** the stage (src/showcase): hidden under the fog again as on a fresh page, so it can be found once more. No event, no draw */
+export function cover() { if (katObj) putBack(); found = false; near = 0; lastWipe = null; if (kat) kat.classList.remove('found'); }
 
 export function install(app) {
   if (app && app.reduced) return;   // legacy cardPhysics() returned before any of this
