@@ -252,7 +252,7 @@ scenario(G, 'hold the seal: the stamp book shows what you found, and a new find 
   // 3 s: the card slides out, sixteen faint outlines with hints, nothing stamped
   await holdSeal(s, 3100);
   let k = await s.eval(book);
-  assert.deepEqual([k.n, k.found, k.count, k.hints], [16, [], '0 / 16', true], 'an empty card');
+  assert.deepEqual([k.n, k.found, k.count, k.hints], [17, [], '0 / 17', true], 'an empty card');
   assert.deepEqual(await s.eval(() => window.__clicks), [false, false, true], 'the click that ends the hold is swallowed');
   await s.key('Escape'); await s.run(300);
   assert.equal(await s.eval(book), null, 'Esc puts it away');
@@ -269,7 +269,7 @@ scenario(G, 'hold the seal: the stamp book shows what you found, and a new find 
   // hold again: both thump down
   await holdSeal(s, 3100);
   k = await s.eval(book);
-  assert.deepEqual([k.found, k.fresh, k.count], [['1926', 'konami'], ['1926', 'konami'], '2 / 16'], 'the two new stamps thump down');
+  assert.deepEqual([k.found, k.fresh, k.count], [['1926', 'konami'], ['1926', 'konami'], '2 / 17'], 'the two new stamps thump down');
   await s.key('Escape'); await s.run(300);
   // the next visit: still there, nothing new
   await s.load();
@@ -282,7 +282,7 @@ scenario(G, 'hold the seal: the stamp book shows what you found, and a new find 
   for (let i = 0; i < 7; i++) await s.press('#theme');
   await holdSeal(s, 3100);
   k = await s.eval(book);
-  assert.deepEqual([k.found, k.fresh, k.count], [['1926', 'moon', 'konami'], ['moon'], '3 / 16'], 'the moon thumps down');
+  assert.deepEqual([k.found, k.fresh, k.count], [['1926', 'moon', 'konami'], ['moon'], '3 / 17'], 'the moon thumps down');
   await s.finishWaapi();
   await s.shot('stamp book');
 });
