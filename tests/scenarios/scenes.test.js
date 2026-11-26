@@ -74,7 +74,7 @@ scenario(G, 'slip opens and own Yes / own No', { idle: 2000, ...RIPPED }, async 
   assert.ok((await s.eval(slip)).open);
 });
 
-scenario(G, 'coin win', { rand: 0.3, idle: 2000, ...RIPPED }, async (s) => {
+scenario(G, 'coin win', { rand: 0.3, idle: 2000, ...RIPPED, legacy: false }, async (s) => {
   // with Math.random at 0.3: its swat is a slap, it lets you pick after the snap, and the coin comes up heads
   await openSlip(s);
   await s.run(1500);
@@ -97,7 +97,7 @@ scenario(G, 'coin win', { rand: 0.3, idle: 2000, ...RIPPED }, async (s) => {
   assert.equal(await s.eval(hand), 'lurk', 'it went back where it came from');
 });
 
-scenario(G, 'coin lose with the 5 s wait before the hand presses Yes', { rand: 0.3, idle: 2000, ...RIPPED }, async (s) => {
+scenario(G, 'coin lose with the 5 s wait before the hand presses Yes', { rand: 0.3, idle: 2000, ...RIPPED, legacy: false }, async (s) => {
   const r = await openSlip(s);
   await s.run(1500);
   await click(s, btn('No'));
@@ -123,7 +123,7 @@ scenario(G, 'coin lose with the 5 s wait before the hand presses Yes', { rand: 0
   assert.equal(await s.leftTo(), r.href, 'and off you go to the project');
 });
 
-scenario(G, 'button slam and snap', { rand: 0.8, idle: 2000, ...RIPPED }, async (s) => {
+scenario(G, 'button slam and snap', { rand: 0.8, idle: 2000, ...RIPPED, legacy: false }, async (s) => {
   // with Math.random at 0.8: its swat is the slam, and after the snap it picks for you (tails), and the coin comes up tails
   await openSlip(s);
   await s.run(1500);
@@ -181,7 +181,7 @@ scenario(G, 'secret ×', { idle: 2000, ...RIPPED }, async (s) => {
   assert.equal(await s.eval(hand), 'lurk');
 });
 
-scenario(G, 'welcome back', { rand: 0.3, session: { 'kiripad-sent': 'https://hive.kiripad.dev/', 'kiripad-ripped': '1' } }, async (s) => {
+scenario(G, 'welcome back', { rand: 0.3, session: { 'kiripad-sent': 'https://hive.kiripad.dev/', 'kiripad-ripped': '1' }, legacy: false }, async (s) => {
   // it pressed Yes for you last time; you came back. planck first: the welcome comes 900 ms after the list loads
   await s.ensurePlanck();
   assert.equal(await s.eval(() => sessionStorage.getItem('kiripad-sent')), 'https://hive.kiripad.dev/');
