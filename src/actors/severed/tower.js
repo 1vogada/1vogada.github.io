@@ -26,7 +26,6 @@ let since = null;    // game ms since when everything has been just right
 let next = 0;        // not again before this (game ms)
 
 /** the tower being built or pulling, or null */ export const tower = () => T;
-/** o is in the tower (gathering, climbing, up or pulling) */ export const inTower = (o) => !!T && T.hands.includes(o);
 /** o's place: 0 bottom, 1 middle, 2 top (or -1) */ export const tier = (o) => (T ? T.hands.indexOf(o) : -1);
 
 const vw = () => document.documentElement.clientWidth;

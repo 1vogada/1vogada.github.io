@@ -63,8 +63,6 @@ function spawn(msg, r, dir) {
   clock.wake();
 }
 
-/** the slice on the page, or null */
-export const current = () => (slice && world.bodies.has(slice) ? slice : null);
 
 export function install(app) {
   if (app && app.reduced) return;

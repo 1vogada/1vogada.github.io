@@ -20,8 +20,6 @@ const MINCHO = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 const CURSE = '凶';
 let on = false, FORTUNES = null;
 
-/** is every card a slip (this visit) */
-export const isOn = () => on;
 
 /** one fortune, by weight (page/language.js drawSlip, as scenes/fortune.js): [kanji, name, [text, tooltip]] */
 function draw() {
