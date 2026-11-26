@@ -282,7 +282,7 @@ let eyed = null;   // the pick-up already looked at
 /** how far page point (x, y) is from the edge of an outline (page px) */
 function edgeDist(poly, x, y) {
   let d = Infinity;
-  for (let i = 0; i < poly.length; i++) { const [ax, ay] = poly[i], [bx, by] = poly[(i + 1) % poly.length], ex = bx - ax, ey = by - ay, f = Math.max(0, Math.min(1, ((x - ax) * ex + (y - ay) * ey) / (ex * ex + ey * ey || 1))); d = Math.min(d, Math.hypot(x - ax - ex * f, y - ay - ey * f)); }
+  for (let i = 0; i < poly.length; i++) d = Math.min(d, segDist([x, y], poly[i], poly[(i + 1) % poly.length]));
   return d;
 }
 function hitchhike() {

@@ -3,6 +3,7 @@
 // hand says it is home). After SEW.S the old hand's body is gone and the arm has its hand again: no new hand grows (no
 // hand.regrown). Then it shows it off (hand.sewn) and lurks. Grab the old hand off it before that and it is a stump again.
 // tick(c, m, dt) sets the motion target on the frame's ctx m.x; hold() moves the old hand (c.o, claimed 'hand' / 'target').
+import { dropOld } from '../old.js';
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
@@ -14,12 +15,7 @@ import { set, wrapA } from '../index.js';
 const S = TUNE.physics.S, SEW = TUNE.hand.SEW;
 
 /** let go of it (you took it back): it falls where it is */
-function letGo(c, o) {
-  if (c.joint) { world.b2.destroyJoint(c.joint); c.joint = null; }
-  if (world.bodies.has(o)) { o.body.getFixtureList().setFilterData(HIT_ALL); o.body.setGravityScale(isHeld(o) ? 1 : TUNE.physics.FALL); o.body.setAwake(true); }
-  c.o = null;
-  bus.emit('hand.dropped', { hand: o });
-}
+function letGo(c, o) { dropOld(c, o); bus.emit('hand.dropped', { hand: o }); }
 
 export default defineBehaviour('hand', 'sew', {
   pose: 'lurk',

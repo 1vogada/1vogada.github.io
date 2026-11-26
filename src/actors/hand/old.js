@@ -20,7 +20,7 @@ import { TUNE } from '../../core/tune.js';
 import { bus } from '../../core/bus.js';
 import { now } from '../../core/clock.js';
 import { isFree } from '../../core/claims.js';
-import { world, isHeld } from '../../world/world.js';
+import { world, isHeld, HIT_ALL } from '../../world/world.js';
 import { sense, set, notice, speak } from './index.js';
 
 const S = TUNE.physics.S, OLD = TUNE.hand.OLD;
@@ -35,6 +35,12 @@ const olds = () => { const f = sense().oldHands; return f ? [...f()].filter((o) 
 export const at = (o) => { const p = o.body.getWorldCenter(); return [p.x * S - scrollX, p.y * S - scrollY]; };
 const inView = (q, vw, vh) => q[0] > OLD.SEE[0] && q[0] < vw - 10 && q[1] > OLD.SEE[1] && q[1] < vh + OLD.SEE_BOTTOM;   // lying on the floor of the page its palm can be at (or just past) the very bottom
 
+/** let go of old hand o, whole: it falls where it is (devour, sew, paper) */
+export function dropOld(c, o) {
+  if (c.joint) { world.b2.destroyJoint(c.joint); c.joint = null; }
+  if (world.bodies.has(o)) { o.body.getFixtureList().setFilterData(HIT_ALL); o.body.setGravityScale(isHeld(o) ? 1 : TUNE.physics.FALL); o.body.setAwake(true); }
+  c.o = null;
+}
 /** it met this one (meet.js) */
 export const meet = (o) => { met.add(o); };
 

@@ -16,15 +16,15 @@ import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
 import { clock } from '../../../core/clock.js';
 import { say as speechSay, sayAt } from '../../../core/speech.js';
-import { world, isHeld, rectPoly, remove, NO_HIT, pinJoint } from '../../../world/world.js';
+import { world, isHeld, rectPoly, NO_HIT } from '../../../world/world.js';
+import { segDist } from '../../../world/math.js';
 import { shake } from '../../../world/fx.js';
 import { POSES } from '../poses.js';
 import { set, speak, clamp01, get, brain } from '../index.js';
-import { gripPt, wristFor, tugDraw, untug, split, strands } from '../tug.js';
+import { gripPt, wristFor, untug } from '../tug.js';
+import { page, grabAt as grab, pullGeom, surge, strained, tearOff } from '../pull.js';
 
 const S = TUNE.physics.S, W = TUNE.hand.WREST;
-
-const page = (v) => [v[0] + scrollX, v[1] + scrollY];
 /** page px of the card's own point L (px from its middle) */
 const world_ = (q, L) => { const p = q.body.getWorldPoint({ x: L[0] / S, y: L[1] / S }); return [p.x * S, p.y * S]; };
 
@@ -40,11 +40,6 @@ function ends(q) {
   const lo = Math.min(...pr), hi = Math.max(...pr), side = poly.reduce((s, p) => s + p[0] * v[0] + p[1] * v[1], 0) / poly.length;
   const at = (f) => [u[0] * f + v[0] * side, u[1] * f + v[1] * side];
   return { gh: at(hi - W.END_PX), gp: at(lo + W.END_PX) };
-}
-/** a mouse joint from the arm's grip H (page px) to the card's point at H */
-function grab(c, q, H) {
-  q.body.setAngularDamping(TUNE.physics.HELD_SPIN); q.body.getFixtureList().setFilterData(NO_HIT); q.el.style.pointerEvents = 'none';
-  c.joint = pinJoint(q.body, { x: H[0] / S, y: H[1] / S }, TUNE.hand.JOINT_HZ);
 }
 function done(c) { c.old = null; c.prey = null; c.slip = false; }
 /** the old hand let go (you clicked it, or picked it up): the card is the arm's, whole */
@@ -75,9 +70,9 @@ export default defineBehaviour('hand', 'wrest', {
       if (Math.hypot(g[0] - Hc[0], g[1] - Hc[1]) < W.GRAB_PX) {   // got it: the old hand stops squeezing and hangs on to its end
         bus.emit('hand.wrest', { hand: old, card: q });
         if (old.ai.st !== 'wrest' || !world.bodies.has(q)) { done(c); set('lurk'); return; }
-        const P = world_(q, gp), H = page(g), lx = gh[0] - gp[0], ly = gh[1] - gp[1], dn = Math.hypot(lx, ly) || 1;
+        const P = world_(q, gp), H = page(g);
         c.o = q; c.prey = null;
-        q.tug = { wrest: old, P: [...P], P0: [...P], H0: H, gp, gh, dn, d0: Math.max(80, dn), d: dn, phi: Math.atan2(ly, lx), psi: Math.atan2(H[1] - P[1], H[0] - P[0]), s: 1, e: 0, grip: 1, rip: W.TEAR_PX };
+        q.tug = { wrest: old, ...pullGeom(P, H, gp, gh, W.TEAR_PX) };
         q.body.getFixtureList().setFilterData(NO_HIT); q.el.style.pointerEvents = 'none';
         c.hy = Hc[1]; c.pullAt = m.t;
         speak('wrest', true); speechSay(q, 'card.wrest', { force: true });
@@ -89,28 +84,16 @@ export default defineBehaviour('hand', 'wrest', {
     if (!old || !world.bodies.has(old) || old.ai.st !== 'wrest') { win(c, o, page(gripPt())); return; }   // it slipped, or you took it
     if (c.slip) { lose(c, o, x.t); return; }
     // both pull, in surges: the arm a little more than the old one
-    const t = m.t - c.pullAt, u = clamp01(t / W.PULL_S), grow = W.TEAR_PX * W.OVER * u * u * (3 - 2 * u) + W.JERK_PX * Math.max(0, Math.sin(t * W.JERK_W)), ux = Math.cos(g.psi), uy = Math.sin(g.psi);
-    const Hg = [g.H0[0] + ux * grow * W.ARM_SHARE - scrollX, g.H0[1] + uy * grow * W.ARM_SHARE + W.SAG_PX * u - scrollY];
-    g.P = [Math.max(scrollX + W.EDGE_PX, g.P0[0] - ux * grow * (1 - W.ARM_SHARE)), g.P0[1] - uy * grow * (1 - W.ARM_SHARE) + W.SAG_PX * u + 3 * Math.sin(t * 21)];
-    const pain = clamp01((g.d - g.d0) / g.rip);
-    x.aim = Math.atan2(g.P[1] - scrollY - Hg[1], g.P[0] - scrollX - Hg[0]); if (Math.cos(x.aim) > -0.2) x.aim = Math.PI;
-    x.T = wristFor(Hg, x.aim); x.rate = 5; x.pose = pain > 0.5 ? POSES.strain : POSES.clamp; x.wig = 0.1; x.shake = 1.5 + 3 * pain; x.strain = pain;
+    const t = m.t - c.pullAt, pain = surge(x, g, W, t, 3 * Math.sin(t * 21));
     if (t > 1.2 && pain < 0.75) speak('wrest');
   },
   // after the easing: the card is drawn stretched between the old hand (P) and the grip (H); past TEAR_PX it gives
   hold(c, m, x, H) {
     const o = c.o, g = o && o.tug; if (!g || !g.wrest) return false;
-    tugDraw(o, g.P, H);
-    const pain = clamp01((g.d - g.d0) / g.rip);
-    bus.emit('card.hurt', { card: o, pain });
-    if (g.d - g.d0 < g.rip && m.t - c.pullAt < W.MAX_S) return true;
-    const old = c.old, Wd = o.w, Hh = o.h, P = g.P, halves = split(o, P, H, o.poly || rectPoly(o));
+    if (!strained(o, g, H) && m.t - c.pullAt < W.MAX_S) return true;
+    const old = c.old, P = g.P, halves = tearOff(c, o, g, H, (mine, its) => { mine.wrested = its.wrested = true; });
     if (!halves) { win(c, o, H); return true; }
-    const { mine, its, cut } = halves;
-    mine.wrested = its.wrested = true;
-    o.tug = null; remove(o);
-    c.o = its; grab(c, its, H);
-    strands(mine, its, g, cut, Wd, Hh);
+    const { mine, its } = halves;
     sayAt((P[0] + H[0]) / 2, (P[1] + H[1]) / 2 - 110, 'card.slice', { scream: true });
     shake();
     done(c); set('eat');
@@ -126,8 +109,6 @@ export default defineBehaviour('hand', 'wrest', {
   },
 });
 
-/** how far viewport point q is from the segment u-v */
-const near = (q, u, v) => { const ex = v[0] - u[0], ey = v[1] - u[1], f = clamp01(((q[0] - u[0]) * ex + (q[1] - u[1]) * ey) / (ex * ex + ey * ey || 1)); return Math.hypot(q[0] - u[0] - ex * f, q[1] - u[1] - ey * f); };
 
 export function install(app) {
   if (app && app.reduced) return;
@@ -136,7 +117,7 @@ export function install(app) {
     const mm = brain(); if (!mm || !mm.is('wrest') || e.button > 0) return;
     const c = get(), g = c.o && c.o.tug; if (!g || !g.wrest) return;
     const q = [e.clientX, e.clientY], segs = [[[c.x, c.y], gripPt()]]; if (c.arm2) segs.push([c.arm2[1], c.arm2[2]], [c.arm2[0], c.arm2[1]]);
-    if (!segs.some(([u, v]) => near(q, u, v) < W.HIT_PX)) return;
+    if (!segs.some(([u, v]) => segDist(q, u, v) < W.HIT_PX)) return;
     c.slip = true; e.preventDefault(); e.stopPropagation(); clock.wake();
   }, true);
 }

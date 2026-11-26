@@ -1,6 +1,7 @@
 // hand state "devour": it goes for an old (cut-off) hand that cannot get away (rules in ../old.js), takes it, drags it off the
 // right edge like a card it eats, and is full for a while. Pick the old hand up on the way to save it.
 // tick(c, m, dt) sets the motion target on the frame's ctx m.x. The old hand is c.o (claimed 'hand' / 'target').
+import { dropOld } from '../old.js';
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
@@ -14,12 +15,7 @@ import { gripPt, wristFor } from '../tug.js';
 const S = TUNE.physics.S, OLD = TUNE.hand.OLD;
 
 /** let go of it, whole (it falls where it is) */
-function letGo(c, o) {
-  if (c.joint) { world.b2.destroyJoint(c.joint); c.joint = null; }
-  if (world.bodies.has(o)) { o.body.getFixtureList().setFilterData(HIT_ALL); o.body.setGravityScale(isHeld(o) ? 1 : TUNE.physics.FALL); o.body.setAwake(true); }
-  c.o = null;
-  bus.emit('hand.dropped', { hand: o });
-}
+function letGo(c, o) { dropOld(c, o); bus.emit('hand.dropped', { hand: o }); }
 
 export default defineBehaviour('hand', 'devour', {
   pose: 'lunge',
