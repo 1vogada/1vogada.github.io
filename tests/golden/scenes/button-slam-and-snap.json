@@ -105,6 +105,14 @@
    "who": "hand",
    "key": "CLAW_SAY.stay",
    "text": "今回だけだぞ。"
+  },
+  {
+   "doc": 1,
+   "t": 25240,
+   "ms": 1848,
+   "who": "card",
+   "key": "coin.land",
+   "text": "heads up, down here"
   }
  ],
  "states": [
@@ -132,6 +140,19 @@
   },
   {
    "doc": 1,
+   "t": 25280,
+   "claw": "show",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "coin": 1
+   }
+  },
+  {
+   "doc": 1,
    "t": 28130,
    "claw": "sulk",
    "sev": "",
@@ -139,7 +160,9 @@
    "kat": "hidden",
    "shelf": false,
    "grab": null,
-   "objs": {}
+   "objs": {
+    "coin": 1
+   }
   }
  ]
 }

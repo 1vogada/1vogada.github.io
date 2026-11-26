@@ -100,6 +100,14 @@
   },
   {
    "doc": 1,
+   "t": 24010,
+   "ms": 2038,
+   "who": "card",
+   "key": "coin.land",
+   "text": "nobody spends me today"
+  },
+  {
+   "doc": 1,
    "t": 27010,
    "ms": 2606,
    "who": "hand",
@@ -137,6 +145,19 @@
    "shelf": false,
    "grab": null,
    "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 24030,
+   "claw": "show",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "coin": 1
+   }
   }
  ]
 }

@@ -3998,5 +3998,219 @@
    ["Silence. Its speaker is out.","en"],
    ["Not a soul to say it.","en"]
   ]
+ },
+ "coin.land": {
+  "who": "coin",
+  "legacy": null,
+  "trigger": {"title":"The coin stays","when":"The coin game is over. The coin drops onto the page and stays there, a small coin you can pick up."},
+  "lines": [
+   ["tails. if anyone asks.","en"],
+   ["and I stay.","en"],
+   ["keep the change. I AM the change.","en"],
+   ["nobody spends me today","en"],
+   ["I live on this page now","en"],
+   ["that was my last toss","en"],
+   ["*clink*","en"],
+   ["a coin on a web page. sure.","en"],
+   ["finders keepers, coin edition","en"],
+   ["still warm from its palm","en"],
+   ["heads up, down here","en"],
+   ["дзън.","bg","clink."],
+   ["チャリン","ja","clink"]
+  ]
+ },
+ "coin.thrown": {
+  "who": "coin",
+  "legacy": null,
+  "trigger": {"title":"Thrown coin","when":"You threw the coin."},
+  "lines": [
+   ["heads! no, tails!","en"],
+   ["I am currency, not a discus","en"],
+   ["wheee—*clink*?","en"],
+   ["spin me right round","en"],
+   ["this is how I got here in the first place","en"],
+   ["call it! call it!","en"],
+   ["legal tender, airborne","en"],
+   ["mind my edge","en"],
+   ["flip me properly!","en"],
+   ["I bounce, you know","en"],
+   ["летяаа!","bg","I am flyiiing!"],
+   ["くるくる〜","ja","round and round~"]
+  ]
+ },
+ "coin.bitten": {
+  "who": "coin",
+  "legacy": null,
+  "trigger": {"title":"Bitten","when":"The hand caught the coin and bit it like gold, to see if it is real."},
+  "lines": [
+   ["OW. that is my milling","en"],
+   ["I am legal tender!","en"],
+   ["that is a tooth mark","en"],
+   ["hands do not even have teeth!","en"],
+   ["how did you BITE me","en"],
+   ["gold-ish! gold-ish!","en"],
+   ["unhand me, ruffian","en"],
+   ["my rim! my beautiful rim!","en"],
+   ["test me gently!","en"],
+   ["I am not a biscuit","en"],
+   ["ай, зъби!","bg","ow, teeth!"],
+   ["かじられた!","ja","I got bitten!"]
+  ]
+ },
+ "coin.flicked": {
+  "who": "coin",
+  "legacy": null,
+  "trigger": {"title":"Flicked back","when":"The hand decided the coin is fake and flicked it back at you."},
+  "lines": [
+   ["I am too real.","en"],
+   ["fake? FAKE?","en"],
+   ["I want a second opinion","en"],
+   ["its loss.","en"],
+   ["one hundred percent probably gold","en"],
+   ["I will remember this, hand","en"],
+   ["I am worth something!","en"],
+   ["go bite a card","en"],
+   ["you will regret this at the bank","en"],
+   ["my value is not up for debate","en"],
+   ["истинска съм!","bg","I am real!"],
+   ["本物だもん!","ja","I am the real thing!"]
+  ]
+ },
+ "coin.reached": {
+  "who": "coin",
+  "legacy": null,
+  "trigger": {"title":"Reached for","when":"You left the coin on the shelf. The hand comes for it, and for nothing else."},
+  "lines": [
+   ["finally. a connoisseur.","en"],
+   ["take me, I am worth it","en"],
+   ["not the cards. me.","en"],
+   ["appraise me, then","en"],
+   ["gently, I am collectible","en"],
+   ["ah. an investor.","en"],
+   ["you have expensive taste","en"],
+   ["careful, I have value","en"],
+   ["do I get a receipt?","en"],
+   ["yes, the shiny one","en"],
+   ["вземи мен!","bg","take me!"],
+   ["選ばれた…","ja","I have been chosen…"]
+  ]
+ },
+ "hand.fake": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Fake","when":"You threw the coin at the hand, or left it on the shelf. It bites it like gold, and flicks it back."},
+  "lines": [
+   ["fake.","en"],
+   ["chocolate? no. fake.","en"],
+   ["fake. not even chocolate.","en"],
+   ["tastes like a forgery","en"],
+   ["fake. I would know.","en"],
+   ["counterfeit. typical.","en"],
+   ["hm. plastic.","en"],
+   ["nope. pyrite.","en"],
+   ["fool's gold. for a fool.","en"],
+   ["fake. keep it.","en"],
+   ["not gold. not even brass.","en"],
+   ["arcade token. fake.","en"],
+   ["фалшива.","bg","fake."],
+   ["偽物。","ja","a fake."]
+  ]
+ },
+ "hand.fakeAgain": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Still fake","when":"The hand bites the same coin again, later on the same visit."},
+  "lines": [
+   ["still fake.","en"],
+   ["still fake. I checked.","en"],
+   ["it did not get any realer","en"],
+   ["fake. again.","en"],
+   ["how many times","en"],
+   ["yep. still fake.","en"],
+   ["fake. with my tooth marks now","en"],
+   ["stop sending me this","en"],
+   ["fake. I SAID fake.","en"],
+   ["you again.","en"],
+   ["fake. and I am out of patience","en"],
+   ["пак е фалшива.","bg","fake again."],
+   ["やっぱり偽物。","ja","a fake after all."]
+  ]
+ },
+ "hand.shelfCoin": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"A coin on the shelf","when":"You left the coin on the shelf. Coins beat cards: the hand goes for the coin."},
+  "lines": [
+   ["ooh. shiny.","en"],
+   ["is that gold?","en"],
+   ["forget the cards. COIN.","en"],
+   ["money on the shelf. mine.","en"],
+   ["coins first. always coins first.","en"],
+   ["mine mine mine mine","en"],
+   ["is that for me? it is for me.","en"],
+   ["who leaves money lying around?","en"],
+   ["cards later. treasure now.","en"],
+   ["shiny shiny shiny","en"],
+   ["пари!","bg","money!"],
+   ["お金だ!","ja","money!"]
+  ]
+ },
+ "hand.paid": {
+  "who": "hand",
+  "legacy": null,
+  "trigger": {"title":"Paid for","when":"You dropped the coin into an empty slot and the card grew back. The hand saw it."},
+  "lines": [
+   ["you PAID for it?","en"],
+   ["that was MY coin","en"],
+   ["buying them back now?","en"],
+   ["that one had my tooth marks","en"],
+   ["bribery. disgusting. effective.","en"],
+   ["it was fake anyway","en"],
+   ["big spender","en"],
+   ["a coin for a card? robbery","en"],
+   ["I want a receipt","en"],
+   ["they take fake coins? noted.","en"],
+   ["платено, а?","bg","paid, huh?"],
+   ["買い戻したの?","ja","you bought it back?"]
+  ]
+ },
+ "card.paid": {
+  "who": "card",
+  "legacy": null,
+  "trigger": {"title":"Paid","when":"You dropped the coin into an empty slot. The card that was ripped out of it grows back at once."},
+  "lines": [
+   ["paid!","en"],
+   ["paid in full","en"],
+   ["I have been bought back!","en"],
+   ["receipt, please","en"],
+   ["cash only. thank you.","en"],
+   ["worth every coin","en"],
+   ["I am home. and expensive.","en"],
+   ["bought and paid for","en"],
+   ["back, and fully paid up","en"],
+   ["one card, one coin. fair.","en"],
+   ["the coin was fake, but shh","en"],
+   ["платено!","bg","paid!"],
+   ["支払い済み!","ja","paid!"]
+  ]
+ },
+ "card.spared": {
+  "who": "card",
+  "legacy": null,
+  "trigger": {"title":"Spared","when":"A card and the coin lie on the shelf. The hand goes for the coin, and the card is very relieved."},
+  "lines": [
+   ["take the coin! take the coin!","en"],
+   ["phew. phew. phew.","en"],
+   ["it wants the coin, not me","en"],
+   ["go on, the shiny one","en"],
+   ["I am worth less! good!","en"],
+   ["never been so glad to be cheap","en"],
+   ["money talks. I scream.","en"],
+   ["yes, the coin, the COIN","en"],
+   ["not me this time","en"],
+   ["saved by small change","en"],
+   ["спасих се!","bg","I am saved!"],
+   ["助かった…","ja","saved…"]
+  ]
  }
 }

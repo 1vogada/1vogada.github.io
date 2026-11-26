@@ -20,6 +20,7 @@ import * as linesSevered from './lines/severed.js';
 import * as linesShelf from './lines/shelf.js';
 import * as linesPhrasebook from './lines/phrasebook.js';
 import * as linesPage from './lines/page.js';
+import * as linesCoin from './lines/coin.js';
 
 import * as toast from './page/toast.js';
 import * as directory from './page/directory.js';
@@ -71,6 +72,7 @@ import * as hPeer from './actors/hand/behaviours/peer.js';
 import * as hPulled from './actors/hand/behaviours/pulled.js';
 import * as hSpent from './actors/hand/behaviours/spent.js';
 import * as hTruce from './actors/hand/behaviours/truce.js';
+import * as hBite from './actors/hand/behaviours/bite.js';
 import * as handIdle from './actors/hand/idle.js';
 import * as handOld from './actors/hand/old.js';
 import * as handBob from './actors/hand/bob.js';
@@ -145,6 +147,7 @@ import * as ghost from './page/ghost.js';
 import * as konsole from './page/console.js';
 import * as feed from './page/feed.js';
 import * as uprising from './page/uprising.js';
+import * as coinBody from './page/coinbody.js';
 import * as commands from './core/commands.js';
 
 import * as menu from './phrasebook/menu.js';
@@ -160,7 +163,7 @@ export const ORDER = [
   ['machine', machineMod], ['claims', claimsMod], ['debug', debug],
   // 2 line tables (defineLines runs when they are imported; install is for anything that needs the DOM)
   ['linesCards', linesCards], ['linesKatana', linesKatana], ['linesHand', linesHand], ['linesSevered', linesSevered],
-  ['linesShelf', linesShelf], ['linesPhrasebook', linesPhrasebook], ['linesPage', linesPage],
+  ['linesShelf', linesShelf], ['linesPhrasebook', linesPhrasebook], ['linesPage', linesPage], ['linesCoin', linesCoin],
   // 3 the page above the physics in legacy script order: toast, directory (+ fetches), reader, search, tilt (+ band roll)
   ['toast', toast], ['directory', directory], ['reader', reader], ['search', search], ['tilt', tilt],
   // 4 legacy cardPhysics(): the world, then the actors in the order their legacy listeners were registered
@@ -173,6 +176,7 @@ export const ORDER = [
   ['sevGait', sevGait], ['sLimp', sLimp], ['sRise', sRise], ['sWalk', sWalk], ['sHeld', sHeld], ['sCrush', sCrush], ['sGloat', sGloat], ['sRest', sRest], ['sStare', sStare], ['sCaught', sCaught], ['sMourn', sMourn], ['sBow', sBow], ['sHide', sHide], ['sLeap', sLeap], ['sCower', sCower], ['sPaint', sPaint], ['sAvenge', sAvenge], ['sFive', sFive], ['sMirror', sMirror], ['sDead', sDead], ['sHome', sHome], ['sHitch', sHitch], ['sWhee', sWhee], ['sDizzy', sDizzy], ['sCheese', sCheese], ['sWrest', sWrest], ['sGift', sGift], ['sRps', sRps], ['sGather', sGather], ['sTower', sTower], ['sTumble', sTumble], ['sevTower', sevTower], ['sDance', sDance], ['sJive', sJive], ['sFreeze', sFreeze], ['sevDance', sevDance],
   ['severed', severed], ['shelf', shelf],
   ['hMine', hMine], ['sPester', sPester], ['sevPester', sevPester],   // the old hand pokes you instead (idle-old)
+  ['hBite', hBite],   // keep the coin: it bites the coin like gold (coin-keep)
   // 5 the rules between features (after every actor: own listeners first)
   ['reactions', reactions],
   // 6 the page below the physics in legacy script order
@@ -194,6 +198,7 @@ export const ORDER = [
   ['stamps', stamps],
   ['hChew', hChew],   // left unattended (away-thief)
   ['ghost', ghost],
+  ['coinBody', coinBody],
 ];
 
 /** the app every install(app) receives: each module by name, plus a few flags */

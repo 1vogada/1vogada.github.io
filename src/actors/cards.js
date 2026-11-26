@@ -2,6 +2,8 @@
 // say(), cardSay with the AGONY tiers, BEG, panic with the PANIC tiers and the NOTME bystanders, the cards-rendered listener,
 // the regrow of resetAll, putBack: one card grown back into its slot after the search box ate it, and takeOne: the card the
 // hand helped itself to while you were away, chain away-thief).
+// the regrow of resetAll, and putBack: one card grown back into its slot after the search box ate it, or paid for with the kept
+// coin, 'card.paid'; spared: a card on the shelf sees the hand go for the coin instead, 'card.spared').
 //
 // A card speaks only from the world's pull/tear hooks and from its own event listeners (registered in install, so they run
 // before src/reactions.js). Each listener runs where the legacy code said the line, so the line picks and the random draws
@@ -198,9 +200,10 @@ function regrow() {
 /**
  * one card goes home (the search box swallowed it and found its project, page/feed.js 'search.fed' via src/reactions.js): its
  * slot is no longer torn out, it grows back like "Put the cards back" does it, and says so over the slot ('card.home').
- * The "Put the cards back" button stays: there may be more out there
+ * The "Put the cards back" button stays: there may be more out there. what: the line it says ('card.paid' when the kept coin paid
+ * for it, page/coinbody.js 'coin.paid')
  */
-export function putBack(key) {
+export function putBack(key, what = 'card.home') {
   if (!key) return;
   world.ripped.delete(key); world.loose.delete(key); world.tugs.delete(key);
   const c = [...document.querySelectorAll('#grid .card')].find((x) => x.dataset.key === key);
@@ -208,7 +211,14 @@ export function putBack(key) {
   c.style.rotate = '';
   if (c.classList.contains('held')) { c.classList.remove('held'); c.classList.add('regrow'); clock.real.after(REGROW_MS, () => c.classList.replace('regrow', 'settled')); }
   const r = c.getBoundingClientRect();
-  if (r.width) sayAt(r.left + scrollX + r.width / 2, r.top + scrollY + TUNE.speech.RIDE_DY, 'card.home');
+  if (r.width) sayAt(r.left + scrollX + r.width / 2, r.top + scrollY + TUNE.speech.RIDE_DY, what);
+}
+/**
+ * the hand goes for the kept coin on the shelf instead of a card (src/reactions.js): the first loose card lying there (on(o): it is
+ * on the shelf) says how relieved it is ('card.spared')
+ */
+export function spared(on) {
+  for (const o of world.bodies) if (o.kind === 'card' && !o.root && !o.tug && on(o)) { say(o, 'card.spared', { force: true }); return; }
 }
 /**
  * the hand helped itself while you were away (page/away.js 'page.returned' via src/reactions.js, chain away-thief): one grid

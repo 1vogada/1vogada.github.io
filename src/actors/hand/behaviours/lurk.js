@@ -1,4 +1,5 @@
 // hand state "lurk": follows a held card up and down; eager when it is brought into the tease zone (not near the shelf); otherwise eyes the shelf for 700 ms and reaches. Blind in the kiri flood (blind-fog): it gropes instead (grope.js).
+// hand state "lurk": follows a held card up and down; eager when it is brought into the tease zone (not near the shelf); otherwise eyes the shelf for 700 ms and reaches (the kept coin before any card, actors/shelf.js snack(); hand.shelfCoin).
 // The mouse still for TUNE.hand.IDLE.MS: poke, or 'mine' when an old hand is already poking the cursor (old.js rival()).
 // After the truce (c.peace, the uprising): a held card only gets a remark now and then, never taken; no shelf reach, no "not paper".
 // Legacy clawTick branch `c.st === 'lurk'`, moved verbatim. tick(c, m, dt) sets the motion target on the frame's ctx m.x.
@@ -34,7 +35,7 @@ export default defineBehaviour('hand', 'lurk', {
         if (r.poked) { c.rival = r.hand; set('mine'); return; }   // an old hand got there first: that's ITS job (mine.js); (not yet poked: it waits)
       }
       const q0 = shelf.snack(), q = q0 && big(q0) ? q0 : null; if (shelf.state()) shelf.want(!!q);
-      if (!q) c.eyed = null; else if (q !== c.eyed) { c.eyed = q; c.eyedAt = t; } else if (t > c.cool && t - c.eyedAt > 700 && !c.peace) { c.o = q; c.eyed = null; set('reach'); speak('shelf', true); }
+      if (!q) c.eyed = null; else if (q !== c.eyed) { c.eyed = q; c.eyedAt = t; } else if (t > c.cool && t - c.eyedAt > 700 && !c.peace) { c.o = q; c.eyed = null; set('reach'); speak(q.kind === 'coin' ? 'shelfCoin' : 'shelf', true); }
     }
   },
 });

@@ -1,0 +1,229 @@
+{
+ "scenario": "arm / coins beat cards on the shelf",
+ "seed": 1,
+ "bubbles": [
+  {
+   "doc": 1,
+   "t": 3432,
+   "ms": 792,
+   "who": "card",
+   "key": "SAY.pull",
+   "text": "やめて!"
+  },
+  {
+   "doc": 1,
+   "t": 4224,
+   "ms": 1392,
+   "who": "card",
+   "key": "SAY.rip",
+   "text": "I was comfy!"
+  },
+  {
+   "doc": 1,
+   "t": 5764,
+   "ms": 1404,
+   "who": "card",
+   "key": "coin.land",
+   "text": "keep the change. I AM the change."
+  },
+  {
+   "doc": 1,
+   "t": 6704,
+   "ms": 1904,
+   "who": "card",
+   "key": "card.spared",
+   "text": "go on, the shiny one"
+  },
+  {
+   "doc": 1,
+   "t": 6704,
+   "ms": 1328,
+   "who": "hand",
+   "key": "hand.shelfCoin",
+   "text": "お金だ!"
+  },
+  {
+   "doc": 1,
+   "t": 7168,
+   "ms": 1408,
+   "who": "card",
+   "key": "coin.reached",
+   "text": "careful, I have value"
+  },
+  {
+   "doc": 1,
+   "t": 8576,
+   "ms": 1408,
+   "who": "card",
+   "key": "coin.reached",
+   "text": "not the cards. me."
+  },
+  {
+   "doc": 1,
+   "t": 9984,
+   "ms": 1312,
+   "who": "card",
+   "key": "coin.reached",
+   "text": "вземи мен!"
+  },
+  {
+   "doc": 1,
+   "t": 11392,
+   "ms": 1408,
+   "who": "card",
+   "key": "coin.reached",
+   "text": "ah. an investor."
+  },
+  {
+   "doc": 1,
+   "t": 12800,
+   "ms": 2064,
+   "who": "card",
+   "key": "coin.reached",
+   "text": "gently, I am collectible"
+  },
+  {
+   "doc": 1,
+   "t": 14864,
+   "ms": 1408,
+   "who": "card",
+   "key": "coin.bitten",
+   "text": "かじられた!"
+  },
+  {
+   "doc": 1,
+   "t": 15216,
+   "ms": null,
+   "who": "hand",
+   "key": "hand.fake",
+   "text": "фалшива."
+  },
+  {
+   "doc": 1,
+   "t": 16272,
+   "ms": null,
+   "who": "card",
+   "key": "coin.flicked",
+   "text": "I will remember this, hand"
+  }
+ ],
+ "states": [
+  {
+   "doc": 1,
+   "t": 100,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 3080,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": null,
+   "objs": {}
+  },
+  {
+   "doc": 1,
+   "t": 3448,
+   "claw": null,
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": "card:rooted",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 4232,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": "card",
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 5764,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": null,
+   "objs": {
+    "card": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 5814,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": null,
+   "objs": {
+    "card": 1,
+    "coin": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 6714,
+   "claw": "reach",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": null,
+   "objs": {
+    "card": 1,
+    "coin": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 14064,
+   "claw": "bite",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": null,
+   "objs": {
+    "card": 1,
+    "coin": 1
+   }
+  },
+  {
+   "doc": 1,
+   "t": 16314,
+   "claw": "lurk",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": true,
+   "grab": null,
+   "objs": {
+    "card": 1,
+    "coin": 1
+   }
+  }
+ ]
+}

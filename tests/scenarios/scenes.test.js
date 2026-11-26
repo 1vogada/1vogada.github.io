@@ -198,3 +198,27 @@ scenario(G, 'welcome back', { rand: 0.3, session: { 'kiripad-sent': 'https://hiv
   assert.equal(await s.said('CLAW_SAY.slap'), false);
   assert.ok(await s.said('CLAW_SAY.won'));
 });
+
+// keep the coin (chain coin-keep, page/coinbody.js): when the game is over the coin does not vanish, it drops onto the page as a
+// small body and stays on the screen until "Put the cards back"
+scenario(G, 'the coin stays on the page after the game', { rand: 0.3, idle: 2000, ...RIPPED, legacy: false, timeout: 400000 }, async (s) => {
+  await openSlip(s);
+  await s.run(1500);
+  await click(s, btn('No'));
+  await toCoin(s);
+  await click(s, btn('Heads'));
+  await s.runUntil(() => { const b = document.querySelector('#omi-actions .btn'); return b && !b.disabled && document.querySelectorAll('#omi-actions .btn-say').length === 0; }, null, { max: 8000 });
+  await click(s, btn('Heads'));
+  await s.runUntil(() => [...window.__cards.objs].some((o) => o.kind === 'coin'), null, { max: 12000 });
+  assert.ok(await s.said('CLAW_SAY.won'), 'you won');
+  assert.ok(await s.said('coin.land'), 'the coin says something as it drops');
+  assert.equal(await s.eval(() => document.querySelectorAll('body > .coin').length), 0, 'the spinning coin itself is gone');
+  await s.runUntil(() => document.getElementById('omikuji').hidden, null, { max: 12000 });
+  await s.run(2500, 100);
+  const c = await s.eval(() => { const o = [...window.__cards.objs].find((q) => q.kind === 'coin'), p = o.body.getPosition(), S = window.__cards.S; return { y: p.y * S - scrollY, vh: innerHeight, side: o.el.textContent }; });
+  assert.equal(c.side, 'H', 'heads up');
+  assert.ok(c.y > c.vh - 120 && c.y < c.vh, `it lies at the bottom of the screen (${c.y})`);
+  await s.press('.reset-cards');
+  await s.run(100);
+  assert.equal(await s.eval(() => [...window.__cards.objs].some((o) => o.kind === 'coin') || !!document.querySelector('#phys .coin-kept')), false, 'Put the cards back clears it');
+});

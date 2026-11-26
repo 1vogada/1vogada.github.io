@@ -122,6 +122,11 @@ export const EVENTS = {
   'ghost.roaming': '{ x, y } the ghost roams the kiri flood and looks for an old hand in view to mourn it (every TUNE.ghost.CALL_MS until one comes)',
   'ghost.tapped': '{ card, x, y } the ghost tapped a card in the flood (card: its element); it shivers and says so',
   'ghost.rested': '{ } wiped away for good: it bowed and faded; it does not come back this visit',
+  // ---- keep the coin (coin-keep) ----
+  'coin.kept': '{ coin } after the coin game the coin dropped onto the page as a body of kind "coin" (page/coinbody.js), after its "coin.land" line',
+  'coin.paid': '{ key } the kept coin was let go on an empty grid slot (a card ripped out of it) and went into it (page/coinbody.js), after the coin body left the world. Reactions: the card grows back ("card.paid"), the hand remarks',
+  'hand.bit': '{ coin } the arm bit the kept coin like gold (hand behaviours/bite.js), before its "fake." line',
+  'hand.flicked': '{ coin } the arm flicked the bitten coin back (after it let go and set its speed, before its cool-down)',
 };
 
 export const EVENT_TYPES = new Set(Object.keys(EVENTS));

@@ -3,7 +3,7 @@
 // search box, or tap the uncovered writing (page/kiri.js and page/search.js call toggle()) and a shelf comes out of the
 // left edge, at a random height under the banner (spot()); do it again and it goes. It is part of the ground, like the floor. A card left lying on
 // it is a card nobody is holding: the hand comes for it, slowly, with its whole arm out across the screen (the hand reads
-// it through hand.senses(), wired in src/reactions.js).
+// it through hand.senses(), wired in src/reactions.js). The kept coin (page/coinbody.js) left on it beats any card: it goes first.
 // install(app): world.resized -> rebuilt at the same y (legacy buildWalls did shelfOff + shelfOn); it survives world.reset
 // (legacy resetAll never touched it); hook('__shelf', toggle); report('shelf', ...) for __cards.state().shelf.
 
@@ -46,12 +46,19 @@ export function holds(o) {
 }
 /** the pointer (viewport px) is near the shelf: the hand stays back (legacy nearShelf). @returns boolean */
 export const near = (P) => { const [l, r, u, d] = T.NEAR; return !!shelf && P[0] + scrollX > shelf.x0 - l && P[0] + scrollX < shelf.x1 + r && P[1] + scrollY > shelf.y - u && P[1] + scrollY < shelf.y + d; };
-/** a card or a big piece lying still on the shelf, on screen, in nobody's hand (legacy shelfSnack). @returns body record | null */
+/**
+ * a card or a big piece lying still on the shelf, on screen, in nobody's hand (legacy shelfSnack). The kept coin (page/coinbody.js,
+ * kind 'coin') comes first: coins beat cards. @returns body record | null
+ */
 export function snack() {
   if (!shelf) return null;
+  return lying((o) => o.kind === 'coin') || lying((o) => o.kind === 'card' || (o.kind === 'piece' && !o.die));
+}
+/** the first body of a kind that lies still on the shelf, on screen, in nobody's hand */
+function lying(kind) {
   const grab = world.grab;
   for (const o of world.bodies) {
-    if ((o.kind !== 'card' && (o.kind !== 'piece' || o.die)) || o.root || o.tug || o.sq || (grab && grab.o === o) || !holds(o)) continue;
+    if (!kind(o) || o.root || o.tug || o.sq || (grab && grab.o === o) || !holds(o)) continue;
     const w = o.body.getWorldCenter(), sy = w.y * S - scrollY; if (sy < 60 || sy > innerHeight - 40 || o.body.getLinearVelocity().length() > 0.6) continue;
     return o;
   }

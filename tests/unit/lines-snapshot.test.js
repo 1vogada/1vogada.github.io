@@ -15,6 +15,7 @@ import '../../src/lines/severed.js';
 import '../../src/lines/shelf.js';
 import '../../src/lines/phrasebook.js';
 import '../../src/lines/page.js';
+import '../../src/lines/coin.js';
 
 const FILE = new URL('./lines.snapshot.json', import.meta.url);
 const defs = lines.allLines();

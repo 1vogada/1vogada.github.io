@@ -1,5 +1,6 @@
 // hand state "catch": plucks a thrown card out of the air; crush (30%) or has. A ball of paper (an old hand's gift) or the fallen
-// toast (kind 'toast', page/bread.js) is eaten on the spot (eat), with its own line (hand.caught / hand.toast).
+// toast (kind 'toast', page/bread.js) is eaten on the spot (eat), with its own line (hand.caught / hand.toast). The kept coin
+// (kind 'coin', page/coinbody.js) is bitten like gold and flicked back (bite.js).
 // Legacy clawTick branch `c.st === 'catch'`, moved verbatim. tick(c, m, dt) sets the motion target on the frame's ctx m.x.
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
@@ -8,6 +9,7 @@ import { world } from '../../../world/world.js';
 import { POSES } from '../poses.js';
 import { set, speak, big } from '../index.js';
 import { gripPt, wristFor, crushStart, middle } from '../tug.js';
+import { take } from '../coin.js';
 
 const S = TUNE.physics.S, H_ = TUNE.hand;
 
@@ -29,6 +31,7 @@ export default defineBehaviour('hand', 'catch', {
           c.joint = world.b2.createJoint(new world.pl.MouseJoint({ maxForce: TUNE.physics.MAX_FORCE * o.body.getMass(), frequencyHz: H_.JOINT_HZ, dampingRatio: 1 }, world.ground, o.body, { x: w.x, y: w.y }));
           set('eat'); return;
         }
+        if (o.kind === 'coin') { bus.emit('hand.grabbed', { card: o, how: 'catch' }); take(c, o, w, Hc[1]); return; }   // the kept coin: is it gold? (bite.js)
         if (!big(o)) {   // a scrap: batted straight back
           o.body.setLinearVelocity({ x: H_.SWAT[0], y: H_.SWAT[1] }); o.body.setAngularVelocity((Math.random() - 0.5) * 14);
           bus.emit('hand.rejected', { card: o }); c.o = null; c.cool = x.t + H_.COOL.small; set('sulk'); speak('small', true);

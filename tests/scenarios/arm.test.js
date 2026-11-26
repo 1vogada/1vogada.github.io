@@ -439,3 +439,79 @@ scenario(G, 'left unattended: it finishes the card', { ...O, legacy: false }, as
   const t = await s.eval(() => JSON.parse(sessionStorage.getItem('kiripad-trophies') || '[]').map((q) => [q.kind, (q.clip || '').startsWith('polygon(')]));
   assert.deepEqual(t, [['card', true]], 'pinned up in the basement, bitten');
 });
+
+// keep the coin (chain coin-keep): the coin left over from the coin game (page/coinbody.js; here dropped with __coin.drop) is
+// thrown at the hand: it bites it like gold, "fake.", flicks it back; a second time it is "still fake."; left on the shelf it
+// beats a card; dropped into an empty slot it pays for that card
+const coin = () => { const o = [...window.__cards.objs].find((q) => q.kind === 'coin'); if (!o) return null; const p = o.body.getPosition(), S = window.__cards.S; return { x: p.x * S - scrollX, y: p.y * S - scrollY, v: o.body.getLinearVelocity().length(), awake: o.body.isAwake(), mark: !!o.el.querySelector('i') }; };
+const still = () => { const o = [...window.__cards.objs].find((q) => q.kind === 'coin'); return !!o && o.body.getLinearVelocity().length() < 0.3 && !window.__cards.state().grab; };
+
+scenario(G, 'the hand bites the coin: fake', { ...O, legacy: false }, async (s) => {
+  await carry(s, 0, 400, 420);
+  await s.up();
+  await s.run(300);
+  await s.eval(() => window.__coin.drop(scrollX + 300, scrollY + 300, 'tails'));
+  await s.runUntil(still, null, { max: 6000, step: 50 });
+  for (const n of [1, 2]) {
+    const at = await s.eval(coin);
+    await s.move(at.x, at.y); await s.down();
+    assert.equal(await s.eval(() => { const g = window.__cards.state().grab; return g && g.o.kind; }), 'coin', 'it can be picked up');
+    await s.line(at.x, at.y, 560, 300, 20);
+    await s.run(400);
+    assert.equal((await s.eval(claw)).st, 'lurk', 'held, it does not tempt the hand');
+    await s.throwTo([560, 300], [560 + 18 * 5, 300], { n: 5 });
+    if (n === 1) assert.ok(await s.said('coin.thrown'), 'thrown, it has something to say');
+    await s.runUntil(() => window.__cards.state().claw.st === 'bite', null, { max: 1500, step: 16 });
+    await s.runUntil(() => window.__cards.state().claw.st === 'lurk', null, { max: 5000, step: 16 });
+    assert.ok(await s.said(n === 1 ? 'hand.fake' : 'hand.fakeAgain'), n === 1 ? 'fake.' : 'still fake.');
+    await s.run(300);
+    const c = await s.eval(coin);
+    assert.ok(c && c.x < (await s.eval(vw)) - 200, 'and it is flicked back');
+    await s.runUntil(still, null, { max: 8000, step: 50 });
+  }
+  assert.ok(await s.said('coin.bitten') && await s.said('coin.flicked'), 'the coin objects to the bite, and to the verdict');
+  assert.equal((await s.eval(coin)).mark, true, 'it keeps the tooth mark');
+});
+
+scenario(G, 'coins beat cards on the shelf', { ...O, legacy: false }, async (s) => {
+  await s.ensurePlanck();
+  await s.randQueue(0, 0);   // the shelf just under the banner
+  await s.type('tana');
+  await s.run(300);
+  await s.scrollTo(250);
+  const shelfY = await s.eval(() => window.__cards.state().shelf.y - scrollY);
+  await carry(s, 0, 200, shelfY - 140, 20);   // a card on the shelf
+  await s.run(800);
+  await s.up();
+  await s.eval((y) => window.__coin.drop(scrollX + 70, scrollY + y - 60, 'heads'), shelfY);   // and the coin next to it
+  await s.runUntil(() => window.__cards.state().claw.st === 'reach', null, { max: 8000 });
+  assert.equal(await s.eval(() => window.__cards.state().claw.o.kind), 'coin', 'it goes for the coin, not the card');
+  assert.ok(await s.said('hand.shelfCoin'), 'and says so');
+  assert.ok(await s.said('card.spared'), 'the card is relieved');
+  await s.runUntil(() => window.__cards.state().claw.st === 'bite', null, { max: 15000 });
+  await s.runUntil(() => window.__cards.state().claw.st === 'lurk', null, { max: 5000 });
+  assert.ok(await s.said('hand.fake'), 'fake.');
+  assert.equal(await s.eval(() => [...window.__cards.objs].filter((o) => o.kind === 'card').length), 1, 'the card is still there');
+  assert.ok(await s.eval(coin), 'and so is the coin');
+});
+
+scenario(G, 'the coin pays for a card', { ...O, legacy: false }, async (s) => {
+  await carry(s, 0, 400, 420);
+  await s.up();
+  await s.run(300);
+  const slot = await s.box('#grid .card.held');
+  const key = await s.eval(() => document.querySelector('#grid .card.held').dataset.key);
+  await s.eval(() => window.__coin.drop(scrollX + 300, scrollY + 300, 'heads'));
+  await s.runUntil(still, null, { max: 6000, step: 50 });
+  const at = await s.eval(coin);
+  await s.move(at.x, at.y); await s.down();
+  await s.line(at.x, at.y, slot.x + slot.w / 2, slot.y + slot.h / 2, 30);
+  await s.run(300);
+  await s.up();
+  await s.run(600);
+  assert.equal(await s.eval(coin), null, 'the coin went into the slot');
+  assert.equal(await s.eval((k) => [...document.querySelectorAll('#grid .card')].find((c) => c.dataset.key === k).classList.contains('held'), key), false, 'the card grew back');
+  assert.ok(await s.said('card.paid'), 'paid');
+  await s.run(4000, 100);
+  assert.ok(await s.said('hand.paid'), 'and the hand saw that');
+});
