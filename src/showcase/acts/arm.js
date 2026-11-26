@@ -151,6 +151,7 @@ const STILL = new Set(['arm-idle', 'arm-mine']);
 function steady(a) {
   return { ...a, async play(r, app) {
     fresh(app);
+    if (app.kiri.floodState()) await r.until(() => !app.kiri.floodState(), 8000);   // (the last act's flood thinning out: the ghost cannot get at the cards under it)
     if (STILL.has(a.id)) return a.play(r, app);
     const stop = fidget(r);
     try { await a.play(r, app); } finally { stop(); }
@@ -420,9 +421,11 @@ export const PART = {
         await to(r, app, 'grope', 6000);
         await carry(r, vw() - 330, 300, 10);
         await r.wait(2600);
-        const hy = Math.round(claw(app).y);
-        await r.line(vw() - 330, 300, vw() - 150, hy, 12);
-        await r.line(vw() - 150, hy, vw() - 60, hy, 6);
+        // over to the hand (it keeps groping up and down) and round about it: the card wipes a hole in the flood there
+        for (let k = 0; k < 160 && !['snatch', 'crush'].includes(st(app)); k++) {
+          const c = claw(app), tx = vw() - 60 - (k % 8 < 4 ? 0 : 40), ty = Math.max(60, Math.min(innerHeight - 60, c.y)), d = Math.hypot(tx - r.x, ty - r.y), f = Math.min(1, 22 / (d || 1));
+          await r.move(r.x + (tx - r.x) * f, r.y + (ty - r.y) * f);
+        }
         await to(r, app, ['snatch', 'crush'], 3000);
         await to(r, app, 'crush', 3000);
         await r.up();
@@ -600,14 +603,23 @@ export const PART = {
         await r.scrollTo(sh.y - 330);
         await carry(r, 160, sh.y - scrollY - 140, 14); await r.wait(800); await r.up();
         await r.glide(700, 560);
-        const q = [...world.bodies].find((b) => b.kind === 'card'), qp = q.body.getPosition();
-        const old = await r.oldHand(qp.x * TUNE.physics.S + 40, qp.y * TUNE.physics.S - q.h / 2 - 70); meet(old); old.ai.met = true;   // it lies down on the card
-        await r.wait(1000);
-        app.severed.set(old, 'rest');
+        const q = [...world.bodies].find((b) => b.kind === 'card'), S = TUNE.physics.S;
+        const near = (o) => { const a = o.body.getWorldCenter(), b = q.body.getWorldCenter(); return Math.hypot(a.x - b.x, a.y - b.y) * S < 260; };
+        let old = null;
         for (let k = 0; ; k++) {   // (in its panic the card may hop right off the shelf, and the arm gives up: it goes back on)
           await to(r, app, 'reach', 12000);
-          // it stays put, resting by the card (not off copying the pointer, or walking away) until the arm has the card
-          await r.until(() => { if (!TUNE.severed.CHEESE.FROM.concat('hitch', 'cheese').includes(sevSt(old)) && ['reach'].includes(st(app))) app.severed.set(old, 'rest'); return st(app) !== 'reach'; }, 16000);
+          // the old hand: dropped onto the card once the arm is well on its way (so it has no time to wander off), and it sits down
+          await r.until(() => st(app) !== 'reach' || claw(app).x - (q.body.getPosition().x * S - scrollX) < 650, 6000);
+          if (st(app) === 'reach' && !(old && world.bodies.has(old) && near(old))) {
+            const qp = q.body.getPosition();
+            old = await r.oldHand(qp.x * S + 40, qp.y * S - q.h / 2 - 70); meet(old); old.ai.met = true;
+            await r.wait(400); app.severed.set(old, 'rest');
+          }
+          // until the arm has the card, it does nothing an old hand cannot jump from (not off copying the pointer)
+          await r.until(() => {
+            if (old && st(app) === 'reach' && !TUNE.severed.CHEESE.FROM.concat('hitch', 'cheese').includes(sevSt(old))) app.severed.set(old, 'rest');
+            return st(app) !== 'reach';
+          }, 16000);
           if (['eat', 'cheese'].includes(st(app))) break;
           if (k === 2) throw new Error('the card kept hopping off the shelf');
           await r.until(() => st(app) === 'lurk', 4000);
