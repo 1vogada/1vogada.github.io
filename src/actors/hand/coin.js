@@ -2,7 +2,7 @@
 // (behaviours/catch.js) and the shelf reach (behaviours/reach.js) hand it to 'bite' (behaviours/bite.js), which bites it and
 // flicks it back. A plain helper, not a behaviour: catch.js and reach.js do not load the bite behaviour itself.
 import { TUNE } from '../../core/tune.js';
-import { world } from '../../world/world.js';
+import { world, pinJoint } from '../../world/world.js';
 import { set } from './index.js';
 
 const K = TUNE.coinKeep, P_ = TUNE.physics, H_ = TUNE.hand;
@@ -11,7 +11,7 @@ const K = TUNE.coinKeep, P_ = TUNE.physics, H_ = TUNE.hand;
 export function take(c, o, w, hy) {
   o.hot = 0; o.body.setBullet(false);
   o.body.setAngularDamping(P_.HELD_SPIN); o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1 | K.LEDGE_BIT, maskBits: 0 }); o.el.style.pointerEvents = 'none';
-  c.joint = world.b2.createJoint(new world.pl.MouseJoint({ maxForce: P_.MAX_FORCE * o.body.getMass(), frequencyHz: H_.JOINT_HZ, dampingRatio: 1 }, world.ground, o.body, { x: w.x, y: w.y }));
+  c.joint = pinJoint(o.body, { x: w.x, y: w.y }, H_.JOINT_HZ);
   c.hy = hy;
   set('bite');
 }

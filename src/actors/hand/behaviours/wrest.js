@@ -16,13 +16,13 @@ import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
 import { clock } from '../../../core/clock.js';
 import { say as speechSay, sayAt } from '../../../core/speech.js';
-import { world, isHeld, rectPoly, remove } from '../../../world/world.js';
+import { world, isHeld, rectPoly, remove, NO_HIT, pinJoint } from '../../../world/world.js';
 import { shake } from '../../../world/fx.js';
 import { POSES } from '../poses.js';
 import { set, speak, clamp01, get, brain } from '../index.js';
 import { gripPt, wristFor, tugDraw, untug, split, strands } from '../tug.js';
 
-const S = TUNE.physics.S, W = TUNE.hand.WREST, NONE = { groupIndex: 0, categoryBits: 1, maskBits: 0 };
+const S = TUNE.physics.S, W = TUNE.hand.WREST;
 
 const page = (v) => [v[0] + scrollX, v[1] + scrollY];
 /** page px of the card's own point L (px from its middle) */
@@ -43,8 +43,8 @@ function ends(q) {
 }
 /** a mouse joint from the arm's grip H (page px) to the card's point at H */
 function grab(c, q, H) {
-  q.body.setAngularDamping(TUNE.physics.HELD_SPIN); q.body.getFixtureList().setFilterData(NONE); q.el.style.pointerEvents = 'none';
-  c.joint = world.b2.createJoint(new world.pl.MouseJoint({ maxForce: TUNE.physics.MAX_FORCE * q.body.getMass(), frequencyHz: TUNE.hand.JOINT_HZ, dampingRatio: 1 }, world.ground, q.body, { x: H[0] / S, y: H[1] / S }));
+  q.body.setAngularDamping(TUNE.physics.HELD_SPIN); q.body.getFixtureList().setFilterData(NO_HIT); q.el.style.pointerEvents = 'none';
+  c.joint = pinJoint(q.body, { x: H[0] / S, y: H[1] / S }, TUNE.hand.JOINT_HZ);
 }
 function done(c) { c.old = null; c.prey = null; c.slip = false; }
 /** the old hand let go (you clicked it, or picked it up): the card is the arm's, whole */
@@ -78,7 +78,7 @@ export default defineBehaviour('hand', 'wrest', {
         const P = world_(q, gp), H = page(g), lx = gh[0] - gp[0], ly = gh[1] - gp[1], dn = Math.hypot(lx, ly) || 1;
         c.o = q; c.prey = null;
         q.tug = { wrest: old, P: [...P], P0: [...P], H0: H, gp, gh, dn, d0: Math.max(80, dn), d: dn, phi: Math.atan2(ly, lx), psi: Math.atan2(H[1] - P[1], H[0] - P[0]), s: 1, e: 0, grip: 1, rip: W.TEAR_PX };
-        q.body.getFixtureList().setFilterData(NONE); q.el.style.pointerEvents = 'none';
+        q.body.getFixtureList().setFilterData(NO_HIT); q.el.style.pointerEvents = 'none';
         c.hy = Hc[1]; c.pullAt = m.t;
         speak('wrest', true); speechSay(q, 'card.wrest', { force: true });
       } else if (m.t > W.WAIT_S + W.REACH_S) { done(c); set('lurk'); }

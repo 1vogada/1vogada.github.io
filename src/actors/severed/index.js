@@ -22,7 +22,7 @@ import { defineSpeaker, say as speak } from '../../core/speech.js';
 import { machine, behaviours } from '../../core/machine.js';
 import { isFree } from '../../core/claims.js';
 import { hook, flags } from '../../core/debug.js';
-import { world, add, remove, isHeld, isCrazy, worldPoly, fragment } from '../../world/world.js';
+import { world, add, remove, isHeld, isCrazy, worldPoly, fragment, HIT_ALL } from '../../world/world.js';
 import { drawOffset } from '../../world/loop.js';
 import { gore } from '../../world/fx.js';
 import { turn } from './gait.js';
@@ -297,7 +297,7 @@ function hitchhike() {
 /** legacy sevUnsquash(q): the card it was squeezing is let go, as it was */
 export function unsquash(q) {
   if (!q.sq) return; if (q.sq.free) q.sq.free(); q.el.style.clipPath = q.sq.clip; q.el.style.filter = ''; q.el.style.pointerEvents = ''; q.sq = null;
-  if (world.bodies.has(q)) { q.body.setGravityScale(P.FALL); q.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF }); q.body.setAwake(true); }
+  if (world.bodies.has(q)) { q.body.setGravityScale(P.FALL); q.body.getFixtureList().setFilterData(HIT_ALL); q.body.setAwake(true); }
 }
 
 /** any hand that is not resting (legacy sevBusy) */

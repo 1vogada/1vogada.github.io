@@ -5,7 +5,7 @@
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
-import { world } from '../../../world/world.js';
+import { world, NO_HIT, pinJoint } from '../../../world/world.js';
 import { POSES } from '../poses.js';
 import { set, speak, big } from '../index.js';
 import { gripPt, wristFor, crushStart, middle } from '../tug.js';
@@ -27,8 +27,8 @@ export default defineBehaviour('hand', 'catch', {
         o.body.setLinearVelocity({ x: 0, y: 0 }); o.body.setAngularVelocity(o.body.getAngularVelocity() * 0.2); o.hot = 0; o.body.setBullet(false);
         if (o.ball || o.kind === 'toast') {   // a ball of paper an old hand brought you, or the toast (page/bread.js): always a treat, eaten on the spot
           bus.emit('hand.grabbed', { card: o, how: 'catch' }); speak(o.ball ? 'caught' : 'toast', true);   // toast. finally, real food
-          o.body.setAngularDamping(TUNE.physics.HELD_SPIN); o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 }); o.el.style.pointerEvents = 'none';
-          c.joint = world.b2.createJoint(new world.pl.MouseJoint({ maxForce: TUNE.physics.MAX_FORCE * o.body.getMass(), frequencyHz: H_.JOINT_HZ, dampingRatio: 1 }, world.ground, o.body, { x: w.x, y: w.y }));
+          o.body.setAngularDamping(TUNE.physics.HELD_SPIN); o.body.getFixtureList().setFilterData(NO_HIT); o.el.style.pointerEvents = 'none';
+          c.joint = pinJoint(o.body, { x: w.x, y: w.y }, H_.JOINT_HZ);
           set('eat'); return;
         }
         if (o.kind === 'coin') { bus.emit('hand.grabbed', { card: o, how: 'catch' }); take(c, o, w, Hc[1]); return; }   // the kept coin: is it gold? (bite.js)
@@ -41,7 +41,7 @@ export default defineBehaviour('hand', 'catch', {
         if (Math.random() < H_.CATCH_CHANCE_CRUSH) { crushStart(o); set('crush'); }   // sometimes it does not feel like sharing
         else {
           o.body.setAngularDamping(TUNE.physics.HELD_SPIN); c.gh = middle(o); c.pre = {}; c.snap = null; c.hy = Math.max(110, Math.min(x.vh - 110, Hc[1]));
-          c.joint = world.b2.createJoint(new world.pl.MouseJoint({ maxForce: TUNE.physics.MAX_FORCE * o.body.getMass(), frequencyHz: H_.JOINT_HZ, dampingRatio: 1 }, world.ground, o.body, { x: w.x, y: w.y }));
+          c.joint = pinJoint(o.body, { x: w.x, y: w.y }, H_.JOINT_HZ);
           set('has');
         }
       } else if (m.t > 0.6) { c.o = null; c.cool = x.t + H_.COOL.catch; set('sulk'); speak('sulk'); }

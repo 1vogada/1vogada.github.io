@@ -302,8 +302,6 @@ function raidHand(dt) {
 
 /** legacy raidStart (window.__phrasebook.raid): the hand comes in now, if the menu is open */
 export const start = raidStart;
-/** legacy raidStop: called when the menu closes */
-export const stop = raidStop;
 /** phrase-say (./say.js): the raiding hand, when it is in the menu (not swatted away), says text now. @returns the bubble element or null */
 export function speak(key, text) { const r = raid; if (!r || !r.c || r.st === 'swat') return null; const s = say(r, key, { as: 'raidHand', floor: 'hand', text }); return s ? s.el : null; }
 /** force the next act: 'throw' | 'eat' | 'help' | 'scroll' (legacy __phrasebook.next) */

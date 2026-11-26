@@ -19,25 +19,13 @@ import { bus } from '../core/bus.js';
 import { clock, real } from '../core/clock.js';
 import { defineSpeaker, say } from '../core/speech.js';
 import { hook } from '../core/debug.js';
-import { world, load, init, add, remove, isCrazy, showReset, isHeld } from '../world/world.js';
+import { world, load, init, add, remove, isCrazy, showReset } from '../world/world.js';
 import { drawOffset } from '../world/loop.js';
+import { makeLedge } from './ledge.js';
 
 const K = TUNE.coinKeep, S = TUNE.physics.S;
-let coin = null, ledge = null, ledgeY = 0;
-
-// the ledge: collides only with the coin (its own category bit; cards, pieces, the toast and hands pass through it)
-function ledgeOn() {
-  ledgeOff();
-  const pl = world.pl, T = TUNE.physics.WALL.thickness, w = innerWidth / S;
-  ledgeY = scrollY;
-  ledge = world.b2.createBody({ position: { x: scrollX / S + w / 2, y: (scrollY + innerHeight) / S + T } });
-  ledge.createFixture({ shape: new pl.Box(w / 2, T), friction: TUNE.physics.WALL.friction, filterCategoryBits: K.LEDGE_BIT, filterMaskBits: K.LEDGE_BIT });
-}
-function ledgeOff() {
-  if (!ledge) return;
-  world.b2.destroyBody(ledge); ledge = null;
-  if (coin && world.bodies.has(coin)) coin.body.setAwake(true);
-}
+let coin = null;
+const ledge = makeLedge({ bit: K.LEDGE_BIT, scrollPx: K.LEDGE_SCROLL_PX, body: () => coin });   // page/ledge.js
 
 const css = (el, s) => { Object.assign(el.style, s); return el; };
 /** dress el as the coin: a gold disc with a milled rim and its side on it ('H', 'T' or '?') */
@@ -60,7 +48,7 @@ function spawn(x, y, label, dir) {
   el.className = 'phys coin-kept'; world.layer.appendChild(el);
   const o = coin = add({ kind: 'coin', el, w: d, h: d, ex: d / 2, ey: d / 2, side: label }, x / S, Math.min(y, world.size.H - d) / S, 0,
     new world.pl.Polygon(outline(d)), { density: K.DENSITY, filterCategoryBits: 1 | K.LEDGE_BIT });
-  ledgeOn();
+  ledge.on();
   el._o = o;
   o.body.setLinearDamping(K.DAMPING);
   o.body.setLinearVelocity({ x: dir * K.POP[0], y: K.POP[1] }); o.body.setAngularVelocity(dir * K.SPIN);
@@ -132,13 +120,13 @@ export function install(app) {
   bus.on('body.thrown', ({ body }) => { if (body.kind === 'coin') say(body, 'coin.thrown', { force: true }); });
   bus.on('body.dropped', dropped);
   bus.on('hand.bit', ({ coin: o }) => { if (o && world.bodies.has(o)) { mark(o); say(o, 'coin.bitten', { force: true }); } });
-  bus.on('hand.flicked', ({ coin: o }) => { if (o && world.bodies.has(o)) { ledgeOn(); say(o, 'coin.flicked', { force: true }); } });   // back to you: it lands on your screen again
+  bus.on('hand.flicked', ({ coin: o }) => { if (o && world.bodies.has(o)) { ledge.on(); say(o, 'coin.flicked', { force: true }); } });   // back to you: it lands on your screen again
   bus.on('hand.reaching', ({ card }) => { if (card && card.kind === 'coin') say(card, 'coin.reached'); });   // unforced: now and then while it creeps up
-  bus.on('body.removed', ({ body }) => { if (body === coin) { coin = null; ledgeOff(); } });
-  bus.on('world.reset', () => { if (coin && world.bodies.has(coin)) remove(coin); coin = null; ledgeOff(); });
+  bus.on('body.removed', ({ body }) => { if (body === coin) { coin = null; ledge.off(); } });
+  bus.on('world.reset', () => { if (coin && world.bodies.has(coin)) remove(coin); coin = null; ledge.off(); });
   // picked up, or the page scrolled: the ledge goes
-  clock.onTick(() => { if (ledge && (!coin || isHeld(coin) || Math.abs(scrollY - ledgeY) > K.LEDGE_SCROLL_PX)) ledgeOff(); }, 'late');
-  addEventListener('scroll', () => { if (ledge && Math.abs(scrollY - ledgeY) > K.LEDGE_SCROLL_PX) { ledgeOff(); clock.wake(); } }, { passive: true });
+  clock.onTick(() => ledge.tick(), 'late');
+  addEventListener('scroll', () => { if (ledge.scroll()) clock.wake(); }, { passive: true });
   hook('__coin', {
     /** drop a coin at page px x, y (side 'heads' | 'tails' | null); resolves to the body, or null without physics */
     drop: (x, y, side = 'heads') => (isCrazy() ? Promise.resolve(null) : load().then(() => { init(); return spawn(x, y, side === 'heads' ? 'H' : side === 'tails' ? 'T' : '?', 1); })),

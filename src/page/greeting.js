@@ -4,19 +4,16 @@
 
 import { TUNE } from '../core/tune.js';
 import { real } from '../core/clock.js';
-import { has, list } from '../core/lines.js';
-import { thin } from './language.js';
+import { list } from '../core/lines.js';
 
 const { TYPE_MS, HOLD_MS, ERASE_MS, PAUSE_MS } = TUNE.greeting;
 
 // ---- Bulgarian, Japanese, English ----
-// The list is the line key 'greeting.hello' (src/lines/page.js; list() is thinned by the language filter). Until that file
-// is merged, the legacy array below stands in, thinned by page/language.js the same way.
-const HELLOS = ['Hi there.', 'Здравей.', 'こんにちは。', 'Welcome.', 'Добре дошли.', 'ようこそ。']; // always English, then Bulgarian, then Japanese
-export const hellos = () => (has('greeting.hello') ? list('greeting.hello') : thin(HELLOS));
+// The list is the line key 'greeting.hello' (src/lines/page.js; list() is thinned by the language filter): always English,
+// then Bulgarian, then Japanese.
 
 export function install(app) {
-  const helloEl = document.getElementById('hello'), words = hellos();
+  const helloEl = document.getElementById('hello'), words = list('greeting.hello');
   if (app.reduced) { helloEl.textContent = words[0]; return; }
   (async function type() {
     const wait = real.sleep;

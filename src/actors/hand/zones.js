@@ -1,6 +1,6 @@
 // Where the hand reacts (legacy zones(vw) and the ?debug=zones overlay). Ivo drew these; change them only here.
 // In viewport x (any scroll, full height): a held card teases it from `tease` rightwards (the last card column of the content),
-// a thrown card is caught from `grab` rightwards (the gutter right of the content; never narrower than a card can get into).
+// a thrown card is caught from `grab` rightwards (one card wide from the right edge).
 // Catch is one card wide from the right edge, tease two (Ivo, 2026-11-25). ?debug=zones draws both. The numbers are TUNE.hand.ZONES.
 
 import { TUNE } from '../../core/tune.js';

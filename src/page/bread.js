@@ -15,25 +15,13 @@ import { TUNE } from '../core/tune.js';
 import { bus } from '../core/bus.js';
 import { clock } from '../core/clock.js';
 import { defineSpeaker, say } from '../core/speech.js';
-import { world, load, init, add, remove, isCrazy, showReset, isHeld } from '../world/world.js';
+import { world, load, init, add, remove, isCrazy, showReset } from '../world/world.js';
 import { drawOffset } from '../world/loop.js';
+import { makeLedge } from './ledge.js';
 
 const B = TUNE.bread, S = TUNE.physics.S;
-let slice = null, ledge = null, ledgeY = 0;
-
-// the ledge: collides only with the slice (its own category bit; cards, pieces and hands pass through it)
-function ledgeOn() {
-  ledgeOff();
-  const pl = world.pl, T = TUNE.physics.WALL.thickness, w = innerWidth / S;
-  ledgeY = scrollY;
-  ledge = world.b2.createBody({ position: { x: scrollX / S + w / 2, y: (scrollY + innerHeight) / S + T } });
-  ledge.createFixture({ shape: new pl.Box(w / 2, T), friction: TUNE.physics.WALL.friction, filterCategoryBits: B.LEDGE_BIT, filterMaskBits: B.LEDGE_BIT });
-}
-function ledgeOff() {
-  if (!ledge) return;
-  world.b2.destroyBody(ledge); ledge = null;
-  if (slice && world.bodies.has(slice)) slice.body.setAwake(true);
-}
+let slice = null;
+const ledge = makeLedge({ bit: B.LEDGE_BIT, scrollPx: B.LEDGE_SCROLL_PX, body: () => slice });   // page/ledge.js
 
 const css = (el, s) => { Object.assign(el.style, s); return el; };
 /** dress el as the slice: crust, crumb, a few burnt spots, the message printed on it. @returns el */
@@ -66,7 +54,7 @@ function spawn(msg, r, dir) {
   const x = (r.left + r.width / 2 + scrollX) / S, y = Math.min((r.top + r.height / 2 + scrollY) / S, world.size.H / S - h / 2 / S);
   const o = slice = add({ kind: 'toast', el, w, h, ex: w / 2, ey: h / 2, msg }, x, y, 0,
     new world.pl.Polygon(outline(w, h).map(([px, py]) => ({ x: px / S, y: py / S }))), { density: B.DENSITY, filterCategoryBits: 1 | B.LEDGE_BIT });
-  ledgeOn();
+  ledge.on();
   el._o = o;
   o.body.setLinearDamping(B.DAMPING);
   o.body.setLinearVelocity({ x: dir * B.POP[0], y: B.POP[1] }); o.body.setAngularVelocity(dir * B.SPIN);
@@ -75,8 +63,6 @@ function spawn(msg, r, dir) {
   clock.wake();
 }
 
-/** the slice on the page, or null */
-export const current = () => (slice && world.bodies.has(slice) ? slice : null);
 
 export function install(app) {
   if (app && app.reduced) return;
@@ -87,9 +73,9 @@ export function install(app) {
     } });
   bus.on('body.thrown', ({ body }) => { if (body.kind === 'toast') say(body, 'bread.thrown', { force: true }); });
   bus.on('hand.grabbed', ({ card }) => { if (card.kind === 'toast' && world.bodies.has(card)) say(card, 'bread.caught', { mode: 'plain' }); });
-  bus.on('body.removed', ({ body }) => { if (body === slice) { slice = null; ledgeOff(); } });
-  bus.on('world.reset', () => { if (slice && world.bodies.has(slice)) remove(slice); slice = null; ledgeOff(); });
+  bus.on('body.removed', ({ body }) => { if (body === slice) { slice = null; ledge.off(); } });
+  bus.on('world.reset', () => { if (slice && world.bodies.has(slice)) remove(slice); slice = null; ledge.off(); });
   // picked up, or the page scrolled: the ledge goes
-  clock.onTick(() => { if (ledge && (!slice || isHeld(slice) || Math.abs(scrollY - ledgeY) > B.LEDGE_SCROLL_PX)) ledgeOff(); }, 'late');
-  addEventListener('scroll', () => { if (ledge && Math.abs(scrollY - ledgeY) > B.LEDGE_SCROLL_PX) { ledgeOff(); clock.wake(); } }, { passive: true });
+  clock.onTick(() => ledge.tick(), 'late');
+  addEventListener('scroll', () => { if (ledge.scroll()) clock.wake(); }, { passive: true });
 }

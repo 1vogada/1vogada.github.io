@@ -7,7 +7,7 @@
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
-import { world, remove, toLocal } from '../../../world/world.js';
+import { world, remove, toLocal, NO_HIT, pinJoint } from '../../../world/world.js';
 import { gore } from '../../../world/fx.js';
 import { bite } from '../../../world/bite.js';
 import { POSES } from '../poses.js';
@@ -34,8 +34,8 @@ export default defineBehaviour('hand', 'chew', {
     const H = gripPage(), b = o.body;
     b.setTransform({ x: (H[0] - o.w / 2 + A.IN_PX) / S, y: H[1] / S }, 0);
     b.setLinearVelocity({ x: 0, y: 0 }); b.setAngularVelocity(0); b.setGravityScale(0); b.setAngularDamping(TUNE.physics.HELD_SPIN);
-    b.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 });
-    c.joint = world.b2.createJoint(new world.pl.MouseJoint({ maxForce: TUNE.physics.MAX_FORCE * b.getMass(), frequencyHz: TUNE.hand.JOINT_HZ, dampingRatio: 1 }, world.ground, b, { x: H[0] / S, y: H[1] / S }));
+    b.getFixtureList().setFilterData(NO_HIT);
+    c.joint = pinJoint(b, { x: H[0] / S, y: H[1] / S }, TUNE.hand.JOINT_HZ);
     c.bites = 0; let n = 0; for (let i = 0; i < A.PRE; i++) n = chomp(c, o);
     c.bite = A.BITE_S; c.gulp = false; c.pull0 = null;
     speak('unattended', true);

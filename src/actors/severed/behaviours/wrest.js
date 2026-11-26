@@ -9,18 +9,18 @@
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
-import { world, isHeld } from '../../../world/world.js';
+import { world, isHeld, HIT_ALL, NO_HIT } from '../../../world/world.js';
 import { clamp01, wrapA } from '../gait.js';
 import { set, say, POSES, regain } from '../index.js';
 
-const S = TUNE.physics.S, HI = TUNE.severed.HITCH, WR = TUNE.severed.WREST, NONE = { groupIndex: 0, categoryBits: 1, maskBits: 0 };
+const S = TUNE.physics.S, HI = TUNE.severed.HITCH, WR = TUNE.severed.WREST;
 
 export default defineBehaviour('sev', 'wrest', {
   pose: 'grip',
   tap: true,
   enter(o, m) {
     const a = o.ai, b = o.body, p = b.getPosition();
-    b.getFixtureList().setFilterData(NONE); b.setGravityScale(0); a.vx = 0; a.press = 0;
+    b.getFixtureList().setFilterData(NO_HIT); b.setGravityScale(0); a.vx = 0; a.press = 0;
     a.from = { x: p.x, y: p.y, a: b.getAngle() };
   },
   tick(o, m, dt) {
@@ -45,7 +45,7 @@ export default defineBehaviour('sev', 'wrest', {
   },
   leave(o, m) {
     const a = o.ai; a.poseSet = false; a.wig = 0; a.press = 0; a.ride = null;
-    if (world.bodies.has(o)) { o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF }); o.body.setGravityScale(TUNE.physics.FALL); o.body.setAwake(true); }
+    if (world.bodies.has(o)) { o.body.getFixtureList().setFilterData(HIT_ALL); o.body.setGravityScale(TUNE.physics.FALL); o.body.setAwake(true); }
   },
 });
 export function install(app) {}

@@ -5,14 +5,14 @@
 // off), it still has hold of the card and simply rides it down (hitch).
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
-import { world } from '../../../world/world.js';
+import { world, HIT_ALL, NO_HIT } from '../../../world/world.js';
 import { set, say, POSES } from '../index.js';
 
-const S = TUNE.physics.S, HI = TUNE.severed.HITCH, NONE = { groupIndex: 0, categoryBits: 1, maskBits: 0 };
+const S = TUNE.physics.S, HI = TUNE.severed.HITCH;
 
 export default defineBehaviour('sev', 'cheese', {
   pose: 'grip',
-  enter(o, m) { o.body.getFixtureList().setFilterData(NONE); o.body.setGravityScale(0); o.ai.vx = 0; },
+  enter(o, m) { o.body.getFixtureList().setFilterData(NO_HIT); o.body.setGravityScale(0); o.ai.vx = 0; },
   tick(o, m, dt) {
     const a = o.ai, q = a.ride, b = o.body;
     if (!q || !world.bodies.has(q)) { set(o, 'limp'); return; }
@@ -28,5 +28,5 @@ export default defineBehaviour('sev', 'cheese', {
   leave(o, m) { const a = o.ai; a.poseSet = false; a.wig = 0; if (world.bodies.has(o)) { b0(o); } },
 });
 // back to an ordinary body: it bumps into things and falls again
-function b0(o) { o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF }); o.body.setGravityScale(TUNE.physics.FALL); o.body.setAwake(true); }
+function b0(o) { o.body.getFixtureList().setFilterData(HIT_ALL); o.body.setGravityScale(TUNE.physics.FALL); o.body.setAwake(true); }
 export function install(app) {}

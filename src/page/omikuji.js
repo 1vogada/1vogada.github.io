@@ -9,10 +9,10 @@
 import { TUNE } from '../core/tune.js';
 import { real } from '../core/clock.js';
 import { bus } from '../core/bus.js';
-import { line, list } from '../core/lines.js';
+import { line } from '../core/lines.js';
 import { say } from '../core/speech.js';
 import { world, isCrazy } from '../world/world.js';
-import { thinFortunes } from './language.js';
+import { fortunes, drawSlip } from './language.js';
 
 const O = TUNE.omikuji, KEY = 'kiripad-omikuji';
 const CODE = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];
@@ -20,19 +20,14 @@ const MINCHO = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 const CURSE = '凶';
 let on = false, FORTUNES = null;
 
-/** is every card a slip (this visit) */
-export const isOn = () => on;
 
-/** one fortune, by weight (as scenes/fortune.js drawFortune): [kanji, name, [text, tooltip]] */
+/** one fortune, by weight (page/language.js drawSlip, as scenes/fortune.js): [kanji, name, [text, tooltip]] */
 function draw() {
-  if (!FORTUNES) FORTUNES = thinFortunes(list('fortune.slip').map((f) => [...f]));
-  const total = FORTUNES.reduce((a, f) => a + f[3], 0);
-  let r = Math.random() * total, f = FORTUNES[0];
-  for (const x of FORTUNES) { if ((r -= x[3]) < 0) { f = x; break; } }
-  const t = Array.isArray(f[2]) ? f[2][Math.floor(Math.random() * f[2].length)] : [f[2], ''];
+  if (!FORTUNES) FORTUNES = fortunes();
+  const [f, t] = drawSlip(FORTUNES);
   return [f[0], f[1], t];
 }
-const curseOf = () => { if (!FORTUNES) FORTUNES = thinFortunes(list('fortune.slip').map((f) => [...f])); const f = FORTUNES.find((x) => x[0] === CURSE) || FORTUNES[FORTUNES.length - 1]; return [f[0], f[1], [f[2], '']]; };
+const curseOf = () => { if (!FORTUNES) FORTUNES = fortunes(); const f = FORTUNES.find((x) => x[0] === CURSE) || FORTUNES[FORTUNES.length - 1]; return [f[0], f[1], [f[2], '']]; };
 
 const css = (el, s) => { Object.assign(el.style, s); return el; };
 const div = (s, text) => { const d = css(document.createElement('div'), s); if (text != null) d.textContent = text; return d; };

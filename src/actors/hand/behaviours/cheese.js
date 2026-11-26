@@ -9,18 +9,18 @@
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
-import { world, isHeld, toLocal, rectPoly, remove } from '../../../world/world.js';
+import { world, isHeld, toLocal, rectPoly, remove, NO_HIT, pinJoint } from '../../../world/world.js';
 import { POSES } from '../poses.js';
 import { set, speak, clamp01 } from '../index.js';
 import { gripPt, wristFor, tugDraw, untug, split, strands } from '../tug.js';
 
-const S = TUNE.physics.S, C = TUNE.hand.CHEESE, NONE = { groupIndex: 0, categoryBits: 1, maskBits: 0 };
+const S = TUNE.physics.S, C = TUNE.hand.CHEESE;
 
 const page = (v) => [v[0] + scrollX, v[1] + scrollY];
 /** a mouse joint from the arm's grip H (page px) to the card's point at H */
 function grab(c, q, H) {
-  q.body.setAngularDamping(TUNE.physics.HELD_SPIN); q.body.getFixtureList().setFilterData(NONE); q.el.style.pointerEvents = 'none';
-  c.joint = world.b2.createJoint(new world.pl.MouseJoint({ maxForce: TUNE.physics.MAX_FORCE * q.body.getMass(), frequencyHz: TUNE.hand.JOINT_HZ, dampingRatio: 1 }, world.ground, q.body, { x: H[0] / S, y: H[1] / S }));
+  q.body.setAngularDamping(TUNE.physics.HELD_SPIN); q.body.getFixtureList().setFilterData(NO_HIT); q.el.style.pointerEvents = 'none';
+  c.joint = pinJoint(q.body, { x: H[0] / S, y: H[1] / S }, TUNE.hand.JOINT_HZ);
 }
 /** the old hand let go first: the card is the arm's, whole */
 function win(c, o, H) {
@@ -35,7 +35,7 @@ export default defineBehaviour('hand', 'cheese', {
     if (c.joint) { world.b2.destroyJoint(c.joint); c.joint = null; }
     const gp = toLocal(o, P), gh = toLocal(o, H), dx = gh[0] - gp[0], dy = gh[1] - gp[1], dn = Math.hypot(dx, dy) || 1;
     o.tug = { cheese: old, P: [...P], P0: [...P], H0: H, gp, gh, dn, d0: Math.max(80, dn), d: dn, phi: Math.atan2(dy, dx), psi: Math.atan2(H[1] - P[1], H[0] - P[0]), s: 1, e: 0, grip: 1, rip: C.TEAR_PX };
-    o.body.getFixtureList().setFilterData(NONE);
+    o.body.getFixtureList().setFilterData(NO_HIT);
     c.hy = H[1] - scrollY; speak('cheese', true);
   },
   tick(c, m, dt) {
@@ -69,6 +69,6 @@ export default defineBehaviour('hand', 'cheese', {
     speak('cheeseEnd', true);
     return true;
   },
-  leave(c, m) { const o = c.o, g = o && o.tug; if (g && g.cheese && world.bodies.has(o)) { untug(o, g.P, page(gripPt())); o.body.getFixtureList().setFilterData(NONE); } },
+  leave(c, m) { const o = c.o, g = o && o.tug; if (g && g.cheese && world.bodies.has(o)) { untug(o, g.P, page(gripPt())); o.body.getFixtureList().setFilterData(NO_HIT); } },
 });
 export function install(app) {}

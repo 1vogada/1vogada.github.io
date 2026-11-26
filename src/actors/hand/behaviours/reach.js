@@ -1,12 +1,11 @@
 // hand state "reach": creeps across the screen to a card on the shelf; emits hand.reaching every frame (cards panic); crushes (40%) or drags it off to eat. Blind in the kiri flood (blind-fog): it gropes instead (grope.js).
-// hand state "reach": creeps across the screen to a card on the shelf; emits hand.reaching every frame (cards panic); crushes (40%) or drags it off to eat.
 // The kept coin (kind 'coin', page/coinbody.js; the shelf offers it before any card) is never crushed: it is bitten (bite.js).
 // Legacy clawTick branch `c.st === 'reach'`, moved verbatim (legacy panic(o, fear, dt, t) is the event 'hand.reaching', answered by
 // the cards in src/reactions.js; legacy say(o, 'pull', true) is 'hand.grabbed' { how: 'reach' }, answered by the cards). tick(c, m, dt) sets the motion target on the frame's ctx m.x.
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
-import { world } from '../../../world/world.js';
+import { world, NO_HIT, pinJoint } from '../../../world/world.js';
 import { POSES } from '../poses.js';
 import { set, speak, shelf, clamp01, blind } from '../index.js';
 import { gripPt, wristFor, crushStart } from '../tug.js';
@@ -33,8 +32,8 @@ export default defineBehaviour('hand', 'reach', {
         if (o.kind === 'coin') { take(c, o, w, Hc[1]); return; }   // a coin: is it gold? (bite.js)
         if (Math.random() < H_.REACH_CHANCE_CRUSH) { crushStart(o); set('crush'); speak('snatch', true); }
         else {
-          o.body.setAngularDamping(TUNE.physics.HELD_SPIN); o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0 }); o.el.style.pointerEvents = 'none';
-          c.joint = world.b2.createJoint(new world.pl.MouseJoint({ maxForce: TUNE.physics.MAX_FORCE * o.body.getMass(), frequencyHz: H_.JOINT_HZ, dampingRatio: 1 }, world.ground, o.body, { x: w.x, y: w.y }));
+          o.body.setAngularDamping(TUNE.physics.HELD_SPIN); o.body.getFixtureList().setFilterData(NO_HIT); o.el.style.pointerEvents = 'none';
+          c.joint = pinJoint(o.body, { x: w.x, y: w.y }, H_.JOINT_HZ);
           set('eat'); speak('grab', true);
         }
       }

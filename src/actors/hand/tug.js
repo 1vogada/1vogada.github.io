@@ -8,7 +8,7 @@ import { TUNE } from '../../core/tune.js';
 import { bus } from '../../core/bus.js';
 import { now } from '../../core/clock.js';
 import { line } from '../../core/lines.js';
-import { world, remove, hold, fragment, rectPoly } from '../../world/world.js';
+import { world, remove, hold, fragment, rectPoly, HIT_ALL, NO_HIT, pinJoint } from '../../world/world.js';
 import { polyArea, validPoly } from '../../world/cut.js';
 import { gore, shake } from '../../world/fx.js';
 import { rim, keepClip, ownClip, stretchLook } from '../../world/stretch.js';
@@ -18,7 +18,6 @@ import { get, set, speak, clamp01 } from './index.js';
 
 const S = TUNE.physics.S, HELD_SPIN = TUNE.physics.HELD_SPIN, H_ = TUNE.hand;
 const html = () => document.documentElement;
-const NONE = { groupIndex: 0, categoryBits: 1, maskBits: 0 }, ALL = { groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF };
 
 // ---- pieces of cards: the same tug of war, rip and crush as a whole card, on the piece's own outline ----
 /** o's outline in its own px (0..w, 0..h): the piece's polygon, or the card's rectangle */
@@ -70,7 +69,7 @@ export function pre(o, keep) {
 export function tug(o) {
   const claw = get();
   keepClip(o); o.tug = { ...claw.pre, grip: 1, s: 1, e: 0, d: claw.pre.d0, psi: 0 }; claw.gh = claw.pre.gh;
-  o.body.getFixtureList().setFilterData(NONE);   // nothing bumps into a card that is being fought over
+  o.body.getFixtureList().setFilterData(NO_HIT);   // nothing bumps into a card that is being fought over
   claw.hy = Math.max(90, Math.min(innerHeight - 90, gripPt()[1]));
   set('tug'); speak('grab', true);
   bus.emit('hand.grabbed', { card: o, how: 'tug' });
@@ -90,7 +89,7 @@ export function untug(o, P, H) {
   const g = o.tug, dx = H[0] - P[0], dy = H[1] - P[1], d = Math.hypot(dx, dy) || 1;
   tugDraw(o, P, [P[0] + dx / d * g.d0, P[1] + dy / d * g.d0]);
   o.tug = null; ownClip(o); o.el.style.maskImage = o.el.style.webkitMaskImage = ''; o.el.style.filter = '';
-  o.body.getFixtureList().setFilterData(ALL);
+  o.body.getFixtureList().setFilterData(HIT_ALL);
   const p = o.body.getPosition(); o.px = p.x; o.py = p.y; o.pa = o.body.getAngle();
 }
 /** a sharp yank right after it grabs and the claws slide off (legacy clawSlip(P, H)); emits 'hand.slipped' after its line */
@@ -163,7 +162,7 @@ export function rip(P, H) {
   // legacy `world.destroyJoint(gr.joint); grab = null;`: the pointer's hold ends without a drop() (no release, no throw)
   world.b2.destroyJoint(gr.joint); world.grab = null; o.tug = null; remove(o);
   hold(mine, P[0], P[1], { pointerId: gr.id, clientX: gr.cx, clientY: gr.cy }); world.grab.moved = true; world.grab.h = gr.h; c.g = world.grab; c.far = false;
-  c.o = its; c.gh = g.gh; c.joint = world.b2.createJoint(new world.pl.MouseJoint({ maxForce: TUNE.physics.MAX_FORCE * its.body.getMass(), frequencyHz: H_.JOINT_HZ, dampingRatio: 1 }, world.ground, its.body, { x: H[0] / S, y: H[1] / S }));
+  c.o = its; c.gh = g.gh; c.joint = pinJoint(its.body, { x: H[0] / S, y: H[1] / S }, H_.JOINT_HZ);
   its.body.setAngularDamping(HELD_SPIN);
   strands(mine, its, g, cut, W, Hh);
   bus.emit('hand.ripped', { mine, its }); set('triumph'); speak('rip', true);   // legacy say(mine, 'slice', true): your half screams
@@ -180,7 +179,7 @@ export const crushPause = (t) => H_.CRUSH_PAUSES.some(([a, b]) => t > a && t < b
 /** the card is in its fist from here on (legacy crushStart(o)) */
 export function crushStart(o) {
   const claw = get();
-  o.hot = 0; o.body.setBullet(false); o.body.setGravityScale(0); o.body.getFixtureList().setFilterData(NONE); o.el.style.pointerEvents = 'none';
+  o.hot = 0; o.body.setBullet(false); o.body.setGravityScale(0); o.body.getFixtureList().setFilterData(NO_HIT); o.el.style.pointerEvents = 'none';
   keepClip(o);
   const pts = [], ph = Math.random() * 6, R = rim(o, 6); for (let k = 0; k < R.length; k++) pts.push([R[k][0], R[k][1], 0.45 + 0.22 * Math.sin(k * 1.9 + ph) + 0.18 * Math.random()]);
   o.tug = { crush: true, cen: middle(o), a: o.body.getAngle(), pts, spin: (Math.random() - 0.5) * 1.6 }; claw.hy = Math.max(110, Math.min(innerHeight - 110, claw.y));

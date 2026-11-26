@@ -6,17 +6,17 @@
 import { defineBehaviour } from '../../../core/machine.js';
 import { TUNE } from '../../../core/tune.js';
 import { bus } from '../../../core/bus.js';
-import { world, remove, isHeld } from '../../../world/world.js';
+import { world, remove, isHeld, HIT_ALL, NO_HIT, pinJoint } from '../../../world/world.js';
 import { gore } from '../../../world/fx.js';
 import { POSES } from '../poses.js';
 import { set, wrapA } from '../index.js';
 
-const S = TUNE.physics.S, SEW = TUNE.hand.SEW, ALL = { groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF }, NONE = { groupIndex: 0, categoryBits: 1, maskBits: 0 };
+const S = TUNE.physics.S, SEW = TUNE.hand.SEW;
 
 /** let go of it (you took it back): it falls where it is */
 function letGo(c, o) {
   if (c.joint) { world.b2.destroyJoint(c.joint); c.joint = null; }
-  if (world.bodies.has(o)) { o.body.getFixtureList().setFilterData(ALL); o.body.setGravityScale(isHeld(o) ? 1 : TUNE.physics.FALL); o.body.setAwake(true); }
+  if (world.bodies.has(o)) { o.body.getFixtureList().setFilterData(HIT_ALL); o.body.setGravityScale(isHeld(o) ? 1 : TUNE.physics.FALL); o.body.setAwake(true); }
   c.o = null;
   bus.emit('hand.dropped', { hand: o });
 }
@@ -26,8 +26,8 @@ export default defineBehaviour('hand', 'sew', {
   uncut: true,
   enter(c, m) {
     const o = c.o, w = o.body.getWorldCenter();
-    o.body.getFixtureList().setFilterData(NONE); o.body.setGravityScale(0); o.body.setAngularDamping(TUNE.physics.HELD_SPIN);
-    c.joint = world.b2.createJoint(new world.pl.MouseJoint({ maxForce: TUNE.physics.MAX_FORCE * o.body.getMass(), frequencyHz: SEW.HZ, dampingRatio: 1 }, world.ground, o.body, { x: w.x, y: w.y }));
+    o.body.getFixtureList().setFilterData(NO_HIT); o.body.setGravityScale(0); o.body.setAngularDamping(TUNE.physics.HELD_SPIN);
+    c.joint = pinJoint(o.body, { x: w.x, y: w.y }, SEW.HZ);
     bus.emit('hand.sewing', { hand: o });
   },
   tick(c, m, dt) {

@@ -1,13 +1,11 @@
 // The search box (legacy q input / keydown). Escape clears it; Enter opens the first result; tana / рафт / たな / 棚 + Enter
 // opens the shelf through actors/shelf.js (legacy window.__shelf, which only existed without reduced motion).
-// The "/" key that focuses the box is part of the page keys (page/kiri.js); it calls focus() here.
+// The "/" key that focuses the box is part of the page keys (page/kiri.js), which focuses it itself.
 
 import { render, setQuery, visible } from './directory.js';
 import * as shelf from '../actors/shelf.js';
 
 let q = null;
-/** legacy q.focus() from the page keys ("/", not in crazy mode: the caller checks) */
-export const focus = () => q && q.focus();
 
 export function install(app) {
   q = document.getElementById('q');

@@ -4,7 +4,7 @@
 import { defineBehaviour } from '../../../core/machine.js';
 import { bus } from '../../../core/bus.js';
 import { TUNE } from '../../../core/tune.js';
-import { world } from '../../../world/world.js';
+import { world, pinJoint } from '../../../world/world.js';
 import { POSES } from '../poses.js';
 import { set, speak } from '../index.js';
 import { wristFor, pre, tug, tugDraw, untug } from '../tug.js';
@@ -37,7 +37,7 @@ export default defineBehaviour('hand', 'has', {
       if (sn.t < 0.45) tugDraw(ob, Pv, H);
       else {
         untug(ob, Pv, H); c.snap = null; ob.body.setGravityScale(P_.FALL); ob.body.setAngularDamping(P_.HELD_SPIN);
-        c.joint = world.b2.createJoint(new world.pl.MouseJoint({ maxForce: P_.MAX_FORCE * ob.body.getMass(), frequencyHz: H_.JOINT_HZ, dampingRatio: 1 }, world.ground, ob.body, { x: H[0] / S, y: H[1] / S }));
+        c.joint = pinJoint(ob.body, { x: H[0] / S, y: H[1] / S }, H_.JOINT_HZ);
       }
     } else if (c.joint) c.joint.setTarget({ x: H[0] / S, y: H[1] / S });
     return true;

@@ -87,7 +87,7 @@ function uproot(o) {
   world.rootOf.delete(card); card.classList.remove('pulling'); card.style.transform = ''; card.classList.add('held');
   o.el = el; o.ex = o.w / 2; o.ey = o.h / 2; o.root = null; W.markRipped(o.key); world.loose.delete(o.key); world.tugs.delete(o.key);
   o.body.setGravityScale(TUNE.physics.FALL);
-  o.body.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF });
+  o.body.getFixtureList().setFilterData(W.HIT_ALL);
   if (world.grab && world.grab.o === o) { world.grab.joint.setFrequency(TUNE.drag.HAND_HZ); world.grab.joint.setDampingRatio(TUNE.drag.HAND_DAMPING); W.carry(o); }
   W.showReset();
 }

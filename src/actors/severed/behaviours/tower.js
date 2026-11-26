@@ -8,6 +8,7 @@ import { TUNE } from '../../../core/tune.js';
 import { clamp01, wrapA } from '../gait.js';
 import { set, say, POSES } from '../index.js';
 import { tower, tier, place } from '../tower.js';
+import { HIT_ALL } from '../../../world/world.js';
 
 const S = TUNE.physics.S, TW = TUNE.severed.TOWER;
 const TEAM = { groupIndex: -7, categoryBits: 1, maskBits: 0xFFFF };   // the three never collide with each other
@@ -42,7 +43,7 @@ export default defineBehaviour('sev', 'tower', {
   },
   leave(o, m) {
     const a = o.ai, b = o.body; a.poseSet = false; a.wig = 0;
-    b.setGravityScale(TUNE.physics.FALL); b.getFixtureList().setFilterData({ groupIndex: 0, categoryBits: 1, maskBits: 0xFFFF }); b.setAwake(true);
+    b.setGravityScale(TUNE.physics.FALL); b.getFixtureList().setFilterData(HIT_ALL); b.setAwake(true);
   },
 });
 export function install(app) {}

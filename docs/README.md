@@ -17,8 +17,8 @@ A file imports only from a layer with a lower number, or from its own package. `
 
 | layer | folder | package | may import |
 |---|---|---|---|
-| 1 | `src/core/` | core: `clock bus events lines speech machine claims tune debug` | core only |
-| 2 | `src/world/` | world: `world loop drag shatter cut fx` | core |
+| 1 | `src/core/` | core: `clock bus events lines speech machine claims tune debug commands` | core only |
+| 2 | `src/world/` | world: `world loop drag shatter cut fx stretch bite math` | core |
 | 3 | `src/actors/` | one package per actor: `cards.js`, `katana.js`, `hand/`, `severed/`, `shelf.js` | core, world. **Never another actor** |
 | 4 | `src/page/`, `src/lines/` | two packages (not each other) | core, world, actors |
 | 4.5 | `src/scenes/`, `src/phrasebook/` | two packages (not each other) | the above, and `page/` |
@@ -37,9 +37,8 @@ public API. Every module exports `install(app)`; `app` holds every module by its
 | the blade's cut, stab, wounds | `src/world/cut.js` (reads `world.blade`) | `card.cutting/stab/slice`, `katana.cut/brag` | |
 | cards: pull, tear, agony, panic, regrow | `src/actors/cards.js` | `src/lines/cards.js` | |
 | katana: reveal, draw, equip, sheathe | `src/actors/katana.js` | `src/lines/katana.js` | `styles/physics.css` |
-| the arm's hand (18 states) | `src/actors/hand/index.js` (tick, speech, sever), `behaviours/<state>.js`, `tug.js` (tug, slip, rip, crush helpers), `draw.js`, `poses.js`, `zones.js` | `src/lines/hand.js` | `styles/hand.css` |
-| cut-off hands (7 states) | `src/actors/severed/index.js`, `behaviours/<state>.js`, `gait.js` (legs, walking forces) | `src/lines/severed.js` | `styles/hand.css` |
-| the secret shelf (棚 tana) | `src/actors/shelf.js`; opened by `src/page/kiri.js` (typed), `src/page/search.js` (Enter) | `src/lines/shelf.js` (toasts) | `styles/physics.css` |
+| the arm's hand (one file per state) | `src/actors/hand/index.js` (tick, speech, sever), `behaviours/<state>.js`, `tug.js` (tug, slip, rip, crush helpers), `draw.js`, `poses.js`, `zones.js` | `src/lines/hand.js` | `styles/hand.css` |
+| cut-off hands (one file per state) | `src/actors/severed/index.js`, `behaviours/<state>.js`, `gait.js` (legs, walking forces) | `src/lines/severed.js` | `styles/hand.css` |
 | the old hand pokes your still cursor first, then turns with the arm (idle-old) | `src/actors/severed/pester.js` (who, the pace), `severed/behaviours/pester.js`, `hand/behaviours/mine.js` ("that's MY job") | `sev.pester*`, `hand.pester*` | |
 | old hands dance in crazy mode, the arm bobs along | `src/actors/severed/dance.js` (groove, the inline overrides of crazy mode's hiding), `behaviours/dance.js`, `jive.js`, `freeze.js`; `src/actors/hand/bob.js` | `sev.dance/jive/freeze/pretend`, `hand.bob/danced` | inline styles only |
 | the secret shelf (棚 tana) | `src/actors/shelf.js`; opened by `src/page/kiri.js` (typed), `src/page/search.js` (Enter), `src/page/slash.js` (katana across 棚) | `src/lines/shelf.js` (toasts) | `styles/physics.css` |
@@ -52,6 +51,17 @@ public API. Every module exports `install(app)`; `app` holds every module by its
 | the katana slits the fog; slashing 棚 opens the shelf | `src/page/slash.js` (on `blade.moved`, in `reactions.js`); `slit` in `fog.js`, `kiri.js` | `katana.tana` | inline |
 | blind in the kiri flood: the hand gropes, a hole wiped by it and it sees you (blind-fog) | `src/actors/hand/behaviours/grope.js`; `sight()` / `blind()` / `unseen()` in `hand/index.js`; `flooded()` / `fogAt()` in `src/page/kiri.js`, injected via `hand.senses` in `reactions.js` | `hand.dark/grope/there/light` | |
 | a ghost in the fog: the eaten old hand lingers in the banner fog, roams the kiri flood tapping cards, is bowed to by old hands, laid to rest by wiping | `src/page/ghost.js` (drawn through `overlay` in `fog.js`, `kiri.js`); `severed.salute` | `ghost.*`, `card.ghost`, `sev.ghost`, `toast.ghost` | inline |
+| a card yanked or tugged goes long and thin and cracks (the stretch look); bite marks as a clip-path | `src/world/stretch.js`; `src/world/bite.js` | | inline |
+| small shared maths (`clamp01`, `wrapA`) | `src/world/math.js` | | |
+| the ledge that keeps the toast or the kept coin on your screen | `src/page/ledge.js` (used by `bread.js`, `coinbody.js`) | | |
+| "are you still there?" (the pointer has not moved) and mouse circles | `src/actors/hand/idle.js` | | |
+| the hand tower (three old hands climb and pull the arm out) | `src/actors/severed/tower.js`, `severed/behaviours/tower.js` | `sev.tower*` | inline |
+| rock, paper, scissors between the arm and an old hand | `src/scenes/rps.js`, `src/actors/severed/behaviours/rps.js` | `hand.rps*`, `sev.rps*` | inline |
+| say "hand": select the word and the hand pinches it off the page | `src/scenes/word.js` | `hand.word`, `hand.wordgot` | inline |
+| Konami code: the grid cards fold into omikuji slips | `src/page/omikuji.js` | `fortune.slip`, `page.konami`, `card.omikuji` | inline |
+| the basement trophy wall under the footer; the hand's diary (a phrasebook chapter, type kotoba) | `src/page/basement.js`; `src/page/diary.js` | `page.trophy*` | inline |
+| page easter eggs: 1926 silent film, and the rest listed in its header | `src/page/eggs.js` | `page.*` | inline |
+| secret console commands (`window.kiri`) and the note in the console | `src/core/commands.js` (`defineCommand`), `src/page/console.js` | | |
 | theme, crazy mode, English only | `src/page/theme.js`, `crazy.js`, `language.js` | | `styles/base.css`, `crazy.css` |
 | Surprise me, the omikuji slip, the secret × | `src/scenes/fortune.js` | `fortune.slip` in `src/lines/page.js` | `styles/omikuji.css` |
 | the coin game; welcome back; scene runner | `src/scenes/coin.js`; `welcome-back.js`; `scene.js` | `hand.*`, `button.hi` | `styles/omikuji.css` |
@@ -87,7 +97,7 @@ frame(t): tab hidden -> return (resumes when shown)    no hasWork() true -> stop
         blade     world/cut: bleed, the blade's stroke (emits blade.moved, card.cutting, card.cut, card.stabbed)
         hand      actors/hand: the arm (pre-chain, the current behaviour's tick, post-chain, draw, sever check)
         severed   actors/severed: every cut-off hand (age, held check, behaviour tick, turn, draw)
-        late      free: put a new actor's per-frame work here
+        late      page/bread, page/coinbody: the ledge (page/ledge.js); put a new actor's per-frame work here too
   busy = any keepAwake()
   draw  bodies    world/loop: transforms, fades, speech.ride(world.bodies)
         bubbles   core/speech: layout()
@@ -97,7 +107,7 @@ frame(t): tab hidden -> return (resumes when shown)    no hasWork() true -> stop
 | register with | signature | who uses it today |
 |---|---|---|
 | `clock.onStep(fn, phase)` | `fn()` per 1/240 s step | world/loop (pose, forces, joints, world, bodies), severed/gait (forces), world/shatter (impacts, blasts) |
-| `clock.onTick(fn, phase)` | `fn(dt, ms)` per frame | world/loop (input), world/fx (fx), world/cut (blade), hand (hand), severed (severed) |
+| `clock.onTick(fn, phase)` | `fn(dt, ms)` per frame | world/loop (input), world/fx (fx), world/cut (blade), hand (hand), severed (severed), page/bread and page/coinbody (late) |
 | `clock.onDraw(fn, phase)` | `fn(k)` per frame | world/loop (bodies), core/speech (bubbles) |
 | `clock.hasWork(fn)` | may the loop start / run this frame | world/loop (bodies exist), world/fx (bits), hand, severed, shelf |
 | `clock.keepAwake(fn)` | ask for another frame | world/loop (grab, root, die, say, awake bodies), world/fx, hand, severed, shelf |
@@ -109,7 +119,7 @@ The phases are fixed in `core/clock.js` (`STEP_PHASES`, `TICK_PHASES`, `DRAW_PHA
 
 | command | what it does |
 |---|---|
-| `npm test` | the 35 browser scenarios (Playwright, Chromium) on the modules, compared **strictly** with `tests/golden/` (about 9 min: prefer `ONLY`) |
+| `npm test` | the browser scenarios (Playwright, Chromium) on the modules, compared **strictly** with `tests/golden/` (about 9 min: prefer `ONLY`) |
 | `ONLY="part of a name" npm test` | only the scenarios whose name contains the text |
 | `npm run test:legacy` | the same scenarios on `?legacy` (`LEGACY=1`; until legacy.js is deleted). A scenario whose behaviour changed after the flip takes `legacy: false` and is skipped there |
 | `UPDATE_GOLDEN=1 ONLY="..." npm run test:golden` | record (or re-record) the goldens of the matching scenarios from the modules; review `git diff tests/golden` (recipes.md 10) |

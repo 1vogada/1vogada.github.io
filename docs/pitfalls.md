@@ -49,9 +49,10 @@ import, an import that leaves `src/`, or a layer violation. Comments are ignored
 
 Lint fails on it. The same holds for `scenes/` vs `phrasebook/`, and nothing below layer 4.5 imports a scene or the phrasebook.
 **Do:** emit an event and add a rule to `src/reactions.js`; for a per-frame query inject a function the way the hand senses the
-shelf (`hand.senses({...})` in `reactions.js`). Three places read another module off `app` instead (not lint-checked; keep it rare):
+shelf (`hand.senses({...})` in `reactions.js`). A few places read another module off `app` instead (not lint-checked; keep it rare):
 `severed` draws with `app.handDraw`, the hand's `__hand.katanaSvg` and `phrasebook/figures.js` read `app.katana.katanaSvg`,
-`page/kiri.js` calls `app.shelf.toggle()`.
+`page/kiri.js` and `page/console.js` call `app.shelf.toggle()`, `page/console.js` calls `app.hand.cut()`, `phrasebook/raid.js`
+reads `app.hand.awake()`.
 
 ## 5. Body claims and shared flags
 
