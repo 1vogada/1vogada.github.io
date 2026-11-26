@@ -48,6 +48,7 @@ function theEnd() {
 function moon() {
   const sun = document.querySelector('#hero svg.scene circle'); if (!sun || sun.dataset.moon) return;
   sun.dataset.moon = '1';
+  const was = { transition: sun.style.transition, fill: sun.getAttribute('fill'), opacity: sun.getAttribute('opacity') };
   bus.emit('secret.found', { name: 'moon' });
   const cx = +sun.getAttribute('cx'), cy = +sun.getAttribute('cy'), r = +sun.getAttribute('r');
   sun.style.transition = 'fill 1.2s, opacity 1.2s'; sun.setAttribute('fill', '#efe9d8'); sun.setAttribute('opacity', '1');
@@ -60,9 +61,14 @@ function moon() {
   eye.animate([{ ry: '0.5px' }, { ry: `${r * 0.2}px` }], { duration: 900, delay: 600, fill: 'forwards', easing: 'ease-out' });
   iris.animate([{ ry: '0.4px' }, { ry: `${r * 0.18}px` }], { duration: 900, delay: 600, fill: 'forwards', easing: 'ease-out' });
   // it watches the pointer, and blinks now and then
-  document.addEventListener('pointermove', (e) => { const b = sun.getBoundingClientRect(), dx = e.clientX - (b.left + b.width / 2), dy = e.clientY - (b.top + b.height / 2), d = Math.hypot(dx, dy) || 1; iris.setAttribute('cx', String(cx + (dx / d) * 12)); iris.setAttribute('cy', String(cy + (dy / d) * 5)); }, { passive: true });
-  real.every(5200, () => { eye.animate([{ ry: `${r * 0.2}px` }, { ry: '0.5px' }, { ry: `${r * 0.2}px` }], { duration: 220 }); iris.animate([{ opacity: 1 }, { opacity: 0 }, { opacity: 1 }], { duration: 220 }); });
+  const watch = (e) => { const b = sun.getBoundingClientRect(), dx = e.clientX - (b.left + b.width / 2), dy = e.clientY - (b.top + b.height / 2), d = Math.hypot(dx, dy) || 1; iris.setAttribute('cx', String(cx + (dx / d) * 12)); iris.setAttribute('cy', String(cy + (dy / d) * 5)); };
+  document.addEventListener('pointermove', watch, { passive: true });
+  const blink = real.every(5200, () => { eye.animate([{ ry: `${r * 0.2}px` }, { ry: '0.5px' }, { ry: `${r * 0.2}px` }], { duration: 220 }); iris.animate([{ opacity: 1 }, { opacity: 0 }, { opacity: 1 }], { duration: 220 }); });
+  sunAgain = () => { document.removeEventListener('pointermove', watch); blink(); g.remove(); sun.style.transition = was.transition; for (const k of ['fill', 'opacity']) { if (was[k] == null) sun.removeAttribute(k); else sun.setAttribute(k, was[k]); } delete sun.dataset.moon; };
 }
+let sunAgain = null;
+/** the sun is back, as if the moon never came (the stage puts it back after its act: src/showcase/acts/page.js) */
+export function unmoon() { if (sunAgain) { const f = sunAgain; sunAgain = null; f(); } }
 
 // ---- apologise to the card ----
 const A = TUNE.apology;

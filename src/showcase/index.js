@@ -14,7 +14,9 @@ import { clock } from '../core/clock.js';
 import { hook } from '../core/debug.js';
 import { rehearse } from '../core/rehearsal.js';
 import { defineCommand } from '../core/commands.js';
-import { world, remove, isCrazy } from '../world/world.js';
+import { world, remove, reset as resetCards, isCrazy } from '../world/world.js';
+import { current as sceneNow } from '../scenes/scene.js';
+import { closeFortune } from '../scenes/fortune.js';
 import { rig, STOP } from './rig.js';
 import { PARTS } from './acts/index.js';
 
@@ -115,10 +117,11 @@ async function setScene(r) {
   if (isCrazy() && app.crazy) app.crazy.setCrazy(false);
   if (app.phrasebook && app.phrasebook.close) app.phrasebook.close();
   if (app.kiri && app.kiri.floodState && app.kiri.floodState()) app.kiri.lift();
-  const omi = document.getElementById('omikuji'); if (omi && !omi.hidden) { const x = omi.querySelector('.omi-x'); if (x) x.click(); }
+  const sc = sceneNow(); if (sc && sc.kill) sc.kill();
+  const omi = document.getElementById('omikuji'); if (omi && !omi.hidden) { if (sceneNow()) { omi.hidden = true; bus.emit('slip.closed', { how: 'stage' }); } else closeFortune('stage'); }
   if (world.b2) {
     for (const o of [...world.bodies]) if (o.kind === 'hand' || o.kind === 'toast') remove(o);
-    world.reset();
+    resetCards();
     if (app.katana && world.blade && !world.blade.root && app.katana.putBack) app.katana.putBack();
     if (app.shelf && app.shelf.state && app.shelf.state()) app.shelf.toggle();
   }

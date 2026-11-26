@@ -47,7 +47,9 @@ export function onHeard(fn) { subs.push(fn); return () => { const i = subs.index
 /** what is new since the last look: { fresh: Set of texts, since: ms of that look (0: never looked) } */
 export const peek = () => ({ fresh: new Set(order.slice(Math.min(seen.n, order.length))), since: seen.at });
 /** the phrasebook is looked at: returns peek() from before, and moves the mark to now */
-export function look() { const p = peek(); seen = { n: order.length, at: Date.now() }; save(); return p; }
+export function look() { const p = peek(); if (rehearsing()) return p; seen = { n: order.length, at: Date.now() }; save(); return p; }   // the stage's look leaves your mark where it was
+/** the stage (src/showcase/): text inks itself in where it is blotted in the open book, as if heard just now. Nothing is recorded */
+export function rehearseInk(text) { for (const fn of subs.slice()) fn(text); }
 
 /** tests: hear every line there is (and look at them, so none is fresh); forget all of it */
 function everything() {
