@@ -31,7 +31,7 @@ const healed = (o) => { o.ai.hurt = 0; };
 async function lurk(r, app, full = true) {
   await r.awake(); app.hand.set('lurk');
   const c = app.hand.get();
-  if (full) { c.fullUntil = clock.now() + 1e9; r.after(() => { c.fullUntil = 0; }); }
+  c.fullUntil = full ? clock.now() + 1e9 : 0; r.after(() => { c.fullUntil = 0; });   // (not still full from an act before)
   return c;
 }
 /** the arm's state */
@@ -45,7 +45,14 @@ async function cardAt(r, i, px, py, quiet) {
   return o;
 }
 /** the ghost takes hold of a body by its middle. @returns where the ghost is */
-async function grab(r, o) { const [x, y] = r.at(o); await r.glide(x, y); await r.down(); return [x, y]; }
+async function grab(r, o) {
+  for (let k = 0; k < 4; k++) {   // (it may have moved on while the ghost came over: aim again)
+    await r.glide(...r.at(o)); const [x, y] = r.at(o); await r.move(x, y); await r.down();
+    if (world.grab && world.grab.o === o) return [x, y];
+    await r.up(); await r.wait(60);
+  }
+  throw new Error('the ghost could not get hold of it');
+}
 /** the ghost lets go where it is and moves off a little (so it does not pick it up again) */
 async function letGo(r) { await r.up(); await r.glide(r.x - 40, r.y - 120); }
 /** Math.random pinned to v for the length of fn (an act forcing a random branch) */
@@ -162,7 +169,7 @@ export const PART = {
         // it sits down: eased down (the drop off its tiptoes is quick enough to count as a knock, and it would be up again at once)
         await sitDown(r, app, o);
         await r.wait(4000);
-        o.ai.wake = 0;
+        o.ai.wake = 0; clock.wake();   // (asleep, it keeps nothing awake)
         await need(r, () => st(app, o) === 'walk', 3000);
         await r.wait(1000);
       } },
@@ -358,8 +365,10 @@ export const PART = {
         const o = await drop(r, 0.35, 300); healed(o);
         await need(r, () => st(app, o) === 'walk', 6000);
         o.ai.cool = clock.now() + 1e6;   // (it is not hungry)
-        const p = r.pos(o), q = await cardAt(r, 1, p[0] + 190, H - 200, true);
-        await r.wait(900);
+        const cx = r.pos(o)[0] + o.ai.fd * 210;   // just ahead of it
+        await r.glide(cx - scrollX, H - 200 - scrollY + 60);   // (the ghost is there already)
+        const q = await cardAt(r, 1, cx, H - 200, true);
+        await r.wait(450);
         const [x, y] = await grab(r, q);
         await r.line(x, y, x + 20, y - 200, 30);
         await need(r, () => o.ai.joint, 2000);
@@ -395,13 +404,15 @@ export const PART = {
         away(); await floor(r);
         tweak(r, TUNE.rps, 'CHANCE', 0); tweak(r, TUNE.hand.WREST, 'CHANCE', 1); tweak(r, TUNE.hand.OLD, 'AWAKE', 0);
         const { W, H } = world.size;
-        const o = await drop(r, W - 440, 300); healed(o); o.ai.met = true;
+        const o = await drop(r, W - 360, 300); healed(o); o.ai.met = true;
         await need(r, () => st(app, o) === 'walk', 6000);
         app.handOld.meet(o);
         const c = await lurk(r, app, false);
         await need(r, () => arm(app) === 'lurk', 4000); await r.wait(600);
-        await cardAt(r, 0, W - 290, H - 260);
-        await need(r, () => st(app, o) === 'crush', 8000);
+        o.ai.fd = o.ai.dir = o.ai.face = 1; o.ai.turn = clock.now() + 1e5;   // facing the edge (turning round, it stalls and loses interest)
+        const q = await cardAt(r, 0, W - 175, H - 280);   // right in front of it, in the arm's reach
+        if (!await r.until(() => st(app, o) === 'crush', 5000) && st(app, o) === 'walk' && world.bodies.has(q)) { o.ai.prey = q; app.severed.set(o, 'crush'); }   // (it lost sight of it: on it goes)
+        await need(r, () => st(app, o) === 'crush', 1000);
         await need(r, () => st(app, o) === 'wrest', 5000);
         c.fullUntil = clock.now() + 1e9; r.after(() => { c.fullUntil = 0; });   // (and then it eats no old hand: this one is a thief now)
         await need(r, () => st(app, o) !== 'wrest', 10000);
