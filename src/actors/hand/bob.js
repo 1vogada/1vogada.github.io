@@ -7,11 +7,11 @@
 // bob(false) (crazy mode off, or the last old hand gone) hands it back to its behaviour, wherever it was.
 import { TUNE } from '../../core/tune.js';
 import { clock, now } from '../../core/clock.js';
-import { expire, place } from '../../core/speech.js';
+import { expire } from '../../core/speech.js';
 import { isCrazy } from '../../world/world.js';
 import { POSES } from './poses.js';
 import { gripPt } from './tug.js';
-import { brain, get, speak, draw, wrapA } from './index.js';
+import { brain, get, speak, draw, easeArm, placeBubble } from './index.js';
 
 const D = TUNE.dance, B = D.BOB, BEAT_MS = TUNE.crazy.TITLE_MS * D.BEAT_TICKS;
 let on = false;
@@ -35,12 +35,10 @@ export function bobTick(c, dt) {
   const vw = document.documentElement.clientWidth, t = now(), b = t / BEAT_MS, n = Math.floor(b), u = b - n;
   const T = [vw - B.EDGE_PX, c.ly + B.PX * (1 - Math.abs(Math.cos(Math.PI * u)))];   // down and up once a beat
   const aim = Math.PI + B.SWAY * Math.sin(Math.PI * b), pose = n % 2 ? POSES.joy : POSES.eager;
-  const k = 1 - Math.exp(-dt * B.RATE), ka = 1 - Math.exp(-dt * 9), kp = 1 - Math.exp(-dt * 12);
-  c.x += (T[0] - c.x) * k; c.y += (T[1] - c.y) * k; c.a += wrapA(aim - c.a) * ka; c.sh += (c.y + 70 - c.sh) * (1 - Math.exp(-dt * 4));
-  for (const key in pose) c.pose[key] = (c.pose[key] || 0) + (pose[key] - (c.pose[key] || 0)) * kp;
+  easeArm(c, dt, T, aim, pose, B.RATE, 9, 12);
   if (!c.bobSaid && t - c.bobAt > B.SAY_MS) { c.bobSaid = true; speak('bob', true); }
   const Hv = gripPt();
-  if (expire(c, t)) place(c, Math.min(c.x, Hv[0], vw - 80) - 30 + scrollX, Math.max(70, Math.min(c.y, Hv[1]) - 115) + scrollY, c.x + scrollX);
+  if (expire(c, t)) placeBubble(c, vw, Hv);
   c.lookAt = null;
   draw(B.WIG, 0, 0);
 }

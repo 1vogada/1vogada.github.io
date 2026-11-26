@@ -1,5 +1,4 @@
 // hand state "reach": creeps across the screen to a card on the shelf; emits hand.reaching every frame (cards panic); crushes (40%) or drags it off to eat. Blind in the kiri flood (blind-fog): it gropes instead (grope.js).
-// hand state "reach": creeps across the screen to a card on the shelf; emits hand.reaching every frame (cards panic); crushes (40%) or drags it off to eat.
 // The kept coin (kind 'coin', page/coinbody.js; the shelf offers it before any card) is never crushed: it is bitten (bite.js).
 // Legacy clawTick branch `c.st === 'reach'`, moved verbatim (legacy panic(o, fear, dt, t) is the event 'hand.reaching', answered by
 // the cards in src/reactions.js; legacy say(o, 'pull', true) is 'hand.grabbed' { how: 'reach' }, answered by the cards). tick(c, m, dt) sets the motion target on the frame's ctx m.x.

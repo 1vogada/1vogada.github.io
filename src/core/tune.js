@@ -114,7 +114,7 @@ export const TUNE = {
     JOINT_HZ: 30,
     SEVER_PX: [13, 16], SEVER_STEP: 8,
     CATCH_CHANCE_CRUSH: 0.3, REACH_CHANCE_CRUSH: 0.4, SNATCH_CHANCE: 0.5, SNATCH_AGAIN: 0.6, TOSS_HARD: 0.3,
-    ZONES: { maxW: 1080, gutter: 16, col: 306, narrow: 0.4, grabMin: 220, grabFrac: 0.4,
+    ZONES: { maxW: 1080, gutter: 16, col: 306,
       cardMaxFrac: 0.45, teaseCards: 2, teaseMaxFrac: 0.6 },   // the tease zone is teaseCards cards wide (so it starts left of the catch zone, past the GitHub link), never more than teaseMaxFrac of vw   // Ivo 2026-11-25: tease and catch zones are each one card wide from the right edge (never more than this share of vw: on a phone a card is the whole screen)
     NEAR: [190, 0.28],                // a held card this close to the right edge (px, or this share of vw if less) gets lunged at and pulled
     SNATCH_REACH: [440, 0.36],        // it only snatches a card this close to the right edge (px, or share of vw); further away it just sulks
@@ -438,7 +438,7 @@ export const TUNE = {
   // The film keeps rolling LINGER_MS (wall time) after the pointer leaves the year (back on the year: it holds); then a last title
   // card (page.filmEnd) and END_MS later the colour comes back (page/eggs.js)
   film: { FPS: 12, LINGER_MS: 30000, END_MS: 1800 },
-  fogSlash: { SLIT_W: 2.5, HALO_W: 9, HALO_A: 0.35, SLIT_SPEED: 40, SLASH_SPEED: 500, TANA_PAD: 12, ACROSS: 0.7, SPLIT_PX: 7, SPLIT_MS: 1800, COOL_MS: 1500 },  // left unattended (chain away-thief): the tab hidden at least AWAY_MS (wall time) after a card was ripped, and you come back to
+  // left unattended (chain away-thief): the tab hidden at least AWAY_MS (wall time) after a card was ripped, and you come back to
   // the hand at the edge chewing one of the grid cards (actors/hand/behaviours/chew.js). Its wrist OUT_PX in from the right edge
   // at Y of the window's height, the card sticking IN_PX into its fist; PRE bites already gone, one more every BITE_S, BITE_PX
   // each (top and bottom edge in turn, from CLEAR_PX left of its fingers on); after CHEW_S it pulls back off the edge and swallows it (to the basement). Pull the card PULL_PX beyond where you took hold and it

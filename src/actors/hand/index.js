@@ -60,6 +60,17 @@ export { POSES };
 const S = TUNE.physics.S, H_ = TUNE.hand;
 const html = () => document.documentElement;
 export const clamp01 = (v) => Math.max(0, Math.min(1, v)), wrapA = (a) => a - 2 * Math.PI * Math.round(a / (2 * Math.PI));
+/** one frame of the arm easing to its wrist target T, angle aim and pose: at rate (position), aRate (angle), pRate (pose) per second; the shoulder follows */
+export function easeArm(c, dt, T, aim, pose, rate, aRate, pRate) {
+  const k = 1 - Math.exp(-dt * rate), ka = 1 - Math.exp(-dt * aRate), kp = 1 - Math.exp(-dt * pRate);
+  c.x += (T[0] - c.x) * k; c.y += (T[1] - c.y) * k; c.a += wrapA(aim - c.a) * ka; c.sh += (c.y + 70 - c.sh) * (1 - Math.exp(-dt * 4));
+  for (const key in pose) c.pose[key] = (c.pose[key] || 0) + (pose[key] - (c.pose[key] || 0)) * kp;
+}
+/** where the arm's bubble goes (TUNE.speech.ARM): above and left of the hand (Hv: the grip in viewport px), kept on screen */
+export function placeBubble(c, vw, Hv) {
+  const A = TUNE.speech.ARM;
+  place(c, Math.min(c.x, Hv[0], vw - A.maxX) + A.dx + scrollX, Math.max(A.minY, Math.min(c.y, Hv[1]) + A.dy) + scrollY, c.x + scrollX);
+}
 
 let claw = null, m = null;
 
@@ -275,9 +286,7 @@ function tick(dt) {
     x.T = [c.mood === 'jealous' ? vw - TUNE.hand.JEALOUS.LEAN_PX : vw + 36, c.ly]; x.rate = 10; x.wig = 0.3; x.aim = Math.PI + Math.sin(m.t * 9) * 0.06; x.pose = c.mood === 'katana' || c.mood === 'smash' ? POSES.sulk : c.mood === 'kdrop' || c.mood === 'stab' ? POSES.joy : POSES.eager;   // jealous: well out, drumming its fingers
   }
   const { T, rate, aim, pose } = x;
-  const k = 1 - Math.exp(-dt * rate), ka = 1 - Math.exp(-dt * (rate > 20 ? 30 : 9)), kp = 1 - Math.exp(-dt * (m.def.poseRate || 12));
-  c.x += (T[0] - c.x) * k; c.y += (T[1] - c.y) * k; c.a += wrapA(aim - c.a) * ka; c.sh += (c.y + 70 - c.sh) * (1 - Math.exp(-dt * 4));
-  for (const key in pose) c.pose[key] = (c.pose[key] || 0) + (pose[key] - (c.pose[key] || 0)) * kp;
+  easeArm(c, dt, T, aim, pose, rate, rate > 20 ? 30 : 9, m.def.poseRate || 12);
   const Hv = gripPt(), H = [Hv[0] + scrollX, Hv[1] + scrollY];
   if (!(m.def.hold && m.def.hold(c, m, x, H)) && c.joint) c.joint.setTarget({ x: H[0] / S, y: H[1] / S });
   for (let i = c.strands.length - 1; i >= 0; i--) {
@@ -288,7 +297,7 @@ function tick(dt) {
     s.el.style.width = len.toFixed(1) + 'px';
     s.el.style.transform = `translate(${(A.x * S).toFixed(1)}px, ${(A.y * S).toFixed(1)}px) rotate(${Math.atan2(B.y - A.y, B.x - A.x).toFixed(3)}rad) scaleY(${Math.max(0.2, s.w / 5 * (1 - 0.8 * len / s.max)).toFixed(2)})`;
   }
-  if (expire(c, t)) place(c, Math.min(c.x, Hv[0], vw - 80) - 30 + scrollX, Math.max(70, Math.min(c.y, Hv[1]) - 115) + scrollY, c.x + scrollX);   // put on the page in the layout pass
+  if (expire(c, t)) placeBubble(c, vw, Hv);   // put on the page in the layout pass
   squeeze(c, vw, t, dt);
   c.lookAt = circling(); c.lookPx = H_.CIRCLE.EYE_PX;   // you move the mouse round in circles: its eye follows the pointer
   draw(x.wig, x.shake, x.strain);
