@@ -19,9 +19,9 @@ Read this before porting anything from `scripts/legacy.js` into `src/`.
 - The import map between the `importmap:start` / `importmap:end` markers in the `<head>` is generated: `npm run stamp` after any change
   under `src/`, `npm run stamp:check` in CI. Every module URL gets one `?v=N`, because GitHub Pages caches each file for 10 minutes on its
   own and a new module next to an old one breaks the page. Import modules by root-absolute or relative URL; both resolve through the map.
-- `npm test` runs the 35 scenarios on legacy and compares each recorded trace (bubbles + actor states) strictly with `tests/golden/`.
-  `npm run test:next` runs them on `/?next` with the looser `kind` comparison (same lists and order of lines, same order of state changes,
-  no exact times or texts). `UPDATE_GOLDEN=1` re-records (legacy only). `ONLY="part of a name"` runs matching scenarios.
+- `npm test` runs the browser scenarios on the modules and compares each recorded trace (bubbles + actor states) strictly with
+  `tests/golden/`; `npm run test:legacy` runs them on `?legacy`. `UPDATE_GOLDEN=1` (`npm run test:golden`) re-records from the modules.
+  `ONLY="part of a name"` runs matching scenarios. (Was: 35 scenarios on legacy, and a `test:next` command; both are gone.)
 - Every test page gets `localStorage['kiripad-lang'] = 'all'` before any site script runs (unless the scenario presets another value).
   The goldens are the mixed English / Bulgarian / Japanese behaviour; an English-only default must treat `all` as "today's behaviour".
 

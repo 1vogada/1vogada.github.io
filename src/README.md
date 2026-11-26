@@ -1,10 +1,7 @@
 # src/: the new kiripad.dev code
 
-<<<<<<< HEAD
-=======
 > Start with [`docs/`](../docs/README.md): the map, recipes for changes, the event catalogue and the pitfalls. This file is the core contract reference.
 
->>>>>>> pkg/d5
 Native ES modules, no build step. Loaded through `/src/main.js` by default since the parity suite passed (all 35 scenarios, strict); `?legacy` loads the old script. Was behind `?next` until the parity suite passes on old
 and new; then the default flips. **Nothing here may change behaviour**: same lines, same timings, same random draws in the
 same order (a seeded `Math.random` gives identical runs old vs new), same order of effects within a frame.
@@ -27,14 +24,15 @@ node scripts/lint-layers.mjs         # layer and timer rules
 5. **No `window.__` outside `core/debug.js`.** Publish a test hook with `debug.hook('__name', value)`.
 6. **Never import another actor.** Emit an event (`core/events.js`) and add one line to `src/reactions.js`.
 7. A file imports only from layers above it, or from its own package. Every module exports `install(app)`.
-8. **Core is frozen.** Later packages code against it; they may not change `src/core/`. Need something? Ask the orchestrator.
+8. **Core was frozen** while the refactor waves ran (later packages coded against it). Since then it has grown a little
+   (`commands.js`, `speech.setStyle`); keep core changes small and documented.
 
 ## Layers
 
 | layer | folder | package (imports inside a package are free) |
 |---|---|---|
-| 1 | `core/` | core: clock bus events lines speech machine claims tune debug |
-| 2 | `world/` | world: world loop drag shatter cut fx |
+| 1 | `core/` | core: clock bus events lines speech machine claims tune debug commands |
+| 2 | `world/` | world: world loop drag shatter cut fx stretch bite math |
 | 3 | `actors/` | one package per actor: `cards.js`, `katana.js`, `hand/`, `severed/`, `shelf.js` |
 | 4 | `page/` `lines/` | two packages (they do not import each other) |
 | 4.5 | `scenes/` `phrasebook/` | two packages; they may import `page/` (the slip needs the directory's data and embroidery), not each other |
