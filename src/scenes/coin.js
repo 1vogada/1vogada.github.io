@@ -21,6 +21,7 @@ const GO_THERE = 'Go there?', HEADS = 'Heads', TAILS = 'Tails';   // page labels
 let free = false;   // the coin landed on its edge: until the slip closes, No just closes it
 let swatsLeft = 1;   // the first time you go for heads or tails (once per visit) it knocks the buttons away, then snaps
 /** legacy swatsLeft (welcome-back sets it to 0) */ export const setSwats = (n) => { swatsLeft = n; };
+/** how many swats are left this visit (the stage puts it back after an act) */ export const swats = () => swatsLeft;
 
 /** legacy handScene(back). back: you returned after it sent you away, so it greets you differently */
 export async function handScene(back) {
