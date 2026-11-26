@@ -66,7 +66,7 @@ export const RULES = [
   ['mode.changed', ({ crazy }) => { if (!severed.list.size) return; const n = severed.groove(crazy); hand.bob(crazy); if (!crazy && n) hand.notice('danced'); }],   // on: they dance; off: they freeze and pretend, and the arm saw it all
   ['sev.gone', () => { if (!severed.list.size) hand.bob(false); }],               // the last dancer gone: the arm stops bobbing
   // ---- the shelf ----
-  ['hand.reaching', ({ card, fear, dt, t, x }) => cards.panic(card, fear, dt, t, x)], // reach: the card on the shelf panics, bystanders point
+  ['hand.reaching', ({ card, fear, dt, t, x }) => card.kind !== 'coin' && cards.panic(card, fear, dt, t, x)], // reach: the card on the shelf panics, bystanders point (a coin does not: page/coinbody.js)
   ['hand.state', ({ from, to }) => { if (from === 'reach' && to === 'eat') { const c = hand.get(), g = hand.grip(); severed.pounce(c.o, g && [g[0] + scrollX, g[1] + scrollY]); } }],   // the cheese pull: an old hand may jump on the snack
   ['sev.cheese', ({ hand: o, card }) => hand.cheese(o, card)],                    // ...and the arm takes up the fight
   ['hand.cheesed', ({ hand: o, mine }) => severed.cheesed(o, mine)],              // half each, or the old hand is flicked off
@@ -98,6 +98,10 @@ export const RULES = [
   ['hand.devoured', () => ghost.rise()],                                           // the old hand it ate lingers in the banner fog
   ['ghost.roaming', () => { const de = document.documentElement, at = severed.salute({ l: scrollX, t: scrollY, r: scrollX + de.clientWidth, b: scrollY + innerHeight }); if (at) ghost.attend(at); }],   // in the flood: old hands in view walk over to bow to it
   ['sev.state', ({ self, to }) => to === 'bow' && self.ai.fun && self.ai.fun.ghost && ghost.bowBack()],   // ...it bows back
+  // ---- keep the coin (chain coin-keep: src/page/coinbody.js, src/actors/hand/behaviours/bite.js) ----
+  ['hand.state', ({ self, to }) => to === 'reach' && self.o && self.o.kind === 'coin' && cards.spared((o) => shelf.holds(o))],   // coins beat cards: the cards on the shelf are relieved
+  ['coin.paid', ({ key }) => cards.putBack(key, 'card.paid')],                     // the coin went into an empty slot: that card grows back at once
+  ['coin.paid', () => hand.notice('paid')],                                        // ...and the hand saw that
 ];
 
 export function install(app) {

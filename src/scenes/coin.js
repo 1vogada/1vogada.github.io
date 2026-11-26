@@ -6,6 +6,8 @@
 // Timers that legacy did not tie to the scene (the snap's, the puffs', the lost coin's removal) are plain wall timers, so a
 // kill does not cancel them. Emits coin.tossed { side, call }. One toss in a hundred (TUNE.coin.EDGE) lands on its edge and
 // rolls off: the hand gives up and you choose (No then only closes the slip).
+// Keep the coin (chain coin-keep): when the game is over (you won, you lost, or it did not bother), the coin is not removed: it
+// drops onto the page as a body you can keep (page/coinbody.js keep()). A killed scene or an edge toss still takes it away.
 
 import { TIMING, TUNE } from '../core/tune.js';
 import { real, wall, frames } from '../core/clock.js';
@@ -16,6 +18,7 @@ import { isCrazy } from '../world/world.js';
 import { scene, current, GONE } from './scene.js';
 import { dom, st, H, keepShow, endShow, closeFortune } from './fortune.js';
 import { SENT } from './welcome-back.js';
+import { keep } from '../page/coinbody.js';
 const GO_THERE = 'Go there?', HEADS = 'Heads', TAILS = 'Tails';   // page labels
 
 let free = false;   // the coin landed on its edge: until the slip closes, No just closes it
@@ -190,13 +193,13 @@ export async function handScene(back) {
       H_.leave();
       return;
     }
-    if (!side) { my.coin = null; coin.remove(); H_.to({ pose: 'clamp' }); H_.say('idgaf'); }
+    if (!side) { my.coin = null; keep(coin, null); H_.to({ pose: 'clamp' }); H_.say('idgaf'); }
     else {
       my.coin = null; turn(0.55, side === 'heads' ? 'H' : 'T'); coin.style.translate = `${cx.toFixed(0)}px ${(g[1] - 40).toFixed(0)}px`;
       H_.say(side); await sleep(TIMING.wait.result);
       if (side === call) {   // spared
         await sleep(300); H_.to({ pose: 'sulk', bob: false }); const ms = H_.say('won');
-        await sleep(Math.max(TIMING.wait.verdict, ms)); coin.remove(); H_.say('stay');
+        await sleep(Math.max(TIMING.wait.verdict, ms)); keep(coin, side); H_.say('stay');
         await sleep(1500); await poke(document.getElementById('omi-x'));   // it closes the slip for you, then goes back where it came from
         omi.hidden = true; H_.leave();
         qEl.textContent = GO_THERE; actEl.innerHTML = ''; actEl.append(goBtn, noBtn); goBtn.classList.remove('pressed');
@@ -204,7 +207,7 @@ export async function handScene(back) {
         return;
       }
       await sleep(300); H_.to({ pose: 'joy', bob: true }); H_.say('lost');
-      real.after(1500, () => coin.remove());
+      real.after(1500, () => keep(coin, side));
     }
     // it reaches over and presses Yes for you
     await sleep(TIMING.wait.verdict);

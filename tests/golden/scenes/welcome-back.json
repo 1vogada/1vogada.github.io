@@ -57,6 +57,14 @@
    "who": "hand",
    "key": "CLAW_SAY.stay",
    "text": "stay. for now."
+  },
+  {
+   "doc": 1,
+   "t": 14350,
+   "ms": 2034,
+   "who": "card",
+   "key": "coin.land",
+   "text": "nobody spends me today"
   }
  ],
  "states": [
@@ -84,6 +92,19 @@
   },
   {
    "doc": 1,
+   "t": 14370,
+   "claw": "show",
+   "sev": "",
+   "pb": "closed",
+   "kat": "hidden",
+   "shelf": false,
+   "grab": null,
+   "objs": {
+    "coin": 1
+   }
+  },
+  {
+   "doc": 1,
    "t": 17270,
    "claw": "sulk",
    "sev": "",
@@ -91,7 +112,9 @@
    "kat": "hidden",
    "shelf": false,
    "grab": null,
-   "objs": {}
+   "objs": {
+    "coin": 1
+   }
   }
  ]
 }

@@ -456,6 +456,16 @@ export const TUNE = {
     SLIP_SPEED: 520, DAMP: 2.2, WAVE_S: 2.2, WIPES: 4, REST_COVER: 0.3, COVER_MS: 500, BOW_S: 2.6,
     ROAM_SPEED: 260, TAPS: 5, TAP_S: 0.7, TAP_GAP_S: 0.9, CALL_MS: 1000, HOVER_DY: 90, SPOT_PX: 130, DIP_S: 2.2, ATTEND_S: 14, WHISPER_DY: -70,
     SHIVER_MS: 650, SHIVER_PX: 3 },
+  // keep the coin (page/coinbody.js, hand behaviours/bite.js): after the coin game the coin drops onto the page as a D px body (kind
+  // 'coin', a SIDES-gon so it does not roll for ever), popping off at POP m/s with SPIN rad/s, and lands on the screen you are looking
+  // at (a ledge only the coin collides with, LEDGE_BIT, until you pick it up or scroll LEDGE_SCROLL_PX). Caught by the hand (thrown at
+  // it, or taken off the shelf), it is pulled to HOLD_PX from the right edge at RATE, bitten at BITE_S for BITE_LEN s ("fake." at
+  // FAKE_S) and flicked back at FLICK m/s (FLICK_SPIN rad/s) at FLICK_S; then the hand leaves coins alone for COOL_MS. Let go slower
+  // than MAX_SPEED m/s over an empty grid slot (the pointer or the coin's middle), it pays for that card: it shrinks into the slot
+  // in SPENT_MS. MARK_PX: the tooth mark the bite leaves
+  coinKeep: { D: 38, SIDES: 10, DENSITY: 2.2, DAMPING: 0.15, POP: [1.6, -5], SPIN: 7, LEDGE_BIT: 0x4000, LEDGE_SCROLL_PX: 40,
+    HOLD_PX: 120, RATE: 7, BITE_S: 0.8, BITE_LEN: 0.22, FAKE_S: 1.15, FLICK_S: 2.2, FLICK: [-12, -7], FLICK_SPIN: 16, COOL_MS: 3000,
+    MAX_SPEED: 9, SPENT_MS: 380, MARK_PX: 11 },
 };
 
 // ---- timing: how long every speech bubble stays up, how long anyone waits before speaking again, and how long you get to answer ----
