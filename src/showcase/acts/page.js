@@ -99,7 +99,7 @@ async function grab(r, o, still = true) {
   throw new Error('the ghost could not get hold of it');
 }
 /** the ghost lies under the act's own clean-up: no ghost, nothing laid to rest, no flood */
-function ghostAfter(r) { r.after(() => { ghost.reset(); if (kiri.floodState()) kiri.lift(); }); }
+function ghostAfter(r) { ghost.reset(); r.after(() => { ghost.reset(); if (kiri.floodState()) kiri.lift(); }); }
 
 export const PART = {
   id: 'page', title: 'The page',

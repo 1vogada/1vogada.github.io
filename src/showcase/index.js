@@ -126,6 +126,7 @@ async function setScene(r) {
     if (app.shelf && app.shelf.state && app.shelf.state()) app.shelf.toggle();
   }
   if (app.hand && app.hand.reset) app.hand.reset();
+  if (app.ghost && app.ghost.reset) app.ghost.reset();   // a ghost raised by an earlier act (the arm ate an old hand)
   await r.wait(80);
 }
 
