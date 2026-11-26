@@ -525,28 +525,6 @@ export const PART = {
         window.dispatchEvent(new WheelEvent('wheel', { deltaY: -200, bubbles: true }));
         await r.wait(900);
       }, tail: 800 },
-    { id: 'page-word', title: 'Highlight the word "hand": the hand takes it',
-      how: 'Select the word "hand" anywhere on the page and let go: the hand reaches in, pinches the word off the page and drags it away.',
-      shortcut: 'The page has no "hand" written on it, so the stage puts one in a toast, and wakes the hand without a rip.',
-      async play(r) {
-        await r.awake();
-        await r.toGrid(110);
-        await park(r);
-        toast('a word for the hand: hand');
-        const t = $('#toast');
-        await r.until(() => t.classList.contains('show'), 1500);
-        await r.wait(300);
-        const node = t.firstChild, i = node && node.textContent ? node.textContent.lastIndexOf('hand') : -1;
-        if (i < 0) throw new Error('no word to select');
-        const range = document.createRange(); range.setStart(node, i); range.setEnd(node, i + 4);
-        const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
-        r.after(() => getSelection().removeAllRanges());
-        const g = await r.until(() => document.documentElement.classList.contains('hand-show'), 3000);
-        if (!g) throw new Error('the hand did not come for the word');
-        await r.wait(5000);
-      } },
-
-    // ---------------- the cards' looks ----------------
     { id: 'page-tilt', title: 'Cards tilt under the pointer; the embroidery rolls with a swung card',
       how: 'Move the pointer over a card: it tilts towards it and its embroidered band slides; swing a card out of its slot and the band rolls with it.',
       async play(r) {
