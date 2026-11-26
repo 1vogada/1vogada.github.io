@@ -347,10 +347,15 @@ export const PART = {
         ghost.rise();
         await r.until(() => { const g = ghost.get(); return g && g.a >= 1; }, 4000);
         await r.wait(1200);
-        const g = ghost.get(); if (!g) throw new Error('no ghost');
-        const gy = g.y - scrollY;
-        await r.glide(g.x - 200, gy - 10);
-        await r.line(g.x - 200, gy - 10, g.x + 200, gy + 10, 10, 16);
+        for (let k = 0; k < 4; k++) {
+          const g = ghost.get(); if (!g) throw new Error('no ghost');
+          if (g.hits > 0) break;
+          await r.glide(g.x - 220, g.y - scrollY - 10, 40);
+          const gx = g.x, gy = g.y - scrollY;   // where it is now (it drifts)
+          await r.move(gx - 200, gy - 10, 0);
+          await r.line(gx - 200, gy - 10, gx + 200, gy + 10, 10, 16);
+          await r.wait(1200);
+        }
         await park(r);
         await r.wait(3500);
       } },
@@ -480,11 +485,11 @@ export const PART = {
       async play(r) {
         r.after(() => omikuji.off());
         unfocus();
-        await r.toGrid(110);
+        await toBox(r, 380);
         for (const k of ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a']) { await r.key(k); await r.wait(120); }
         await r.until(() => $('#grid .card .omi-card'), 2000);
         await r.wait(1500);
-        const p = await r.tugOut(0, { dx: 160, dy: -120 });
+        const p = await r.tugOut(0);
         await r.wait(2600);
         await r.line(p[0], p[1], p[0] + 60, p[1] + 40, 12);
         await r.up();
